@@ -1,5 +1,6 @@
 import { Stack } from "expo-router";
 import { useState } from "react";
+import "./globals.css";
 
 export default function RootLayout() {
   const [firstLaunch, setFirstLaunch] = useState(true);

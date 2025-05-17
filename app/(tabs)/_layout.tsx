@@ -1,4 +1,4 @@
-import { IconSymbol } from "@/components/ui/IconSymbol";
+import { IconRenderer } from "@/components/ui/IconRenderer";
 import { Tabs } from "expo-router";
 import React from "react";
 import { Platform } from "react-native";
@@ -24,7 +24,12 @@ export default function TabLayout() {
         options={{
           title: "Home",
           tabBarIcon: ({ color }) => (
-            <IconSymbol size={28} name="house.fill" color={color} />
+            <IconRenderer
+              size={28}
+              name="home"
+              color={color}
+              type="material-community"
+            />
           ),
         }}
       />
@@ -33,7 +38,12 @@ export default function TabLayout() {
         options={{
           title: "Community",
           tabBarIcon: ({ color }) => (
-            <IconSymbol size={28} name="paperplane.fill" color={color} />
+            <IconRenderer
+              size={28}
+              name="community"
+              color={color}
+              type="material-community"
+            />
           ),
         }}
       />
@@ -42,7 +52,12 @@ export default function TabLayout() {
         options={{
           title: "Services",
           tabBarIcon: ({ color }) => (
-            <IconSymbol size={28} name="paperplane.fill" color={color} />
+            <IconRenderer
+              size={28}
+              name="services"
+              color={color}
+              type="material"
+            />
           ),
         }}
       />
@@ -51,7 +66,12 @@ export default function TabLayout() {
         options={{
           title: "Settings",
           tabBarIcon: ({ color }) => (
-            <IconSymbol size={28} name="paperplane.fill" color={color} />
+            <IconRenderer
+              size={28}
+              name="settings"
+              color={color}
+              type="material"
+            />
           ),
         }}
       />
