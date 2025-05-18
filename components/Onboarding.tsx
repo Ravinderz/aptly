@@ -64,7 +64,7 @@ const Onboarding = () => {
   return (
     <SafeAreaView style={styles.container}>
       <View>
-        <TouchableOpacity onPress={() => alert("Onboarding Completed")}>
+        <TouchableOpacity onPress={() => handleButtonPress()}>
           <Text style={styles.skipBtnText}>Skip</Text>
         </TouchableOpacity>
       </View>

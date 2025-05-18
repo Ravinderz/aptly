@@ -1,5 +1,6 @@
 import { Stack } from "expo-router";
 import { useState } from "react";
+import { SafeAreaView } from "react-native-safe-area-context";
 import "./globals.css";
 
 export default function RootLayout() {
@@ -20,9 +21,11 @@ export default function RootLayout() {
   // return  firstLaunch ? <Onboarding /> : <Tabs />;
 
   return (
-    <Stack>
-      <Stack.Screen name="index" />
-      <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-    </Stack>
+    <SafeAreaView style={{ flex: 1 }}>
+      <Stack>
+        <Stack.Screen name="index" options={{ headerShown: false }} />
+        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+      </Stack>
+    </SafeAreaView>
   );
 }

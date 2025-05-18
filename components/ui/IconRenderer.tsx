@@ -6,6 +6,17 @@ const IconMapping = {
   community: "home-city-outline",
   services: "design-services",
   settings: "settings",
+  notifications: "bell-ring-outline",
+  messages: "message-processing-outline",
+  alert_icons: {
+    general: "add-alert",
+    alert_circle: "alert-circle-outline",
+    garbage: "delete-alert",
+    fire: "fire-alert",
+    electricity: "flash-alert",
+    security: "shield-alert",
+    water: "water-alert",
+  },
 };
 
 export function IconRenderer({
@@ -22,20 +33,27 @@ export function IconRenderer({
   weight?: string;
   type?: string;
 }) {
+  const getName = (name: string) => {
+    if (name.split(".")[0] === "alert_icons") {
+      return IconMapping[name.split(".")[0]][name.split(".")[1]];
+    }
+    return IconMapping[name];
+  };
+
   switch (type) {
     case "material":
       return (
         <MaterialIcons
           color={color}
           size={size}
-          name={IconMapping[name]}
+          name={getName(name)}
           style={style}
         />
       );
     case "material-community":
       return (
         <MaterialCommunityIcons
-          name={IconMapping[name]}
+          name={getName(name)}
           size={size}
           color={color}
           style={style}
@@ -46,7 +64,7 @@ export function IconRenderer({
         <MaterialIcons
           color={color}
           size={size}
-          name={IconMapping[name]}
+          name={getName(name)}
           style={style}
         />
       );
