@@ -1,14 +1,12 @@
 import React from "react";
-import { ScrollView, Text, View } from "react-native";
+import { ScrollView, View } from "react-native";
 import ElevatedButton from "./ui/ElevatedButton";
+import SectionHeading from "./ui/SectionHeading";
 
 const VisitorHorizontalScrollSection = () => {
   return (
     <View className="mt-4 mb-8 flex gap-8">
-      <View className="flex flex-row justify-between items-center">
-        <Text className="text-xl font-bold">Visitor Section</Text>
-        <Text className="font-bold color-blue-800">View All</Text>
-      </View>
+      <SectionHeading heading="Visitors" />
       <ScrollView
         horizontal
         showsHorizontalScrollIndicator={false}
@@ -19,7 +17,10 @@ const VisitorHorizontalScrollSection = () => {
         scrollEventThrottle={16}
         alwaysBounceHorizontal
       >
-        <ElevatedButton label="Add Visitor" />
+        <ElevatedButton label="Amazon Delivery" />
+        <ElevatedButton label="Blinkit Delivery" />
+        <ElevatedButton label="Nishant" />
+        <ElevatedButton label="Swiggy Delivery" />
         <ElevatedButton label="Amazon Delivery" />
       </ScrollView>
     </View>

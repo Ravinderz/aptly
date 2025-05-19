@@ -34,6 +34,15 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
+        name="visitor"
+        options={{
+          title: "Visitors",
+          tabBarIcon: ({ color }) => (
+            <IconRenderer size={28} name="visitor" color={color} />
+          ),
+        }}
+      />
+      <Tabs.Screen
         name="community"
         options={{
           title: "Community",

@@ -1,19 +1,17 @@
 import React from "react";
-import { Text, View } from "react-native";
+import { View } from "react-native";
 import QuickActionButton from "./ui/QuickActionButton";
+import SectionHeading from "./ui/SectionHeading";
 
 const QuickActions = () => {
   return (
     <View className="flex gap-2">
-      <View className="flex flex-row justify-between items-center pb-6">
-        <Text className="text-xl font-bold">Quick Actions</Text>
-        <Text className="font-bold color-blue-800">View All</Text>
-      </View>
+      <SectionHeading heading="Quick Actions" />
       <View className="flex flex-row gap-4 flex-wrap">
-        <QuickActionButton label="Add Visitor" />
-        <QuickActionButton label="Request Service" />
-        <QuickActionButton label="Request maintenance" />
-        <QuickActionButton label="Raise Compliant" />
+        <QuickActionButton label="Add Visitor" icon="visitor-add" />
+        <QuickActionButton label="Request Service" icon="service-add" />
+        <QuickActionButton label="Request maintenance" icon="maintenance-add" />
+        <QuickActionButton label="Raise Compliant" icon="compliant-add" />
       </View>
     </View>
   );

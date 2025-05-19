@@ -1,13 +1,29 @@
 import React from "react";
-import { Platform, StyleSheet, Text, TouchableOpacity } from "react-native";
+import {
+  Platform,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
+import { IconRenderer } from "./IconRenderer";
 
-const QuickActionButton = ({ label }: { label: string }) => {
+const QuickActionButton = ({
+  label,
+  icon,
+}: {
+  label: string;
+  icon: string;
+}) => {
   return (
     <TouchableOpacity
       className="h-24 w-52 flex items-center justify-center rounded-lg bg-white"
       style={styles.button}
     >
-      <Text className="font-bold">{label}</Text>
+      <View className="flex gap-2 items-center">
+        <IconRenderer name={icon} size={30} color="black" />
+        <Text className="font-bold">{label}</Text>
+      </View>
     </TouchableOpacity>
   );
 };

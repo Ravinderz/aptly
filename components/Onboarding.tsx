@@ -142,7 +142,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   skipBtnText: {
-    color: Colors.accent,
+    color: Colors.secondary,
     fontSize: 14,
     marginTop: 20,
     marginRight: 20,

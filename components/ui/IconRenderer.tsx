@@ -8,6 +8,12 @@ const IconMapping = {
   settings: "settings",
   notifications: "bell-ring-outline",
   messages: "message-processing-outline",
+  visitor: "people-alt",
+  add: "add-circle-outline",
+  "visitor-add": "person-add-alt-1",
+  "service-add": "build-circle",
+  "maintenance-add": "home-repair-service",
+  "compliant-add": "phone-in-talk",
   alert_icons: {
     general: "add-alert",
     alert_circle: "alert-circle-outline",
