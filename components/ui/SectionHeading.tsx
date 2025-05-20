@@ -5,7 +5,7 @@ import LinkButton from "./LinkButton";
 const SectionHeading = ({ heading }: { heading: string }) => {
   return (
     <View className="flex flex-row justify-between items-center pb-6">
-      <Text className="text-xl font-bold">{heading}</Text>
+      <Text className="text-xl font-semibold">{heading}</Text>
       <LinkButton label="View All" />
     </View>
   );

@@ -4,7 +4,7 @@ import HomeHeader from "../HomeHeader";
 
 const Header = ({ children }: { children: ReactNode }) => {
   return (
-    <View className="flex flex-1 bg-[#fed0b5] border-t-2 border-[#d59f7e]">
+    <View className="flex flex-1">
       <HomeHeader />
       <ScrollView
         className="flex flex-1"
@@ -12,7 +12,10 @@ const Header = ({ children }: { children: ReactNode }) => {
         showsVerticalScrollIndicator={false}
         alwaysBounceVertical
       >
-        <View className="flex h-full p-4 rounded-t-3xl bg-[#fff5ee] mb-8">
+        <View
+          className="flex h-full p-4 mb-8"
+          style={{ backgroundColor: "#f8fafc" }}
+        >
           {children}
         </View>
       </ScrollView>
