@@ -20,7 +20,7 @@ import {
 } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 
-const visitor = () => {
+const Visitor = () => {
   const router = useRouter();
 
   const [selectedVisitor, setSelectedVisitor] = useState<{
@@ -149,6 +149,7 @@ const visitor = () => {
               name="Nishant"
               date="Today"
               time="10:00 AM"
+              type="upcoming"
               status="Pre-approved"
               handleClick={(name: any, date: any, time: any, status: any) =>
                 handlePresentModalPress(
@@ -164,12 +165,28 @@ const visitor = () => {
               date="Today"
               time="11:00 AM"
               status="Approved"
+              type="upcoming"
               handleClick={(name: any, date: any, time: any, status: any) =>
                 handlePresentModalPress(
                   "Amazon Delivery",
                   "Today",
                   "10:00 AM",
                   "Approved"
+                )
+              }
+            />
+            <VisitorListItem
+              name="Blinkit Delivery"
+              date="Today"
+              time="11:00 AM"
+              status="Pending"
+              type="upcoming"
+              handleClick={(name: any, date: any, time: any, status: any) =>
+                handlePresentModalPress(
+                  "Blinkit Delivery",
+                  "Today",
+                  "10:00 AM",
+                  "Pending"
                 )
               }
             />
@@ -189,6 +206,7 @@ const visitor = () => {
               date="Today"
               time="10:00 AM"
               status="Pre-approved"
+              type="past"
               handleClick={(name: any, date: any, time: any, status: any) =>
                 handlePresentModalPress(
                   "Nishant",
@@ -203,6 +221,7 @@ const visitor = () => {
               date="Today"
               time="09:00 AM"
               status="Rejected"
+              type="past"
               handleClick={(name: any, date: any, time: any, status: any) =>
                 handlePresentModalPress(
                   "Blibkit Delivery",
@@ -227,4 +246,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default visitor;
+export default Visitor;

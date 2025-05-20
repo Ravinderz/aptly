@@ -21,7 +21,7 @@ const QuickActionButton = ({
       style={styles.button}
     >
       <View className="flex gap-2 items-center">
-        <IconRenderer name={icon} size={30} color="black" />
+        <IconRenderer name={icon} size={28} color="black" />
         <Text className="font-bold">{label}</Text>
       </View>
     </TouchableOpacity>

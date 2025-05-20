@@ -15,6 +15,7 @@ module.exports = {
         neutral: "#f89b7c",
         accent_primary: "#22B07D",
         accent_secondary: "#f58c5b",
+        alert: "#DF3F40",
         "border-color": "#E3E6EA",
       },
     },

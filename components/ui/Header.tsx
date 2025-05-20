@@ -10,7 +10,6 @@ const Header = ({ children }: { children: ReactNode }) => {
         className="flex flex-1"
         contentContainerStyle={{ flexGrow: 1 }}
         showsVerticalScrollIndicator={false}
-        alwaysBounceVertical
       >
         <View
           className="flex h-full p-4 mb-8"
