@@ -5,7 +5,7 @@ import SectionHeading from "./ui/SectionHeading";
 
 const VisitorHorizontalScrollSection = () => {
   return (
-    <View className="mt-4 mb-8 flex gap-8">
+    <View className="mt-4 mb-8 flex gap">
       <SectionHeading heading="Visitors" />
       <ScrollView
         horizontal
@@ -14,8 +14,6 @@ const VisitorHorizontalScrollSection = () => {
           gap: 14,
           padding: 2,
         }}
-        scrollEventThrottle={16}
-        alwaysBounceHorizontal
       >
         <ElevatedButton label="Amazon Delivery" />
         <ElevatedButton label="Blinkit Delivery" />

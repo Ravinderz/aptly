@@ -23,7 +23,7 @@
 
 /* CVS */
 
-export const colors = {
+export const Colors = {
   primary: "#16519f",
   secondary: "#f07e74",
   dark: "#f8dd2e",
