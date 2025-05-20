@@ -33,7 +33,7 @@ const VisitorListItem: React.FC<VisitorListItemProps> = ({
       <View className="flex gap-2">
         <View className="flex flex-row gap-2 items-center">
           {/* <IconRenderer name="visitor" size={40} color="black" /> */}
-          <Text className="text-2xl font-bold bg-sky-900 text-white rounded-full flex items-center justify-center p-3">
+          <Text className="text-2xl font-bold bg-secondary text-white rounded-full flex items-center justify-center p-3">
             {getLetters(name)}
           </Text>
           <Text className="text-xl font-semibold">{name}</Text>
@@ -50,7 +50,7 @@ const VisitorListItem: React.FC<VisitorListItemProps> = ({
       <View className="flex  gap-4 items-end">
         <Text
           className={`text-md font-medium rounded-lg ${
-            status === "Rejected" ? "bg-[#df493d] text-white" : "bg-[#fed0b5]"
+            status === "Rejected" ? "bg-[#df493d] text-white" : "bg-secondary"
           } p-4 w-36 text-center`}
         >
           {status}

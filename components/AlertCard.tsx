@@ -10,7 +10,7 @@ const AlertCard = () => {
         <Text className="text-xl font-bold">Notices</Text>
         <LinkButton label="View All" />
       </View>
-      <View className="flex gap-4 bg-[#fed0b5] h-48 rounded-xl p-4 border-2 border-[##d59f7e]">
+      <View className="flex gap-4 bg-primary h-48 rounded-xl p-4 border-2 border-primary-dark">
         <View className="flex flex-row gap-4 items-center">
           <IconRenderer
             name="alert_icons.alert_circle"

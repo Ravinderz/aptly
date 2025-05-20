@@ -4,6 +4,7 @@ import React from "react";
 import { Platform } from "react-native";
 
 export default function TabLayout() {
+  const activeColor = "#f89b7c";
   return (
     <Tabs
       screenOptions={{
@@ -22,12 +23,13 @@ export default function TabLayout() {
       <Tabs.Screen
         name="index"
         options={{
+          tabBarActiveTintColor: activeColor,
           title: "Home",
-          tabBarIcon: ({ color }) => (
+          tabBarIcon: ({ focused, color }) => (
             <IconRenderer
               size={28}
               name="home"
-              color={color}
+              color={focused ? activeColor : color}
               type="material-community"
             />
           ),
@@ -36,21 +38,27 @@ export default function TabLayout() {
       <Tabs.Screen
         name="visitor"
         options={{
+          tabBarActiveTintColor: activeColor,
           title: "Visitors",
-          tabBarIcon: ({ color }) => (
-            <IconRenderer size={28} name="visitor" color={color} />
+          tabBarIcon: ({ focused, color }) => (
+            <IconRenderer
+              size={28}
+              name="visitor"
+              color={focused ? activeColor : color}
+            />
           ),
         }}
       />
       <Tabs.Screen
         name="community"
         options={{
+          tabBarActiveTintColor: activeColor,
           title: "Community",
-          tabBarIcon: ({ color }) => (
+          tabBarIcon: ({ focused, color }) => (
             <IconRenderer
               size={28}
               name="community"
-              color={color}
+              color={focused ? activeColor : color}
               type="material-community"
             />
           ),
@@ -59,12 +67,13 @@ export default function TabLayout() {
       <Tabs.Screen
         name="services"
         options={{
+          tabBarActiveTintColor: activeColor,
           title: "Services",
-          tabBarIcon: ({ color }) => (
+          tabBarIcon: ({ focused, color }) => (
             <IconRenderer
               size={28}
               name="services"
-              color={color}
+              color={focused ? activeColor : color}
               type="material"
             />
           ),
@@ -73,12 +82,13 @@ export default function TabLayout() {
       <Tabs.Screen
         name="settings"
         options={{
+          tabBarActiveTintColor: activeColor,
           title: "Settings",
-          tabBarIcon: ({ color }) => (
+          tabBarIcon: ({ focused, color }) => (
             <IconRenderer
               size={28}
               name="settings"
-              color={color}
+              color={focused ? activeColor : color}
               type="material"
             />
           ),
