@@ -1,4 +1,4 @@
-import { Clock } from "lucide-react-native";
+import { CalendarDays, Check, Clock, List, X } from "lucide-react-native";
 import React from "react";
 import { Text, TouchableOpacity, View } from "react-native";
 
@@ -29,24 +29,24 @@ const VisitorListItem: React.FC<VisitorListItemProps> = ({
 
   return (
     <View
-      className=" bg-white border border-border-color rounded-lg p-4"
+      className=" bg-white border border-border-color rounded-lg p-4 mb-3"
       style={{ elevation: 0.25 }}
     >
       <View className="flex flex-row justify-between gap-4">
         <View className="flex gap-2">
           <View className="flex flex-row gap-3 items-center">
             {/* <IconRenderer name="visitor" size={40} color="black" /> */}
-            <Text className="text-xl font-bold bg-primary/10 text-primary rounded-full flex items-center justify-center p-3">
+            <Text className="text-md font-bold bg-primary/10 text-primary rounded-full flex items-center justify-center p-3">
               {getLetters(name)}
             </Text>
-            <Text className="text-lg font-medium">{name}</Text>
+            <Text className="text-md font-medium">{name}</Text>
           </View>
           <View className="flex mt-1">
             <Text className="text-sm font-medium text-zinc-500">
               <View className="flex flex-row gap-2 items-center px-1">
-                <Clock size={20} color="#6b7280" strokeWidth={1.5} />
-                <Text className="text-md text-gray-500">
-                  {date} {time}
+                <Clock size={16} color="#6b7280" strokeWidth={1.5} />
+                <Text className="text-sm text-gray-500">
+                  {date}, {time}
                 </Text>
               </View>
             </Text>
@@ -54,7 +54,7 @@ const VisitorListItem: React.FC<VisitorListItemProps> = ({
         </View>
         <View className="flex gap-4 items-end">
           <Text
-            className={`text-md font-medium rounded-lg ${
+            className={`text-sm font-medium rounded-full ${
               status === "Rejected"
                 ? "bg-[#df493d]/10 text-[#df493d]"
                 : status === "Approved" || status === "Pre-Approved"
@@ -73,26 +73,41 @@ const VisitorListItem: React.FC<VisitorListItemProps> = ({
       </View>
       {type !== "past" && (
         <View className="flex flex-row space-x-2 gap-4 mt-3">
-          <TouchableOpacity
-            className="py-3 bg-primary rounded-lg w-48"
-            onPress={handleClick}
-          >
-            <Text className="text-md font-semibold text-white text-center">
-              {status === "Approved" || status === "Pre-approved"
-                ? "Reschedule"
-                : "Approve"}
-            </Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            className="py-3 rounded-lg border border-border-color w-48"
-            onPress={handleClick}
-          >
-            <Text className="text-md font-semibold text-grey-500 text-center">
-              {status === "Approved" || status === "Pre-approved"
-                ? "View Details"
-                : "Deny"}
-            </Text>
-          </TouchableOpacity>
+          <View className="flex-1">
+            <TouchableOpacity
+              className="py-3 bg-primary rounded-lg flex flex-row w-full items-center justify-center gap-2"
+              onPress={handleClick}
+            >
+              {status === "Approved" || status === "Pre-approved" ? (
+                <CalendarDays size={16} color="#fff" strokeWidth={2} />
+              ) : (
+                <Check size={16} color="#fff" strokeWidth={2} />
+              )}
+
+              <Text className="text-sm font-semibold text-white text-center">
+                {status === "Approved" || status === "Pre-approved"
+                  ? "Reschedule"
+                  : "Approve"}
+              </Text>
+            </TouchableOpacity>
+          </View>
+          <View className="flex-1">
+            <TouchableOpacity
+              className="py-3 rounded-lg border border-border-color w-full flex flex-row items-center justify-center gap-2"
+              onPress={handleClick}
+            >
+              {status === "Approved" || status === "Pre-approved" ? (
+                <List size={16} color="#6b7280" strokeWidth={2} />
+              ) : (
+                <X size={16} color="#6b7280" strokeWidth={2} />
+              )}
+              <Text className="text-sm font-semibold text-grey-500 text-center">
+                {status === "Approved" || status === "Pre-approved"
+                  ? "View Details"
+                  : "Deny"}
+              </Text>
+            </TouchableOpacity>
+          </View>
         </View>
       )}
     </View>
