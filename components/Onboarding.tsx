@@ -108,13 +108,13 @@ const styles = StyleSheet.create({
     padding: 40,
   },
   image: {
-    width: 400,
-    height: 400,
+    width: 300,
+    height: 300,
     marginBottom: 60,
   },
   image2: {
-    width: 400,
-    height: 400,
+    width: 300,
+    height: 300,
     marginBottom: 60,
     resizeMode: "contain",
   },

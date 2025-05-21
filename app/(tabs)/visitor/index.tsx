@@ -149,7 +149,6 @@ const Visitor = () => {
             />
             <ScrollView
               contentContainerStyle={{
-                gap: 8,
                 padding: 2,
               }}
               scrollEventThrottle={16}
@@ -208,7 +207,6 @@ const Visitor = () => {
             />
             <ScrollView
               contentContainerStyle={{
-                gap: 8,
                 padding: 2,
               }}
               scrollEventThrottle={16}

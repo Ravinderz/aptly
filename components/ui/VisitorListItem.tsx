@@ -1,6 +1,7 @@
 import { CalendarDays, Check, Clock, List, X } from "lucide-react-native";
 import React from "react";
 import { Text, TouchableOpacity, View } from "react-native";
+import UserAvatar from "./UserAvatar";
 
 interface VisitorListItemProps {
   name: string;
@@ -29,16 +30,14 @@ const VisitorListItem: React.FC<VisitorListItemProps> = ({
 
   return (
     <View
-      className=" bg-white border border-border-color rounded-lg p-4 mb-3"
+      className=" bg-white border border-border-color rounded-lg p-4 mb-2"
       style={{ elevation: 0.25 }}
     >
       <View className="flex flex-row justify-between gap-4">
         <View className="flex gap-2">
           <View className="flex flex-row gap-3 items-center">
             {/* <IconRenderer name="visitor" size={40} color="black" /> */}
-            <Text className="text-md font-bold bg-primary/10 text-primary rounded-full flex items-center justify-center p-3">
-              {getLetters(name)}
-            </Text>
+            <UserAvatar name={name} />
             <Text className="text-md font-medium">{name}</Text>
           </View>
           <View className="flex mt-1">

@@ -9,14 +9,20 @@ export default function TabLayout() {
     <Tabs
       screenOptions={{
         headerShown: false,
-        // tabBarButton: HapticTab,
-        // tabBarBackground: TabBarBackground,
+        tabBarActiveTintColor: activeColor,
+        tabBarIconStyle: {
+          marginTop: 7,
+        },
         tabBarStyle: Platform.select({
           ios: {
             // Use a transparent background on iOS to show the blur effect
             position: "absolute",
           },
-          default: {},
+          default: {
+            marginBottom: 0,
+            elevation: 0,
+            height: 70,
+          },
         }),
       }}
     >
@@ -27,7 +33,7 @@ export default function TabLayout() {
           title: "Home",
           tabBarIcon: ({ focused, color }) => (
             <IconRenderer
-              size={28}
+              size={24}
               name="home"
               color={focused ? activeColor : color}
               type="material-community"
@@ -42,7 +48,7 @@ export default function TabLayout() {
           title: "Visitors",
           tabBarIcon: ({ focused, color }) => (
             <IconRenderer
-              size={28}
+              size={24}
               name="visitor"
               color={focused ? activeColor : color}
             />
@@ -56,7 +62,7 @@ export default function TabLayout() {
           title: "Community",
           tabBarIcon: ({ focused, color }) => (
             <IconRenderer
-              size={28}
+              size={24}
               name="community"
               color={focused ? activeColor : color}
               type="material-community"
@@ -71,7 +77,7 @@ export default function TabLayout() {
           title: "Services",
           tabBarIcon: ({ focused, color }) => (
             <IconRenderer
-              size={28}
+              size={24}
               name="services"
               color={focused ? activeColor : color}
               type="material"
@@ -86,7 +92,7 @@ export default function TabLayout() {
           title: "Settings",
           tabBarIcon: ({ focused, color }) => (
             <IconRenderer
-              size={28}
+              size={24}
               name="settings"
               color={focused ? activeColor : color}
               type="material"
