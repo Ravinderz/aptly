@@ -1,50 +1,50 @@
-# Welcome to your Expo app 👋
+# aptly
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+A mobile application for community living, facilitating visitor management, community interactions, service access, and user settings.
 
-## Get started
+## Features
 
-1. Install dependencies
+-   **Home**: Displays a summary of community activities, quick access to common features, and important notifications.
+-   **Visitors**: Manage guest access, pre-authorize visitors, and view visitor history.
+-   **Community**: A platform for residents to share posts, view announcements, and engage in discussions.
+-   **Services**: Access to community amenities, book facilities, or request services offered within the community.
+-   **Settings**: Manage user profile information, application preferences, and notification settings.
 
-   ```bash
-   npm install
-   ```
+## Technologies Used
 
-2. Start the app
+-   React Native
+-   Expo
+-   TypeScript
+-   NativeWind (Tailwind CSS)
+-   React Navigation
+-   Gorhom Bottom Sheet
 
-   ```bash
-   npx expo start
-   ```
+## Getting Started
 
-In the output, you'll find options to open the app in a
+### Prerequisites
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+-   Node.js and npm/yarn installed.
+-   Expo CLI installed (`npm install -g expo-cli`).
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+### Installation
 
-## Get a fresh project
+1.  Clone the repository: `git clone <repository-url>`
+2.  Install dependencies: `npm install`
 
-When you're ready, run:
+### Running the Application
 
-```bash
-npm run reset-project
-```
+-   To run on Android: `npm run android`
+-   To run on iOS: `npm run ios`
+-   To run on the web: `npm run web`
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+### Linting
 
-## Learn more
+-   To lint the code: `npm run lint`
 
-To learn more about developing your project with Expo, look at the following resources:
+## Contributing
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+Contributions are welcome! Please feel free to open an issue to discuss a new feature or bug, or submit a pull request with your changes.
 
-## Join the community
+## License
 
-Join our community of developers creating universal apps.
-
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+Please see the LICENSE file for more information. If no LICENSE file exists, the license information is TBD.
