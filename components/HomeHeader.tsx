@@ -1,7 +1,6 @@
-import { MapPinHouse } from "lucide-react-native";
+import { BellRing, MapPinHouse, MessageSquareMore } from "lucide-react-native";
 import React from "react";
 import { Text, TouchableOpacity, View } from "react-native";
-import { IconRenderer } from "./ui/IconRenderer";
 
 const HomeHeader = () => {
   return (
@@ -13,20 +12,10 @@ const HomeHeader = () => {
 
       <View className="flex flex-row gap-5">
         <TouchableOpacity>
-          <IconRenderer
-            name="notifications"
-            size={18}
-            color="#4b5563"
-            type="material-community"
-          />
+          <BellRing size={18} color="#4b5563" strokeWidth={2} />
         </TouchableOpacity>
         <TouchableOpacity>
-          <IconRenderer
-            name="messages"
-            size={18}
-            color="#4b5563"
-            type="material-community"
-          />
+          <MessageSquareMore size={18} color="#4b5563" strokeWidth={2} />
         </TouchableOpacity>
       </View>
     </View>

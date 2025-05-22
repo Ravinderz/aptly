@@ -1,7 +1,7 @@
+import AptlySearchBar from "@/components/ui/AptlySearchBar";
 import Header from "@/components/ui/Header";
 import PillFilter from "@/components/ui/PillFilter";
 import PostCard from "@/components/ui/PostCard";
-import { Search } from "lucide-react-native";
 import {
   ScrollView,
   Text,
@@ -31,21 +31,7 @@ export default function Community() {
         </TouchableOpacity>
       </View>
       <View>
-        <View className="flex-1 relative">
-          <View className="absolute right-4 top-3">
-            <Search size={18} color="#6366f1" />
-          </View>
-          <TextInput
-            placeholder="Search Posts..."
-            cursorColor={"#6366f1"}
-            className="w-full p-2 border border-border-color rounded-lg mb-2 bg-primary/10 text-primary text-lg "
-            placeholderTextColor="#9CA3AF"
-            multiline={true}
-            textAlignVertical="top"
-            onChangeText={() => {}}
-            numberOfLines={6}
-          />
-        </View>
+        <AptlySearchBar placeholder="Search Community..." />
         <ScrollView
           className="flex flex-row gap-3 mt-4"
           horizontal

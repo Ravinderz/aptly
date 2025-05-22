@@ -1,5 +1,11 @@
-import { IconRenderer } from "@/components/ui/IconRenderer";
 import { Tabs } from "expo-router";
+import {
+  Building2,
+  House,
+  PencilRuler,
+  Settings2,
+  Users2,
+} from "lucide-react-native";
 import React from "react";
 import { Platform } from "react-native";
 
@@ -11,13 +17,10 @@ export default function TabLayout() {
         headerShown: false,
         tabBarActiveTintColor: activeColor,
         tabBarIconStyle: {
-          marginTop: 7,
+          marginTop: 2,
         },
         tabBarStyle: Platform.select({
-          ios: {
-            // Use a transparent background on iOS to show the blur effect
-            position: "absolute",
-          },
+          ios: {},
           default: {
             marginBottom: 0,
             elevation: 0,
@@ -32,12 +35,7 @@ export default function TabLayout() {
           tabBarActiveTintColor: activeColor,
           title: "Home",
           tabBarIcon: ({ focused, color }) => (
-            <IconRenderer
-              size={24}
-              name="home"
-              color={focused ? activeColor : color}
-              type="material-community"
-            />
+            <House size={18} color={focused ? activeColor : color} />
           ),
         }}
       />
@@ -47,11 +45,7 @@ export default function TabLayout() {
           tabBarActiveTintColor: activeColor,
           title: "Visitors",
           tabBarIcon: ({ focused, color }) => (
-            <IconRenderer
-              size={24}
-              name="visitor"
-              color={focused ? activeColor : color}
-            />
+            <Users2 size={18} color={focused ? activeColor : color} />
           ),
         }}
       />
@@ -61,12 +55,7 @@ export default function TabLayout() {
           tabBarActiveTintColor: activeColor,
           title: "Community",
           tabBarIcon: ({ focused, color }) => (
-            <IconRenderer
-              size={24}
-              name="community"
-              color={focused ? activeColor : color}
-              type="material-community"
-            />
+            <Building2 size={18} color={focused ? activeColor : color} />
           ),
         }}
       />
@@ -76,12 +65,7 @@ export default function TabLayout() {
           tabBarActiveTintColor: activeColor,
           title: "Services",
           tabBarIcon: ({ focused, color }) => (
-            <IconRenderer
-              size={24}
-              name="services"
-              color={focused ? activeColor : color}
-              type="material"
-            />
+            <PencilRuler size={18} color={focused ? activeColor : color} />
           ),
         }}
       />
@@ -91,12 +75,7 @@ export default function TabLayout() {
           tabBarActiveTintColor: activeColor,
           title: "Settings",
           tabBarIcon: ({ focused, color }) => (
-            <IconRenderer
-              size={24}
-              name="settings"
-              color={focused ? activeColor : color}
-              type="material"
-            />
+            <Settings2 size={18} color={focused ? activeColor : color} />
           ),
         }}
       />

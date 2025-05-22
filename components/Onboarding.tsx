@@ -100,7 +100,7 @@ const Onboarding = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: Colors.white,
+    backgroundColor: "#FFF",
   },
   slide: {
     justifyContent: "center",
@@ -158,7 +158,7 @@ const styles = StyleSheet.create({
     borderRadius: 40,
   },
   startBtnText: {
-    color: Colors.white,
+    color: "#fff",
     fontSize: 18,
     fontWeight: "bold",
   },
