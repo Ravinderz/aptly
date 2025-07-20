@@ -100,7 +100,7 @@ const Onboarding = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: Colors.white,
+    backgroundColor: "#FFF",
   },
   slide: {
     justifyContent: "center",
@@ -108,13 +108,13 @@ const styles = StyleSheet.create({
     padding: 40,
   },
   image: {
-    width: 400,
-    height: 400,
+    width: 300,
+    height: 300,
     marginBottom: 60,
   },
   image2: {
-    width: 400,
-    height: 400,
+    width: 300,
+    height: 300,
     marginBottom: 60,
     resizeMode: "contain",
   },
@@ -158,7 +158,7 @@ const styles = StyleSheet.create({
     borderRadius: 40,
   },
   startBtnText: {
-    color: Colors.white,
+    color: "#fff",
     fontSize: 18,
     fontWeight: "bold",
   },
