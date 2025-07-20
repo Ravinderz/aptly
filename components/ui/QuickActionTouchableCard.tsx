@@ -1,6 +1,7 @@
 import React from "react";
 import { Text, TouchableOpacity, View } from "react-native";
 import LucideIcons from "./LucideIcons";
+import { cn } from "../../utils/cn";
 
 const QuickActionTouchableCard = ({
   label,
@@ -15,15 +16,18 @@ const QuickActionTouchableCard = ({
 }) => {
   return (
     <TouchableOpacity
-      className="h-28 flex items-center justify-center rounded-lg bg-white border border-border-color w-full"
+      className={cn(
+        "h-28 flex items-center justify-center rounded-xl bg-surface border border-divider w-full",
+        "shadow-sm shadow-black/5"
+      )}
       onPress={onPress}
-      activeOpacity={0.3}
+      activeOpacity={0.7}
     >
       <View className="flex gap-2 items-center">
         <View className="rounded-3xl p-3 bg-primary/10">
-          <LucideIcons name={icon} size={28} color={color} />
+          <LucideIcons name={icon} size={28} color={color || "#FF6B35"} />
         </View>
-        <Text className="text-sm font-semibold">{label}</Text>
+        <Text className="text-sm font-semibold text-text-primary">{label}</Text>
       </View>
     </TouchableOpacity>
   );
