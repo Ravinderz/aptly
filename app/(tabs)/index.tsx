@@ -1,13 +1,13 @@
 import AlertCard from "@/components/AlertCard";
 import QuickActions from "@/components/QuickActions";
 import Header from "@/components/ui/Header";
-import VisitorHorizontalScrollSection from "@/components/VisitorHorizontalScrollSection";
+import UpcomingVisitorSection from "@/components/UpcomingVisitorSection";
 import { StyleSheet } from "react-native";
 
 export default function HomeScreen() {
   return (
     <Header>
-      <VisitorHorizontalScrollSection />
+      <UpcomingVisitorSection />
       <AlertCard />
       <QuickActions />
     </Header>
