@@ -11,10 +11,7 @@ const Header = ({ children }: { children: ReactNode }) => {
         contentContainerStyle={{ flexGrow: 1 }}
         showsVerticalScrollIndicator={false}
       >
-        <View
-          className="flex h-full p-4 mb-8"
-          style={{ backgroundColor: "#f8fafc" }}
-        >
+        <View className="flex h-full px-4 py-4 mb-8 bg-background">
           {children}
         </View>
       </ScrollView>

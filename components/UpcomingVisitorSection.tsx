@@ -16,7 +16,7 @@ const UpcomingVisitorSection = () => {
   };
 
   return (
-    <View className="mt-2 mb-6 gap">
+    <View className="mb-6">
       <SectionHeading
         heading="Upcoming Visitors"
         handleViewAll={() => handleViewAll("Upcoming Visitors")}

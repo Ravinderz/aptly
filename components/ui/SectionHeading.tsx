@@ -10,8 +10,8 @@ const SectionHeading = ({
   handleViewAll: () => void;
 }) => {
   return (
-    <View className="flex flex-row justify-between items-center pb-2 mx-2">
-      <Text className="text-lg font-semibold">{heading}</Text>
+    <View className="flex flex-row justify-between items-center pb-2">
+      <Text className="text-lg font-semibold text-text-primary">{heading}</Text>
       <LinkButton label="View All" handleViewAll={handleViewAll} />
     </View>
   );

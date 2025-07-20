@@ -1,48 +1,140 @@
-import { Ellipsis, Megaphone } from "lucide-react-native";
+import { AlertTriangle, Clock, Ellipsis, Megaphone } from "lucide-react-native";
 import React from "react";
 import { Text, TouchableOpacity, View } from "react-native";
-
-import SectionHeading from "./ui/SectionHeading";
+import { cn } from "../utils/cn";
 
 const AlertCard = () => {
+  // Mock notice data with priority levels - simulate checking for today's notices
+  const todaysNotices = [
+    {
+      title: "Water Supply Interruption",
+      message:
+        "Please note that the community center will be closed on Saturday, June 3rd from 8am-1pm for maintenance.",
+      priority: "high", // high, medium, low
+      timestamp: new Date(),
+      isUrgent: true,
+    }
+  ];
+
+  // Check if there are any notices for today
+  const hasNoticesForToday = todaysNotices.length > 0;
+
+  // If no notices for today, don't render the section
+  if (!hasNoticesForToday) {
+    return null;
+  }
+
+  // Get the first notice to display
+  const notice = todaysNotices[0];
+
+  const getPriorityStyles = (priority: string) => {
+    switch (priority) {
+      case "high":
+        return {
+          container: "border-error/30 border-2",
+          badge: "bg-error text-white",
+          icon: "#D32F2F",
+          iconBg: "bg-error/20",
+        };
+      case "medium":
+        return {
+          container: "border-warning/30 border-2",
+          badge: "bg-warning text-white",
+          icon: "#FF9800",
+          iconBg: "bg-warning/20",
+        };
+      default:
+        return {
+          container: "border-primary/30 border-2",
+          badge: "bg-primary text-white",
+          icon: "#6366f1",
+          iconBg: "bg-primary/20",
+        };
+    }
+  };
+
+  const priorityStyles = getPriorityStyles(notice.priority);
+
   return (
     <View className="mb-6">
-      <SectionHeading heading="Notices" handleViewAll={() => {}} />
-      <View className="flex gap-4 bg-white rounded-xl p-4 border-2 border-orange-200">
-        <View className="flex flex-row justify-between items-center">
-          <View className="flex flex-row gap-4 items-center">
-            <View className="bg-orange-100 rounded-full p-2">
-              <Megaphone size={24} color="#6b7280" strokeWidth={2} />
-            </View>
-            {/* This should be a dropdown or menu item */}
-            <Text className="text-md font-bold">Water Supply Interruption</Text>
-          </View>
-          <View>
-            <Ellipsis size={24} color="#6b7280" strokeWidth={2} />
-            {/* This should be a dropdown or menu item */}
-          </View>
-        </View>
-        <View>
-          <Text className="text-sm font-medium mt-1">
-            Please note that the community center will be closed on Saturday,
-            June 3rd from 8am-1pm for maintenance.
+      {/* Enhanced Header with Urgency Indicator */}
+      <View className="flex-row items-center justify-between mb-3">
+        <View className="flex-row items-center">
+          <View
+            className={cn(
+              "w-3 h-3 rounded-full mr-2",
+              notice.isUrgent ? "" : "bg-primary"
+            )}
+          />
+          <Text className="text-xl font-bold text-text-primary">
+            Important Notices
           </Text>
         </View>
-        <View className="flex flex-row justify-between items-center mt-1">
-          <Text className="text-sm font-medium text-gray-500">
-            {new Intl.DateTimeFormat("en-US", {
-              year: "numeric",
-              month: "2-digit",
-              day: "2-digit",
-              hour: "2-digit",
-              minute: "2-digit",
-            }).format(new Date())}
-          </Text>
-          <TouchableOpacity>
-            <Text className="text-sm font-semibold text-orange-400 text-center">
-              Read More
+        <TouchableOpacity className="bg-primary/10 rounded-full px-3 py-1">
+          <Text className="text-primary text-xs font-semibold">View All</Text>
+        </TouchableOpacity>
+      </View>
+
+      {/* Prominent Notice Card */}
+      <View className={cn("rounded-2xl p-5", priorityStyles.container)}>
+        {/* Priority Badge */}
+        <View className="flex-row items-center justify-between mb-3">
+          <View
+            className={cn(
+              "px-3 py-1 rounded-full flex-row items-center",
+              priorityStyles.badge
+            )}
+          >
+            <AlertTriangle size={12} color="white" />
+            <Text className="text-white text-xs font-bold ml-1 uppercase">
+              {notice.priority} Priority
             </Text>
+          </View>
+          <TouchableOpacity>
+            <Ellipsis size={20} color="#757575" strokeWidth={2} />
           </TouchableOpacity>
+        </View>
+
+        {/* Notice Content */}
+        <View className="flex-row items-start mb-4">
+          <View className={cn("rounded-full p-3 mr-4", priorityStyles.iconBg)}>
+            <Megaphone size={28} color={priorityStyles.icon} strokeWidth={2} />
+          </View>
+          <View className="flex-1">
+            <Text className="text-lg font-bold text-text-primary mb-2">
+              {notice.title}
+            </Text>
+            <Text className="text-sm leading-5 text-text-secondary">
+              {notice.message}
+            </Text>
+          </View>
+        </View>
+
+        {/* Bottom Actions */}
+        <View className="flex-row items-center justify-between pt-3 border-t border-divider/50">
+          <View className="flex-row items-center">
+            <Clock size={14} color="#757575" />
+            <Text className="text-xs text-text-secondary ml-1">
+              {new Intl.DateTimeFormat("en-US", {
+                month: "short",
+                day: "numeric",
+                hour: "2-digit",
+                minute: "2-digit",
+              }).format(notice.timestamp)}
+            </Text>
+          </View>
+          <View className="flex-row gap-3">
+            <TouchableOpacity className="bg-surface rounded-lg px-4 py-2">
+              <Text className="text-text-primary text-sm font-medium">
+                Dismiss
+              </Text>
+            </TouchableOpacity>
+            <TouchableOpacity className="bg-primary rounded-lg px-4 py-2">
+              <Text className="text-white text-sm font-semibold">
+                Read More
+              </Text>
+            </TouchableOpacity>
+          </View>
         </View>
       </View>
     </View>

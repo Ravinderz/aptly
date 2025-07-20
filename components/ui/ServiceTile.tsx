@@ -28,18 +28,18 @@ const ServiceTile: React.FC<ServiceTileProps> = ({ iconName, serviceName }) => {
   // Dynamically import the icon based on the iconName prop
 
   const IconMap = {
-    Sparkles: <Sparkles color="#FF6B35" size={28} />,
-    Wrench: <Wrench color="#FF6B35" size={28} />,
-    Zap: <Zap color="#FF6B35" size={28} />,
-    PaintRoller: <PaintRoller color="#FF6B35" size={28} />,
-    Sprout: <Sprout color="#FF6B35" size={28} />,
-    PackageOpen: <PackageOpen color="#FF6B35" size={28} />,
-    Cog: <Cog color="#FF6B35" size={28} />,
-    Bug: <Bug color="#FF6B35" size={28} />,
-    Hammer: <Hammer color="#FF6B35" size={28} />,
-    Router: <Router color="#FF6B35" size={28} />,
-    Package: <Package color="#FF6B35" size={28} />,
-    CreditCard: <CreditCard color="#FF6B35" size={28} />,
+    Sparkles: <Sparkles color="#6366f1" size={28} />,
+    Wrench: <Wrench color="#6366f1" size={28} />,
+    Zap: <Zap color="#6366f1" size={28} />,
+    PaintRoller: <PaintRoller color="#6366f1" size={28} />,
+    Sprout: <Sprout color="#6366f1" size={28} />,
+    PackageOpen: <PackageOpen color="#6366f1" size={28} />,
+    Cog: <Cog color="#6366f1" size={28} />,
+    Bug: <Bug color="#6366f1" size={28} />,
+    Hammer: <Hammer color="#6366f1" size={28} />,
+    Router: <Router color="#6366f1" size={28} />,
+    Package: <Package color="#6366f1" size={28} />,
+    CreditCard: <CreditCard color="#6366f1" size={28} />,
   };
 
   return (

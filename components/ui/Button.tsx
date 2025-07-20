@@ -70,7 +70,7 @@ export const Button: React.FC<ButtonProps> = ({
       {loading && (
         <ActivityIndicator
           size="small"
-          color={variant === 'outline' || variant === 'ghost' ? '#FF6B35' : '#FFFFFF'}
+          color={variant === 'outline' || variant === 'ghost' ? '#6366f1' : '#FFFFFF'}
           className="mr-2"
         />
       )}

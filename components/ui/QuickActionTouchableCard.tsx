@@ -25,7 +25,7 @@ const QuickActionTouchableCard = ({
     >
       <View className="flex gap-2 items-center">
         <View className="rounded-3xl p-3 bg-primary/10">
-          <LucideIcons name={icon} size={28} color={color || "#FF6B35"} />
+          <LucideIcons name={icon} size={28} color={color || "#6366f1"} />
         </View>
         <Text className="text-sm font-semibold text-text-primary">{label}</Text>
       </View>

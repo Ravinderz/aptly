@@ -18,9 +18,9 @@ const QuickActions = () => {
   };
 
   return (
-    <View className="flex gap-2">
+    <View className="mb-6">
       <SectionHeading heading="Quick Actions" handleViewAll={() => {}} />
-      <View className="flex flex-row gap-4">
+      <View className="flex flex-row gap-4 mb-4">
         <View className="flex-1">
           <QuickActionTouchableCard
             label="Add Visitor"

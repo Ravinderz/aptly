@@ -9,11 +9,11 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        // India-focused color palette system
+        // Indigo color palette system
         primary: {
-          DEFAULT: "#FF6B35", // Primary Saffron
-          light: "#FF8A65",   // Interactive states
-          dark: "#E65100",    // Headers and emphasis
+          DEFAULT: "#6366f1", // Primary Indigo
+          light: "#818cf8",   // Interactive states (indigo-400)
+          dark: "#4f46e5",    // Headers and emphasis (indigo-600)
         },
         secondary: {
           DEFAULT: "#4CAF50", // India Green (success, prosperity)

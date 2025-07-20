@@ -10,7 +10,7 @@ import React from "react";
 import { Platform } from "react-native";
 
 export default function TabLayout() {
-  const activeColor = "#f89b7c";
+  const activeColor = "#6366f1";
   return (
     <Tabs
       screenOptions={{
