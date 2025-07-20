@@ -1,4 +1,17 @@
-import { icons } from "lucide-react-native";
+import {
+  Bug,
+  Cog,
+  CreditCard,
+  Hammer,
+  Package,
+  PackageOpen,
+  PaintRoller,
+  Router,
+  Sparkles,
+  Sprout,
+  Wrench,
+  Zap,
+} from "lucide-react-native";
 import React from "react";
 import { Text, View } from "react-native";
 
@@ -12,7 +25,21 @@ interface ServiceTileProps {
 
 const ServiceTile: React.FC<ServiceTileProps> = ({ iconName, serviceName }) => {
   // Dynamically import the icon based on the iconName prop
-  const LucideIcon = icons[iconName as keyof typeof icons];
+
+  const IconMap = {
+    Sparkles: <Sparkles color="#6366f1" size={28} />,
+    Wrench: <Wrench color="#6366f1" size={28} />,
+    Zap: <Zap color="#6366f1" size={28} />,
+    PaintRoller: <PaintRoller color="#6366f1" size={28} />,
+    Sprout: <Sprout color="#6366f1" size={28} />,
+    PackageOpen: <PackageOpen color="#6366f1" size={28} />,
+    Cog: <Cog color="#6366f1" size={28} />,
+    Bug: <Bug color="#6366f1" size={28} />,
+    Hammer: <Hammer color="#6366f1" size={28} />,
+    Router: <Router color="#6366f1" size={28} />,
+    Package: <Package color="#6366f1" size={28} />,
+    CreditCard: <CreditCard color="#6366f1" size={28} />,
+  };
 
   return (
     <View>
@@ -20,7 +47,7 @@ const ServiceTile: React.FC<ServiceTileProps> = ({ iconName, serviceName }) => {
         className={`p-6 rounded-lg items-center justify-center bg-white border border-border-color`}
       >
         <View className="flex items-center justify-center bg-primary/10 rounded-full p-4">
-          {LucideIcon && <LucideIcon color="#6366f1" size={28} />}
+          {IconMap[iconName as keyof typeof IconMap]}
         </View>
       </View>
       <Text className="text-sm text-center font-medium mt-2">
