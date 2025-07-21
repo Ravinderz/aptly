@@ -10,7 +10,7 @@ const LinkButton = ({
 }) => {
   return (
     <TouchableOpacity onPress={handleViewAll}>
-      <Text className="text-sm font-semibold text-primary">{label}</Text>
+      <Text className="text-label-large font-semibold text-primary">{label}</Text>
     </TouchableOpacity>
   );
 };

@@ -58,7 +58,7 @@ const Onboarding = () => {
   const router = useRouter();
 
   const handleButtonPress = () => {
-    router.replace("/(tabs)");
+    router.replace("/welcome");
   };
 
   return (

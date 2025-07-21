@@ -21,11 +21,10 @@ const AddVisitor = () => {
 
   return (
     <View
-      className="flex h-full p-4 mb-8"
-      style={{ backgroundColor: "#f8fafc" }}
+      className="flex h-full p-4 mb-8 bg-background"
     >
       <View className="mb-2">
-        <Text className="block text-md font-medium text-gray-700 mb-2">
+        <Text className="block text-headline-medium font-semibold text-text-primary mb-2">
           Visitor Name
         </Text>
         <Controller
@@ -40,18 +39,18 @@ const AddVisitor = () => {
               onBlur={onBlur}
               onChangeText={onChange}
               value={value}
-              className="w-full p-4 border border-border-color rounded-lg mb-2 bg-primary/10 text-primary text-lg "
-              placeholderTextColor="#9CA3AF"
+              className="w-full p-4 border border-divider rounded-lg mb-2 bg-surface text-text-primary text-body-large"
+              placeholderTextColor="#757575"
             />
           )}
           name="visitorName"
         />
         {errors.visitorName && (
-          <Text className="text-red-500 mb-2">This is required.</Text>
+          <Text className="text-error text-body-medium mb-2">This is required.</Text>
         )}
       </View>
       <View className="mb-2">
-        <Text className="block text-md font-medium text-gray-700 mb-2">
+        <Text className="block text-headline-medium font-semibold text-text-primary mb-2">
           Contact Number
         </Text>
         <Controller
@@ -66,20 +65,20 @@ const AddVisitor = () => {
               onBlur={onBlur}
               onChangeText={onChange}
               value={value}
-              className="w-full p-4 border border-border-color rounded-lg mb-2 bg-primary/10 text-primary text-lg"
-              placeholderTextColor="#9CA3AF"
+              className="w-full p-4 border border-divider rounded-lg mb-2 bg-surface text-text-primary text-body-large"
+              placeholderTextColor="#757575"
             />
           )}
           name="contactNumber"
         />
         {errors.contactNumber && (
-          <Text className="text-red-500 mb-2">This is required.</Text>
+          <Text className="text-error text-body-medium mb-2">This is required.</Text>
         )}
       </View>
 
       <View className="flex flex-row gap-2 items-center justify-between mb-2">
         <View className="flex-1">
-          <Text className="block text-md font-medium text-gray-700 mb-2">
+          <Text className="block text-headline-medium font-semibold text-text-primary mb-2">
             Visit Date
           </Text>
           <Controller
@@ -94,21 +93,21 @@ const AddVisitor = () => {
                 onBlur={onBlur}
                 onChangeText={onChange}
                 value={value}
-                className="w-full p-4 border border-border-color rounded-lg mb-2 bg-primary/10 text-primary text-lg"
-                placeholderTextColor="#6b7280"
+                className="w-full p-4 border border-divider rounded-lg mb-2 bg-surface text-text-primary text-body-large"
+                placeholderTextColor="#757575"
               />
             )}
             name="visitDate"
           />
           {errors.visitDate && (
-            <Text className="text-red-500 mb-2">This is required.</Text>
+            <Text className="text-error text-body-medium mb-2">This is required.</Text>
           )}
           <View className="absolute right-4 top-11">
             <Calendar size={24} color="#6366f1" />
           </View>
         </View>
         <View className="flex-1 relative">
-          <Text className="block text-md font-medium text-gray-700 mb-2">
+          <Text className="block text-headline-medium font-semibold text-text-primary mb-2">
             Visit Time
           </Text>
           <Controller
@@ -123,14 +122,14 @@ const AddVisitor = () => {
                 onBlur={onBlur}
                 onChangeText={onChange}
                 value={value}
-                className="w-full p-4 border border-border-color rounded-lg mb-2 bg-primary/10 text-primary text-lg"
-                placeholderTextColor="#6b7280"
+                className="w-full p-4 border border-divider rounded-lg mb-2 bg-surface text-text-primary text-body-large"
+                placeholderTextColor="#757575"
               />
             )}
             name="visitTime"
           />
           {errors.visitTime && (
-            <Text className="text-red-500 mb-2">This is required.</Text>
+            <Text className="text-error text-body-medium mb-2">This is required.</Text>
           )}
           <View className="absolute right-4 top-11">
             <Clock size={24} color="#6366f1" />
@@ -138,7 +137,7 @@ const AddVisitor = () => {
         </View>
       </View>
       <View className="mb-2">
-        <Text className="block text-md font-medium text-gray-700 mb-2">
+        <Text className="block text-headline-medium font-semibold text-text-primary mb-2">
           Purpose of Visit
         </Text>
         <Controller
@@ -153,14 +152,14 @@ const AddVisitor = () => {
               onBlur={onBlur}
               onChangeText={onChange}
               value={value}
-              className="w-full p-4 border border-border-color rounded-lg mb-2 bg-primary/10 text-primary text-lg"
-              placeholderTextColor="#9CA3AF"
+              className="w-full p-4 border border-divider rounded-lg mb-2 bg-surface text-text-primary text-body-large"
+              placeholderTextColor="#757575"
             />
           )}
           name="visitPurpose"
         />
         {errors.visitPurpose && (
-          <Text className="text-red-500 mb-2">This is required.</Text>
+          <Text className="text-error text-body-medium mb-2">This is required.</Text>
         )}
       </View>
 
@@ -171,7 +170,7 @@ const AddVisitor = () => {
           handleSubmit(onSubmit)();
         }}
       >
-        <Text className="text-white text-center font-medium text-xl">
+        <Text className="text-white text-center font-semibold text-headline-medium">
           Submit
         </Text>
       </TouchableOpacity>

@@ -1,5 +1,7 @@
 import React from 'react';
-import { ScrollView, SafeAreaView, View } from 'react-native';
+import { ScrollView, SafeAreaView, View, Alert } from 'react-native';
+import { useRouter } from 'expo-router';
+import { useAuth } from '@/contexts/AuthContext';
 import { 
   User, 
   Users, 
@@ -10,79 +12,108 @@ import {
   Shield, 
   LogOut,
   HelpCircle,
-  Settings as SettingsIcon
+  Settings as SettingsIcon,
+  Camera
 } from 'lucide-react-native';
 import ProfileHeader from '../../../components/ui/ProfileHeader';
 import ProfileSection, { ProfileItem } from '../../../components/ui/ProfileSection';
+import * as ImagePicker from 'expo-image-picker';
 
 export default function Profile() {
-  // Mock user data - replace with actual user context/state
+  const router = useRouter();
+  const { user, logout } = useAuth();
+  
+  // Use real user data from auth context, fallback to mock data
   const userData = {
-    name: "Rajesh Kumar",
-    role: "Flat Owner",
-    flatNumber: "A-301",
-    societyName: "Green Valley Apartments",
+    name: user?.fullName || "Rajesh Kumar Sharma",
+    role: user?.ownershipType === 'owner' ? "Flat Owner" : "Tenant",
+    flatNumber: user?.flatNumber || "A-301",
+    societyName: user?.societyCode || "Green Valley Apartments",
     profileImage: undefined, // Add image URL when available
   };
 
   const handleEditProfile = () => {
-    // Navigate to edit profile screen
-    console.log('Edit profile pressed');
+    router.push('/(tabs)/settings/personal-details');
   };
 
-  const handleChangePhoto = () => {
-    // Handle photo selection/camera
-    console.log('Change photo pressed');
+  const handleChangePhoto = async () => {
+    try {
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        allowsEditing: true,
+        aspect: [1, 1],
+        quality: 0.8,
+      });
+
+      if (!result.canceled && result.assets[0]) {
+        // TODO: Upload image and update user profile
+        Alert.alert('Success', 'Profile photo updated successfully');
+      }
+    } catch (error) {
+      Alert.alert('Error', 'Failed to update profile photo');
+    }
   };
 
   const handlePersonalInfo = () => {
-    // Navigate to personal information screen
-    console.log('Personal info pressed');
+    router.push('/(tabs)/settings/personal-details');
   };
 
   const handleFamilyMembers = () => {
-    // Navigate to family members screen
-    console.log('Family members pressed');
+    router.push('/(tabs)/settings/family-members');
   };
 
   const handleVehicles = () => {
-    // Navigate to vehicle registration screen
-    console.log('Vehicles pressed');
+    router.push('/(tabs)/settings/vehicles');
   };
 
   const handleDocuments = () => {
-    // Navigate to document vault screen
-    console.log('Documents pressed');
+    router.push('/(tabs)/settings/documents');
   };
 
   const handleNotifications = () => {
-    // Navigate to notification preferences screen
-    console.log('Notifications pressed');
+    router.push('/(tabs)/settings/notifications');
   };
 
   const handleEmergencyContacts = () => {
-    // Navigate to emergency contacts screen
-    console.log('Emergency contacts pressed');
+    router.push('/(tabs)/settings/emergency-contacts');
   };
 
   const handleSecurity = () => {
-    // Navigate to security settings screen
-    console.log('Security pressed');
+    // TODO: Implement security settings screen
+    Alert.alert('Coming Soon', 'Security settings will be available in the next update');
   };
 
   const handleHelp = () => {
-    // Navigate to help & support screen
-    console.log('Help pressed');
+    // TODO: Implement help & support screen
+    Alert.alert('Help & Support', 'For assistance, please contact your society management or email support@aptly.app');
   };
 
   const handleSettings = () => {
-    // Navigate to app settings screen
-    console.log('Settings pressed');
+    // TODO: Implement app settings screen
+    Alert.alert('Coming Soon', 'App settings will be available in the next update');
   };
 
   const handleLogout = () => {
-    // Handle logout functionality
-    console.log('Logout pressed');
+    Alert.alert(
+      'Logout',
+      'Are you sure you want to sign out of your account?',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Logout',
+          style: 'destructive',
+          onPress: async () => {
+            try {
+              await logout();
+              // Navigation will be handled by AppNavigator based on auth state
+            } catch (error) {
+              console.error('Logout error:', error);
+              Alert.alert('Error', 'Failed to logout. Please try again.');
+            }
+          }
+        }
+      ]
+    );
   };
 
   return (
@@ -108,45 +139,45 @@ export default function Profile() {
           <ProfileItem
             icon={<User size={20} color="#6366f1" />}
             title="Personal Details"
-            subtitle="Name, phone, email, address"
+            subtitle="Complete profile with Indian documents"
             onPress={handlePersonalInfo}
           />
           <View className="h-px bg-divider mx-4" />
           <ProfileItem
             icon={<Users size={20} color="#6366f1" />}
             title="Family Members"
-            subtitle="3 members registered"
+            subtitle="4 members • 2 dependents"
             onPress={handleFamilyMembers}
           />
           <View className="h-px bg-divider mx-4" />
           <ProfileItem
             icon={<Car size={20} color="#6366f1" />}
             title="Vehicles"
-            subtitle="2 vehicles registered"
+            subtitle="3 vehicles registered • 1 electric"
             onPress={handleVehicles}
           />
           <View className="h-px bg-divider mx-4" />
           <ProfileItem
             icon={<FileText size={20} color="#6366f1" />}
             title="Documents"
-            subtitle="Aadhar, PAN, Lease agreement"
+            subtitle="Aadhar, PAN, RC, Insurance"
             onPress={handleDocuments}
           />
         </ProfileSection>
 
         {/* Preferences Section */}
-        <ProfileSection title="Preferences">
+        <ProfileSection title="Preferences & Settings">
           <ProfileItem
             icon={<Bell size={20} color="#6366f1" />}
             title="Notifications"
-            subtitle="Manage your notification preferences"
+            subtitle="8 categories • Festival mode enabled"
             onPress={handleNotifications}
           />
           <View className="h-px bg-divider mx-4" />
           <ProfileItem
             icon={<Phone size={20} color="#6366f1" />}
             title="Emergency Contacts"
-            subtitle="2 contacts added"
+            subtitle="2 verified contacts"
             onPress={handleEmergencyContacts}
           />
         </ProfileSection>
@@ -155,32 +186,32 @@ export default function Profile() {
         <ProfileSection title="Security & Support">
           <ProfileItem
             icon={<Shield size={20} color="#6366f1" />}
-            title="Security"
-            subtitle="Biometric, PIN, privacy settings"
+            title="Security Settings"
+            subtitle="Privacy, biometric, app lock"
             onPress={handleSecurity}
           />
           <View className="h-px bg-divider mx-4" />
           <ProfileItem
             icon={<HelpCircle size={20} color="#6366f1" />}
             title="Help & Support"
-            subtitle="FAQs, contact support"
+            subtitle="FAQs, contact support, feedback"
             onPress={handleHelp}
           />
           <View className="h-px bg-divider mx-4" />
           <ProfileItem
             icon={<SettingsIcon size={20} color="#6366f1" />}
             title="App Settings"
-            subtitle="Language, theme, data usage"
+            subtitle="Language, theme, storage"
             onPress={handleSettings}
           />
         </ProfileSection>
 
-        {/* Logout Section */}
+        {/* Account Section */}
         <ProfileSection title="Account">
           <ProfileItem
             icon={<LogOut size={20} color="#D32F2F" />}
             title="Logout"
-            subtitle="Sign out of your account"
+            subtitle="Sign out securely from this device"
             onPress={handleLogout}
             showArrow={false}
           />

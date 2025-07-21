@@ -3,6 +3,7 @@ import { Building, Shield, Users, Smartphone } from "lucide-react-native";
 import React from "react";
 import { SafeAreaView, ScrollView, Text, TouchableOpacity, View, Image } from "react-native";
 import { Button } from "@/components/ui/Button";
+import HighlightCard from "@/components/ui/HighlightCard";
 
 export default function Welcome() {
   const router = useRouter();
@@ -116,7 +117,7 @@ export default function Welcome() {
           </Button>
           
           <TouchableOpacity 
-            onPress={() => router.push("/(tabs)")}
+            onPress={() => router.push("/auth/phone-registration")}
             className="items-center py-3"
           >
             <Text className="text-text-secondary">
@@ -126,12 +127,15 @@ export default function Welcome() {
         </View>
 
         {/* Demo Notice */}
-        <View className="mx-6 mb-6 bg-warning/5 rounded-xl p-4 border border-warning/20">
-          <Text className="text-warning font-semibold mb-2">Demo Mode</Text>
-          <Text className="text-text-secondary text-sm leading-5">
+        <View className="mx-6 mb-6">
+          <HighlightCard
+            title="Demo Mode"
+            variant="warning"
+            size="md"
+          >
             This is a demonstration version. In production, you would connect to your 
             society's actual management system.
-          </Text>
+          </HighlightCard>
         </View>
       </ScrollView>
     </SafeAreaView>

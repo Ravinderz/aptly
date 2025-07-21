@@ -47,32 +47,34 @@ export class AuthService {
   // Phone Registration
   async registerPhone(phoneNumber: string, societyCode: string): Promise<AuthResult> {
     try {
-      const response = await fetch(`${this.baseURL}/auth/register-phone`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          phoneNumber,
-          societyCode
-        }),
-      });
-
-      const data = await response.json();
-
-      if (response.ok) {
-        return {
-          success: true,
-          data: data,
-          requiresOTP: true,
-          sessionId: data.sessionId
-        };
-      } else {
+      // For demo purposes, simulate API call
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      // Validate Indian phone number
+      const cleanNumber = phoneNumber.replace(/[\s\-\(\)\+]/g, '');
+      const indianMobileRegex = /^(?:\+91|91)?[6-9]\d{9}$/;
+      
+      if (!indianMobileRegex.test(cleanNumber)) {
         return {
           success: false,
-          error: data.message || 'Failed to send OTP'
+          error: 'Please enter a valid Indian mobile number'
         };
       }
+      
+      // Validate society code
+      if (!societyCode || societyCode.length < 4) {
+        return {
+          success: false,
+          error: 'Please enter a valid society code'
+        };
+      }
+      
+      return {
+        success: true,
+        data: { message: 'OTP sent successfully' },
+        requiresOTP: true,
+        sessionId: `session_${Date.now()}`
+      };
     } catch (error) {
       return {
         success: false,
@@ -84,38 +86,34 @@ export class AuthService {
   // OTP Verification
   async verifyOTP(phoneNumber: string, otp: string, sessionId?: string): Promise<AuthResult> {
     try {
-      const response = await fetch(`${this.baseURL}/auth/verify-otp`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          phoneNumber,
-          otp,
-          sessionId
-        }),
-      });
-
-      const data = await response.json();
-
-      if (response.ok) {
-        // Store tokens securely
-        await this.storeTokens({
-          accessToken: data.accessToken,
-          refreshToken: data.refreshToken,
-          expiresAt: data.expiresAt
-        });
-
-        return {
-          success: true,
-          data: data.user
-        };
-      } else {
+      // For demo purposes, simulate API call
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      // Accept demo OTP: 123456
+      if (otp !== '123456') {
         return {
           success: false,
-          error: data.message || 'Invalid OTP'
+          error: 'Invalid OTP. Use 123456 for demo.'
         };
       }
+      
+      // Generate demo tokens
+      const tokens = {
+        accessToken: `demo_access_token_${Date.now()}`,
+        refreshToken: `demo_refresh_token_${Date.now()}`,
+        expiresAt: Date.now() + (24 * 60 * 60 * 1000) // 24 hours
+      };
+      
+      // Store tokens securely
+      await this.storeTokens(tokens);
+      
+      return {
+        success: true,
+        data: {
+          message: 'OTP verified successfully',
+          user: null // Profile will be created in next step
+        }
+      };
     } catch (error) {
       return {
         success: false,
@@ -169,36 +167,37 @@ export class AuthService {
   // Create User Profile
   async createProfile(profileData: Partial<UserProfile>): Promise<AuthResult> {
     try {
+      // For demo purposes, simulate API call
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
       const token = await this.getAccessToken();
       if (!token) {
         return { success: false, error: 'Authentication required' };
       }
-
-      const response = await fetch(`${this.baseURL}/auth/create-profile`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify(profileData),
-      });
-
-      const data = await response.json();
-
-      if (response.ok) {
-        this.currentUser = data.user;
-        await AsyncStorage.setItem('userProfile', JSON.stringify(data.user));
-        
-        return {
-          success: true,
-          data: data.user
-        };
-      } else {
-        return {
-          success: false,
-          error: data.message || 'Failed to create profile'
-        };
-      }
+      
+      // Create complete user profile
+      const completeProfile: UserProfile = {
+        id: profileData.id || `user_${Date.now()}`,
+        phoneNumber: profileData.phoneNumber || '',
+        fullName: profileData.fullName || '',
+        flatNumber: profileData.flatNumber || '',
+        ownershipType: profileData.ownershipType || 'owner',
+        familySize: profileData.familySize || 1,
+        emergencyContact: profileData.emergencyContact || '',
+        role: profileData.role || 'resident',
+        societyId: profileData.societyId || 'society_1',
+        societyCode: profileData.societyCode || 'DEMO001',
+        isVerified: true,
+        createdAt: new Date().toISOString(),
+      };
+      
+      this.currentUser = completeProfile;
+      await AsyncStorage.setItem('userProfile', JSON.stringify(completeProfile));
+      
+      return {
+        success: true,
+        data: completeProfile
+      };
     } catch (error) {
       return {
         success: false,

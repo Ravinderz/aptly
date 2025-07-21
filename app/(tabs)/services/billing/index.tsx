@@ -1,11 +1,14 @@
 import { useRouter } from "expo-router";
-import { ArrowLeft, Download, Calendar, AlertCircle, CheckCircle } from "lucide-react-native";
+import { ArrowLeft, Download, Calendar, AlertCircle, CheckCircle, Bell, CreditCard, TrendingUp, Filter, Search, Plus, Settings } from "lucide-react-native";
 import React, { useState } from "react";
-import { SafeAreaView, ScrollView, Text, TouchableOpacity, View } from "react-native";
+import { SafeAreaView, ScrollView, Text, TouchableOpacity, View, TextInput, Alert } from "react-native";
+import HighlightCard from "@/components/ui/HighlightCard";
 
 export default function Billing() {
   const router = useRouter();
   const [selectedTab, setSelectedTab] = useState("pending");
+  const [searchQuery, setSearchQuery] = useState("");
+  const [showFilters, setShowFilters] = useState(false);
 
   // Mock billing data
   const bills = [
@@ -74,6 +77,23 @@ export default function Billing() {
         { description: "Water Consumption", amount: 530 },
         { description: "Water Tank Cleaning", amount: 150 }
       ]
+    },
+    {
+      id: "5",
+      title: "Common Area Maintenance - Main Lobby",
+      billNumber: "CAM-2024-01-001",
+      amount: 2800,
+      gstAmount: 504,
+      totalAmount: 3304,
+      dueDate: "2024-04-15",
+      issueDate: "2024-04-01",
+      status: "pending",
+      type: "common_area",
+      items: [
+        { description: "Lobby Lighting Repair", amount: 2800 }
+      ],
+      splitBetween: 25,
+      costPerFlat: 132
     }
   ];
 
@@ -105,9 +125,16 @@ export default function Billing() {
   };
 
   const filteredBills = bills.filter(bill => {
-    if (selectedTab === "pending") return bill.status === "pending" || bill.status === "overdue";
-    if (selectedTab === "paid") return bill.status === "paid";
-    return true;
+    const matchesSearch = searchQuery === "" || 
+      bill.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      bill.billNumber.toLowerCase().includes(searchQuery.toLowerCase());
+    
+    let matchesTab = true;
+    if (selectedTab === "pending") matchesTab = bill.status === "pending" || bill.status === "overdue";
+    if (selectedTab === "paid") matchesTab = bill.status === "paid";
+    if (selectedTab === "common_area") matchesTab = bill.type === "common_area";
+    
+    return matchesSearch && matchesTab;
   });
 
   const totalPending = bills
@@ -144,71 +171,136 @@ export default function Billing() {
           <Text className="text-xl font-bold text-text-primary">Billing</Text>
           <Text className="text-text-secondary text-sm">Flat A-201</Text>
         </View>
+        <TouchableOpacity 
+          onPress={() => Alert.alert('Notifications', 'Payment reminders and notifications would be shown here.')}
+          className="mr-3 relative"
+        >
+          <Bell size={20} color="#6366f1" />
+          <View className="absolute -top-1 -right-1 bg-error rounded-full w-3 h-3" />
+        </TouchableOpacity>
+        <TouchableOpacity 
+          onPress={() => Alert.alert('Settings', 'Billing settings like auto-pay, payment methods etc.')}
+        >
+          <Settings size={20} color="#6366f1" />
+        </TouchableOpacity>
       </View>
 
       {/* Summary Cards */}
-      <View className="px-4 py-4 bg-surface border-b border-divider">
+      <View className="px-6 py-5 bg-surface border-b border-divider">
+        <View className="flex-row gap-4 mb-5">
+          <View className="flex-1 bg-error/10 rounded-2xl p-5 border border-error/20">
+            <View className="flex-row items-center mb-3">
+              <AlertCircle size={16} color="#D32F2F" />
+              <Text className="text-error text-sm font-medium ml-2">Total Pending</Text>
+            </View>
+            <Text className="text-error text-2xl font-bold mb-1">{formatCurrency(totalPending)}</Text>
+            <Text className="text-error/70 text-xs">3 bills pending</Text>
+          </View>
+          <View className="flex-1 bg-success/10 rounded-2xl p-5 border border-success/20">
+            <View className="flex-row items-center mb-3">
+              <CheckCircle size={16} color="#4CAF50" />
+              <Text className="text-success text-sm font-medium ml-2">Paid This Month</Text>
+            </View>
+            <Text className="text-success text-2xl font-bold mb-1">{formatCurrency(totalPaidThisMonth)}</Text>
+            <Text className="text-success/70 text-xs">On time payment</Text>
+          </View>
+        </View>
+        
+        {/* Quick Actions */}
         <View className="flex-row gap-4">
-          <View className="flex-1 bg-error/10 rounded-2xl p-4 border border-error/20">
-            <Text className="text-error text-sm font-medium mb-1">Total Pending</Text>
-            <Text className="text-error text-2xl font-bold">{formatCurrency(totalPending)}</Text>
-            <Text className="text-error/70 text-xs mt-1">2 bills pending</Text>
-          </View>
-          <View className="flex-1 bg-success/10 rounded-2xl p-4 border border-success/20">
-            <Text className="text-success text-sm font-medium mb-1">Paid This Month</Text>
-            <Text className="text-success text-2xl font-bold">{formatCurrency(totalPaidThisMonth)}</Text>
-            <Text className="text-success/70 text-xs mt-1">On time payment</Text>
-          </View>
+          <TouchableOpacity 
+            onPress={() => Alert.alert('Auto Pay', 'Setup automatic payments for all bills')}
+            className="flex-1 bg-primary rounded-xl p-4 flex-row items-center justify-center"
+          >
+            <CreditCard size={16} color="white" />
+            <Text className="text-white font-semibold ml-2 text-sm">Setup Auto Pay</Text>
+          </TouchableOpacity>
+          <TouchableOpacity 
+            onPress={() => Alert.alert('Payment History', 'View detailed payment history and analytics')}
+            className="flex-1 bg-surface border border-divider rounded-xl p-4 flex-row items-center justify-center"
+          >
+            <TrendingUp size={16} color="#6366f1" />
+            <Text className="text-primary font-semibold ml-2 text-sm">View Analytics</Text>
+          </TouchableOpacity>
         </View>
       </View>
 
-      {/* Tab Navigation */}
-      <View className="px-4 py-4 bg-surface border-b border-divider">
-        <View className="flex-row bg-background rounded-xl p-1">
-          <TouchableOpacity
-            onPress={() => setSelectedTab("pending")}
-            className={`flex-1 py-3 rounded-lg ${
-              selectedTab === "pending" ? "bg-primary" : "bg-transparent"
-            }`}
-          >
-            <Text
-              className={`text-center font-medium ${
-                selectedTab === "pending" ? "text-white" : "text-text-secondary"
-              }`}
-            >
-              Pending ({bills.filter(b => b.status === "pending" || b.status === "overdue").length})
-            </Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            onPress={() => setSelectedTab("paid")}
-            className={`flex-1 py-3 rounded-lg ${
-              selectedTab === "paid" ? "bg-primary" : "bg-transparent"
-            }`}
-          >
-            <Text
-              className={`text-center font-medium ${
-                selectedTab === "paid" ? "text-white" : "text-text-secondary"
-              }`}
-            >
-              Paid ({bills.filter(b => b.status === "paid").length})
-            </Text>
+      {/* Search & Filter */}
+      <View className="px-6 py-5 bg-surface border-b border-divider">
+        <View className="flex-row items-center bg-background rounded-xl px-4 py-4 mb-5">
+          <Search size={20} color="#757575" />
+          <TextInput
+            className="flex-1 ml-3 text-text-primary"
+            placeholder="Search bills..."
+            placeholderTextColor="#757575"
+            value={searchQuery}
+            onChangeText={setSearchQuery}
+          />
+          <TouchableOpacity onPress={() => setShowFilters(!showFilters)}>
+            <Filter size={20} color="#6366f1" />
           </TouchableOpacity>
         </View>
+
+        {/* Tab Navigation */}
+        <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+          <View className="flex-row gap-3">
+            {[
+              { key: "pending", label: "Pending", count: bills.filter(b => b.status === "pending" || b.status === "overdue").length },
+              { key: "paid", label: "Paid", count: bills.filter(b => b.status === "paid").length },
+              { key: "common_area", label: "Common Area", count: bills.filter(b => b.type === "common_area").length }
+            ].map((tab) => (
+              <TouchableOpacity
+                key={tab.key}
+                onPress={() => setSelectedTab(tab.key)}
+                className={`px-4 py-3 rounded-full border ${
+                  selectedTab === tab.key
+                    ? "bg-primary border-primary"
+                    : "bg-background border-divider"
+                }`}
+              >
+                <Text
+                  className={`font-medium ${
+                    selectedTab === tab.key ? "text-white" : "text-text-secondary"
+                  }`}
+                >
+                  {tab.label} ({tab.count})
+                </Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+        </ScrollView>
       </View>
 
       {/* Bills List */}
-      <ScrollView className="flex-1 px-4 py-4">
-        {filteredBills.map((bill) => (
-          <TouchableOpacity
-            key={bill.id}
-            className="bg-surface rounded-2xl p-6 mb-4 border border-divider"
-            onPress={() => router.push(`/(tabs)/services/billing/${bill.id}`)}
-          >
+      <ScrollView 
+        className="flex-1" 
+        contentContainerStyle={{ paddingHorizontal: 24, paddingVertical: 20, paddingBottom: 24 }}
+        showsVerticalScrollIndicator={false}
+      >
+        <View className="space-y-4">
+          {filteredBills.map((bill) => (
+            <TouchableOpacity
+              key={bill.id}
+              className="bg-surface rounded-2xl p-6 border border-divider"
+              onPress={() => router.push(`/(tabs)/services/billing/${bill.id}`)}
+            >
             {/* Header */}
             <View className="flex-row items-start justify-between mb-4">
               <View className="flex-1">
-                <Text className="text-lg font-semibold text-text-primary mb-1">{bill.title}</Text>
+                <View className="flex-row items-center mb-1">
+                  <Text className="text-lg font-semibold text-text-primary">{bill.title}</Text>
+                  {bill.type === 'common_area' && (
+                    <View className="bg-primary/10 rounded-full px-2 py-1 ml-2">
+                      <Text className="text-primary text-xs font-medium">Split Bill</Text>
+                    </View>
+                  )}
+                </View>
                 <Text className="text-text-secondary text-sm">Bill #{bill.billNumber}</Text>
+                {bill.type === 'common_area' && (
+                  <Text className="text-text-secondary text-xs mt-1">
+                    Split between {bill.splitBetween} flats • Your share: {formatCurrency(bill.costPerFlat)}
+                  </Text>
+                )}
               </View>
               <View className="items-end">
                 <Text className="text-2xl font-bold text-text-primary">{formatCurrency(bill.totalAmount)}</Text>
@@ -274,17 +366,32 @@ export default function Billing() {
                 <Text className="text-primary font-medium ml-2">Download Receipt</Text>
               </TouchableOpacity>
             )}
-          </TouchableOpacity>
-        ))}
+            </TouchableOpacity>
+          ))}
 
-        {filteredBills.length === 0 && (
-          <View className="flex-1 items-center justify-center py-12">
-            <Text className="text-text-secondary text-lg mb-2">No bills found</Text>
-            <Text className="text-text-secondary text-center">
-              {selectedTab === "pending" ? "All bills are up to date!" : "No payment history available"}
-            </Text>
-          </View>
-        )}
+          {filteredBills.length === 0 && (
+            <View className="flex-1 items-center justify-center py-16">
+              <Text className="text-text-secondary text-lg mb-2">No bills found</Text>
+              <Text className="text-text-secondary text-center">
+                {selectedTab === "pending" ? "All bills are up to date!" : "No payment history available"}
+              </Text>
+            </View>
+          )}
+
+          {/* Payment Security Notice */}
+          {selectedTab === "pending" && filteredBills.length > 0 && (
+            <HighlightCard
+              title="Secure Payments"
+              variant="primary" 
+              size="sm"
+              className="mt-4"
+            >
+              <Text className="text-text-secondary leading-5">
+                All payments are processed through encrypted gateways. Your financial data is protected.
+              </Text>
+            </HighlightCard>
+          )}
+        </View>
       </ScrollView>
     </SafeAreaView>
   );

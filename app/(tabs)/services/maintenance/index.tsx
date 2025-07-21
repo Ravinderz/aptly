@@ -1,5 +1,5 @@
 import { useRouter } from "expo-router";
-import { ArrowLeft, Plus, Filter, Search } from "lucide-react-native";
+import { ArrowLeft, Plus, Filter, Search, Building, Users, Clock, AlertTriangle, CheckCircle, Wrench } from "lucide-react-native";
 import React, { useState } from "react";
 import { SafeAreaView, ScrollView, Text, TextInput, TouchableOpacity, View } from "react-native";
 
@@ -8,8 +8,8 @@ export default function MaintenanceRequests() {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedFilter, setSelectedFilter] = useState("all");
 
-  // Mock maintenance requests data
-  const maintenanceRequests = [
+  // Mock maintenance requests data (individual requests)
+  const individualRequests = [
     {
       id: "1",
       title: "Plumbing Issue - Kitchen Sink",
@@ -20,7 +20,8 @@ export default function MaintenanceRequests() {
       date: "2024-03-15",
       assignedTo: "Rajesh Kumar",
       estimatedCost: "₹2,500",
-      flatNumber: "A-201"
+      flatNumber: "A-201",
+      type: "individual"
     },
     {
       id: "2",
@@ -32,36 +33,52 @@ export default function MaintenanceRequests() {
       date: "2024-03-12",
       assignedTo: "Suresh Electricals",
       actualCost: "₹1,200",
-      flatNumber: "A-201"
-    },
-    {
-      id: "3",
-      title: "Door Lock Repair",
-      description: "Main door lock is not working properly. Key gets stuck.",
-      category: "Civil",
-      priority: "medium",
-      status: "pending",
-      date: "2024-03-18",
-      flatNumber: "A-201"
-    },
-    {
-      id: "4",
-      title: "AC Not Cooling",
-      description: "Air conditioner in bedroom is not cooling properly.",
-      category: "Appliance",
-      priority: "low",
-      status: "submitted",
-      date: "2024-03-20",
-      flatNumber: "A-201"
+      flatNumber: "A-201",
+      type: "individual"
     }
   ];
 
+  // Mock common area requests
+  const commonAreaRequests = [
+    {
+      id: "demo-request-id",
+      title: "Main Lobby Lighting Issue",
+      description: "Several LED lights in the main lobby are flickering and two have completely stopped working.",
+      category: "Electrical",
+      priority: "high",
+      status: "in_progress",
+      date: "2024-01-15",
+      assignedTo: "PowerTech Electricians",
+      estimatedCost: "₹4,500",
+      submittedBy: "Priya Sharma",
+      affectedResidents: 25,
+      type: "common_area"
+    },
+    {
+      id: "ca-2",
+      title: "Garden Irrigation System Repair",
+      description: "Sprinkler system in the main garden area is not working properly.",
+      category: "Plumbing",
+      priority: "medium",
+      status: "approved",
+      date: "2024-01-12",
+      estimatedCost: "₹3,200",
+      submittedBy: "Amit Kumar",
+      affectedResidents: 40,
+      type: "common_area"
+    }
+  ];
+
+  // Combine all requests
+  const allRequests = [...commonAreaRequests, ...individualRequests];
+
   const filterOptions = [
     { label: "All", value: "all" },
-    { label: "Pending", value: "pending" },
+    { label: "Common Area", value: "common_area" },
+    { label: "Individual", value: "individual" },
     { label: "In Progress", value: "in_progress" },
     { label: "Completed", value: "completed" },
-    { label: "Submitted", value: "submitted" }
+    { label: "Pending", value: "pending" }
   ];
 
   const getStatusColor = (status: string) => {
@@ -69,6 +86,7 @@ export default function MaintenanceRequests() {
       case "completed": return "text-success";
       case "in_progress": return "text-warning";
       case "pending": return "text-primary";
+      case "approved": return "text-secondary";
       case "submitted": return "text-text-secondary";
       default: return "text-text-secondary";
     }
@@ -79,6 +97,7 @@ export default function MaintenanceRequests() {
       case "completed": return "bg-success/20";
       case "in_progress": return "bg-warning/20";
       case "pending": return "bg-primary/20";
+      case "approved": return "bg-secondary/20";
       case "submitted": return "bg-text-secondary/20";
       default: return "bg-text-secondary/20";
     }
@@ -105,12 +124,14 @@ export default function MaintenanceRequests() {
     return categoryIcons[category] || "🔧";
   };
 
-  const filteredRequests = maintenanceRequests.filter(request => {
+  const filteredRequests = allRequests.filter(request => {
     const matchesSearch = request.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
                          request.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
                          request.category.toLowerCase().includes(searchQuery.toLowerCase());
     
-    const matchesFilter = selectedFilter === "all" || request.status === selectedFilter;
+    const matchesFilter = selectedFilter === "all" || 
+                         request.status === selectedFilter ||
+                         request.type === selectedFilter;
     
     return matchesSearch && matchesFilter;
   });
@@ -126,18 +147,32 @@ export default function MaintenanceRequests() {
           <Text className="text-xl font-bold text-text-primary">Maintenance Requests</Text>
           <Text className="text-text-secondary text-sm">{filteredRequests.length} requests</Text>
         </View>
-        <TouchableOpacity 
-          onPress={() => router.push("/(tabs)/services/maintenance/create")}
-          className="bg-primary rounded-full p-2"
-        >
-          <Plus size={20} color="white" />
-        </TouchableOpacity>
+      </View>
+
+      {/* Quick Actions */}
+      <View className="bg-surface px-6 py-5 border-b border-divider">
+        <View className="flex-row gap-4">
+          <TouchableOpacity 
+            onPress={() => router.push("/(tabs)/services/maintenance/common-area/create")}
+            className="flex-1 bg-primary rounded-xl p-5 flex-row items-center justify-center"
+          >
+            <Building size={20} color="white" />
+            <Text className="text-white font-semibold ml-3">Common Area Request</Text>
+          </TouchableOpacity>
+          <TouchableOpacity 
+            onPress={() => router.push("/(tabs)/services/maintenance/create")}
+            className="flex-1 bg-surface border border-divider rounded-xl p-5 flex-row items-center justify-center"
+          >
+            <Wrench size={20} color="#6366f1" />
+            <Text className="text-primary font-semibold ml-3">Individual Request</Text>
+          </TouchableOpacity>
+        </View>
       </View>
 
       {/* Search and Filters */}
-      <View className="px-4 py-4 bg-surface border-b border-divider">
+      <View className="px-6 py-5 bg-surface border-b border-divider">
         {/* Search Bar */}
-        <View className="flex-row items-center bg-background rounded-xl px-4 py-3 mb-4">
+        <View className="flex-row items-center bg-background rounded-xl px-4 py-4 mb-5">
           <Search size={20} color="#757575" />
           <TextInput
             className="flex-1 ml-3 text-text-primary"
@@ -155,7 +190,7 @@ export default function MaintenanceRequests() {
               <TouchableOpacity
                 key={filter.value}
                 onPress={() => setSelectedFilter(filter.value)}
-                className={`px-4 py-2 rounded-full border ${
+                className={`px-4 py-3 rounded-full border ${
                   selectedFilter === filter.value
                     ? "bg-primary border-primary"
                     : "bg-background border-divider"
@@ -177,27 +212,45 @@ export default function MaintenanceRequests() {
       </View>
 
       {/* Requests List */}
-      <ScrollView className="flex-1 px-4 py-4">
+      <ScrollView 
+        className="flex-1" 
+        contentContainerStyle={{ paddingHorizontal: 24, paddingVertical: 20, paddingBottom: 24 }}
+        showsVerticalScrollIndicator={false}
+      >
         {filteredRequests.length === 0 ? (
-          <View className="flex-1 items-center justify-center py-12">
+          <View className="flex-1 items-center justify-center py-16">
             <Text className="text-text-secondary text-lg mb-2">No requests found</Text>
             <Text className="text-text-secondary text-center">
               {searchQuery ? "Try adjusting your search" : "Create your first maintenance request"}
             </Text>
           </View>
         ) : (
-          filteredRequests.map((request) => (
-            <TouchableOpacity
-              key={request.id}
-              className="bg-surface rounded-2xl p-6 mb-4 border border-divider"
-              onPress={() => router.push(`/(tabs)/services/maintenance/${request.id}`)}
-            >
+          <View className="space-y-4">
+            {filteredRequests.map((request) => (
+              <TouchableOpacity
+                key={request.id}
+                className="bg-surface rounded-2xl p-6 border border-divider"
+                onPress={() => {
+                  if (request.type === 'common_area') {
+                    router.push(`/(tabs)/services/maintenance/common-area/${request.id}`);
+                  } else {
+                    router.push(`/(tabs)/services/maintenance/${request.id}`);
+                  }
+                }}
+              >
               {/* Header with Category and Priority */}
               <View className="flex-row items-center justify-between mb-3">
                 <View className="flex-row items-center">
                   <Text className="text-xl mr-2">{getCategoryIcon(request.category)}</Text>
                   <View>
-                    <Text className="text-text-secondary text-sm">{request.category}</Text>
+                    <View className="flex-row items-center">
+                      <Text className="text-text-secondary text-sm">{request.category}</Text>
+                      {request.type === 'common_area' && (
+                        <View className="bg-primary/10 rounded-full px-2 py-1 ml-2">
+                          <Text className="text-primary text-xs font-medium">Common Area</Text>
+                        </View>
+                      )}
+                    </View>
                     <Text className="text-text-secondary text-xs">#{request.id}</Text>
                   </View>
                 </View>
@@ -209,6 +262,19 @@ export default function MaintenanceRequests() {
               {/* Title and Description */}
               <Text className="text-lg font-semibold text-text-primary mb-2">{request.title}</Text>
               <Text className="text-text-secondary text-sm mb-4 leading-5">{request.description}</Text>
+
+              {/* Common Area specific info */}
+              {request.type === 'common_area' && (
+                <View className="flex-row items-center mb-3">
+                  <Users size={14} color="#757575" />
+                  <Text className="text-text-secondary text-xs ml-1">
+                    Affects {request.affectedResidents} residents
+                  </Text>
+                  <Text className="text-text-secondary text-xs ml-3">
+                    by {request.submittedBy}
+                  </Text>
+                </View>
+              )}
 
               {/* Status and Details */}
               <View className="flex-row items-center justify-between">
@@ -233,8 +299,9 @@ export default function MaintenanceRequests() {
                   )}
                 </View>
               </View>
-            </TouchableOpacity>
-          ))
+              </TouchableOpacity>
+            ))}
+          </View>
         )}
       </ScrollView>
     </SafeAreaView>

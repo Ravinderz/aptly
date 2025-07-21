@@ -3,6 +3,8 @@ import { ArrowLeft, User, Home, Users, Shield } from "lucide-react-native";
 import React, { useState } from "react";
 import { SafeAreaView, ScrollView, Text, TextInput, TouchableOpacity, View, Alert } from "react-native";
 import { Button } from "@/components/ui/Button";
+import { useAuth } from "@/contexts/AuthContext";
+import AuthService, { UserProfile } from "@/services/auth.service";
 
 interface ProfileData {
   fullName: string;
@@ -15,6 +17,7 @@ interface ProfileData {
 
 export default function ProfileSetup() {
   const router = useRouter();
+  const { login } = useAuth();
   const { phoneNumber, societyCode, societyId, societyName } = useLocalSearchParams<{
     phoneNumber: string;
     societyCode: string;
@@ -95,16 +98,28 @@ export default function ProfileSetup() {
     setIsLoading(true);
     
     try {
-      // TODO: Replace with actual API call
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      // Create profile data
+      const completeProfileData = {
+        id: `user_${Date.now()}`, // Generate temp ID for demo
+        phoneNumber: phoneNumber || '',
+        fullName: profileData.fullName,
+        flatNumber: profileData.flatNumber,
+        ownershipType: profileData.ownershipType,
+        familySize: parseInt(profileData.familySize),
+        emergencyContact: profileData.emergencyContact,
+        role: profileData.role,
+        societyId: societyId || '',
+        societyCode: societyCode || '',
+        isVerified: true,
+        createdAt: new Date().toISOString(),
+      } as UserProfile;
+
+      // For demo purposes, we'll simulate the API call
+      // In production, use: const result = await AuthService.createProfile(completeProfileData);
+      await new Promise(resolve => setTimeout(resolve, 1500));
       
-      // Simulate profile creation
-      const userProfile = {
-        phoneNumber,
-        societyId,
-        societyCode,
-        ...profileData
-      };
+      // Log the user in with the auth context
+      login(completeProfileData);
       
       Alert.alert(
         "Profile Created!",
@@ -113,7 +128,7 @@ export default function ProfileSetup() {
           {
             text: "Continue",
             onPress: () => {
-              // Navigate to main app (tabs)
+              // The auth context will handle navigation
               router.replace("/(tabs)");
             }
           }
@@ -121,6 +136,7 @@ export default function ProfileSetup() {
       );
       
     } catch (error) {
+      console.error('Profile creation error:', error);
       Alert.alert("Error", "Failed to create profile. Please try again.");
     } finally {
       setIsLoading(false);

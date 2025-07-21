@@ -68,7 +68,7 @@ const Visitor = () => {
     <>
       <View style={{ zIndex: 1, position: "absolute", right: 20, bottom: 20 }}>
         <TouchableOpacity
-          className="bg-orange-400 rounded-full p-4 "
+          className="bg-primary rounded-full p-4 shadow-lg shadow-primary/25"
           onPress={() => handleAddVisitor()}
         >
           <Plus size={24} color="white" strokeWidth={2} />
@@ -89,10 +89,10 @@ const Visitor = () => {
                 <View className="w-full px-4">
                   <View className="flex flex-row justify-between items-center pb-3 ">
                     <View className="flex flex-row gap-2 items-center ">
-                      <Text className="text-2xl font-bold bg-accent_secondary text-white rounded-full flex items-center justify-center p-3">
+                      <Text className="text-2xl font-bold bg-primary text-white rounded-full flex items-center justify-center p-3">
                         {getLetters(selectedVisitor?.name as string)}
                       </Text>
-                      <Text className="text-xl font-semibold">
+                      <Text className="text-headline-large font-semibold text-text-primary">
                         {selectedVisitor?.name}
                       </Text>
                     </View>
@@ -113,27 +113,27 @@ const Visitor = () => {
                   </View>
                   <View className="flex items-center gap-2">
                     <View className="flex flex-row gap-2">
-                      <Text className="text-xl font-medium text-zinc-500">
+                      <Text className="text-body-large font-medium text-text-secondary">
                         {selectedVisitor?.date}
                       </Text>
-                      <Text className="text-xl font-medium text-zinc-500">
+                      <Text className="text-body-large font-medium text-text-secondary">
                         {selectedVisitor?.time}
                       </Text>
                     </View>
-                    <Text className="text-lg font-medium text-zinc-500">
+                    <Text className="text-headline-medium font-medium text-text-secondary">
                       {selectedVisitor?.status}
                     </Text>
                   </View>
                   <View className="flex flex-row justify-around my-6">
-                    <TouchableOpacity className="flex flex-row gap-2 justify-center items-center bg-neutral h-16 w-36  rounded-lg">
+                    <TouchableOpacity className="flex flex-row gap-2 justify-center items-center bg-primary h-16 w-36 rounded-lg">
                       <Share2 size={24} color="white" strokeWidth={1.5} />
-                      <Text className="text-white text-md font-semibold">
+                      <Text className="text-white text-body-large font-semibold">
                         Share
                       </Text>
                     </TouchableOpacity>
-                    <TouchableOpacity className="flex flex-row gap-2 justify-center items-center bg-neutral h-16 w-36 rounded-lg">
-                      <Download size={24} color="white" strokeWidth={1.5} />
-                      <Text className="text-white text-md font-semibold">
+                    <TouchableOpacity className="flex flex-row gap-2 justify-center items-center bg-surface border border-divider h-16 w-36 rounded-lg">
+                      <Download size={24} color="#6366f1" strokeWidth={1.5} />
+                      <Text className="text-primary text-body-large font-semibold">
                         Download
                       </Text>
                     </TouchableOpacity>

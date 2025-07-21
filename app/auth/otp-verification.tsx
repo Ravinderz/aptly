@@ -3,6 +3,7 @@ import { ArrowLeft, Shield, RefreshCw } from "lucide-react-native";
 import React, { useState, useEffect, useRef } from "react";
 import { SafeAreaView, Text, TextInput, TouchableOpacity, View, Alert } from "react-native";
 import { Button } from "@/components/ui/Button";
+import AuthService from "@/services/auth.service";
 
 export default function OTPVerification() {
   const router = useRouter();
@@ -72,13 +73,9 @@ export default function OTPVerification() {
     setError("");
     
     try {
-      // TODO: Replace with actual API call
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      const result = await AuthService.verifyOTP(phoneNumber || '', otpToVerify);
       
-      // Simulate API response
-      const isValidOTP = otpToVerify === "123456"; // For demo purposes
-      
-      if (isValidOTP) {
+      if (result.success) {
         // Navigate to society verification/profile setup
         router.push({
           pathname: "/auth/society-verification",
@@ -88,13 +85,14 @@ export default function OTPVerification() {
           }
         });
       } else {
-        setError("Invalid OTP. Please try again.");
+        setError(result.error || "Invalid OTP. Please try again.");
         // Clear OTP inputs
         setOTP(["", "", "", "", "", ""]);
         inputRefs.current[0]?.focus();
       }
       
     } catch (error) {
+      console.error('OTP verification error:', error);
       setError("Verification failed. Please try again.");
     } finally {
       setIsLoading(false);
@@ -105,17 +103,21 @@ export default function OTPVerification() {
     setIsResending(true);
     
     try {
-      // TODO: Replace with actual API call
-      await new Promise(resolve => setTimeout(resolve, 1500));
+      const result = await AuthService.registerPhone(phoneNumber || '', societyCode || '');
       
-      // Reset timer
-      setTimeLeft(30);
-      setCanResend(false);
-      setError("");
-      
-      Alert.alert("OTP Sent", "A new OTP has been sent to your mobile number.");
+      if (result.success) {
+        // Reset timer
+        setTimeLeft(30);
+        setCanResend(false);
+        setError("");
+        
+        Alert.alert("OTP Sent", "A new OTP has been sent to your mobile number.");
+      } else {
+        Alert.alert("Error", result.error || "Failed to resend OTP. Please try again.");
+      }
       
     } catch (error) {
+      console.error('Resend OTP error:', error);
       Alert.alert("Error", "Failed to resend OTP. Please try again.");
     } finally {
       setIsResending(false);

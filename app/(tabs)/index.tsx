@@ -1,4 +1,5 @@
 import AlertCard from "@/components/AlertCard";
+import NoticeSection from "@/components/NoticeSection";
 import QuickActions from "@/components/QuickActions";
 import Header from "@/components/ui/Header";
 import UpcomingVisitorSection from "@/components/UpcomingVisitorSection";
@@ -8,7 +9,7 @@ import { StyleSheet } from "react-native";
 export default function HomeScreen() {
   return (
     <Header>
-      <AlertCard />
+      <NoticeSection />
       <UpcomingVisitorSection />
       <QuickActions />
       <SocietyOverview />

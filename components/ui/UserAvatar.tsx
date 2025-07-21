@@ -11,7 +11,7 @@ const UserAvatar = ({ name }: { name: string }) => {
   };
 
   return (
-    <Text className="text-md font-bold bg-primary/10 text-primary rounded-full flex items-center justify-center p-3">
+    <Text className="text-headline-medium font-bold bg-primary/10 text-primary rounded-full flex items-center justify-center p-3">
       {getLetters(name)}
     </Text>
   );

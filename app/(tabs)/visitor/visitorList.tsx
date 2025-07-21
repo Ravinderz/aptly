@@ -26,8 +26,7 @@ const visitorList = () => {
 
   return (
     <View
-      className="flex h-full p-4 mb-8"
-      style={{ backgroundColor: "#f8fafc" }}
+      className="flex h-full p-4 mb-8 bg-background"
     >
       <FlatList
         data={dummyVisitors}
@@ -46,18 +45,18 @@ const visitorList = () => {
         showsVerticalScrollIndicator={false}
         ListEmptyComponent={
           <View className="flex items-center justify-center h-full">
-            <Text className="text-lg text-gray-500">No visitors found</Text>
+            <Text className="text-headline-medium text-text-secondary">No visitors found</Text>
           </View>
         }
         ListFooterComponent={
           <View className="flex items-center justify-center h-full">
-            <Text className="text-lg text-gray-500">End of List</Text>
+            <Text className="text-headline-medium text-text-secondary">End of List</Text>
           </View>
         }
         style={{
           padding: 2,
-          backgroundColor: "#f8fafc",
         }}
+        className="bg-background"
       ></FlatList>
     </View>
   );
