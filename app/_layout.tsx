@@ -2,9 +2,18 @@ import { Stack } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { AuthProvider } from "@/contexts/AuthContext";
 import AppNavigator from "@/components/AppNavigator";
+import { useAlert } from "@/components/ui/AlertCard";
+import { setGlobalAlertHandler } from "@/utils/alert";
+import { useEffect } from "react";
 import "./globals.css";
 
 export default function RootLayout() {
+  const { showAlert, AlertComponent } = useAlert();
+
+  useEffect(() => {
+    setGlobalAlertHandler(showAlert);
+  }, [showAlert]);
+
   return (
     <AuthProvider>
       <SafeAreaView style={{ flex: 1 }}>
@@ -16,6 +25,7 @@ export default function RootLayout() {
             <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
           </Stack>
         </AppNavigator>
+        {AlertComponent}
       </SafeAreaView>
     </AuthProvider>
   );

@@ -1,7 +1,12 @@
 import React from "react";
-import { Text } from "react-native";
+import { Text, View } from "react-native";
 
-const UserAvatar = ({ name }: { name: string }) => {
+interface UserAvatarProps {
+  name: string;
+  size?: 'sm' | 'md' | 'lg';
+}
+
+const UserAvatar: React.FC<UserAvatarProps> = ({ name, size = 'md' }) => {
   const getLetters = (name: string) => {
     const names = name.split(" ");
     if (names.length > 1) {
@@ -10,10 +15,18 @@ const UserAvatar = ({ name }: { name: string }) => {
     return names[0][0];
   };
 
+  const sizeClasses = {
+    sm: 'w-8 h-8 text-xs',
+    md: 'w-12 h-12 text-sm',
+    lg: 'w-16 h-16 text-lg'
+  };
+
   return (
-    <Text className="text-headline-medium font-bold bg-primary/10 text-primary rounded-full flex items-center justify-center p-3">
-      {getLetters(name)}
-    </Text>
+    <View className={`bg-primary/10 rounded-full items-center justify-center ${sizeClasses[size]}`}>
+      <Text className="text-primary font-bold">
+        {getLetters(name)}
+      </Text>
+    </View>
   );
 };
 

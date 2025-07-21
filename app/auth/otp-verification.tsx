@@ -1,9 +1,10 @@
 import { useRouter, useLocalSearchParams } from "expo-router";
 import { ArrowLeft, Shield, RefreshCw } from "lucide-react-native";
 import React, { useState, useEffect, useRef } from "react";
-import { SafeAreaView, Text, TextInput, TouchableOpacity, View, Alert } from "react-native";
+import { SafeAreaView, Text, TextInput, TouchableOpacity, View } from "react-native";
 import { Button } from "@/components/ui/Button";
 import AuthService from "@/services/auth.service";
+import { showErrorAlert, showSuccessAlert } from "@/utils/alert";
 
 export default function OTPVerification() {
   const router = useRouter();
@@ -111,14 +112,14 @@ export default function OTPVerification() {
         setCanResend(false);
         setError("");
         
-        Alert.alert("OTP Sent", "A new OTP has been sent to your mobile number.");
+        showSuccessAlert("OTP Sent", "A new OTP has been sent to your mobile number.");
       } else {
-        Alert.alert("Error", result.error || "Failed to resend OTP. Please try again.");
+        showErrorAlert("Error", result.error || "Failed to resend OTP. Please try again.");
       }
       
     } catch (error) {
       console.error('Resend OTP error:', error);
-      Alert.alert("Error", "Failed to resend OTP. Please try again.");
+      showErrorAlert("Error", "Failed to resend OTP. Please try again.");
     } finally {
       setIsResending(false);
     }

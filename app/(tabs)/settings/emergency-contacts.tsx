@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
-import { ScrollView, SafeAreaView, View, Text, TouchableOpacity, Alert, Linking } from 'react-native';
+import { ScrollView, SafeAreaView, View, Text, TouchableOpacity, Linking } from 'react-native';
 import { ArrowLeft, Plus, Phone, Edit3, Trash2, PhoneCall } from 'lucide-react-native';
 import { router } from 'expo-router';
 import Button from '../../../components/ui/Button';
 import { Card } from '../../../components/ui/Card';
 import { cn } from '../../../utils/cn';
+import { showErrorAlert, showDeleteConfirmAlert } from '../../../utils/alert';
 
 interface EmergencyContact {
   id: string;
@@ -49,27 +50,19 @@ export default function EmergencyContacts() {
 
   const handleDeleteContact = (contact: EmergencyContact) => {
     if (contact.isPrimary) {
-      Alert.alert(
+      showErrorAlert(
         'Cannot Delete Primary Contact',
-        'You cannot delete your primary emergency contact. Please set another contact as primary first.',
-        [{ text: 'OK' }]
+        'You cannot delete your primary emergency contact. Please set another contact as primary first.'
       );
       return;
     }
 
-    Alert.alert(
+    showDeleteConfirmAlert(
       'Delete Emergency Contact',
       `Are you sure you want to delete ${contact.name}?`,
-      [
-        { text: 'Cancel', style: 'cancel' },
-        {
-          text: 'Delete',
-          style: 'destructive',
-          onPress: () => {
-            setContacts(prev => prev.filter(c => c.id !== contact.id));
-          },
-        },
-      ]
+      () => {
+        setContacts(prev => prev.filter(c => c.id !== contact.id));
+      }
     );
   };
 
@@ -79,7 +72,7 @@ export default function EmergencyContacts() {
       if (supported) {
         Linking.openURL(phoneUrl);
       } else {
-        Alert.alert('Error', 'Unable to make phone call');
+        showErrorAlert('Error', 'Unable to make phone call');
       }
     });
   };

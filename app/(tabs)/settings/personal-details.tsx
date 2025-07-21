@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
-import { ScrollView, SafeAreaView, View, Text, Alert } from 'react-native';
+import { ScrollView, SafeAreaView, View, Text } from 'react-native';
 import { ArrowLeft, Save } from 'lucide-react-native';
 import { router } from 'expo-router';
 import Input from '../../../components/ui/Input';
 import Button from '../../../components/ui/Button';
 import { Card } from '../../../components/ui/Card';
+import { showErrorAlert, showSuccessAlert } from '../../../utils/alert';
 
 export default function PersonalDetails() {
   const [formData, setFormData] = useState({
@@ -25,14 +26,14 @@ export default function PersonalDetails() {
   const handleSave = () => {
     // Validate and save the form data
     if (!formData.fullName.trim() || !formData.email.trim() || !formData.phone.trim()) {
-      Alert.alert('Error', 'Please fill in all required fields');
+      showErrorAlert('Error', 'Please fill in all required fields');
       return;
     }
 
     // Here you would typically save to your backend/context
     console.log('Saving personal details:', formData);
     setIsEditing(false);
-    Alert.alert('Success', 'Personal details updated successfully');
+    showSuccessAlert('Success', 'Personal details updated successfully');
   };
 
   const handleCancel = () => {

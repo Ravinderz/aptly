@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ScrollView, SafeAreaView, View, Text, TouchableOpacity, Alert } from 'react-native';
+import { ScrollView, SafeAreaView, View, Text, TouchableOpacity } from 'react-native';
 import { 
   ArrowLeft, 
   Plus, 
@@ -17,6 +17,7 @@ import { router } from 'expo-router';
 import Button from '../../../components/ui/Button';
 import { Card } from '../../../components/ui/Card';
 import { cn } from '../../../utils/cn';
+import { showDeleteConfirmAlert } from '../../../utils/alert';
 
 interface Document {
   id: string;
@@ -87,19 +88,12 @@ export default function Documents() {
   };
 
   const handleDeleteDocument = (document: Document) => {
-    Alert.alert(
+    showDeleteConfirmAlert(
       'Delete Document',
       `Are you sure you want to delete ${document.name}?`,
-      [
-        { text: 'Cancel', style: 'cancel' },
-        {
-          text: 'Delete',
-          style: 'destructive',
-          onPress: () => {
-            setDocuments(prev => prev.filter(d => d.id !== document.id));
-          },
-        },
-      ]
+      () => {
+        setDocuments(prev => prev.filter(d => d.id !== document.id));
+      }
     );
   };
 

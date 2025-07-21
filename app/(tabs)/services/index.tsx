@@ -83,7 +83,7 @@ export default function Services() {
             <Text className="text-lg font-semibold text-text-primary mb-4">Quick Actions</Text>
             <TouchableOpacity 
               className="bg-primary rounded-2xl p-5 flex-row items-center justify-center"
-              onPress={() => router.push("/(tabs)/services/maintenance/create")}
+              onPress={() => router.push("/(tabs)/services/maintenance/common-area/create")}
             >
               <Plus size={24} color="white" />
               <Text className="text-white font-semibold ml-3">New Maintenance Request</Text>
@@ -170,7 +170,7 @@ export default function Services() {
                   <TouchableOpacity 
                     key={request.id}
                     className="bg-surface rounded-xl p-5 border border-divider"
-                    onPress={() => router.push(`/(tabs)/services/maintenance/${request.id}`)}
+                    onPress={() => router.push(`/(tabs)/services/maintenance/common-area/${request.id}`)}
                   >
                     <View className="flex-row items-start justify-between mb-3">
                       <Text className="text-text-primary font-medium flex-1 mr-3">{request.title}</Text>

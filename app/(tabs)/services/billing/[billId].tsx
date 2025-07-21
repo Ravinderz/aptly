@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { SafeAreaView, ScrollView, Text, TouchableOpacity, View, Alert, Linking } from 'react-native';
+import { SafeAreaView, ScrollView, Text, TouchableOpacity, View, Linking } from 'react-native';
+import { showConfirmAlert, showSuccessAlert, showAlert } from '@/utils/alert';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { 
   ArrowLeft, 
@@ -240,54 +241,53 @@ export default function BillDetail() {
   const handlePaymentMethodSelect = (method: string, gateway: string) => {
     setSelectedPaymentMethod({ method, gateway });
     
-    Alert.alert(
+    showConfirmAlert(
       'Payment Method Selected',
       `You selected ${method} via ${paymentGateways[gateway as keyof typeof paymentGateways].name}. This would integrate with the actual payment gateway.`,
-      [
-        { text: 'Cancel' },
-        { 
-          text: 'Proceed to Pay', 
-          onPress: () => handlePayment(method, gateway)
-        }
-      ]
+      () => handlePayment(method, gateway),
+      undefined,
+      'Proceed to Pay',
+      'Cancel'
     );
   };
 
   const handlePayment = (method: string, gateway: string) => {
     // In production, this would integrate with actual payment gateways
-    Alert.alert(
+    showAlert(
       'Payment Processing',
       `Processing payment of ${formatCurrency(calculateTotalWithLateFee())} via ${method}...`,
-      [
-        {
-          text: 'OK',
+      {
+        type: 'info',
+        primaryAction: {
+          label: 'OK',
           onPress: () => {
-            Alert.alert('Payment Successful!', 'Your payment has been processed successfully.');
-            router.back();
+            showSuccessAlert('Payment Successful!', 'Your payment has been processed successfully.', () => {
+              router.back();
+            });
           }
         }
-      ]
+      }
     );
   };
 
   const handleDownloadBill = () => {
     // In production, this would generate and download PDF
-    Alert.alert('Download Started', 'Bill PDF download will start shortly.');
+    showSuccessAlert('Download Started', 'Bill PDF download will start shortly.');
   };
 
   const handleShareBill = () => {
     // In production, this would use React Native Share
-    Alert.alert('Share Bill', 'Bill sharing functionality would be integrated here.');
+    showAlert('Share Bill', 'Bill sharing functionality would be integrated here.');
   };
 
   const handleSetupAutoPayment = () => {
-    Alert.alert(
+    showConfirmAlert(
       'Setup Auto Payment',
       'Configure automatic payment for future bills?',
-      [
-        { text: 'Cancel' },
-        { text: 'Setup', onPress: () => Alert.alert('Auto Payment', 'Auto payment setup functionality would be here.') }
-      ]
+      () => showAlert('Auto Payment', 'Auto payment setup functionality would be here.'),
+      undefined,
+      'Setup',
+      'Cancel'
     );
   };
 

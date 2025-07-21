@@ -1,9 +1,10 @@
 import { useRouter } from "expo-router";
 import { ArrowLeft, Phone, Shield } from "lucide-react-native";
 import React, { useState } from "react";
-import { SafeAreaView, Text, TextInput, TouchableOpacity, View, Alert, KeyboardAvoidingView, Platform } from "react-native";
+import { SafeAreaView, Text, TextInput, TouchableOpacity, View, KeyboardAvoidingView, Platform } from "react-native";
 import { Button } from "@/components/ui/Button";
 import AuthService from "@/services/auth.service";
+import { showErrorAlert } from "@/utils/alert";
 
 export default function PhoneRegistration() {
   const router = useRouter();
@@ -153,13 +154,13 @@ export default function PhoneRegistration() {
         } else if (result.error?.includes('society')) {
           setErrors({ society: result.error });
         } else {
-          Alert.alert("Error", result.error || "Failed to send OTP. Please try again.");
+          showErrorAlert("Error", result.error || "Failed to send OTP. Please try again.");
         }
       }
       
     } catch (error) {
       console.error('Phone registration error:', error);
-      Alert.alert("Error", "Failed to send OTP. Please try again.");
+      showErrorAlert("Error", "Failed to send OTP. Please try again.");
     } finally {
       setIsLoading(false);
     }

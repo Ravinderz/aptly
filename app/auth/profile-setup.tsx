@@ -1,10 +1,11 @@
 import { useRouter, useLocalSearchParams } from "expo-router";
 import { ArrowLeft, User, Home, Users, Shield } from "lucide-react-native";
 import React, { useState } from "react";
-import { SafeAreaView, ScrollView, Text, TextInput, TouchableOpacity, View, Alert } from "react-native";
+import { SafeAreaView, ScrollView, Text, TextInput, TouchableOpacity, View } from "react-native";
 import { Button } from "@/components/ui/Button";
 import { useAuth } from "@/contexts/AuthContext";
 import AuthService, { UserProfile } from "@/services/auth.service";
+import { showErrorAlert, showSuccessAlert } from "@/utils/alert";
 
 interface ProfileData {
   fullName: string;
@@ -121,23 +122,18 @@ export default function ProfileSetup() {
       // Log the user in with the auth context
       login(completeProfileData);
       
-      Alert.alert(
+      showSuccessAlert(
         "Profile Created!",
         "Your profile has been set up successfully. Welcome to Aptly!",
-        [
-          {
-            text: "Continue",
-            onPress: () => {
-              // The auth context will handle navigation
-              router.replace("/(tabs)");
-            }
-          }
-        ]
+        () => {
+          // The auth context will handle navigation
+          router.replace("/(tabs)");
+        }
       );
       
     } catch (error) {
       console.error('Profile creation error:', error);
-      Alert.alert("Error", "Failed to create profile. Please try again.");
+      showErrorAlert("Error", "Failed to create profile. Please try again.");
     } finally {
       setIsLoading(false);
     }

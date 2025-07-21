@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
-import { ScrollView, SafeAreaView, View, Text, TouchableOpacity, Alert } from 'react-native';
+import { ScrollView, SafeAreaView, View, Text, TouchableOpacity } from 'react-native';
 import { ArrowLeft, Plus, Edit3, Trash2, Car, Bike } from 'lucide-react-native';
 import { router } from 'expo-router';
 import Button from '../../../components/ui/Button';
 import { Card } from '../../../components/ui/Card';
 import { cn } from '../../../utils/cn';
+import { showDeleteConfirmAlert } from '../../../utils/alert';
 
 interface Vehicle {
   id: string;
@@ -57,19 +58,12 @@ export default function Vehicles() {
   };
 
   const handleDeleteVehicle = (vehicle: Vehicle) => {
-    Alert.alert(
+    showDeleteConfirmAlert(
       'Remove Vehicle',
       `Are you sure you want to remove ${vehicle.brand} ${vehicle.model} (${vehicle.registrationNumber})?`,
-      [
-        { text: 'Cancel', style: 'cancel' },
-        {
-          text: 'Remove',
-          style: 'destructive',
-          onPress: () => {
-            setVehicles(prev => prev.filter(v => v.id !== vehicle.id));
-          },
-        },
-      ]
+      () => {
+        setVehicles(prev => prev.filter(v => v.id !== vehicle.id));
+      }
     );
   };
 

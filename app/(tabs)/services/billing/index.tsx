@@ -1,7 +1,8 @@
 import { useRouter } from "expo-router";
 import { ArrowLeft, Download, Calendar, AlertCircle, CheckCircle, Bell, CreditCard, TrendingUp, Filter, Search, Plus, Settings } from "lucide-react-native";
 import React, { useState } from "react";
-import { SafeAreaView, ScrollView, Text, TouchableOpacity, View, TextInput, Alert } from "react-native";
+import { SafeAreaView, ScrollView, Text, TouchableOpacity, View, TextInput } from "react-native";
+import { showAlert } from "@/utils/alert";
 import HighlightCard from "@/components/ui/HighlightCard";
 
 export default function Billing() {
@@ -172,14 +173,14 @@ export default function Billing() {
           <Text className="text-text-secondary text-sm">Flat A-201</Text>
         </View>
         <TouchableOpacity 
-          onPress={() => Alert.alert('Notifications', 'Payment reminders and notifications would be shown here.')}
+          onPress={() => showAlert('Notifications', 'Payment reminders and notifications would be shown here.')}
           className="mr-3 relative"
         >
           <Bell size={20} color="#6366f1" />
           <View className="absolute -top-1 -right-1 bg-error rounded-full w-3 h-3" />
         </TouchableOpacity>
         <TouchableOpacity 
-          onPress={() => Alert.alert('Settings', 'Billing settings like auto-pay, payment methods etc.')}
+          onPress={() => showAlert('Settings', 'Billing settings like auto-pay, payment methods etc.')}
         >
           <Settings size={20} color="#6366f1" />
         </TouchableOpacity>
@@ -209,14 +210,14 @@ export default function Billing() {
         {/* Quick Actions */}
         <View className="flex-row gap-4">
           <TouchableOpacity 
-            onPress={() => Alert.alert('Auto Pay', 'Setup automatic payments for all bills')}
+            onPress={() => showAlert('Auto Pay', 'Setup automatic payments for all bills')}
             className="flex-1 bg-primary rounded-xl p-4 flex-row items-center justify-center"
           >
             <CreditCard size={16} color="white" />
             <Text className="text-white font-semibold ml-2 text-sm">Setup Auto Pay</Text>
           </TouchableOpacity>
           <TouchableOpacity 
-            onPress={() => Alert.alert('Payment History', 'View detailed payment history and analytics')}
+            onPress={() => showAlert('Payment History', 'View detailed payment history and analytics')}
             className="flex-1 bg-surface border border-divider rounded-xl p-4 flex-row items-center justify-center"
           >
             <TrendingUp size={16} color="#6366f1" />

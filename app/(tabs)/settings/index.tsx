@@ -1,7 +1,8 @@
 import React from 'react';
-import { ScrollView, SafeAreaView, View, Alert } from 'react-native';
+import { ScrollView, SafeAreaView, View } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useAuth } from '@/contexts/AuthContext';
+import { showErrorAlert, showSuccessAlert, showConfirmAlert } from '@/utils/alert';
 import { 
   User, 
   Users, 
@@ -47,10 +48,10 @@ export default function Profile() {
 
       if (!result.canceled && result.assets[0]) {
         // TODO: Upload image and update user profile
-        Alert.alert('Success', 'Profile photo updated successfully');
+        showSuccessAlert('Success', 'Profile photo updated successfully');
       }
     } catch (error) {
-      Alert.alert('Error', 'Failed to update profile photo');
+      showErrorAlert('Error', 'Failed to update profile photo');
     }
   };
 
@@ -80,39 +81,36 @@ export default function Profile() {
 
   const handleSecurity = () => {
     // TODO: Implement security settings screen
-    Alert.alert('Coming Soon', 'Security settings will be available in the next update');
+    showSuccessAlert('Coming Soon', 'Security settings will be available in the next update');
   };
 
   const handleHelp = () => {
     // TODO: Implement help & support screen
-    Alert.alert('Help & Support', 'For assistance, please contact your society management or email support@aptly.app');
+    showSuccessAlert('Help & Support', 'For assistance, please contact your society management or email support@aptly.app');
   };
 
   const handleSettings = () => {
     // TODO: Implement app settings screen
-    Alert.alert('Coming Soon', 'App settings will be available in the next update');
+    showSuccessAlert('Coming Soon', 'App settings will be available in the next update');
   };
 
   const handleLogout = () => {
-    Alert.alert(
+    showConfirmAlert(
       'Logout',
       'Are you sure you want to sign out of your account?',
-      [
-        { text: 'Cancel', style: 'cancel' },
-        {
-          text: 'Logout',
-          style: 'destructive',
-          onPress: async () => {
-            try {
-              await logout();
-              // Navigation will be handled by AppNavigator based on auth state
-            } catch (error) {
-              console.error('Logout error:', error);
-              Alert.alert('Error', 'Failed to logout. Please try again.');
-            }
-          }
+      async () => {
+        try {
+          await logout();
+          // Navigation will be handled by AppNavigator based on auth state
+        } catch (error) {
+          console.error('Logout error:', error);
+          showErrorAlert('Error', 'Failed to logout. Please try again.');
         }
-      ]
+      },
+      () => {}, // Cancel callback
+      'Logout',
+      'Cancel',
+      true // destructive
     );
   };
 

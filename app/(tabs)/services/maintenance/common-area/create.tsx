@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { SafeAreaView, ScrollView, Text, TouchableOpacity, View, TextInput, Alert } from 'react-native';
+import { SafeAreaView, ScrollView, Text, TouchableOpacity, View, TextInput } from 'react-native';
 import { useRouter } from 'expo-router';
 import { 
   ArrowLeft, 
@@ -18,6 +18,7 @@ import {
 } from 'lucide-react-native';
 import * as ImagePicker from 'expo-image-picker';
 import { Audio } from 'expo-av';
+import { showErrorAlert, showSuccessAlert } from '@/utils/alert';
 
 // Common area locations
 const commonAreaLocations = [
@@ -137,19 +138,19 @@ export default function CreateCommonAreaRequest() {
 
   const validateForm = () => {
     if (!selectedLocation) {
-      Alert.alert('Error', 'Please select a location');
+      showErrorAlert('Error', 'Please select a location');
       return false;
     }
     if (!selectedArea) {
-      Alert.alert('Error', 'Please select a specific area');
+      showErrorAlert('Error', 'Please select a specific area');
       return false;
     }
     if (!selectedCategory) {
-      Alert.alert('Error', 'Please select an issue category');
+      showErrorAlert('Error', 'Please select an issue category');
       return false;
     }
     if (!description.trim()) {
-      Alert.alert('Error', 'Please describe the issue');
+      showErrorAlert('Error', 'Please describe the issue');
       return false;
     }
     return true;
@@ -157,7 +158,7 @@ export default function CreateCommonAreaRequest() {
 
   const handleImagePicker = async () => {
     if (mediaFiles.filter(f => f.type === 'image').length >= 5) {
-      Alert.alert('Limit Reached', 'Maximum 5 images allowed');
+      showErrorAlert('Limit Reached', 'Maximum 5 images allowed');
       return;
     }
 
@@ -181,7 +182,7 @@ export default function CreateCommonAreaRequest() {
 
   const handleCamera = async () => {
     if (mediaFiles.filter(f => f.type === 'image').length >= 5) {
-      Alert.alert('Limit Reached', 'Maximum 5 images allowed');
+      showErrorAlert('Limit Reached', 'Maximum 5 images allowed');
       return;
     }
 
@@ -206,12 +207,12 @@ export default function CreateCommonAreaRequest() {
     try {
       const permission = await Audio.requestPermissionsAsync();
       if (permission.status !== 'granted') {
-        Alert.alert('Permission Required', 'Audio recording permission is required');
+        showErrorAlert('Permission Required', 'Audio recording permission is required');
         return;
       }
 
       if (mediaFiles.filter(f => f.type === 'audio').length >= 2) {
-        Alert.alert('Limit Reached', 'Maximum 2 voice notes allowed');
+        showErrorAlert('Limit Reached', 'Maximum 2 voice notes allowed');
         return;
       }
 
@@ -227,7 +228,7 @@ export default function CreateCommonAreaRequest() {
       setIsRecording(true);
     } catch (err) {
       console.error('Failed to start recording', err);
-      Alert.alert('Error', 'Failed to start recording');
+      showErrorAlert('Error', 'Failed to start recording');
     }
   };
 
@@ -279,24 +280,15 @@ export default function CreateCommonAreaRequest() {
         submittedAt: new Date().toISOString(),
       };
 
-      Alert.alert(
+      showSuccessAlert(
         'Request Submitted!',
         'Your common area maintenance request has been submitted to the society committee for review.',
-        [
-          {
-            text: 'View Request',
-            onPress: () => router.replace(`/services/maintenance/common-area/demo-request-id`)
-          },
-          {
-            text: 'Back to Services',
-            onPress: () => router.replace('/services')
-          }
-        ]
+        () => router.replace(`/services/maintenance/common-area/demo-request-id`)
       );
 
     } catch (error) {
       console.error('Submit error:', error);
-      Alert.alert('Error', 'Failed to submit request. Please try again.');
+      showErrorAlert('Error', 'Failed to submit request. Please try again.');
     } finally {
       setIsSubmitting(false);
     }

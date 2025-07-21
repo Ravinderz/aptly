@@ -1,58 +1,196 @@
-import { Heart, MessageSquareText } from "lucide-react-native";
-import React from "react";
-import { Text, View } from "react-native";
+import { Heart, MessageSquareText, Trash2, Edit3, MoreHorizontal } from "lucide-react-native";
+import React, { useState } from "react";
+import { Text, View, TouchableOpacity, ActivityIndicator, Image } from "react-native";
 import UserAvatar from "./UserAvatar";
+import MentionText from "./MentionText";
+import { Post } from "@/types/community";
+import { formatTimeAgo, getCategoryDisplay, getPostStats, canEditPost } from "@/utils/community";
+import { communityApi } from "@/services/communityApi";
+import { useRouter } from "expo-router";
+import { showErrorAlert, showDeleteConfirmAlert } from "@/utils/alert";
 
-const PostCard = () => {
+interface PostCardProps {
+  post: Post;
+  onLike?: (postId: string, liked: boolean, likesCount: number) => void;
+  onComment?: (postId: string) => void;
+  onDelete?: (postId: string) => void;
+  onEdit?: (postId: string) => void;
+}
+
+const PostCard: React.FC<PostCardProps> = ({ post, onLike, onComment, onDelete, onEdit }) => {
+  const [liking, setLiking] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+  const [showActions, setShowActions] = useState(false);
+  const router = useRouter();
+  
+  // Check if user can edit this post (within 30 minutes)
+  const canEdit = canEditPost(post, post.userId);
+
+  const handleLike = async () => {
+    if (liking) return;
+    
+    try {
+      setLiking(true);
+      const result = await communityApi.toggleLike(post.id);
+      onLike?.(post.id, result.liked, result.likesCount);
+    } catch (error) {
+      console.error('Error toggling like:', error);
+      showErrorAlert('Error', 'Failed to update like. Please try again.');
+    } finally {
+      setLiking(false);
+    }
+  };
+
+  const handleComment = () => {
+    onComment?.(post.id);
+  };
+  
+  const handleEdit = () => {
+    if (onEdit) {
+      onEdit(post.id);
+    } else {
+      router.push(`/(tabs)/community/edit/${post.id}`);
+    }
+    setShowActions(false);
+  };
+  
+  const toggleActions = () => {
+    setShowActions(!showActions);
+  };
+
+  const handleDelete = () => {
+    showDeleteConfirmAlert(
+      'Delete Post',
+      'Are you sure you want to delete this post? This action cannot be undone.',
+      async () => {
+        try {
+          setDeleting(true);
+          await communityApi.deletePost(post.id);
+          onDelete?.(post.id);
+        } catch (error) {
+          console.error('Error deleting post:', error);
+          showErrorAlert('Error', 'Failed to delete post. Please try again.');
+          setDeleting(false);
+        }
+      }
+    );
+  };
+
+  const categoryDisplay = getCategoryDisplay(post.category);
+  const postStats = getPostStats(post.likesCount, post.commentsCount);
   return (
     <View
-      id="post-card-main-container"
-      className="bg-white border border-border-color rounded-lg p-4 mb-2"
+      className="bg-surface border border-divider rounded-2xl p-5 mb-4 shadow-sm shadow-black/5"
     >
-      <View
-        id="post-card-header"
-        className="flex flex-row justify-between gap-4"
-      >
-        <View
-          id="post-card-header-left"
-          className="flex flex-row gap-3 items-center"
-        >
-          <UserAvatar name="John Doe" />
-          <View id="post-card-header-left-text" className="flex flex-col gap-1">
-            <Text className="text-md font-semibold">John Doe</Text>
-            <Text className="text-sm text-gray-400">
-              Flat #401 | Announcement
-            </Text>
+      <View className="flex flex-row justify-between items-start mb-3">
+        <View className="flex flex-row gap-3 items-center flex-1">
+          <UserAvatar name={post.userName} />
+          <View className="flex flex-col gap-1 flex-1">
+            <Text className="text-lg font-semibold text-text-primary">{post.userName}</Text>
+            <View className="flex flex-row items-center gap-2">
+              <Text className="text-sm text-text-secondary">
+                Flat {post.flatNumber}
+              </Text>
+              <View className="w-1 h-1 bg-text-secondary rounded-full" />
+              <View className="bg-primary/10 px-2 py-1 rounded-full flex-row items-center">
+                <Text className="text-xs mr-1">{categoryDisplay.icon}</Text>
+                <Text className="text-primary text-xs font-medium">{categoryDisplay.name}</Text>
+              </View>
+            </View>
           </View>
         </View>
-        <View id="post-card-header-right">
-          <Text className="text-sm text-gray-400">2h ago</Text>
+        <View className="flex flex-row items-center gap-3">
+          <Text className="text-sm text-text-secondary">{formatTimeAgo(post.createdAt)}</Text>
+          {(post.canDelete || canEdit) && (
+            <View className="relative">
+              <TouchableOpacity
+                onPress={toggleActions}
+                className="p-1"
+              >
+                <MoreHorizontal size={16} color="#757575" />
+              </TouchableOpacity>
+              
+              {showActions && (
+                <View className="absolute top-8 right-0 bg-surface border border-divider rounded-xl shadow-lg z-10 min-w-32">
+                  {canEdit && (
+                    <TouchableOpacity
+                      onPress={handleEdit}
+                      className="flex-row items-center px-4 py-3 border-b border-divider"
+                    >
+                      <Edit3 size={14} color="#6366f1" />
+                      <Text className="text-primary ml-3 font-medium">Edit</Text>
+                    </TouchableOpacity>
+                  )}
+                  {post.canDelete && (
+                    <TouchableOpacity
+                      onPress={() => {
+                        setShowActions(false);
+                        handleDelete();
+                      }}
+                      disabled={deleting}
+                      className="flex-row items-center px-4 py-3"
+                    >
+                      {deleting ? (
+                        <ActivityIndicator size="small" color="#D32F2F" />
+                      ) : (
+                        <Trash2 size={14} color="#D32F2F" />
+                      )}
+                      <Text className="text-error ml-3 font-medium">
+                        {deleting ? 'Deleting...' : 'Delete'}
+                      </Text>
+                    </TouchableOpacity>
+                  )}
+                </View>
+              )}
+            </View>
+          )}
         </View>
       </View>
-      <View
-        id="post-card-content"
-        className="flex flex-col gap-2 mt-2 border-b border-border-color pb-4"
-        style={{ maxHeight: 200 }}
-      >
-        <Text className="text-sm font-normal text-gray-700">
-          Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla
-          facilisi. Vestibulum ante ipsum primis in faucibus orci luctus et
-          ultrices posuere cubilia Curae; Donec velit neque, auctor sit amet
-          aliquam vel, ullamcorper sit amet ligula.
-        </Text>
+      <View className="border-b border-divider pb-4 mb-4">
+        <MentionText style={{ fontSize: 16, lineHeight: 24, color: '#212121' }}>
+          {post.content}
+        </MentionText>
+        {post.imageUrl && (
+          <View className="mt-3 rounded-xl overflow-hidden">
+            <Image 
+              source={{ uri: post.imageUrl }}
+              style={{ width: '100%', height: 200, resizeMode: 'cover' }}
+            />
+          </View>
+        )}
       </View>
-      <View
-        id="post-card-footer"
-        className="flex flex-row justify-between items-center mt-2"
-      >
-        <View className="flex flex-row gap-2 items-center">
-          <MessageSquareText size={16} color="#6b7280" strokeWidth={2} />
-          <Text className="text-sm font-medium text-gray-500">2 comments</Text>
-        </View>
-        <View className="flex flex-row gap-2 items-center">
-          <Heart size={16} color="#6b7280" strokeWidth={2} />
-          <Text className="text-sm font-medium text-gray-500">2 likes</Text>
-        </View>
+      <View className="flex flex-row justify-between items-center">
+        <TouchableOpacity 
+          onPress={handleComment}
+          className="flex flex-row gap-2 items-center flex-1 py-2"
+          activeOpacity={0.7}
+        >
+          <MessageSquareText size={18} color="#757575" strokeWidth={2} />
+          <Text className="text-sm font-medium text-text-secondary">{postStats.comments}</Text>
+        </TouchableOpacity>
+        
+        <TouchableOpacity 
+          onPress={handleLike}
+          disabled={liking}
+          className="flex flex-row gap-2 items-center flex-1 py-2 justify-end"
+          activeOpacity={0.7}
+        >
+          {liking ? (
+            <ActivityIndicator size="small" color="#D32F2F" />
+          ) : (
+            <Heart 
+              size={18} 
+              color={post.isLikedByUser ? "#D32F2F" : "#757575"} 
+              fill={post.isLikedByUser ? "#D32F2F" : "transparent"}
+              strokeWidth={2} 
+            />
+          )}
+          <Text className={`text-sm font-medium ${
+            post.isLikedByUser ? 'text-error' : 'text-text-secondary'
+          }`}>
+            {postStats.likes}
+          </Text>
+        </TouchableOpacity>
       </View>
     </View>
   );

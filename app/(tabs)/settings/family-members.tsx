@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
-import { ScrollView, SafeAreaView, View, Text, TouchableOpacity, Alert } from 'react-native';
+import { ScrollView, SafeAreaView, View, Text, TouchableOpacity } from 'react-native';
 import { ArrowLeft, Plus, Edit3, Trash2, User } from 'lucide-react-native';
 import { router } from 'expo-router';
 import Button from '../../../components/ui/Button';
 import { Card } from '../../../components/ui/Card';
 import { cn } from '../../../utils/cn';
+import { showDeleteConfirmAlert } from '../../../utils/alert';
 
 interface FamilyMember {
   id: string;
@@ -55,19 +56,12 @@ export default function FamilyMembers() {
   };
 
   const handleDeleteMember = (member: FamilyMember) => {
-    Alert.alert(
+    showDeleteConfirmAlert(
       'Remove Family Member',
       `Are you sure you want to remove ${member.name} from your family list?`,
-      [
-        { text: 'Cancel', style: 'cancel' },
-        {
-          text: 'Remove',
-          style: 'destructive',
-          onPress: () => {
-            setFamilyMembers(prev => prev.filter(m => m.id !== member.id));
-          },
-        },
-      ]
+      () => {
+        setFamilyMembers(prev => prev.filter(m => m.id !== member.id));
+      }
     );
   };
 

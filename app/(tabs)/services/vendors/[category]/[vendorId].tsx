@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { SafeAreaView, ScrollView, Text, TouchableOpacity, View, TextInput, Linking, Alert } from 'react-native';
+import { SafeAreaView, ScrollView, Text, TouchableOpacity, View, TextInput, Linking } from 'react-native';
+import { showErrorAlert, showSuccessAlert, showAlert } from '@/utils/alert';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { 
   ArrowLeft, 
@@ -198,14 +199,14 @@ export default function VendorProfile() {
 
   const handleQuoteRequest = () => {
     if (!quoteRequest.trim()) {
-      Alert.alert('Error', 'Please describe what you need help with');
+      showErrorAlert('Error', 'Please describe what you need help with');
       return;
     }
     
-    Alert.alert(
+    showSuccessAlert(
       'Quote Request Sent',
       `Your quote request has been sent to ${vendor.name}. They will contact you within ${vendor.responseTime}.`,
-      [{ text: 'OK', onPress: () => setQuoteRequest('') }]
+      () => setQuoteRequest('')
     );
   };
 
@@ -311,7 +312,7 @@ export default function VendorProfile() {
         <ServiceCard
           key={index}
           service={service}
-          onSelect={() => Alert.alert('Service Selected', `You selected: ${service.name}`)}
+          onSelect={() => showAlert('Service Selected', `You selected: ${service.name}`)}
         />
       ))}
     </View>

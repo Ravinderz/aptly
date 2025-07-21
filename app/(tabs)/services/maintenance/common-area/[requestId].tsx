@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { SafeAreaView, ScrollView, Text, TouchableOpacity, View, Linking, Alert } from 'react-native';
+import { SafeAreaView, ScrollView, Text, TouchableOpacity, View, Linking } from 'react-native';
+import { showSuccessAlert } from '@/utils/alert';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { 
   ArrowLeft, 
@@ -252,11 +253,11 @@ export default function CommonAreaRequestDetail() {
 
   const handleVoteUp = () => {
     setHasVoted(true);
-    Alert.alert('Vote Recorded', 'Thank you for supporting this request!');
+    showSuccessAlert('Vote Recorded', 'Thank you for supporting this request!');
   };
 
   const handleVoteDown = () => {
-    Alert.alert('Vote Recorded', 'Your feedback has been noted.');
+    showSuccessAlert('Vote Recorded', 'Your feedback has been noted.');
   };
 
   const renderTimeline = () => (
