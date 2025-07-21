@@ -5,7 +5,11 @@ import AppNavigator from "@/components/AppNavigator";
 import { useAlert } from "@/components/ui/AlertCard";
 import { setGlobalAlertHandler } from "@/utils/alert";
 import { useEffect } from "react";
+import * as SplashScreen from "expo-splash-screen";
 import "./globals.css";
+
+// Keep the splash screen visible while we fetch resources
+SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
   const { showAlert, AlertComponent } = useAlert();

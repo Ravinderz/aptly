@@ -1,87 +1,95 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { ScrollView, SafeAreaView, View, Text, TouchableOpacity } from 'react-native';
-import { ArrowLeft, Plus, Edit3, Trash2, Car, Bike } from 'lucide-react-native';
-import { router } from 'expo-router';
+import { ArrowLeft, Plus, Edit3, Trash2, Car, Bike, Star } from 'lucide-react-native';
+import { router, useFocusEffect } from 'expo-router';
 import Button from '../../../components/ui/Button';
 import { Card } from '../../../components/ui/Card';
 import { cn } from '../../../utils/cn';
 import { showDeleteConfirmAlert } from '../../../utils/alert';
-
-interface Vehicle {
-  id: string;
-  type: 'two-wheeler' | 'four-wheeler';
-  brand: string;
-  model: string;
-  registrationNumber: string;
-  color: string;
-  ownerName: string;
-  parkingSlot?: string;
-  rcNumber?: string;
-  insuranceExpiry?: string;
-}
+import { VehicleStorage, Vehicle, initializeMockData } from '../../../utils/storage';
 
 export default function Vehicles() {
-  const [vehicles, setVehicles] = useState<Vehicle[]>([
-    {
-      id: '1',
-      type: 'four-wheeler',
-      brand: 'Maruti Suzuki',
-      model: 'Swift',
-      registrationNumber: 'DL 01 AB 1234',
-      color: 'White',
-      ownerName: 'Rajesh Kumar',
-      parkingSlot: 'A-301',
-      rcNumber: 'DL01AB1234567890',
-      insuranceExpiry: '2025-03-15',
-    },
-    {
-      id: '2',
-      type: 'two-wheeler',
-      brand: 'Honda',
-      model: 'Activa 6G',
-      registrationNumber: 'DL 02 XY 5678',
-      color: 'Black',
-      ownerName: 'Priya Kumar',
-      parkingSlot: 'B-12',
-      insuranceExpiry: '2024-12-20',
-    },
-  ]);
+  const [vehicles, setVehicles] = useState<Vehicle[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    initializeData();
+  }, []);
+
+  useFocusEffect(
+    React.useCallback(() => {
+      loadVehicles();
+    }, [])
+  );
+
+  const initializeData = async () => {
+    try {
+      await initializeMockData();
+      await loadVehicles();
+    } catch (error) {
+      console.error('Error initializing data:', error);
+    }
+  };
+
+  const loadVehicles = async () => {
+    try {
+      const vehicleData = await VehicleStorage.getVehicles();
+      setVehicles(vehicleData);
+    } catch (error) {
+      console.error('Error loading vehicles:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleAddVehicle = () => {
-    console.log('Add vehicle pressed');
-    // router.push('/settings/add-vehicle');
+    router.push('/(tabs)/settings/vehicles/add');
   };
 
   const handleEditVehicle = (vehicle: Vehicle) => {
-    console.log('Edit vehicle:', vehicle.registrationNumber);
-    // router.push(`/settings/edit-vehicle/${vehicle.id}`);
+    router.push(`/(tabs)/settings/vehicles/edit/${vehicle.id}`);
   };
 
   const handleDeleteVehicle = (vehicle: Vehicle) => {
     showDeleteConfirmAlert(
       'Remove Vehicle',
-      `Are you sure you want to remove ${vehicle.brand} ${vehicle.model} (${vehicle.registrationNumber})?`,
-      () => {
-        setVehicles(prev => prev.filter(v => v.id !== vehicle.id));
+      `Are you sure you want to remove ${vehicle.make} ${vehicle.model} (${vehicle.registrationNumber})?`,
+      async () => {
+        try {
+          await VehicleStorage.deleteVehicle(vehicle.id);
+          await loadVehicles();
+        } catch (error) {
+          console.error('Error deleting vehicle:', error);
+        }
       }
     );
   };
 
   const getVehicleIcon = (type: string) => {
-    return type === 'four-wheeler' ? Car : Bike;
+    switch (type) {
+      case 'car': return Car;
+      case 'bike': return Bike;
+      case 'bicycle': return Bike;
+      default: return Car;
+    }
   };
 
   const getVehicleTypeColor = (type: string) => {
-    return type === 'four-wheeler' ? '#2196F3' : '#FF9800';
+    switch (type) {
+      case 'car': return '#2196F3';
+      case 'bike': return '#FF9800';
+      case 'bicycle': return '#4CAF50';
+      default: return '#757575';
+    }
   };
 
-  const isInsuranceExpiring = (expiryDate?: string) => {
-    if (!expiryDate) return false;
-    const expiry = new Date(expiryDate);
-    const today = new Date();
-    const diffTime = expiry.getTime() - today.getTime();
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-    return diffDays <= 30; // Expiring within 30 days
+  const getVehicleTypeLabel = (type: string) => {
+    switch (type) {
+      case 'car': return 'Car';
+      case 'bike': return 'Bike/Scooter';
+      case 'bicycle': return 'Bicycle';
+      default: return 'Other';
+    }
   };
 
   return (
@@ -112,19 +120,28 @@ export default function Vehicles() {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingBottom: 20 }}
       >
+        {/* Loading State */}
+        {loading && (
+          <View className="flex-1 items-center justify-center py-16">
+            <Text className="text-text-secondary">Loading vehicles...</Text>
+          </View>
+        )}
+
         {/* Vehicles List */}
-        {vehicles.map((vehicle, index) => {
+        {!loading && vehicles.map((vehicle, index) => {
           const VehicleIcon = getVehicleIcon(vehicle.type);
-          const isExpiring = isInsuranceExpiring(vehicle.insuranceExpiry);
           
           return (
-            <Card key={vehicle.id} className={cn("mb-4", isExpiring && "border-warning/50")}>
-              {/* Insurance Warning */}
-              {isExpiring && (
+            <Card key={vehicle.id} className="mb-4">
+              {/* Primary Vehicle Badge */}
+              {vehicle.isPrimary && (
                 <View className="bg-warning/10 border border-warning/20 rounded-lg p-3 mb-4">
-                  <Text className="text-warning text-sm font-medium">
-                    ⚠️ Insurance expires on {vehicle.insuranceExpiry}
-                  </Text>
+                  <View className="flex-row items-center">
+                    <Star size={16} color="#FF9800" />
+                    <Text className="text-warning text-sm font-medium ml-2">
+                      Primary Vehicle
+                    </Text>
+                  </View>
                 </View>
               )}
 
@@ -140,9 +157,14 @@ export default function Vehicles() {
                 {/* Vehicle Info */}
                 <View className="flex-1">
                   <View className="flex-row items-center justify-between mb-2">
-                    <Text className="text-text-primary text-lg font-semibold">
-                      {vehicle.brand} {vehicle.model}
-                    </Text>
+                    <View className="flex-row items-center">
+                      <Text className="text-text-primary text-lg font-semibold">
+                        {vehicle.make} {vehicle.model}
+                      </Text>
+                      {vehicle.isPrimary && (
+                        <Star size={16} color="#FF9800" className="ml-2" />
+                      )}
+                    </View>
                     <View className="flex-row gap-2">
                       <TouchableOpacity
                         onPress={() => handleEditVehicle(vehicle)}
@@ -171,7 +193,7 @@ export default function Vehicles() {
                   {/* Vehicle Details */}
                   <View className="space-y-1">
                     <Text className="text-text-secondary text-sm">
-                      Color: {vehicle.color} • Owner: {vehicle.ownerName}
+                      Color: {vehicle.color}
                     </Text>
                     
                     {vehicle.parkingSlot && (
@@ -180,20 +202,9 @@ export default function Vehicles() {
                       </Text>
                     )}
                     
-                    {vehicle.rcNumber && (
-                      <Text className="text-text-secondary text-sm">
-                        RC: {vehicle.rcNumber}
-                      </Text>
-                    )}
-                    
-                    {vehicle.insuranceExpiry && (
-                      <Text className={cn(
-                        "text-sm",
-                        isExpiring ? "text-warning font-medium" : "text-text-secondary"
-                      )}>
-                        Insurance: Valid till {vehicle.insuranceExpiry}
-                      </Text>
-                    )}
+                    <Text className="text-text-secondary text-xs">
+                      Added: {new Date(vehicle.createdAt).toLocaleDateString('en-IN')}
+                    </Text>
                   </View>
 
                   {/* Vehicle Type Badge */}
@@ -202,10 +213,10 @@ export default function Vehicles() {
                     style={{ backgroundColor: `${getVehicleTypeColor(vehicle.type)}15` }}
                   >
                     <Text 
-                      className="text-xs font-medium capitalize"
+                      className="text-xs font-medium"
                       style={{ color: getVehicleTypeColor(vehicle.type) }}
                     >
-                      {vehicle.type.replace('-', ' ')}
+                      {getVehicleTypeLabel(vehicle.type)}
                     </Text>
                   </View>
                 </View>
@@ -215,7 +226,7 @@ export default function Vehicles() {
         })}
 
         {/* Empty State */}
-        {vehicles.length === 0 && (
+        {!loading && vehicles.length === 0 && (
           <View className="items-center justify-center py-12">
             <View className="w-24 h-24 rounded-full bg-primary/10 items-center justify-center mb-4">
               <Car size={32} color="#6366f1" />
@@ -251,23 +262,33 @@ export default function Vehicles() {
         )}
 
         {/* Quick Stats */}
-        <View className="flex-row gap-4 mt-6">
-          <Card className="flex-1 items-center p-4">
-            <Car size={20} color="#2196F3" />
-            <Text className="text-display-small font-bold text-text-primary mt-2">
-              {vehicles.filter(v => v.type === 'four-wheeler').length}
-            </Text>
-            <Text className="text-text-secondary text-sm">Four Wheeler</Text>
-          </Card>
-          
-          <Card className="flex-1 items-center p-4">
-            <Bike size={20} color="#FF9800" />
-            <Text className="text-display-small font-bold text-text-primary mt-2">
-              {vehicles.filter(v => v.type === 'two-wheeler').length}
-            </Text>
-            <Text className="text-text-secondary text-sm">Two Wheeler</Text>
-          </Card>
-        </View>
+        {!loading && vehicles.length > 0 && (
+          <View className="flex-row gap-4 mt-6">
+            <Card className="flex-1 items-center p-4">
+              <Car size={20} color="#2196F3" />
+              <Text className="text-display-small font-bold text-text-primary mt-2">
+                {vehicles.filter(v => v.type === 'car').length}
+              </Text>
+              <Text className="text-text-secondary text-sm">Cars</Text>
+            </Card>
+            
+            <Card className="flex-1 items-center p-4">
+              <Bike size={20} color="#FF9800" />
+              <Text className="text-display-small font-bold text-text-primary mt-2">
+                {vehicles.filter(v => v.type === 'bike').length}
+              </Text>
+              <Text className="text-text-secondary text-sm">Bikes</Text>
+            </Card>
+
+            <Card className="flex-1 items-center p-4">
+              <Bike size={20} color="#4CAF50" />
+              <Text className="text-display-small font-bold text-text-primary mt-2">
+                {vehicles.filter(v => v.type === 'bicycle').length}
+              </Text>
+              <Text className="text-text-secondary text-sm">Bicycles</Text>
+            </Card>
+          </View>
+        )}
 
         {/* Info Card */}
         <Card className="mt-6 bg-secondary/10 border-secondary/20">

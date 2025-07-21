@@ -33,21 +33,21 @@ const AlertCard = () => {
         return {
           container: "border-error/30 border-2",
           badge: "bg-error text-white",
-          icon: "#D32F2F",
+          iconColor: "text-error",
           iconBg: "bg-error/20",
         };
       case "medium":
         return {
           container: "border-warning/30 border-2",
           badge: "bg-warning text-white",
-          icon: "#FF9800",
+          iconColor: "text-warning",
           iconBg: "bg-warning/20",
         };
       default:
         return {
           container: "border-primary/30 border-2",
           badge: "bg-primary text-white",
-          icon: "#6366f1",
+          iconColor: "text-primary",
           iconBg: "bg-primary/20",
         };
     }
@@ -66,12 +66,12 @@ const AlertCard = () => {
               notice.isUrgent ? "" : "bg-primary"
             )}
           />
-          <Text className="text-xl font-bold text-text-primary">
+          <Text className="text-headline-large text-text-primary">
             Important Notices
           </Text>
         </View>
         <TouchableOpacity className="bg-primary/10 rounded-full px-3 py-1">
-          <Text className="text-primary text-xs font-semibold">View All</Text>
+          <Text className="text-primary text-label-large font-semibold">View All</Text>
         </TouchableOpacity>
       </View>
 
@@ -85,26 +85,26 @@ const AlertCard = () => {
               priorityStyles.badge
             )}
           >
-            <AlertTriangle size={12} color="white" />
-            <Text className="text-white text-xs font-bold ml-1 uppercase">
+            <AlertTriangle size={16} color="white" />
+            <Text className="text-white text-label-large font-bold ml-1 uppercase">
               {notice.priority} Priority
             </Text>
           </View>
           <TouchableOpacity>
-            <Ellipsis size={20} color="#757575" strokeWidth={2} />
+            <Ellipsis size={20} className="text-text-secondary" strokeWidth={2} />
           </TouchableOpacity>
         </View>
 
         {/* Notice Content */}
         <View className="flex-row items-start mb-4">
           <View className={cn("rounded-full p-3 mr-4", priorityStyles.iconBg)}>
-            <Megaphone size={28} color={priorityStyles.icon} strokeWidth={2} />
+            <Megaphone size={24} className={priorityStyles.iconColor} strokeWidth={2} />
           </View>
           <View className="flex-1">
-            <Text className="text-lg font-bold text-text-primary mb-2">
+            <Text className="text-headline-medium text-text-primary mb-2">
               {notice.title}
             </Text>
-            <Text className="text-sm leading-5 text-text-secondary">
+            <Text className="text-body-medium leading-5 text-text-secondary">
               {notice.message}
             </Text>
           </View>
@@ -113,8 +113,8 @@ const AlertCard = () => {
         {/* Bottom Actions */}
         <View className="flex-row items-center justify-between pt-3 border-t border-divider/50">
           <View className="flex-row items-center">
-            <Clock size={14} color="#757575" />
-            <Text className="text-xs text-text-secondary ml-1">
+            <Clock size={16} className="text-text-secondary" />
+            <Text className="text-label-large text-text-secondary ml-1">
               {new Intl.DateTimeFormat("en-US", {
                 month: "short",
                 day: "numeric",
@@ -125,12 +125,12 @@ const AlertCard = () => {
           </View>
           <View className="flex-row gap-3">
             <TouchableOpacity className="bg-surface rounded-lg px-4 py-2">
-              <Text className="text-text-primary text-sm font-medium">
+              <Text className="text-text-primary text-body-medium font-medium">
                 Dismiss
               </Text>
             </TouchableOpacity>
             <TouchableOpacity className="bg-primary rounded-lg px-4 py-2">
-              <Text className="text-white text-sm font-semibold">
+              <Text className="text-white text-body-medium font-semibold">
                 Read More
               </Text>
             </TouchableOpacity>

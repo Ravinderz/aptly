@@ -1,9 +1,10 @@
 import { useRouter } from "expo-router";
-import { ArrowLeft, Download, Calendar, AlertCircle, CheckCircle, Bell, CreditCard, TrendingUp, Filter, Search, Plus, Settings } from "lucide-react-native";
+import { ArrowLeft, Download, Calendar, AlertCircle, CheckCircle, Bell, CreditCard, TrendingUp, Filter, Search, Plus, Settings, Smartphone, Wifi, Zap, Car, Tv, Home } from "lucide-react-native";
 import React, { useState } from "react";
 import { SafeAreaView, ScrollView, Text, TouchableOpacity, View, TextInput } from "react-native";
 import { showAlert } from "@/utils/alert";
 import HighlightCard from "@/components/ui/HighlightCard";
+import { Card } from "@/components/ui/Card";
 
 export default function Billing() {
   const router = useRouter();
@@ -164,66 +165,190 @@ export default function Billing() {
   return (
     <SafeAreaView className="flex-1 bg-background">
       {/* Header */}
-      <View className="flex-row items-center px-4 py-4 border-b border-divider bg-surface">
-        <TouchableOpacity onPress={() => router.back()} className="mr-4">
-          <ArrowLeft size={24} color="#212121" />
+      <View className="flex-row items-center px-6 py-4 border-b border-divider bg-surface">
+        <TouchableOpacity onPress={() => router.back()} className="mr-4 p-2">
+          <ArrowLeft size={20} color="#6366f1" />
         </TouchableOpacity>
         <View className="flex-1">
-          <Text className="text-xl font-bold text-text-primary">Billing</Text>
-          <Text className="text-text-secondary text-sm">Flat A-201</Text>
+          <Text className="text-headline-large font-semibold text-text-primary">Billing</Text>
+          <Text className="text-body-medium text-text-secondary">Flat A-201</Text>
         </View>
         <TouchableOpacity 
-          onPress={() => showAlert('Notifications', 'Payment reminders and notifications would be shown here.')}
-          className="mr-3 relative"
+          onPress={() => router.push("/(tabs)/services/billing/notifications")}
+          className="mr-4 p-2 relative"
         >
           <Bell size={20} color="#6366f1" />
-          <View className="absolute -top-1 -right-1 bg-error rounded-full w-3 h-3" />
+          <View className="absolute top-1 right-1 bg-error rounded-full w-3 h-3" />
         </TouchableOpacity>
         <TouchableOpacity 
-          onPress={() => showAlert('Settings', 'Billing settings like auto-pay, payment methods etc.')}
+          onPress={() => router.push("/(tabs)/services/billing/settings")}
+          className="p-2"
         >
           <Settings size={20} color="#6366f1" />
         </TouchableOpacity>
       </View>
 
       {/* Summary Cards */}
-      <View className="px-6 py-5 bg-surface border-b border-divider">
-        <View className="flex-row gap-4 mb-5">
-          <View className="flex-1 bg-error/10 rounded-2xl p-5 border border-error/20">
+      <View className="px-6 py-6 bg-surface border-b border-divider">
+        <View className="flex-row gap-4 mb-6">
+          <View className="flex-1 bg-error/10 rounded-xl p-4 border border-error/20">
             <View className="flex-row items-center mb-3">
               <AlertCircle size={16} color="#D32F2F" />
-              <Text className="text-error text-sm font-medium ml-2">Total Pending</Text>
+              <Text className="text-error text-body-medium font-medium ml-2">Total Pending</Text>
             </View>
-            <Text className="text-error text-2xl font-bold mb-1">{formatCurrency(totalPending)}</Text>
-            <Text className="text-error/70 text-xs">3 bills pending</Text>
+            <Text className="text-error text-display-small font-bold mb-1">{formatCurrency(totalPending)}</Text>
+            <Text className="text-error/70 text-label-large">3 bills pending</Text>
           </View>
-          <View className="flex-1 bg-success/10 rounded-2xl p-5 border border-success/20">
+          <View className="flex-1 bg-success/10 rounded-xl p-4 border border-success/20">
             <View className="flex-row items-center mb-3">
               <CheckCircle size={16} color="#4CAF50" />
-              <Text className="text-success text-sm font-medium ml-2">Paid This Month</Text>
+              <Text className="text-success text-body-medium font-medium ml-2">Paid This Month</Text>
             </View>
-            <Text className="text-success text-2xl font-bold mb-1">{formatCurrency(totalPaidThisMonth)}</Text>
-            <Text className="text-success/70 text-xs">On time payment</Text>
+            <Text className="text-success text-display-small font-bold mb-1">{formatCurrency(totalPaidThisMonth)}</Text>
+            <Text className="text-success/70 text-label-large">On time payment</Text>
           </View>
         </View>
         
         {/* Quick Actions */}
         <View className="flex-row gap-4">
           <TouchableOpacity 
-            onPress={() => showAlert('Auto Pay', 'Setup automatic payments for all bills')}
+            onPress={() => router.push("/(tabs)/services/billing/auto-pay")}
             className="flex-1 bg-primary rounded-xl p-4 flex-row items-center justify-center"
           >
             <CreditCard size={16} color="white" />
-            <Text className="text-white font-semibold ml-2 text-sm">Setup Auto Pay</Text>
+            <Text className="text-white font-semibold ml-2 text-body-medium">Setup Auto Pay</Text>
           </TouchableOpacity>
           <TouchableOpacity 
-            onPress={() => showAlert('Payment History', 'View detailed payment history and analytics')}
+            onPress={() => router.push("/(tabs)/services/billing/analytics")}
             className="flex-1 bg-surface border border-divider rounded-xl p-4 flex-row items-center justify-center"
           >
             <TrendingUp size={16} color="#6366f1" />
-            <Text className="text-primary font-semibold ml-2 text-sm">View Analytics</Text>
+            <Text className="text-primary font-semibold ml-2 text-body-medium">View Analytics</Text>
           </TouchableOpacity>
         </View>
+      </View>
+
+      {/* Utility Billers Section */}
+      <View className="px-6 py-6 bg-background">
+        <View className="flex-row items-center justify-between mb-4">
+          <Text className="text-headline-large font-semibold text-text-primary">Utility & Recharge</Text>
+          <View className="bg-success/10 rounded-full px-3 py-1">
+            <Text className="text-success text-label-large font-bold">💰 Earn Cashback</Text>
+          </View>
+        </View>
+        
+        <Text className="text-text-secondary text-body-medium mb-6 leading-5">
+          Pay utility bills and recharge services. Earn cashback on every transaction!
+        </Text>
+
+        {/* Utility Billers Grid */}
+        <View className="flex-row flex-wrap gap-4">
+          {/* Mobile Recharge */}
+          <TouchableOpacity 
+            onPress={() => router.push("/(tabs)/services/billing/mobile-recharge")}
+            className="bg-surface rounded-xl p-4 border border-divider flex-1 min-w-[45%] items-center"
+            activeOpacity={0.7}
+          >
+            <View className="bg-primary/10 rounded-full w-12 h-12 items-center justify-center mb-3">
+              <Smartphone size={20} color="#6366f1" />
+            </View>
+            <Text className="text-text-primary font-semibold text-body-medium text-center mb-1">Mobile Recharge</Text>
+            <Text className="text-text-secondary text-label-large text-center">Prepaid & Postpaid</Text>
+          </TouchableOpacity>
+
+          {/* Broadband */}
+          <TouchableOpacity 
+            onPress={() => router.push("/(tabs)/services/billing/broadband-recharge")}
+            className="bg-surface rounded-xl p-4 border border-divider flex-1 min-w-[45%] items-center"
+            activeOpacity={0.7}
+          >
+            <View className="bg-secondary/10 rounded-full w-12 h-12 items-center justify-center mb-3">
+              <Wifi size={20} color="#4CAF50" />
+            </View>
+            <Text className="text-text-primary font-semibold text-body-medium text-center mb-1">Broadband</Text>
+            <Text className="text-text-secondary text-label-large text-center">Internet Bills</Text>
+          </TouchableOpacity>
+
+          {/* Gas Cylinder */}
+          <TouchableOpacity 
+            onPress={() => router.push("/(tabs)/services/billing/cylinder-booking")}
+            className="bg-surface rounded-xl p-4 border border-divider flex-1 min-w-[45%] items-center"
+            activeOpacity={0.7}
+          >
+            <View className="bg-warning/10 rounded-full w-12 h-12 items-center justify-center mb-3">
+              <Zap size={20} color="#FF9800" />
+            </View>
+            <Text className="text-text-primary font-semibold text-body-medium text-center mb-1">Gas Cylinder</Text>
+            <Text className="text-text-secondary text-label-large text-center">LPG Booking</Text>
+          </TouchableOpacity>
+
+          {/* Prepaid Gas */}
+          <TouchableOpacity 
+            onPress={() => router.push("/(tabs)/services/billing/gas-recharge")}
+            className="bg-surface rounded-xl p-4 border border-divider flex-1 min-w-[45%] items-center"
+            activeOpacity={0.7}
+          >
+            <View className="bg-error/10 rounded-full w-12 h-12 items-center justify-center mb-3">
+              <Car size={20} color="#D32F2F" />
+            </View>
+            <Text className="text-text-primary font-semibold text-body-medium text-center mb-1">Prepaid Gas</Text>
+            <Text className="text-text-secondary text-label-large text-center">PNG Recharge</Text>
+          </TouchableOpacity>
+
+          {/* DishTV */}
+          <TouchableOpacity 
+            onPress={() => router.push("/(tabs)/services/billing/dishtv-recharge")}
+            className="bg-surface rounded-xl p-4 border border-divider flex-1 min-w-[45%] items-center"
+            activeOpacity={0.7}
+          >
+            <View className="bg-primary/10 rounded-full w-12 h-12 items-center justify-center mb-3">
+              <Tv size={20} color="#6366f1" />
+            </View>
+            <Text className="text-text-primary font-semibold text-body-medium text-center mb-1">DishTV</Text>
+            <Text className="text-text-secondary text-label-large text-center">DTH Recharge</Text>
+          </TouchableOpacity>
+
+          {/* Electricity (Future) */}
+          <TouchableOpacity 
+            onPress={() => showAlert("Coming Soon", "Electricity bill payment will be available soon!")}
+            className="bg-surface rounded-xl p-4 border border-divider flex-1 min-w-[45%] items-center opacity-60"
+            activeOpacity={0.7}
+          >
+            <View className="bg-warning/10 rounded-full w-12 h-12 items-center justify-center mb-3">
+              <Home size={20} color="#FF9800" />
+            </View>
+            <Text className="text-text-primary font-semibold text-body-medium text-center mb-1">Electricity</Text>
+            <Text className="text-text-secondary text-label-large text-center">Coming Soon</Text>
+          </TouchableOpacity>
+        </View>
+
+        {/* Cashback Info */}
+        <Card className="mt-6 bg-primary/5 border-primary/20">
+          <View className="flex-row items-center">
+            <View className="bg-success rounded-full w-10 h-10 items-center justify-center mr-4">
+              <Text className="text-white text-body-large">💸</Text>
+            </View>
+            <View className="flex-1">
+              <Text className="text-text-primary font-semibold text-body-medium mb-1">
+                Earn up to 5% Cashback
+              </Text>
+              <Text className="text-text-secondary text-body-medium leading-5">
+                On all utility payments. Cashback credited within 24-48 hours.
+              </Text>
+            </View>
+          </View>
+        </Card>
+      </View>
+
+      {/* Society Bills Section Header */}
+      <View className="px-6 py-4 bg-background border-t border-divider">
+        <View className="flex-row items-center mb-2">
+          <Home size={20} color="#6366f1" />
+          <Text className="text-headline-large font-semibold text-text-primary ml-3">Society Bills</Text>
+        </View>
+        <Text className="text-text-secondary text-body-medium">
+          Maintenance and society-related payments
+        </Text>
       </View>
 
       {/* Search & Filter */}

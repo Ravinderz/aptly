@@ -127,7 +127,6 @@ export default function CreateCommonAreaRequest() {
   const [description, setDescription] = useState<string>('');
   const [affectedResidents, setAffectedResidents] = useState<string>('');
   const [suggestedVendor, setSuggestedVendor] = useState<string>('');
-  const [budgetEstimate, setBudgetEstimate] = useState<string>('');
   const [mediaFiles, setMediaFiles] = useState<MediaFile[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
@@ -272,7 +271,6 @@ export default function CreateCommonAreaRequest() {
         description,
         affectedResidents: parseInt(affectedResidents) || 0,
         suggestedVendor,
-        budgetEstimate: budgetEstimate ? parseFloat(budgetEstimate) : null,
         mediaFiles: mediaFiles.length,
         submittedBy: 'Current User', // Would come from auth context
         flatNumber: 'A-301', // Would come from auth context
@@ -316,7 +314,7 @@ export default function CreateCommonAreaRequest() {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingBottom: 100 }}
       >
-        <View className="px-6 py-6 space-y-6">
+        <View className="px-6 py-6 space-y-8">
           {/* Location Selection */}
           <View>
             <Text className="text-headline-medium font-semibold text-text-primary mb-4">
@@ -468,14 +466,14 @@ export default function CreateCommonAreaRequest() {
           </View>
 
           {/* Additional Information */}
-          <View className="space-y-4">
+          <View className="space-y-6">
             <Text className="text-headline-medium font-semibold text-text-primary">
               Additional Information
             </Text>
             
             {/* Affected Residents */}
             <View>
-              <Text className="text-body-large font-medium text-text-primary mb-2">
+              <Text className="text-body-large font-medium text-text-primary mb-3">
                 Number of Residents Affected (Optional)
               </Text>
               <TextInput
@@ -490,7 +488,7 @@ export default function CreateCommonAreaRequest() {
 
             {/* Suggested Vendor */}
             <View>
-              <Text className="text-body-large font-medium text-text-primary mb-2">
+              <Text className="text-body-large font-medium text-text-primary mb-3">
                 Suggested Vendor (Optional)
               </Text>
               <TextInput
@@ -502,20 +500,6 @@ export default function CreateCommonAreaRequest() {
               />
             </View>
 
-            {/* Budget Estimate */}
-            <View>
-              <Text className="text-body-large font-medium text-text-primary mb-2">
-                Budget Estimate (Optional)
-              </Text>
-              <TextInput
-                className="bg-surface border border-divider rounded-xl px-4 py-3 text-body-large text-text-primary"
-                placeholder="₹ Estimated cost"
-                placeholderTextColor="#757575"
-                value={budgetEstimate}
-                onChangeText={setBudgetEstimate}
-                keyboardType="number-pad"
-              />
-            </View>
           </View>
 
           {/* Media Upload */}

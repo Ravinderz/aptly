@@ -66,12 +66,12 @@ const Visitor = () => {
 
   return (
     <>
-      <View style={{ zIndex: 1, position: "absolute", right: 20, bottom: 20 }}>
+      <View style={{ zIndex: 1, position: "absolute", right: 24, bottom: 24 }}>
         <TouchableOpacity
-          className="bg-primary rounded-full p-4 shadow-lg shadow-primary/25"
+          className="bg-primary rounded-full w-14 h-14 items-center justify-center shadow-lg shadow-primary/25"
           onPress={() => handleAddVisitor()}
         >
-          <Plus size={24} color="white" strokeWidth={2} />
+          <Plus size={20} color="white" strokeWidth={2} />
         </TouchableOpacity>
       </View>
       <Header>
@@ -86,54 +86,62 @@ const Visitor = () => {
               // snapPoints={["90%"]}
             >
               <BottomSheetView style={styles.contentContainer}>
-                <View className="w-full px-4">
-                  <View className="flex flex-row justify-between items-center pb-3 ">
-                    <View className="flex flex-row gap-2 items-center ">
-                      <Text className="text-2xl font-bold bg-primary text-white rounded-full flex items-center justify-center p-3">
-                        {getLetters(selectedVisitor?.name as string)}
-                      </Text>
+                <View className="w-full px-6">
+                  <View className="flex-row justify-between items-center pb-6">
+                    <View className="flex-row items-center">
+                      <View className="bg-primary rounded-full w-12 h-12 items-center justify-center mr-3">
+                        <Text className="text-white font-bold text-body-medium">
+                          {getLetters(selectedVisitor?.name as string)}
+                        </Text>
+                      </View>
                       <Text className="text-headline-large font-semibold text-text-primary">
                         {selectedVisitor?.name}
                       </Text>
                     </View>
-                    <CircleX
-                      size={24}
-                      color="black"
-                      strokeWidth={1.5}
+                    <TouchableOpacity
                       onPress={() => bottomSheetModalRef.current?.dismiss()}
-                    />
+                      className="p-2"
+                    >
+                      <CircleX size={20} color="#757575" strokeWidth={1.5} />
+                    </TouchableOpacity>
                   </View>
-                  <View className="flex items-center justify-center">
+                  <View className="items-center justify-center mb-6">
                     <Image
-                      style={{ width: 250, height: 250 }}
+                      style={{ width: 200, height: 200 }}
                       source={require("../../../assets/images/QR_Code.png")}
                       contentFit="cover"
                       transition={1000}
                     />
                   </View>
-                  <View className="flex items-center gap-2">
-                    <View className="flex flex-row gap-2">
-                      <Text className="text-body-large font-medium text-text-secondary">
+                  <View className="items-center mb-8">
+                    <View className="flex-row items-center mb-2">
+                      <Text className="text-body-large font-medium text-text-secondary mr-2">
                         {selectedVisitor?.date}
                       </Text>
                       <Text className="text-body-large font-medium text-text-secondary">
                         {selectedVisitor?.time}
                       </Text>
                     </View>
-                    <Text className="text-headline-medium font-medium text-text-secondary">
-                      {selectedVisitor?.status}
-                    </Text>
+                    <View className={`px-3 py-1 rounded-full ${
+                      selectedVisitor?.status === 'Pre-approved' ? 'bg-success/10' : 'bg-primary/10'
+                    }`}>
+                      <Text className={`text-body-medium font-medium ${
+                        selectedVisitor?.status === 'Pre-approved' ? 'text-success' : 'text-primary'
+                      }`}>
+                        {selectedVisitor?.status}
+                      </Text>
+                    </View>
                   </View>
-                  <View className="flex flex-row justify-around my-6">
-                    <TouchableOpacity className="flex flex-row gap-2 justify-center items-center bg-primary h-16 w-36 rounded-lg">
-                      <Share2 size={24} color="white" strokeWidth={1.5} />
-                      <Text className="text-white text-body-large font-semibold">
-                        Share
+                  <View className="flex-row justify-between gap-4">
+                    <TouchableOpacity className="flex-1 flex-row items-center justify-center bg-primary py-4 rounded-xl">
+                      <Share2 size={16} color="white" strokeWidth={1.5} />
+                      <Text className="text-white text-body-medium font-semibold ml-2">
+                        Share QR
                       </Text>
                     </TouchableOpacity>
-                    <TouchableOpacity className="flex flex-row gap-2 justify-center items-center bg-surface border border-divider h-16 w-36 rounded-lg">
-                      <Download size={24} color="#6366f1" strokeWidth={1.5} />
-                      <Text className="text-primary text-body-large font-semibold">
+                    <TouchableOpacity className="flex-1 flex-row items-center justify-center bg-surface border border-divider py-4 rounded-xl">
+                      <Download size={16} color="#6366f1" strokeWidth={1.5} />
+                      <Text className="text-primary text-body-medium font-semibold ml-2">
                         Download
                       </Text>
                     </TouchableOpacity>

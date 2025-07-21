@@ -18,6 +18,8 @@
 - In Maintenance request, we have individual request button, which is throwing unmatch route, no route error.
 - Billing component only have index page implemented, we need to implement, billing notifications, settings, setup auto pay, view Analytics, if they are already implemented, we need to map them to their respective buttons.
 - Billing home page needs change, I would like a new section that should show different billers like mobile recharge, broadband recharge, cylinder booking, prepaid gas recharge, DishTv recharge, each biller should have their own page with a form to fill out necessary details and make the payment for the service.
+- Add utility methods for reusable code, implement best practices.
 - Write tests for the implemented features.
 - Write types for all the components wherever needed.
 - Do lint testing and tsc command to validate and verify that project is working as expected.
+- Need to good splash screen for our app

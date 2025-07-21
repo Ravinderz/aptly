@@ -1,12 +1,54 @@
 import { useRouter } from "expo-router";
-import { Building, Shield, Users, Smartphone } from "lucide-react-native";
+import { Building, Shield, Users, Smartphone, Zap } from "lucide-react-native";
 import React from "react";
 import { SafeAreaView, ScrollView, Text, TouchableOpacity, View, Image } from "react-native";
 import { Button } from "@/components/ui/Button";
 import HighlightCard from "@/components/ui/HighlightCard";
+import { useAuth } from "@/contexts/AuthContext";
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function Welcome() {
   const router = useRouter();
+  const { login } = useAuth();
+
+  const handleDevSkip = async () => {
+    try {
+      // Create mock user data for development
+      const mockUserProfile = {
+        id: "dev-user-123",
+        name: "John Developer",
+        phone: "9876543210",
+        email: "john@aptly.app",
+        flatNumber: "A-101",
+        societyId: "dev-society-123",
+        societyName: "Green Valley Apartments",
+        role: "resident",
+        isVerified: true,
+        avatar: null,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      };
+
+      const mockTokens = {
+        accessToken: "mock-access-token-123",
+        refreshToken: "mock-refresh-token-123"
+      };
+
+      // Store mock data in AsyncStorage
+      await AsyncStorage.multiSet([
+        ['auth_tokens', JSON.stringify(mockTokens)],
+        ['user_profile', JSON.stringify(mockUserProfile)]
+      ]);
+
+      // Update auth context
+      login(mockUserProfile);
+
+      // Navigate to home
+      router.push('/(tabs)');
+    } catch (error) {
+      console.error('Error setting up dev mode:', error);
+    }
+  };
 
   const features = [
     {
@@ -33,6 +75,20 @@ export default function Welcome() {
 
   return (
     <SafeAreaView className="flex-1 bg-background">
+      {/* Development Skip Button */}
+      {__DEV__ && (
+        <View className="absolute top-12 right-4 z-10">
+          <TouchableOpacity
+            onPress={handleDevSkip}
+            className="bg-warning/90 rounded-full px-3 py-2 flex-row items-center shadow-sm"
+            activeOpacity={0.8}
+          >
+            <Zap size={16} color="white" />
+            <Text className="text-white text-xs font-bold ml-1">DEV SKIP</Text>
+          </TouchableOpacity>
+        </View>
+      )}
+
       <ScrollView className="flex-1" showsVerticalScrollIndicator={false}>
         {/* Hero Section */}
         <View className="items-center px-6 py-12">
@@ -117,7 +173,10 @@ export default function Welcome() {
           </Button>
           
           <TouchableOpacity 
-            onPress={() => router.push("/auth/phone-registration")}
+            onPress={() => router.push({
+              pathname: "/auth/phone-registration",
+              params: { mode: "signin" }
+            })}
             className="items-center py-3"
           >
             <Text className="text-text-secondary">

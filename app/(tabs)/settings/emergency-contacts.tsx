@@ -6,6 +6,7 @@ import Button from '../../../components/ui/Button';
 import { Card } from '../../../components/ui/Card';
 import { cn } from '../../../utils/cn';
 import { showErrorAlert, showDeleteConfirmAlert } from '../../../utils/alert';
+import { validateEmergencyContact, formatIndianPhoneNumber } from '../../../utils/validation';
 
 interface EmergencyContact {
   id: string;
@@ -23,8 +24,8 @@ export default function EmergencyContacts() {
       id: '1',
       name: 'Dr. Priya Kumar',
       relationship: 'Wife',
-      phoneNumber: '+91 98765 43211',
-      alternatePhone: '+91 87654 32198',
+      phoneNumber: '9876543211',
+      alternatePhone: '8765432198',
       address: 'Same flat - A-301',
       isPrimary: true,
     },
@@ -32,7 +33,7 @@ export default function EmergencyContacts() {
       id: '2',
       name: 'Mr. Suresh Kumar',
       relationship: 'Father',
-      phoneNumber: '+91 98765 43212',
+      phoneNumber: '9876543212',
       address: 'B-Block, Sector 15, Noida',
       isPrimary: false,
     },
@@ -67,7 +68,14 @@ export default function EmergencyContacts() {
   };
 
   const handleCallContact = (phoneNumber: string) => {
-    const phoneUrl = `tel:${phoneNumber}`;
+    // Validate phone number before calling
+    const validation = validateEmergencyContact(phoneNumber);
+    if (!validation.isValid) {
+      showErrorAlert('Invalid Phone Number', validation.error || 'Invalid phone number format');
+      return;
+    }
+
+    const phoneUrl = `tel:+91${phoneNumber}`;
     Linking.canOpenURL(phoneUrl).then((supported) => {
       if (supported) {
         Linking.openURL(phoneUrl);
@@ -204,7 +212,7 @@ export default function EmergencyContacts() {
                   >
                     <PhoneCall size={16} color="#4CAF50" />
                     <Text className="text-text-primary text-sm font-medium ml-2">
-                      {contact.phoneNumber}
+                      +91 {formatIndianPhoneNumber(contact.phoneNumber)}
                     </Text>
                   </TouchableOpacity>
                   
@@ -216,7 +224,7 @@ export default function EmergencyContacts() {
                     >
                       <Phone size={16} color="#757575" />
                       <Text className="text-text-secondary text-sm ml-2">
-                        {contact.alternatePhone} (Alternate)
+                        +91 {formatIndianPhoneNumber(contact.alternatePhone)} (Alternate)
                       </Text>
                     </TouchableOpacity>
                   )}

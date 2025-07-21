@@ -3,6 +3,7 @@ import { View, ActivityIndicator } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useAuth } from '@/contexts/AuthContext';
 import { useRouter, useSegments } from 'expo-router';
+import * as SplashScreen from 'expo-splash-screen';
 
 const AppNavigator: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [isFirstLaunch, setIsFirstLaunch] = useState<boolean | null>(null);
@@ -39,6 +40,9 @@ const AppNavigator: React.FC<{ children: React.ReactNode }> = ({ children }) => 
   // Handle navigation based on auth status and first launch
   useEffect(() => {
     if (isCheckingFirstLaunch || isLoading) return;
+
+    // Hide splash screen when we're done loading
+    SplashScreen.hideAsync();
 
     const inAuthGroup = segments[0] === 'auth';
     const inTabsGroup = segments[0] === '(tabs)';

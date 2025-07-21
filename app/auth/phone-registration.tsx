@@ -1,4 +1,4 @@
-import { useRouter } from "expo-router";
+import { useRouter, useLocalSearchParams } from "expo-router";
 import { ArrowLeft, Phone, Shield } from "lucide-react-native";
 import React, { useState } from "react";
 import { SafeAreaView, Text, TextInput, TouchableOpacity, View, KeyboardAvoidingView, Platform } from "react-native";
@@ -8,6 +8,8 @@ import { showErrorAlert } from "@/utils/alert";
 
 export default function PhoneRegistration() {
   const router = useRouter();
+  const { mode } = useLocalSearchParams<{ mode?: string }>();
+  const isSignIn = mode === "signin";
   const [phoneNumber, setPhoneNumber] = useState("");
   const [societyCode, setSocietyCode] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -177,7 +179,7 @@ export default function PhoneRegistration() {
           <TouchableOpacity onPress={() => router.back()} className="mr-4">
             <ArrowLeft size={24} color="#212121" />
           </TouchableOpacity>
-          <Text className="text-xl font-bold text-text-primary">Sign Up</Text>
+          <Text className="text-xl font-bold text-text-primary">{isSignIn ? "Sign In" : "Sign Up"}</Text>
         </View>
 
         <View className="flex-1 px-6 py-8">
@@ -190,7 +192,10 @@ export default function PhoneRegistration() {
               Welcome to Aptly
             </Text>
             <Text className="text-text-secondary text-center leading-6">
-              Enter your mobile number and society code to get started with your housing society management
+              {isSignIn 
+                ? "Enter your registered mobile number and society code to sign in"
+                : "Enter your mobile number and society code to get started with your housing society management"
+              }
             </Text>
           </View>
 
@@ -215,7 +220,10 @@ export default function PhoneRegistration() {
               <Text className="text-error text-sm mt-2">{errors.phone}</Text>
             )}
             <Text className="text-text-secondary text-xs mt-2">
-              We'll send an OTP to verify your number
+              {isSignIn 
+                ? "We'll send an OTP to your registered number"
+                : "We'll send an OTP to verify your number"
+              }
             </Text>
           </View>
 
@@ -238,7 +246,10 @@ export default function PhoneRegistration() {
               <Text className="text-error text-sm mt-2">{errors.society}</Text>
             )}
             <Text className="text-text-secondary text-xs mt-2">
-              Get your society code from your housing society management
+              {isSignIn 
+                ? "Enter your society code to verify your account"
+                : "Get your society code from your housing society management"
+              }
             </Text>
           </View>
 

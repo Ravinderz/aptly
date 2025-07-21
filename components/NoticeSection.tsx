@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Text, TouchableOpacity } from 'react-native';
 import { Bell, Calendar, Users, Zap, Shield, AlertTriangle } from 'lucide-react-native';
+import { router } from 'expo-router';
 import HighlightCard from './ui/HighlightCard';
 
 interface Notice {
@@ -75,7 +76,11 @@ const NoticeSection = () => {
             Society Notices
           </Text>
         </View>
-        <TouchableOpacity className="bg-primary/10 rounded-full px-3 py-1">
+        <TouchableOpacity 
+          className="bg-primary/10 rounded-full px-3 py-1"
+          onPress={() => router.push('/(tabs)/notices')}
+          activeOpacity={0.7}
+        >
           <Text className="text-primary text-xs font-semibold">View All</Text>
         </TouchableOpacity>
       </View>
@@ -145,7 +150,11 @@ const NoticeSection = () => {
 
       {/* Show more if there are additional notices */}
       {notices.length > 3 && (
-        <TouchableOpacity className="mt-4 bg-surface border border-divider rounded-xl p-4 items-center">
+        <TouchableOpacity 
+          className="mt-4 bg-surface border border-divider rounded-xl p-4 items-center"
+          onPress={() => router.push('/(tabs)/notices')}
+          activeOpacity={0.7}
+        >
           <Text className="text-primary font-medium">
             + {notices.length - 3} more notices
           </Text>
