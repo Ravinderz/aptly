@@ -25,12 +25,12 @@ export const SocietyOverview: React.FC = () => {
       <Card>
         {/* Society Basic Info */}
         <View className="mb-4">
-          <Text className="text-lg font-semibold text-text-primary mb-1">
+          <Text className="text-headline-medium text-text-primary mb-1">
             {societyInfo.name}
           </Text>
           <View className="flex-row items-center">
-            <MapPin size={14} color="#757575" />
-            <Text className="text-text-secondary text-sm ml-1">
+            <MapPin size={16} className="text-text-secondary" />
+            <Text className="text-text-secondary text-body-medium ml-1">
               {societyInfo.totalFlats} flats • Sector 12, Noida
             </Text>
           </View>
@@ -42,13 +42,13 @@ export const SocietyOverview: React.FC = () => {
         <View className="flex-row items-center justify-between mb-4">
           <View className="flex-row items-center flex-1">
             <View className="w-8 h-8 rounded-lg bg-primary/10 items-center justify-center mr-3">
-              <Calendar size={16} color="#6366f1" />
+              <Calendar size={16} className="text-primary" />
             </View>
             <View>
               <Text className="text-text-primary font-medium">
                 {societyInfo.nextEvent}
               </Text>
-              <Text className="text-text-secondary text-sm">
+              <Text className="text-text-secondary text-body-medium">
                 {societyInfo.eventDate}
               </Text>
             </View>
@@ -61,13 +61,13 @@ export const SocietyOverview: React.FC = () => {
         <View className="flex-row items-center justify-between mb-4">
           <View className="flex-row items-center flex-1">
             <View className="w-8 h-8 rounded-lg bg-secondary/10 items-center justify-center mr-3">
-              <Clock size={16} color="#4CAF50" />
+              <Clock size={16} className="text-secondary" />
             </View>
             <View>
               <Text className="text-text-primary font-medium">
                 Maintenance Hours
               </Text>
-              <Text className="text-text-secondary text-sm">
+              <Text className="text-text-secondary text-body-medium">
                 {societyInfo.maintenanceWindow}
               </Text>
             </View>
@@ -80,13 +80,13 @@ export const SocietyOverview: React.FC = () => {
         <View className="flex-row items-center justify-between">
           <View className="flex-row items-center flex-1">
             <View className="w-8 h-8 rounded-lg bg-error/10 items-center justify-center mr-3">
-              <Users size={16} color="#D32F2F" />
+              <Users size={16} className="text-error" />
             </View>
             <View>
               <Text className="text-text-primary font-medium">
                 Emergency Contact
               </Text>
-              <Text className="text-text-secondary text-sm">
+              <Text className="text-text-secondary text-body-medium">
                 {societyInfo.emergencyContact}
               </Text>
             </View>

@@ -24,7 +24,7 @@ const NoticeSection = () => {
       variant: 'warning',
       date: '2024-01-19',
       category: 'maintenance',
-      icon: <Zap size={16} color="#FF9800" />
+      icon: <Zap size={16} className="text-warning" />
     },
     {
       id: '2', 
@@ -33,7 +33,7 @@ const NoticeSection = () => {
       variant: 'info',
       date: '2024-01-18',
       category: 'community',
-      icon: <Users size={16} color="#6366f1" />
+      icon: <Users size={16} className="text-primary" />
     },
     {
       id: '3',
@@ -42,7 +42,7 @@ const NoticeSection = () => {
       variant: 'primary',
       date: '2024-01-17',
       category: 'security',
-      icon: <Shield size={16} color="#6366f1" />
+      icon: <Shield size={16} className="text-primary" />
     }
   ];
 
@@ -55,10 +55,10 @@ const NoticeSection = () => {
 
   const getCategoryColor = (category: string) => {
     switch (category) {
-      case 'maintenance': return '#FF9800';
-      case 'community': return '#6366f1';
-      case 'security': return '#4CAF50';
-      default: return '#757575';
+      case 'maintenance': return 'text-warning';
+      case 'community': return 'text-primary';
+      case 'security': return 'text-secondary';
+      default: return 'text-text-secondary';
     }
   };
 
@@ -71,8 +71,8 @@ const NoticeSection = () => {
       {/* Header */}
       <View className="flex-row items-center justify-between mb-4">
         <View className="flex-row items-center">
-          <Bell size={20} color="#6366f1" />
-          <Text className="text-xl font-bold text-text-primary ml-2">
+          <Bell size={20} className="text-primary" />
+          <Text className="text-headline-large text-text-primary ml-2">
             Society Notices
           </Text>
         </View>
@@ -81,7 +81,7 @@ const NoticeSection = () => {
           onPress={() => router.push('/(tabs)/notices')}
           activeOpacity={0.7}
         >
-          <Text className="text-primary text-xs font-semibold">View All</Text>
+          <Text className="text-primary text-label-large font-semibold">View All</Text>
         </TouchableOpacity>
       </View>
 
@@ -98,14 +98,14 @@ const NoticeSection = () => {
           </Text>
           <View className="flex-row items-center justify-between">
             <View className="flex-row items-center">
-              <Calendar size={14} color="#757575" />
-              <Text className="text-text-secondary text-sm ml-2">
+              <Calendar size={16} className="text-text-secondary" />
+              <Text className="text-text-secondary text-body-medium ml-2">
                 {formatDate(notices[0].date)}
               </Text>
             </View>
             <View className="flex-row items-center bg-background rounded-full px-3 py-1">
               {notices[0].icon}
-              <Text className="text-text-secondary text-sm ml-2 capitalize">
+              <Text className="text-text-secondary text-body-medium ml-2 capitalize">
                 {notices[0].category}
               </Text>
             </View>
@@ -131,14 +131,14 @@ const NoticeSection = () => {
               </Text>
               <View className="flex-row items-center justify-between">
                 <View className="flex-row items-center">
-                  <Calendar size={12} color="#757575" />
-                  <Text className="text-text-secondary text-xs ml-1">
+                  <Calendar size={16} className="text-text-secondary" />
+                  <Text className="text-text-secondary text-label-large ml-1">
                     {formatDate(notice.date)}
                   </Text>
                 </View>
                 <View className="flex-row items-center">
                   {notice.icon}
-                  <Text className="text-text-secondary text-xs ml-1 capitalize">
+                  <Text className="text-text-secondary text-label-large ml-1 capitalize">
                     {notice.category}
                   </Text>
                 </View>

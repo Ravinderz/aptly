@@ -52,22 +52,22 @@ export default function Welcome() {
 
   const features = [
     {
-      icon: <Building size={32} color="#6366f1" />,
+      icon: <Building size={32} className="text-primary" />,
       title: "Digital Society Management",
       description: "Manage your housing society digitally with ease"
     },
     {
-      icon: <Shield size={32} color="#4CAF50" />,
+      icon: <Shield size={32} className="text-secondary" />,
       title: "Secure & Private",
       description: "Your data is protected with bank-level security"
     },
     {
-      icon: <Users size={32} color="#FF9800" />,
+      icon: <Users size={32} className="text-warning" />,
       title: "Community Connect",
       description: "Stay connected with your society members"
     },
     {
-      icon: <Smartphone size={32} color="#D32F2F" />,
+      icon: <Smartphone size={32} className="text-error" />,
       title: "Mobile First",
       description: "Designed specifically for Indian mobile users"
     }
@@ -84,7 +84,7 @@ export default function Welcome() {
             activeOpacity={0.8}
           >
             <Zap size={16} color="white" />
-            <Text className="text-white text-xs font-bold ml-1">DEV SKIP</Text>
+            <Text className="text-white text-label-large font-bold ml-1">DEV SKIP</Text>
           </TouchableOpacity>
         </View>
       )}
@@ -93,14 +93,14 @@ export default function Welcome() {
         {/* Hero Section */}
         <View className="items-center px-6 py-12">
           <View className="bg-primary/10 rounded-full w-24 h-24 items-center justify-center mb-6">
-            <Building size={48} color="#6366f1" />
+            <Building size={48} className="text-primary" />
           </View>
           
-          <Text className="text-3xl font-bold text-text-primary mb-4 text-center">
+          <Text className="text-display-large text-text-primary mb-4 text-center">
             Welcome to Aptly
           </Text>
           
-          <Text className="text-lg text-text-secondary text-center leading-7 mb-8">
+          <Text className="text-body-large text-text-secondary text-center leading-7 mb-8">
             India's most trusted housing society management app. 
             Simplify maintenance, billing, and community management.
           </Text>
@@ -115,7 +115,7 @@ export default function Welcome() {
 
         {/* Features Grid */}
         <View className="px-6 mb-8">
-          <Text className="text-xl font-bold text-text-primary mb-6 text-center">
+          <Text className="text-headline-large text-text-primary mb-6 text-center">
             Why Choose Aptly?
           </Text>
           
@@ -127,7 +127,7 @@ export default function Welcome() {
                     {feature.icon}
                   </View>
                   <View className="flex-1">
-                    <Text className="text-lg font-semibold text-text-primary mb-1">
+                    <Text className="text-headline-medium text-text-primary mb-1">
                       {feature.title}
                     </Text>
                     <Text className="text-text-secondary leading-5">
@@ -143,21 +143,21 @@ export default function Welcome() {
         {/* Trusted By Section */}
         <View className="px-6 mb-8">
           <View className="bg-primary/5 rounded-2xl p-6">
-            <Text className="text-primary font-bold text-lg mb-3 text-center">
+            <Text className="text-primary font-bold text-headline-medium mb-3 text-center">
               Trusted by 10,000+ Residents
             </Text>
             <View className="flex-row justify-between items-center">
               <View className="items-center">
-                <Text className="text-2xl font-bold text-text-primary">500+</Text>
-                <Text className="text-text-secondary text-sm">Societies</Text>
+                <Text className="text-display-medium text-text-primary">500+</Text>
+                <Text className="text-text-secondary text-body-medium">Societies</Text>
               </View>
               <View className="items-center">
-                <Text className="text-2xl font-bold text-text-primary">50K+</Text>
-                <Text className="text-text-secondary text-sm">Residents</Text>
+                <Text className="text-display-medium text-text-primary">50K+</Text>
+                <Text className="text-text-secondary text-body-medium">Residents</Text>
               </View>
               <View className="items-center">
-                <Text className="text-2xl font-bold text-text-primary">4.8★</Text>
-                <Text className="text-text-secondary text-sm">Rating</Text>
+                <Text className="text-display-medium text-text-primary">4.8★</Text>
+                <Text className="text-text-secondary text-body-medium">Rating</Text>
               </View>
             </View>
           </View>

@@ -78,11 +78,11 @@ export default function BillingSettings() {
 
   const getPaymentMethodIcon = (type: string) => {
     switch (type) {
-      case "card": return <CreditCard size={20} color="#6366f1" />;
-      case "upi": return <Smartphone size={20} color="#FF9800" />;
-      case "bank": return <Building2 size={20} color="#4CAF50" />;
-      case "wallet": return <Smartphone size={20} color="#9C27B0" />;
-      default: return <CreditCard size={20} color="#6366f1" />;
+      case "card": return <CreditCard size={20} className="text-primary" />;
+      case "upi": return <Smartphone size={20} className="text-warning" />;
+      case "bank": return <Building2 size={20} className="text-secondary" />;
+      case "wallet": return <Smartphone size={20} className="text-primary" />;
+      default: return <CreditCard size={20} className="text-primary" />;
     }
   };
 
@@ -139,11 +139,11 @@ export default function BillingSettings() {
       {/* Header */}
       <View className="flex-row items-center px-4 py-4 border-b border-divider bg-surface">
         <TouchableOpacity onPress={() => router.back()} className="mr-4">
-          <ArrowLeft size={24} color="#212121" />
+          <ArrowLeft size={24} className="text-text-primary" />
         </TouchableOpacity>
         <View className="flex-1">
-          <Text className="text-xl font-bold text-text-primary">Billing Settings</Text>
-          <Text className="text-text-secondary text-sm">Manage payments and preferences</Text>
+          <Text className="text-headline-large text-text-primary">Billing Settings</Text>
+          <Text className="text-text-secondary text-body-medium">Manage payments and preferences</Text>
         </View>
       </View>
 

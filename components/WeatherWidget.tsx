@@ -22,13 +22,13 @@ export const WeatherWidget: React.FC = () => {
   const getWeatherIcon = (condition: string) => {
     switch (condition) {
       case 'sunny':
-        return <Sun size={24} color="#FF9800" />;
+        return <Sun size={24} className="text-warning" />;
       case 'cloudy':
-        return <Cloud size={24} color="#757575" />;
+        return <Cloud size={24} className="text-text-secondary" />;
       case 'rainy':
-        return <CloudRain size={24} color="#2196F3" />;
+        return <CloudRain size={24} className="text-primary" />;
       default:
-        return <Sun size={24} color="#FF9800" />;
+        return <Sun size={24} className="text-warning" />;
     }
   };
 
@@ -49,24 +49,24 @@ export const WeatherWidget: React.FC = () => {
     <Card className="bg-gradient-to-r from-primary/5 to-primary/10">
       <View className="flex-row items-center justify-between">
         <View className="flex-1">
-          <Text className="text-text-secondary text-sm mb-1">
+          <Text className="text-text-secondary text-body-medium mb-1">
             {weather.location}
           </Text>
           <View className="flex-row items-center">
-            <Text className="text-3xl font-bold text-text-primary mr-2">
+            <Text className="text-display-large text-text-primary mr-2">
               {weather.temperature}°
             </Text>
             {getWeatherIcon(weather.condition)}
           </View>
-          <Text className="text-text-secondary text-sm">
+          <Text className="text-text-secondary text-body-medium">
             {getConditionText(weather.condition)}
           </Text>
         </View>
         
         <View className="items-end">
           <View className="flex-row items-center mb-1">
-            <Thermometer size={14} color="#757575" />
-            <Text className="text-text-secondary text-xs ml-1">
+            <Thermometer size={16} className="text-text-secondary" />
+            <Text className="text-text-secondary text-label-large ml-1">
               Humidity
             </Text>
           </View>
