@@ -1,16 +1,11 @@
-import React, { useState } from 'react';
-import {
-  View,
-  Text,
-  TouchableOpacity,
-  ActivityIndicator
-} from 'react-native';
-import { Trash2, MessageCircle } from 'lucide-react-native';
-import UserAvatar from '@/components/ui/UserAvatar';
-import MentionText from '@/components/ui/MentionText';
-import { Comment } from '@/types/community';
-import { formatTimeAgo } from '@/utils/community';
-import { showDeleteConfirmAlert } from '@/utils/alert';
+import MentionText from "@/components/ui/MentionText";
+import UserAvatar from "@/components/ui/UserAvatar";
+import { Comment } from "@/types/community";
+import { showDeleteConfirmAlert } from "@/utils/alert";
+import { formatTimeAgo } from "@/utils/community";
+import { MessageCircle, Trash2 } from "lucide-react-native";
+import React, { useState } from "react";
+import { ActivityIndicator, Text, TouchableOpacity, View } from "react-native";
 
 interface CommentCardProps {
   comment: Comment;
@@ -23,20 +18,20 @@ const CommentCard: React.FC<CommentCardProps> = ({
   comment,
   onDelete,
   onReply,
-  isNested = false
+  isNested = false,
 }) => {
   const [deleting, setDeleting] = useState(false);
 
   const handleDelete = () => {
     showDeleteConfirmAlert(
-      'Delete Comment',
-      'Are you sure you want to delete this comment?',
+      "Delete Comment",
+      "Are you sure you want to delete this comment?",
       async () => {
         try {
           setDeleting(true);
           await onDelete(comment.id);
         } catch (error) {
-          console.error('Error deleting comment:', error);
+          console.error("Error deleting comment:", error);
           setDeleting(false);
         }
       }
@@ -48,7 +43,11 @@ const CommentCard: React.FC<CommentCardProps> = ({
   };
 
   return (
-    <View className={`mb-4 ${isNested ? 'ml-8 border-l-2 border-divider pl-4' : ''}`}>
+    <View
+      className={`mb-4 ${
+        isNested ? "ml-8 border-l-2 border-divider pl-4" : ""
+      }`}
+    >
       <View className="bg-surface rounded-2xl p-4 border border-divider">
         {/* Comment Header */}
         <View className="flex-row items-start justify-between mb-3">
@@ -56,15 +55,19 @@ const CommentCard: React.FC<CommentCardProps> = ({
             <UserAvatar name={comment.userName} size="sm" />
             <View className="ml-3 flex-1">
               <View className="flex-row items-center gap-2">
-                <Text className="font-semibold text-text-primary">{comment.userName}</Text>
-                <Text className="text-xs text-text-secondary">Flat {comment.flatNumber}</Text>
+                <Text className="font-semibold text-text-primary">
+                  {comment.userName}
+                </Text>
+                <Text className="text-xs text-text-secondary">
+                  Flat {comment.flatNumber}
+                </Text>
               </View>
               <Text className="text-xs text-text-secondary mt-1">
                 {formatTimeAgo(comment.createdAt)}
               </Text>
             </View>
           </View>
-          
+
           {comment.canDelete && (
             <TouchableOpacity
               onPress={handleDelete}
@@ -81,7 +84,13 @@ const CommentCard: React.FC<CommentCardProps> = ({
         </View>
 
         {/* Comment Content */}
-        <MentionText style={{ fontSize: 14, lineHeight: 20, color: '#212121' }}>
+        <MentionText
+          style={{
+            fontSize: 14,
+            lineHeight: 18,
+            color: "#212121",
+          }}
+        >
           {comment.content}
         </MentionText>
         <View className="mb-3" />
@@ -94,7 +103,9 @@ const CommentCard: React.FC<CommentCardProps> = ({
             activeOpacity={0.7}
           >
             <MessageCircle size={14} color="#757575" />
-            <Text className="text-text-secondary text-sm ml-2 font-medium">Reply</Text>
+            <Text className="text-text-secondary text-sm ml-2 font-medium">
+              Reply
+            </Text>
           </TouchableOpacity>
         )}
       </View>

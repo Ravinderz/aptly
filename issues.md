@@ -1,0 +1,23 @@
+## 📋 Current Issues
+
+- Mention text is not middle aligned after we submit the comment
+- Character counter in the add comment mess up the button and input field alignment
+- No add form for vehicle add button
+- edit vehicle doesn't do anything, seems like we do not have implementation yet
+- View/ add/ download documents doesn't do anything, seems like we do not have implementation yet
+- Similarly in the emergency contact section as well, no implementation for edit/ add
+- Security and support section needs implementation
+- sign in and get started in the welcome page takes us to the same page,
+- limit the characters in emergency contact to 10, since this is also a phone number, we need india specific validations
+- in index page, society notices view all button should show us the list if all the notices that were sent out for past week start from today.
+- visitor tab and subsequent pages should follow design system.
+- In community tab, there is no action when we click on post.. there should be read more option which upon clicking should take us to post details page.
+- View profile for person after clicking on mentionText, doesn't show anything.
+- Create Maintenance request, doesn't need Budget estimate input field, and there seems to spacing issues in the form.
+- Vendor directory section seems to have icon alignment issues.
+- In Maintenance request, we have individual request button, which is throwing unmatch route, no route error.
+- Billing component only have index page implemented, we need to implement, billing notifications, settings, setup auto pay, view Analytics, if they are already implemented, we need to map them to their respective buttons.
+- Billing home page needs change, I would like a new section that should show different billers like mobile recharge, broadband recharge, cylinder booking, prepaid gas recharge, DishTv recharge, each biller should have their own page with a form to fill out necessary details and make the payment for the service.
+- Write tests for the implemented features.
+- Write types for all the components wherever needed.
+- Do lint testing and tsc command to validate and verify that project is working as expected.

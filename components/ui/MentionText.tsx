@@ -1,7 +1,7 @@
-import React from 'react';
-import { Text, TouchableOpacity } from 'react-native';
-import { formatTextWithMentions } from '@/utils/mentions';
-import { showSuccessAlert } from '@/utils/alert';
+import { showSuccessAlert } from "@/utils/alert";
+import { formatTextWithMentions } from "@/utils/mentions";
+import React from "react";
+import { Text, TouchableOpacity } from "react-native";
 
 interface MentionTextProps {
   children: string;
@@ -9,10 +9,10 @@ interface MentionTextProps {
   onMentionPress?: (username: string) => void;
 }
 
-const MentionText: React.FC<MentionTextProps> = ({ 
-  children, 
-  style, 
-  onMentionPress 
+const MentionText: React.FC<MentionTextProps> = ({
+  children,
+  style,
+  onMentionPress,
 }) => {
   const textParts = formatTextWithMentions(children);
 
@@ -20,7 +20,7 @@ const MentionText: React.FC<MentionTextProps> = ({
     if (onMentionPress) {
       onMentionPress(username);
     } else {
-      showSuccessAlert('User Profile', `View profile for @${username}`);
+      showSuccessAlert("User Profile", `View profile for @${username}`);
     }
   };
 
@@ -32,19 +32,13 @@ const MentionText: React.FC<MentionTextProps> = ({
             <TouchableOpacity
               key={index}
               onPress={() => handleMentionPress(part.username!)}
-              style={{ flexDirection: 'row' }}
+              className="bg-primary/10 rounded-xl px-2 py-1"
             >
-              <Text className="text-primary font-semibold">
-                {part.text}
-              </Text>
+              <Text className="text-primary font-semibold">{part.text}</Text>
             </TouchableOpacity>
           );
         }
-        return (
-          <Text key={index}>
-            {part.text}
-          </Text>
-        );
+        return <Text key={index}>{part.text}</Text>;
       })}
     </Text>
   );
