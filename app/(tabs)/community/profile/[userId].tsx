@@ -181,7 +181,7 @@ export default function UserProfile() {
           </Card>
         </View>
 
-        {/* User's Posts */}
+        {/* User&apos;s Posts */}
         <View className="px-4">
           <Text className="text-text-primary text-headline-small font-semibold mb-4">
             Recent Posts ({userPosts.length})
@@ -206,7 +206,7 @@ export default function UserProfile() {
                 No Posts Yet
               </Text>
               <Text className="text-text-secondary text-center px-4">
-                {user.name} hasn't shared any posts in the community yet.
+                {user.name} hasn&apos;t shared any posts in the community yet.
               </Text>
             </Card>
           )}

@@ -208,6 +208,263 @@ export const validateAmount = (amount: string): { isValid: boolean; error?: stri
   return { isValid: true };
 };
 
+// Pincode validation (Indian postal codes)
+export const validatePincode = (pincode: string): { isValid: boolean; error?: string } => {
+  const cleanPincode = pincode.trim();
+  
+  if (!cleanPincode) {
+    return { isValid: false, error: "Pincode is required" };
+  }
+  
+  // Indian pincode format: 6 digits
+  const pincodeRegex = /^[1-9][0-9]{5}$/;
+  if (!pincodeRegex.test(cleanPincode)) {
+    return { isValid: false, error: "Pincode must be 6 digits and cannot start with 0" };
+  }
+  
+  return { isValid: true };
+};
+
+// Vehicle number validation (Indian format)
+export const validateVehicleNumber = (vehicleNumber: string): { isValid: boolean; error?: string } => {
+  const cleanVehicle = vehicleNumber.trim().toUpperCase().replace(/\s/g, '');
+  
+  if (!cleanVehicle) {
+    return { isValid: false, error: "Vehicle number is required" };
+  }
+  
+  // Indian vehicle number formats:
+  // Old format: XX XX XXXX (state code + district code + 4 digits)
+  // New format: XX XX XX XXXX (state code + district code + series + 4 digits)
+  const oldFormatRegex = /^[A-Z]{2}[0-9]{2}[A-Z]{0,2}[0-9]{4}$/;
+  const newFormatRegex = /^[A-Z]{2}[0-9]{2}[A-Z]{2}[0-9]{4}$/;
+  
+  if (!oldFormatRegex.test(cleanVehicle) && !newFormatRegex.test(cleanVehicle)) {
+    return { isValid: false, error: "Invalid vehicle number format" };
+  }
+  
+  return { isValid: true };
+};
+
+// GST number validation
+export const validateGSTNumber = (gstNumber: string): { isValid: boolean; error?: string } => {
+  const cleanGST = gstNumber.trim().toUpperCase().replace(/\s/g, '');
+  
+  if (!cleanGST) {
+    return { isValid: false, error: "GST number is required" };
+  }
+  
+  // GST format: 15 characters (2 state code + 10 PAN + 1 entity code + 1 check digit + 1 default)
+  const gstRegex = /^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z][1-9A-Z][Z][0-9A-Z]$/;
+  
+  if (cleanGST.length !== 15) {
+    return { isValid: false, error: "GST number must be 15 characters" };
+  }
+  
+  if (!gstRegex.test(cleanGST)) {
+    return { isValid: false, error: "Invalid GST number format" };
+  }
+  
+  return { isValid: true };
+};
+
+// Aadhar number validation
+export const validateAadharNumber = (aadharNumber: string): { isValid: boolean; error?: string } => {
+  const cleanAadhar = aadharNumber.replace(/\s/g, '');
+  
+  if (!cleanAadhar) {
+    return { isValid: false, error: "Aadhar number is required" };
+  }
+  
+  if (cleanAadhar.length !== 12) {
+    return { isValid: false, error: "Aadhar number must be 12 digits" };
+  }
+  
+  if (!/^[0-9]{12}$/.test(cleanAadhar)) {
+    return { isValid: false, error: "Aadhar number must contain only digits" };
+  }
+  
+  // Basic validation: cannot start with 0 or 1
+  if (cleanAadhar.startsWith('0') || cleanAadhar.startsWith('1')) {
+    return { isValid: false, error: "Invalid Aadhar number" };
+  }
+  
+  return { isValid: true };
+};
+
+// PAN card validation
+export const validatePANNumber = (panNumber: string): { isValid: boolean; error?: string } => {
+  const cleanPAN = panNumber.trim().toUpperCase().replace(/\s/g, '');
+  
+  if (!cleanPAN) {
+    return { isValid: false, error: "PAN number is required" };
+  }
+  
+  // PAN format: 5 letters + 4 digits + 1 letter
+  const panRegex = /^[A-Z]{5}[0-9]{4}[A-Z]$/;
+  
+  if (cleanPAN.length !== 10) {
+    return { isValid: false, error: "PAN number must be 10 characters" };
+  }
+  
+  if (!panRegex.test(cleanPAN)) {
+    return { isValid: false, error: "Invalid PAN number format" };
+  }
+  
+  return { isValid: true };
+};
+
+// IFSC code validation
+export const validateIFSCCode = (ifscCode: string): { isValid: boolean; error?: string } => {
+  const cleanIFSC = ifscCode.trim().toUpperCase().replace(/\s/g, '');
+  
+  if (!cleanIFSC) {
+    return { isValid: false, error: "IFSC code is required" };
+  }
+  
+  // IFSC format: 4 letters (bank code) + 0 + 6 characters (branch code)
+  const ifscRegex = /^[A-Z]{4}0[A-Z0-9]{6}$/;
+  
+  if (cleanIFSC.length !== 11) {
+    return { isValid: false, error: "IFSC code must be 11 characters" };
+  }
+  
+  if (!ifscRegex.test(cleanIFSC)) {
+    return { isValid: false, error: "Invalid IFSC code format" };
+  }
+  
+  return { isValid: true };
+};
+
+// Password strength validation
+export const validatePassword = (password: string): { isValid: boolean; error?: string; strength?: 'weak' | 'medium' | 'strong' } => {
+  if (!password) {
+    return { isValid: false, error: "Password is required" };
+  }
+  
+  if (password.length < 8) {
+    return { isValid: false, error: "Password must be at least 8 characters long" };
+  }
+  
+  const hasUppercase = /[A-Z]/.test(password);
+  const hasLowercase = /[a-z]/.test(password);
+  const hasNumbers = /[0-9]/.test(password);
+  const hasSpecial = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\?]/.test(password);
+  
+  let strength: 'weak' | 'medium' | 'strong' = 'weak';
+  const criteriaCount = [hasUppercase, hasLowercase, hasNumbers, hasSpecial].filter(Boolean).length;
+  
+  if (criteriaCount >= 3 && password.length >= 12) {
+    strength = 'strong';
+  } else if (criteriaCount >= 2 && password.length >= 10) {
+    strength = 'medium';
+  }
+  
+  if (criteriaCount < 2) {
+    return { 
+      isValid: false, 
+      error: "Password must contain at least 2 of: uppercase, lowercase, numbers, special characters",
+      strength
+    };
+  }
+  
+  return { isValid: true, strength };
+};
+
+// File size validation
+export const validateFileSize = (fileSizeBytes: number, maxSizeMB: number = 5): { isValid: boolean; error?: string } => {
+  const maxSizeBytes = maxSizeMB * 1024 * 1024;
+  
+  if (fileSizeBytes > maxSizeBytes) {
+    return { isValid: false, error: `File size must be less than ${maxSizeMB}MB` };
+  }
+  
+  return { isValid: true };
+};
+
+// File type validation
+export const validateFileType = (fileName: string, allowedTypes: string[]): { isValid: boolean; error?: string } => {
+  const fileExtension = fileName.split('.').pop()?.toLowerCase();
+  
+  if (!fileExtension) {
+    return { isValid: false, error: "File must have an extension" };
+  }
+  
+  if (!allowedTypes.includes(fileExtension)) {
+    return { isValid: false, error: `File type must be one of: ${allowedTypes.join(', ')}` };
+  }
+  
+  return { isValid: true };
+};
+
+// Date validation
+export const validateDate = (date: string | Date, fieldName: string = "Date"): { isValid: boolean; error?: string } => {
+  if (!date) {
+    return { isValid: false, error: `${fieldName} is required` };
+  }
+  
+  const dateObj = new Date(date);
+  
+  if (isNaN(dateObj.getTime())) {
+    return { isValid: false, error: `${fieldName} is not a valid date` };
+  }
+  
+  return { isValid: true };
+};
+
+// Future date validation
+export const validateFutureDate = (date: string | Date, fieldName: string = "Date"): { isValid: boolean; error?: string } => {
+  const dateValidation = validateDate(date, fieldName);
+  if (!dateValidation.isValid) {
+    return dateValidation;
+  }
+  
+  const dateObj = new Date(date);
+  const now = new Date();
+  
+  if (dateObj <= now) {
+    return { isValid: false, error: `${fieldName} must be in the future` };
+  }
+  
+  return { isValid: true };
+};
+
+// Age validation
+export const validateAge = (birthDate: string | Date, minAge: number = 18, maxAge: number = 120): { isValid: boolean; error?: string } => {
+  const dateValidation = validateDate(birthDate, "Birth date");
+  if (!dateValidation.isValid) {
+    return dateValidation;
+  }
+  
+  const birth = new Date(birthDate);
+  const now = new Date();
+  const age = Math.floor((now.getTime() - birth.getTime()) / (365.25 * 24 * 60 * 60 * 1000));
+  
+  if (age < minAge) {
+    return { isValid: false, error: `Age must be at least ${minAge} years` };
+  }
+  
+  if (age > maxAge) {
+    return { isValid: false, error: `Age cannot be more than ${maxAge} years` };
+  }
+  
+  return { isValid: true };
+};
+
+// URL validation
+export const validateURL = (url: string): { isValid: boolean; error?: string } => {
+  if (!url) {
+    return { isValid: false, error: "URL is required" };
+  }
+  
+  try {
+    new URL(url);
+    return { isValid: true };
+  } catch {
+    return { isValid: false, error: "Invalid URL format" };
+  }
+};
+
 // Form validation helper
 export const validateForm = (
   fields: Record<string, any>,
@@ -228,5 +485,20 @@ export const validateForm = (
   return {
     isValid: Object.keys(errors).length === 0,
     errors
+  };
+};
+
+// Debounced validation helper
+export const createDebouncedValidator = (
+  validator: (value: any) => { isValid: boolean; error?: string },
+  delay: number = 500
+) => {
+  let timeoutId: ReturnType<typeof setTimeout>;
+  
+  return (value: any, callback: (result: { isValid: boolean; error?: string }) => void) => {
+    clearTimeout(timeoutId);
+    timeoutId = setTimeout(() => {
+      callback(validator(value));
+    }, delay);
   };
 };
