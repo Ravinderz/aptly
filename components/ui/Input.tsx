@@ -21,7 +21,7 @@ const inputVariants = {
 };
 
 const inputSizes = {
-  sm: 'px-3 py-2 min-h-[36px] text-sm',
+  sm: 'px-3 py-2 min-h-[36px] text-body-small',
   md: 'px-4 py-3 min-h-[44px] text-body-large',
   lg: 'px-4 py-4 min-h-[52px] text-headline-medium',
 };
@@ -45,7 +45,7 @@ export const Input = forwardRef<TextInput, InputProps>(
     return (
       <View className={cn('w-full', containerClassName)}>
         {label && (
-          <Text className="text-text-primary text-sm font-medium mb-2">
+          <Text className="text-text-primary text-label-medium font-medium mb-2">
             {label}
           </Text>
         )}
@@ -68,7 +68,7 @@ export const Input = forwardRef<TextInput, InputProps>(
               error && 'border-error',
               className
             )}
-            placeholderTextColor="#757575"
+            placeholderTextColor="rgb(var(--color-text-secondary))"
             {...props}
           />
           
@@ -82,7 +82,7 @@ export const Input = forwardRef<TextInput, InputProps>(
         {(error || helperText) && (
           <Text 
             className={cn(
-              'text-xs mt-1',
+              'text-label-small mt-1',
               error ? 'text-error' : 'text-text-secondary'
             )}
           >

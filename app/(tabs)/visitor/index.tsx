@@ -1,268 +1,389 @@
+import AptlySearchBar from "@/components/ui/AptlySearchBar";
 import Header from "@/components/ui/Header";
-import SectionHeading from "@/components/ui/SectionHeading";
 import VisitorListItem from "@/components/ui/VisitorListItem";
+import VisitorQRModal from "@/components/ui/VisitorQRModal";
+import { router } from "expo-router";
+import { Calendar, Filter, Plus, Users } from "lucide-react-native";
+import React, { useEffect, useState } from "react";
 import {
-  BottomSheetModal,
-  BottomSheetModalProvider,
-  BottomSheetView,
-} from "@gorhom/bottom-sheet";
-import { Image } from "expo-image";
-import { useRouter } from "expo-router";
-import { CircleX, Download, Plus, Share2 } from "lucide-react-native";
-import { useCallback, useRef, useState } from "react";
-import {
+  RefreshControl,
   ScrollView,
-  StyleSheet,
   Text,
   TouchableOpacity,
   View,
 } from "react-native";
-import { GestureHandlerRootView } from "react-native-gesture-handler";
 
-const Visitor = () => {
-  const router = useRouter();
+interface Visitor {
+  id: string;
+  name: string;
+  date: string;
+  time: string;
+  status: "Pending" | "Approved" | "Pre-approved" | "Rejected" | "Completed";
+  category: "Personal" | "Delivery" | "Service" | "Official";
+  phone?: string;
+  purpose?: string;
+}
 
-  const [selectedVisitor, setSelectedVisitor] = useState<{
-    name: string;
-    date: string;
-    time: string;
-    status: string;
-  } | null>(null);
+const FILTER_OPTIONS = [
+  { key: "all", label: "All Visitors" },
+  { key: "pending", label: "Pending" },
+  { key: "approved", label: "Approved" },
+  { key: "today", label: "Today" },
+];
 
-  const bottomSheetModalRef = useRef<BottomSheetModal>(null);
+const CATEGORY_FILTERS = [
+  { key: "all", label: "All Categories", icon: Users },
+  { key: "Personal", label: "Personal", icon: Users },
+  { key: "Delivery", label: "Delivery", icon: Users },
+  { key: "Service", label: "Service", icon: Users },
+  { key: "Official", label: "Official", icon: Users },
+];
 
-  const getLetters = (str: string) => {
-    const parts = str ? str.split(" ") : "A A";
-    if (parts?.length > 1) {
-      return `${parts[0].charAt(0)}${parts[1].charAt(0)}`.toUpperCase();
-    }
-    return `${str.charAt(0)}${str.charAt(0)}`.toUpperCase();
-  };
+export default function VisitorDashboard() {
+  const [visitors, setVisitors] = useState<Visitor[]>([]);
+  const [filteredVisitors, setFilteredVisitors] = useState<Visitor[]>([]);
+  const [selectedFilter, setSelectedFilter] = useState("all");
+  const [selectedCategory, setSelectedCategory] = useState("all");
+  const [searchQuery, setSearchQuery] = useState("");
+  const [refreshing, setRefreshing] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [selectedVisitor, setSelectedVisitor] = useState<Visitor | null>(null);
+  const [showQRModal, setShowQRModal] = useState(false);
 
-  const handleViewAll = (title: string) => {
-    console.log("handleViewAll", title);
-    router.push({
-      pathname: "/(tabs)/visitor/visitorList",
-      params: { title: title },
-    });
-  };
-
-  const handlePresentModalPress = useCallback(
-    (name: any, date: any, time: any, status: any) => {
-      console.log("handlePresentModalPress", name, date, time, status);
-      setSelectedVisitor({ name, date, time, status });
-      bottomSheetModalRef.current?.present();
-    },
-    []
-  );
-  const handleSheetChanges = useCallback((index: number) => {
-    console.log("handleSheetChanges", index);
+  useEffect(() => {
+    loadVisitors();
   }, []);
 
+  useEffect(() => {
+    filterVisitors();
+  }, [visitors, selectedFilter, selectedCategory, searchQuery]);
+
+  const loadVisitors = async () => {
+    try {
+      // Mock data - in production this would be an API call
+      const mockVisitors: Visitor[] = [
+        {
+          id: "1",
+          name: "Nishant Kumar",
+          date: "Today",
+          time: "10:00 AM",
+          status: "Pre-approved",
+          category: "Personal",
+          phone: "+91 9876543210",
+          purpose: "Family visit"
+        },
+        {
+          id: "2",
+          name: "Amazon Delivery",
+          date: "Today",
+          time: "11:00 AM",
+          status: "Approved",
+          category: "Delivery",
+          phone: "+91 9876543211",
+          purpose: "Package delivery"
+        },
+        {
+          id: "3",
+          name: "Blinkit Delivery",
+          date: "Today",
+          time: "12:30 PM",
+          status: "Pending",
+          category: "Delivery",
+          phone: "+91 9876543212",
+          purpose: "Grocery delivery"
+        },
+        {
+          id: "4",
+          name: "Plumber - Raj",
+          date: "Tomorrow",
+          time: "09:00 AM",
+          status: "Approved",
+          category: "Service",
+          phone: "+91 9876543213",
+          purpose: "Pipe repair"
+        },
+        {
+          id: "5",
+          name: "Dr. Sharma",
+          date: "Yesterday",
+          time: "08:00 PM",
+          status: "Completed",
+          category: "Personal",
+          phone: "+91 9876543214",
+          purpose: "Home consultation"
+        }
+      ];
+      
+      setVisitors(mockVisitors);
+    } catch (error) {
+      console.error("Error loading visitors:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const filterVisitors = () => {
+    let filtered = visitors;
+
+    // Filter by status/time
+    if (selectedFilter !== "all") {
+      switch (selectedFilter) {
+        case "pending":
+          filtered = filtered.filter(v => v.status === "Pending");
+          break;
+        case "approved":
+          filtered = filtered.filter(v => v.status === "Approved" || v.status === "Pre-approved");
+          break;
+        case "today":
+          filtered = filtered.filter(v => v.date === "Today");
+          break;
+      }
+    }
+
+    // Filter by category
+    if (selectedCategory !== "all") {
+      filtered = filtered.filter(v => v.category === selectedCategory);
+    }
+
+    // Filter by search query
+    if (searchQuery.trim()) {
+      const query = searchQuery.toLowerCase();
+      filtered = filtered.filter(v => 
+        v.name.toLowerCase().includes(query) ||
+        v.purpose?.toLowerCase().includes(query) ||
+        v.category.toLowerCase().includes(query)
+      );
+    }
+
+    // Sort by date and status priority
+    filtered.sort((a, b) => {
+      const statusOrder = { "Pending": 4, "Pre-approved": 3, "Approved": 2, "Completed": 1, "Rejected": 0 };
+      const statusComparison = statusOrder[b.status] - statusOrder[a.status];
+      if (statusComparison !== 0) return statusComparison;
+      
+      // Then sort by date
+      const dateOrder = { "Today": 3, "Tomorrow": 2, "Yesterday": 1 };
+      return (dateOrder[b.date as keyof typeof dateOrder] || 0) - (dateOrder[a.date as keyof typeof dateOrder] || 0);
+    });
+
+    setFilteredVisitors(filtered);
+  };
+
+  const onRefresh = async () => {
+    setRefreshing(true);
+    await loadVisitors();
+    setRefreshing(false);
+  };
+
   const handleAddVisitor = () => {
-    console.log("handleAddVisitor");
     router.push("/(tabs)/visitor/addVisitor");
   };
 
+  const handleVisitorAction = (visitor: Visitor, action: string) => {
+    console.log(`${action} visitor:`, visitor.name);
+    // TODO: Implement visitor actions
+  };
+
+  const handleViewQR = (visitor: Visitor) => {
+    setSelectedVisitor(visitor);
+    setShowQRModal(true);
+  };
+
+  const handleCloseQRModal = () => {
+    setShowQRModal(false);
+    setSelectedVisitor(null);
+  };
+
+  const getUpcomingCount = () => visitors.filter(v => v.status !== "Completed" && v.status !== "Rejected").length;
+  const getPendingCount = () => visitors.filter(v => v.status === "Pending").length;
+
   return (
-    <>
-      <View style={{ zIndex: 1, position: "absolute", right: 24, bottom: 24 }}>
-        <TouchableOpacity
-          className="bg-primary rounded-full w-14 h-14 items-center justify-center shadow-lg shadow-primary/25"
-          onPress={() => handleAddVisitor()}
-        >
-          <Plus size={20} color="white" strokeWidth={2} />
-        </TouchableOpacity>
+    <Header>
+      {/* Enhanced Header with Stats */}
+      <View className="mb-6">
+        <View className="flex-row items-center justify-between mb-4">
+          <Text className="text-display-small font-bold text-text-primary">
+            Visitors
+          </Text>
+          <TouchableOpacity
+            onPress={handleAddVisitor}
+            className="bg-primary rounded-full w-12 h-12 items-center justify-center shadow-sm"
+          >
+            <Plus size={20} color="white" strokeWidth={2} />
+          </TouchableOpacity>
+        </View>
+
+        {/* Quick Stats */}
+        <View className="flex-row gap-4 mb-4">
+          <View className="flex-1 bg-surface border border-divider rounded-xl p-4">
+            <Text className="text-headline-small font-semibold text-text-primary">
+              {getUpcomingCount()}
+            </Text>
+            <Text className="text-body-medium text-text-secondary">
+              Upcoming
+            </Text>
+          </View>
+          <View className="flex-1 bg-surface border border-divider rounded-xl p-4">
+            <Text className="text-headline-small font-semibold text-warning">
+              {getPendingCount()}
+            </Text>
+            <Text className="text-body-medium text-text-secondary">
+              Pending Approval
+            </Text>
+          </View>
+          <View className="flex-1 bg-secondary/5 border border-secondary/20 rounded-xl p-4">
+            <Text className="text-headline-small font-semibold text-secondary">
+              {visitors.filter(v => v.date === "Today").length}
+            </Text>
+            <Text className="text-body-medium text-text-secondary">
+              Today's Visits
+            </Text>
+          </View>
+        </View>
       </View>
-      <Header>
-        <GestureHandlerRootView style={{ flex: 1, zIndex: 0 }}>
-          <BottomSheetModalProvider>
-            <BottomSheetModal
-              ref={bottomSheetModalRef}
-              onChange={handleSheetChanges}
-              stackBehavior="push"
-              containerStyle={{ zIndex: 3, height: "100%" }}
-              enablePanDownToClose={false}
-              // snapPoints={["90%"]}
+
+      {/* Search Bar */}
+      <View className="mb-4">
+        <AptlySearchBar
+          placeholder="Search visitors, purpose..."
+          value={searchQuery}
+          onChangeText={setSearchQuery}
+          onClear={() => setSearchQuery("")}
+        />
+      </View>
+
+      {/* Filter Pills - Status */}
+      <View className="mb-4">
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={{ paddingRight: 16 }}
+        >
+          {FILTER_OPTIONS.map((filter) => (
+            <TouchableOpacity
+              key={filter.key}
+              onPress={() => setSelectedFilter(filter.key)}
+              className={`mr-3 px-4 py-2 rounded-full border ${
+                selectedFilter === filter.key
+                  ? "bg-primary border-primary"
+                  : "bg-surface border-divider"
+              }`}
+              activeOpacity={0.7}
             >
-              <BottomSheetView style={styles.contentContainer}>
-                <View className="w-full px-6">
-                  <View className="flex-row justify-between items-center pb-6">
-                    <View className="flex-row items-center">
-                      <View className="bg-primary rounded-full w-12 h-12 items-center justify-center mr-3">
-                        <Text className="text-white font-bold text-body-medium">
-                          {getLetters(selectedVisitor?.name as string)}
-                        </Text>
-                      </View>
-                      <Text className="text-headline-large font-semibold text-text-primary">
-                        {selectedVisitor?.name}
-                      </Text>
-                    </View>
-                    <TouchableOpacity
-                      onPress={() => bottomSheetModalRef.current?.dismiss()}
-                      className="p-2"
-                    >
-                      <CircleX size={20} color="#757575" strokeWidth={1.5} />
-                    </TouchableOpacity>
-                  </View>
-                  <View className="items-center justify-center mb-6">
-                    <Image
-                      style={{ width: 200, height: 200 }}
-                      source={require("../../../assets/images/QR_Code.png")}
-                      contentFit="cover"
-                      transition={1000}
-                    />
-                  </View>
-                  <View className="items-center mb-8">
-                    <View className="flex-row items-center mb-2">
-                      <Text className="text-body-large font-medium text-text-secondary mr-2">
-                        {selectedVisitor?.date}
-                      </Text>
-                      <Text className="text-body-large font-medium text-text-secondary">
-                        {selectedVisitor?.time}
-                      </Text>
-                    </View>
-                    <View className={`px-3 py-1 rounded-full ${
-                      selectedVisitor?.status === 'Pre-approved' ? 'bg-success/10' : 'bg-primary/10'
-                    }`}>
-                      <Text className={`text-body-medium font-medium ${
-                        selectedVisitor?.status === 'Pre-approved' ? 'text-success' : 'text-primary'
-                      }`}>
-                        {selectedVisitor?.status}
-                      </Text>
-                    </View>
-                  </View>
-                  <View className="flex-row justify-between gap-4">
-                    <TouchableOpacity className="flex-1 flex-row items-center justify-center bg-primary py-4 rounded-xl">
-                      <Share2 size={16} color="white" strokeWidth={1.5} />
-                      <Text className="text-white text-body-medium font-semibold ml-2">
-                        Share QR
-                      </Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity className="flex-1 flex-row items-center justify-center bg-surface border border-divider py-4 rounded-xl">
-                      <Download size={16} color="#6366f1" strokeWidth={1.5} />
-                      <Text className="text-primary text-body-medium font-semibold ml-2">
-                        Download
-                      </Text>
-                    </TouchableOpacity>
-                  </View>
-                </View>
-              </BottomSheetView>
-            </BottomSheetModal>
-          </BottomSheetModalProvider>
-          <View>
-            <SectionHeading
-              heading="Upcoming Visitors"
-              handleViewAll={() => handleViewAll("Upcoming Visitors")}
-            />
-            <ScrollView
-              contentContainerStyle={{
-                padding: 2,
-              }}
-              scrollEventThrottle={16}
+              <Text
+                className={`text-body-medium font-medium ${
+                  selectedFilter === filter.key
+                    ? "text-white"
+                    : "text-text-primary"
+                }`}
+              >
+                {filter.label}
+              </Text>
+            </TouchableOpacity>
+          ))}
+        </ScrollView>
+      </View>
+
+      {/* Filter Pills - Category */}
+      <View className="mb-6">
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={{ paddingRight: 16 }}
+        >
+          {CATEGORY_FILTERS.map((category) => (
+            <TouchableOpacity
+              key={category.key}
+              onPress={() => setSelectedCategory(category.key)}
+              className={`mr-3 px-3 py-2 rounded-full border flex-row items-center ${
+                selectedCategory === category.key
+                  ? "bg-secondary/10 border-secondary"
+                  : "bg-surface border-divider"
+              }`}
+              activeOpacity={0.7}
             >
-              <VisitorListItem
-                name="Nishant"
-                date="Today"
-                time="10:00 AM"
-                type="upcoming"
-                status="Pre-approved"
-                handleClick={(name: any, date: any, time: any, status: any) =>
-                  handlePresentModalPress(
-                    "Nishant",
-                    "Today",
-                    "10:00 AM",
-                    "Pre-approved"
-                  )
-                }
+              <category.icon 
+                size={14} 
+                className={selectedCategory === category.key ? "text-secondary" : "text-text-secondary"}
+                strokeWidth={1.5}
               />
-              <VisitorListItem
-                name="Amazon Delivery"
-                date="Today"
-                time="11:00 AM"
-                status="Approved"
-                type="upcoming"
-                handleClick={(name: any, date: any, time: any, status: any) =>
-                  handlePresentModalPress(
-                    "Amazon Delivery",
-                    "Today",
-                    "10:00 AM",
-                    "Approved"
-                  )
-                }
-              />
-              <VisitorListItem
-                name="Blinkit Delivery"
-                date="Today"
-                time="11:00 AM"
-                status="Pending"
-                type="upcoming"
-                handleClick={(name: any, date: any, time: any, status: any) =>
-                  handlePresentModalPress(
-                    "Blinkit Delivery",
-                    "Today",
-                    "10:00 AM",
-                    "Pending"
-                  )
-                }
-              />
-            </ScrollView>
+              <Text
+                className={`text-label-medium font-medium ml-1 ${
+                  selectedCategory === category.key
+                    ? "text-secondary"
+                    : "text-text-primary"
+                }`}
+              >
+                {category.label}
+              </Text>
+            </TouchableOpacity>
+          ))}
+        </ScrollView>
+      </View>
+
+      {/* Visitors List */}
+      <ScrollView
+        className="flex-1"
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }
+        showsVerticalScrollIndicator={false}
+      >
+        {loading ? (
+          <View className="flex-1 items-center justify-center py-12">
+            <Text className="text-text-secondary">Loading visitors...</Text>
           </View>
-          <View className="mt-2">
-            <SectionHeading
-              heading="Past Visitors"
-              handleViewAll={() => handleViewAll("Past Visitors")}
-            />
-            <ScrollView
-              contentContainerStyle={{
-                padding: 2,
-              }}
-              scrollEventThrottle={16}
-            >
+        ) : filteredVisitors.length > 0 ? (
+          <>
+            {filteredVisitors.map((visitor) => (
               <VisitorListItem
-                name="Nishant"
-                date="Today"
-                time="10:00 AM"
-                status="Pre-approved"
-                type="past"
-                handleClick={(name: any, date: any, time: any, status: any) =>
-                  handlePresentModalPress(
-                    "Nishant",
-                    "Today",
-                    "10:00 AM",
-                    "Pre-approved"
-                  )
-                }
+                key={visitor.id}
+                name={visitor.name}
+                date={visitor.date}
+                time={visitor.time}
+                status={visitor.status}
+                category={visitor.category}
+                type={visitor.status === "Completed" || visitor.status === "Rejected" ? "past" : "upcoming"}
+                onViewQR={() => handleViewQR(visitor)}
+                handleClick={() => handleVisitorAction(visitor, "view")}
               />
-              <VisitorListItem
-                name="Blinkit Delivery"
-                date="Today"
-                time="09:00 AM"
-                status="Rejected"
-                type="past"
-                handleClick={(name: any, date: any, time: any, status: any) =>
-                  handlePresentModalPress(
-                    "Blibkit Delivery",
-                    "Today",
-                    "10:00 AM",
-                    "Rejected"
-                  )
-                }
-              />
-            </ScrollView>
+            ))}
+          </>
+        ) : (
+          <View className="flex-1 items-center justify-center py-12">
+            <Users size={48} className="text-text-disabled mb-4" />
+            <Text className="text-text-primary text-headline-small font-semibold mb-2">
+              {searchQuery.trim() ? "No Matching Visitors" : "No Visitors Found"}
+            </Text>
+            <Text className="text-text-secondary text-center px-8 mb-6">
+              {searchQuery.trim() 
+                ? "Try adjusting your search or filter criteria."
+                : "Add your first visitor to get started with visitor management."
+              }
+            </Text>
+            {!searchQuery.trim() && (
+              <TouchableOpacity
+                onPress={handleAddVisitor}
+                className="bg-primary px-6 py-3 rounded-lg flex-row items-center"
+              >
+                <Plus size={16} color="white" strokeWidth={2} />
+                <Text className="text-white font-semibold ml-2">
+                  Add Visitor
+                </Text>
+              </TouchableOpacity>
+            )}
           </View>
-        </GestureHandlerRootView>
-      </Header>
-    </>
+        )}
+
+        <View className="h-6" />
+      </ScrollView>
+      
+      {/* QR Code Modal */}
+      <VisitorQRModal
+        visible={showQRModal}
+        visitor={selectedVisitor}
+        onClose={handleCloseQRModal}
+      />
+    </Header>
   );
-};
-
-const styles = StyleSheet.create({
-  contentContainer: {
-    flex: 1,
-    width: "100%",
-    zIndex: 1,
-  },
-});
-
-export default Visitor;
+}

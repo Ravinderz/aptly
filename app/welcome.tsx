@@ -1,11 +1,17 @@
-import { useRouter } from "expo-router";
-import { Building, Shield, Users, Smartphone, Zap } from "lucide-react-native";
-import React from "react";
-import { SafeAreaView, ScrollView, Text, TouchableOpacity, View, Image } from "react-native";
 import { Button } from "@/components/ui/Button";
 import HighlightCard from "@/components/ui/HighlightCard";
 import { useAuth } from "@/contexts/AuthContext";
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useRouter } from "expo-router";
+import { Building, Shield, Smartphone, Users, Zap } from "lucide-react-native";
+import React from "react";
+import {
+  SafeAreaView,
+  ScrollView,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 
 export default function Welcome() {
   const router = useRouter();
@@ -26,27 +32,27 @@ export default function Welcome() {
         isVerified: true,
         avatar: null,
         createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString()
+        updatedAt: new Date().toISOString(),
       };
 
       const mockTokens = {
         accessToken: "mock-access-token-123",
-        refreshToken: "mock-refresh-token-123"
+        refreshToken: "mock-refresh-token-123",
       };
 
       // Store mock data in AsyncStorage
       await AsyncStorage.multiSet([
-        ['auth_tokens', JSON.stringify(mockTokens)],
-        ['user_profile', JSON.stringify(mockUserProfile)]
+        ["auth_tokens", JSON.stringify(mockTokens)],
+        ["user_profile", JSON.stringify(mockUserProfile)],
       ]);
 
       // Update auth context
       login(mockUserProfile);
 
       // Navigate to home
-      router.push('/(tabs)');
+      router.replace("/(tabs)");
     } catch (error) {
-      console.error('Error setting up dev mode:', error);
+      console.error("Error setting up dev mode:", error);
     }
   };
 
@@ -54,23 +60,23 @@ export default function Welcome() {
     {
       icon: <Building size={32} className="text-primary" />,
       title: "Digital Society Management",
-      description: "Manage your housing society digitally with ease"
+      description: "Manage your housing society digitally with ease",
     },
     {
       icon: <Shield size={32} className="text-secondary" />,
       title: "Secure & Private",
-      description: "Your data is protected with bank-level security"
+      description: "Your data is protected with bank-level security",
     },
     {
       icon: <Users size={32} className="text-warning" />,
       title: "Community Connect",
-      description: "Stay connected with your society members"
+      description: "Stay connected with your society members",
     },
     {
       icon: <Smartphone size={32} className="text-error" />,
       title: "Mobile First",
-      description: "Designed specifically for Indian mobile users"
-    }
+      description: "Designed specifically for Indian mobile users",
+    },
   ];
 
   return (
@@ -84,7 +90,9 @@ export default function Welcome() {
             activeOpacity={0.8}
           >
             <Zap size={16} color="white" />
-            <Text className="text-white text-label-large font-bold ml-1">DEV SKIP</Text>
+            <Text className="text-white text-label-large font-bold ml-1">
+              DEV SKIP
+            </Text>
           </TouchableOpacity>
         </View>
       )}
@@ -95,14 +103,14 @@ export default function Welcome() {
           <View className="bg-primary/10 rounded-full w-24 h-24 items-center justify-center mb-6">
             <Building size={48} className="text-primary" />
           </View>
-          
+
           <Text className="text-display-large text-text-primary mb-4 text-center">
             Welcome to Aptly
           </Text>
-          
+
           <Text className="text-body-large text-text-secondary text-center leading-7 mb-8">
-            India's most trusted housing society management app. 
-            Simplify maintenance, billing, and community management.
+            India's most trusted housing society management app. Simplify
+            maintenance, billing, and community management.
           </Text>
 
           {/* Indian Context Badge */}
@@ -118,10 +126,13 @@ export default function Welcome() {
           <Text className="text-headline-large text-text-primary mb-6 text-center">
             Why Choose Aptly?
           </Text>
-          
+
           <View className="space-y-4">
             {features.map((feature, index) => (
-              <View key={index} className="bg-surface rounded-2xl p-6 border border-divider">
+              <View
+                key={index}
+                className="bg-surface rounded-2xl p-6 border border-divider"
+              >
                 <View className="flex-row items-center mb-3">
                   <View className="bg-background rounded-full w-16 h-16 items-center justify-center mr-4">
                     {feature.icon}
@@ -148,16 +159,28 @@ export default function Welcome() {
             </Text>
             <View className="flex-row justify-between items-center">
               <View className="items-center">
-                <Text className="text-display-medium text-text-primary">500+</Text>
-                <Text className="text-text-secondary text-body-medium">Societies</Text>
+                <Text className="text-display-medium text-text-primary">
+                  500+
+                </Text>
+                <Text className="text-text-secondary text-body-medium">
+                  Societies
+                </Text>
               </View>
               <View className="items-center">
-                <Text className="text-display-medium text-text-primary">50K+</Text>
-                <Text className="text-text-secondary text-body-medium">Residents</Text>
+                <Text className="text-display-medium text-text-primary">
+                  50K+
+                </Text>
+                <Text className="text-text-secondary text-body-medium">
+                  Residents
+                </Text>
               </View>
               <View className="items-center">
-                <Text className="text-display-medium text-text-primary">4.8★</Text>
-                <Text className="text-text-secondary text-body-medium">Rating</Text>
+                <Text className="text-display-medium text-text-primary">
+                  4.8★
+                </Text>
+                <Text className="text-text-secondary text-body-medium">
+                  Rating
+                </Text>
               </View>
             </View>
           </View>
@@ -171,29 +194,28 @@ export default function Welcome() {
           >
             Get Started
           </Button>
-          
-          <TouchableOpacity 
-            onPress={() => router.push({
-              pathname: "/auth/phone-registration",
-              params: { mode: "signin" }
-            })}
+
+          <TouchableOpacity
+            onPress={() =>
+              router.push({
+                pathname: "/auth/phone-registration",
+                params: { mode: "signin" },
+              })
+            }
             className="items-center py-3"
           >
             <Text className="text-text-secondary">
-              Already have an account? <Text className="text-primary font-semibold">Sign In</Text>
+              Already have an account?{" "}
+              <Text className="text-primary font-semibold">Sign In</Text>
             </Text>
           </TouchableOpacity>
         </View>
 
         {/* Demo Notice */}
         <View className="mx-6 mb-6">
-          <HighlightCard
-            title="Demo Mode"
-            variant="warning"
-            size="md"
-          >
-            This is a demonstration version. In production, you would connect to your 
-            society's actual management system.
+          <HighlightCard title="Demo Mode" variant="warning" size="md">
+            This is a demonstration version. In production, you would connect to
+            your society's actual management system.
           </HighlightCard>
         </View>
       </ScrollView>

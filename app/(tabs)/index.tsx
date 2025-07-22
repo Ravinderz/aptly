@@ -1,12 +1,10 @@
-import AlertCard from "@/components/AlertCard";
 import NoticeSection from "@/components/NoticeSection";
 import QuickActions from "@/components/QuickActions";
+import SocietyOverview from "@/components/SocietyOverview";
 import Header from "@/components/ui/Header";
 import UpcomingVisitorSection from "@/components/UpcomingVisitorSection";
-import SocietyOverview from "@/components/SocietyOverview";
-import { StyleSheet } from "react-native";
 
-export default function HomeScreen() {
+export default function HomePage() {
   return (
     <Header>
       <NoticeSection />
@@ -16,11 +14,3 @@ export default function HomeScreen() {
     </Header>
   );
 }
-
-const styles = StyleSheet.create({
-  contentContainer: {
-    flex: 1,
-    width: "100%",
-    zIndex: 1,
-  },
-});

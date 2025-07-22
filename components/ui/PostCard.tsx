@@ -86,28 +86,28 @@ const PostCard: React.FC<PostCardProps> = ({ post, onLike, onComment, onDelete, 
         <View className="flex flex-row gap-3 items-center flex-1">
           <UserAvatar name={post.userName} />
           <View className="flex flex-col gap-1 flex-1">
-            <Text className="text-lg font-semibold text-text-primary">{post.userName}</Text>
+            <Text className="text-headline-small font-semibold text-text-primary">{post.userName}</Text>
             <View className="flex flex-row items-center gap-2">
-              <Text className="text-sm text-text-secondary">
+              <Text className="text-body-medium text-text-secondary">
                 Flat {post.flatNumber}
               </Text>
               <View className="w-1 h-1 bg-text-secondary rounded-full" />
               <View className="bg-primary/10 px-2 py-1 rounded-full flex-row items-center">
-                <Text className="text-xs mr-1">{categoryDisplay.icon}</Text>
-                <Text className="text-primary text-xs font-medium">{categoryDisplay.name}</Text>
+                <Text className="text-label-small mr-1">{categoryDisplay.icon}</Text>
+                <Text className="text-primary text-label-small font-medium">{categoryDisplay.name}</Text>
               </View>
             </View>
           </View>
         </View>
         <View className="flex flex-row items-center gap-3">
-          <Text className="text-sm text-text-secondary">{formatTimeAgo(post.createdAt)}</Text>
+          <Text className="text-body-medium text-text-secondary">{formatTimeAgo(post.createdAt)}</Text>
           {(post.canDelete || canEdit) && (
             <View className="relative">
               <TouchableOpacity
                 onPress={toggleActions}
                 className="p-1"
               >
-                <MoreHorizontal size={16} color="#757575" />
+                <MoreHorizontal size={16} className="text-text-secondary" />
               </TouchableOpacity>
               
               {showActions && (
@@ -117,7 +117,7 @@ const PostCard: React.FC<PostCardProps> = ({ post, onLike, onComment, onDelete, 
                       onPress={handleEdit}
                       className="flex-row items-center px-4 py-3 border-b border-divider"
                     >
-                      <Edit3 size={14} color="#6366f1" />
+                      <Edit3 size={14} className="text-primary" />
                       <Text className="text-primary ml-3 font-medium">Edit</Text>
                     </TouchableOpacity>
                   )}
@@ -131,9 +131,9 @@ const PostCard: React.FC<PostCardProps> = ({ post, onLike, onComment, onDelete, 
                       className="flex-row items-center px-4 py-3"
                     >
                       {deleting ? (
-                        <ActivityIndicator size="small" color="#D32F2F" />
+                        <ActivityIndicator size="small" className="text-error" />
                       ) : (
-                        <Trash2 size={14} color="#D32F2F" />
+                        <Trash2 size={14} className="text-error" />
                       )}
                       <Text className="text-error ml-3 font-medium">
                         {deleting ? 'Deleting...' : 'Delete'}
@@ -147,7 +147,7 @@ const PostCard: React.FC<PostCardProps> = ({ post, onLike, onComment, onDelete, 
         </View>
       </View>
       <View className="border-b border-divider pb-4 mb-4">
-        <MentionText style={{ fontSize: 16, lineHeight: 24, color: '#212121' }}>
+        <MentionText className="text-body-large leading-6 text-text-primary">
           {post.content}
         </MentionText>
         {post.imageUrl && (
@@ -165,8 +165,8 @@ const PostCard: React.FC<PostCardProps> = ({ post, onLike, onComment, onDelete, 
           className="flex flex-row gap-2 items-center flex-1 py-2"
           activeOpacity={0.7}
         >
-          <MessageSquareText size={18} color="#757575" strokeWidth={2} />
-          <Text className="text-sm font-medium text-text-secondary">{postStats.comments}</Text>
+          <MessageSquareText size={18} className="text-text-secondary" strokeWidth={2} />
+          <Text className="text-body-medium font-medium text-text-secondary">{postStats.comments}</Text>
         </TouchableOpacity>
         
         <TouchableOpacity 
@@ -176,16 +176,16 @@ const PostCard: React.FC<PostCardProps> = ({ post, onLike, onComment, onDelete, 
           activeOpacity={0.7}
         >
           {liking ? (
-            <ActivityIndicator size="small" color="#D32F2F" />
+            <ActivityIndicator size="small" className="text-error" />
           ) : (
             <Heart 
               size={18} 
-              color={post.isLikedByUser ? "#D32F2F" : "#757575"} 
-              fill={post.isLikedByUser ? "#D32F2F" : "transparent"}
+              className={post.isLikedByUser ? "text-error" : "text-text-secondary"} 
+              fill={post.isLikedByUser ? "currentColor" : "transparent"}
               strokeWidth={2} 
             />
           )}
-          <Text className={`text-sm font-medium ${
+          <Text className={`text-body-medium font-medium ${
             post.isLikedByUser ? 'text-error' : 'text-text-secondary'
           }`}>
             {postStats.likes}

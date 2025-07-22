@@ -119,10 +119,10 @@ export default function Billing() {
 
   const getStatusIcon = (status: string) => {
     switch (status) {
-      case "paid": return <CheckCircle size={16} color="#4CAF50" />;
-      case "pending": return <Calendar size={16} color="#FF9800" />;
-      case "overdue": return <AlertCircle size={16} color="#D32F2F" />;
-      default: return <Calendar size={16} color="#757575" />;
+      case "paid": return <CheckCircle size={16} className="text-success" />;
+      case "pending": return <Calendar size={16} className="text-warning" />;
+      case "overdue": return <AlertCircle size={16} className="text-error" />;
+      default: return <Calendar size={16} className="text-text-secondary" />;
     }
   };
 
@@ -167,7 +167,7 @@ export default function Billing() {
       {/* Header */}
       <View className="flex-row items-center px-6 py-4 border-b border-divider bg-surface">
         <TouchableOpacity onPress={() => router.back()} className="mr-4 p-2">
-          <ArrowLeft size={20} color="#6366f1" />
+          <ArrowLeft size={20} className="text-primary" />
         </TouchableOpacity>
         <View className="flex-1">
           <Text className="text-headline-large font-semibold text-text-primary">Billing</Text>
@@ -177,14 +177,14 @@ export default function Billing() {
           onPress={() => router.push("/(tabs)/services/billing/notifications")}
           className="mr-4 p-2 relative"
         >
-          <Bell size={20} color="#6366f1" />
+          <Bell size={20} className="text-primary" />
           <View className="absolute top-1 right-1 bg-error rounded-full w-3 h-3" />
         </TouchableOpacity>
         <TouchableOpacity 
           onPress={() => router.push("/(tabs)/services/billing/settings")}
           className="p-2"
         >
-          <Settings size={20} color="#6366f1" />
+          <Settings size={20} className="text-primary" />
         </TouchableOpacity>
       </View>
 
@@ -193,7 +193,7 @@ export default function Billing() {
         <View className="flex-row gap-4 mb-6">
           <View className="flex-1 bg-error/10 rounded-xl p-4 border border-error/20">
             <View className="flex-row items-center mb-3">
-              <AlertCircle size={16} color="#D32F2F" />
+              <AlertCircle size={16} className="text-error" />
               <Text className="text-error text-body-medium font-medium ml-2">Total Pending</Text>
             </View>
             <Text className="text-error text-display-small font-bold mb-1">{formatCurrency(totalPending)}</Text>
@@ -201,7 +201,7 @@ export default function Billing() {
           </View>
           <View className="flex-1 bg-success/10 rounded-xl p-4 border border-success/20">
             <View className="flex-row items-center mb-3">
-              <CheckCircle size={16} color="#4CAF50" />
+              <CheckCircle size={16} className="text-success" />
               <Text className="text-success text-body-medium font-medium ml-2">Paid This Month</Text>
             </View>
             <Text className="text-success text-display-small font-bold mb-1">{formatCurrency(totalPaidThisMonth)}</Text>
@@ -215,14 +215,14 @@ export default function Billing() {
             onPress={() => router.push("/(tabs)/services/billing/auto-pay")}
             className="flex-1 bg-primary rounded-xl p-4 flex-row items-center justify-center"
           >
-            <CreditCard size={16} color="white" />
+            <CreditCard size={16} className="text-white" />
             <Text className="text-white font-semibold ml-2 text-body-medium">Setup Auto Pay</Text>
           </TouchableOpacity>
           <TouchableOpacity 
             onPress={() => router.push("/(tabs)/services/billing/analytics")}
             className="flex-1 bg-surface border border-divider rounded-xl p-4 flex-row items-center justify-center"
           >
-            <TrendingUp size={16} color="#6366f1" />
+            <TrendingUp size={16} className="text-primary" />
             <Text className="text-primary font-semibold ml-2 text-body-medium">View Analytics</Text>
           </TouchableOpacity>
         </View>
@@ -250,7 +250,7 @@ export default function Billing() {
             activeOpacity={0.7}
           >
             <View className="bg-primary/10 rounded-full w-12 h-12 items-center justify-center mb-3">
-              <Smartphone size={20} color="#6366f1" />
+              <Smartphone size={20} className="text-primary" />
             </View>
             <Text className="text-text-primary font-semibold text-body-medium text-center mb-1">Mobile Recharge</Text>
             <Text className="text-text-secondary text-label-large text-center">Prepaid & Postpaid</Text>
@@ -263,7 +263,7 @@ export default function Billing() {
             activeOpacity={0.7}
           >
             <View className="bg-secondary/10 rounded-full w-12 h-12 items-center justify-center mb-3">
-              <Wifi size={20} color="#4CAF50" />
+              <Wifi size={20} className="text-secondary" />
             </View>
             <Text className="text-text-primary font-semibold text-body-medium text-center mb-1">Broadband</Text>
             <Text className="text-text-secondary text-label-large text-center">Internet Bills</Text>
@@ -276,7 +276,7 @@ export default function Billing() {
             activeOpacity={0.7}
           >
             <View className="bg-warning/10 rounded-full w-12 h-12 items-center justify-center mb-3">
-              <Zap size={20} color="#FF9800" />
+              <Zap size={20} className="text-warning" />
             </View>
             <Text className="text-text-primary font-semibold text-body-medium text-center mb-1">Gas Cylinder</Text>
             <Text className="text-text-secondary text-label-large text-center">LPG Booking</Text>
@@ -289,7 +289,7 @@ export default function Billing() {
             activeOpacity={0.7}
           >
             <View className="bg-error/10 rounded-full w-12 h-12 items-center justify-center mb-3">
-              <Car size={20} color="#D32F2F" />
+              <Car size={20} className="text-error" />
             </View>
             <Text className="text-text-primary font-semibold text-body-medium text-center mb-1">Prepaid Gas</Text>
             <Text className="text-text-secondary text-label-large text-center">PNG Recharge</Text>
@@ -302,7 +302,7 @@ export default function Billing() {
             activeOpacity={0.7}
           >
             <View className="bg-primary/10 rounded-full w-12 h-12 items-center justify-center mb-3">
-              <Tv size={20} color="#6366f1" />
+              <Tv size={20} className="text-primary" />
             </View>
             <Text className="text-text-primary font-semibold text-body-medium text-center mb-1">DishTV</Text>
             <Text className="text-text-secondary text-label-large text-center">DTH Recharge</Text>
@@ -315,7 +315,7 @@ export default function Billing() {
             activeOpacity={0.7}
           >
             <View className="bg-warning/10 rounded-full w-12 h-12 items-center justify-center mb-3">
-              <Home size={20} color="#FF9800" />
+              <Home size={20} className="text-warning" />
             </View>
             <Text className="text-text-primary font-semibold text-body-medium text-center mb-1">Electricity</Text>
             <Text className="text-text-secondary text-label-large text-center">Coming Soon</Text>
@@ -343,7 +343,7 @@ export default function Billing() {
       {/* Society Bills Section Header */}
       <View className="px-6 py-4 bg-background border-t border-divider">
         <View className="flex-row items-center mb-2">
-          <Home size={20} color="#6366f1" />
+          <Home size={20} className="text-primary" />
           <Text className="text-headline-large font-semibold text-text-primary ml-3">Society Bills</Text>
         </View>
         <Text className="text-text-secondary text-body-medium">
@@ -354,16 +354,16 @@ export default function Billing() {
       {/* Search & Filter */}
       <View className="px-6 py-5 bg-surface border-b border-divider">
         <View className="flex-row items-center bg-background rounded-xl px-4 py-4 mb-5">
-          <Search size={20} color="#757575" />
+          <Search size={20} className="text-text-secondary" />
           <TextInput
             className="flex-1 ml-3 text-text-primary"
             placeholder="Search bills..."
-            placeholderTextColor="#757575"
+            placeholderTextColor="rgb(var(--color-text-secondary))"
             value={searchQuery}
             onChangeText={setSearchQuery}
           />
           <TouchableOpacity onPress={() => setShowFilters(!showFilters)}>
-            <Filter size={20} color="#6366f1" />
+            <Filter size={20} className="text-primary" />
           </TouchableOpacity>
         </View>
 
@@ -414,23 +414,23 @@ export default function Billing() {
             <View className="flex-row items-start justify-between mb-4">
               <View className="flex-1">
                 <View className="flex-row items-center mb-1">
-                  <Text className="text-lg font-semibold text-text-primary">{bill.title}</Text>
+                  <Text className="text-headline-small font-semibold text-text-primary">{bill.title}</Text>
                   {bill.type === 'common_area' && (
                     <View className="bg-primary/10 rounded-full px-2 py-1 ml-2">
-                      <Text className="text-primary text-xs font-medium">Split Bill</Text>
+                      <Text className="text-primary text-label-small font-medium">Split Bill</Text>
                     </View>
                   )}
                 </View>
-                <Text className="text-text-secondary text-sm">Bill #{bill.billNumber}</Text>
+                <Text className="text-text-secondary text-body-medium">Bill #{bill.billNumber}</Text>
                 {bill.type === 'common_area' && (
-                  <Text className="text-text-secondary text-xs mt-1">
+                  <Text className="text-text-secondary text-label-small mt-1">
                     Split between {bill.splitBetween} flats • Your share: {formatCurrency(bill.costPerFlat)}
                   </Text>
                 )}
               </View>
               <View className="items-end">
-                <Text className="text-2xl font-bold text-text-primary">{formatCurrency(bill.totalAmount)}</Text>
-                <Text className="text-text-secondary text-sm">Inc. GST</Text>
+                <Text className="text-display-medium font-bold text-text-primary">{formatCurrency(bill.totalAmount)}</Text>
+                <Text className="text-text-secondary text-body-medium">Inc. GST</Text>
               </View>
             </View>
 
@@ -438,15 +438,15 @@ export default function Billing() {
             <View className="flex-row items-center justify-between mb-4">
               <View className={`flex-row items-center px-3 py-2 rounded-full ${getStatusBgColor(bill.status)}`}>
                 {getStatusIcon(bill.status)}
-                <Text className={`font-medium text-sm ml-2 capitalize ${getStatusColor(bill.status)}`}>
+                <Text className={`font-medium text-body-medium ml-2 capitalize ${getStatusColor(bill.status)}`}>
                   {bill.status}
                 </Text>
               </View>
               <View className="items-end">
-                <Text className="text-text-secondary text-xs">
+                <Text className="text-text-secondary text-label-small">
                   {bill.status === "paid" ? "Paid on" : "Due on"}
                 </Text>
-                <Text className={`text-sm font-medium ${
+                <Text className={`text-body-medium font-medium ${
                   bill.status === "overdue" ? "text-error" : "text-text-primary"
                 }`}>
                   {bill.status === "paid" ? formatDate(bill.paidDate!) : formatDate(bill.dueDate)}
@@ -481,14 +481,14 @@ export default function Billing() {
                   <Text className="text-white font-semibold text-center">Pay Now</Text>
                 </TouchableOpacity>
                 <TouchableOpacity className="bg-surface border border-divider rounded-xl p-3">
-                  <Download size={20} color="#6366f1" />
+                  <Download size={20} className="text-primary" />
                 </TouchableOpacity>
               </View>
             )}
 
             {bill.status === "paid" && (
               <TouchableOpacity className="flex-row items-center justify-center mt-4 py-3 bg-background rounded-xl">
-                <Download size={16} color="#6366f1" />
+                <Download size={16} className="text-primary" />
                 <Text className="text-primary font-medium ml-2">Download Receipt</Text>
               </TouchableOpacity>
             )}
@@ -497,7 +497,7 @@ export default function Billing() {
 
           {filteredBills.length === 0 && (
             <View className="flex-1 items-center justify-center py-16">
-              <Text className="text-text-secondary text-lg mb-2">No bills found</Text>
+              <Text className="text-text-secondary text-headline-small mb-2">No bills found</Text>
               <Text className="text-text-secondary text-center">
                 {selectedTab === "pending" ? "All bills are up to date!" : "No payment history available"}
               </Text>

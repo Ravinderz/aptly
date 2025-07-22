@@ -20,7 +20,7 @@ interface AptlyStackHeaderProps {
 const AptlyStackHeader = ({
   title,
   showBackButton = true,
-  tintColor = "#f89b7c",
+  tintColor = "#6366f1", // Design system primary color as default
 }: AptlyStackHeaderProps) => {
   const navigation = useNavigation();
 
@@ -28,14 +28,14 @@ const AptlyStackHeader = ({
     <View
       style={[
         styles.customHeaderContainer,
-        { height: 50, backgroundColor: "#fff" },
+        { height: 50, backgroundColor: "#ffffff" }, // Keep white background but explicit
       ]}
-      className="border-b border-border-color elevation-sm z-10"
+      className="border-b border-divider bg-surface z-10"
     >
       <View className="flex flex-row justify-between w-full">
         {showBackButton && (
           <TouchableOpacity onPress={() => navigation.goBack()}>
-            <ArrowLeft size={24} color={tintColor} />
+            <ArrowLeft size={20} color={tintColor} />
           </TouchableOpacity>
         )}
         <Text style={[styles.customHeaderTitle, { color: tintColor }]}>
@@ -58,10 +58,9 @@ const styles = StyleSheet.create({
     paddingTop: Platform.OS === "ios" ? 44 : 20, // Example: iOS status bar height ~44, Android ~20
   },
   customHeaderTitle: {
-    fontSize: 18, // Adjust font size as needed
-    fontWeight: "bold",
-    // flex: 1, // Uncomment if you want title to take up remaining space and push back button
-    textAlign: "center", // Center the title
+    fontSize: 18, // Following design system headline-medium
+    fontWeight: "600", // Semibold weight for better readability
+    textAlign: "center",
   },
 });
 

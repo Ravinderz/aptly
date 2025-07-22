@@ -1,11 +1,11 @@
-import { Stack } from "expo-router";
-import { SafeAreaView } from "react-native-safe-area-context";
-import { AuthProvider } from "@/contexts/AuthContext";
 import AppNavigator from "@/components/AppNavigator";
 import { useAlert } from "@/components/ui/AlertCard";
+import { AuthProvider } from "@/contexts/AuthContext";
 import { setGlobalAlertHandler } from "@/utils/alert";
-import { useEffect } from "react";
+import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
+import { useEffect } from "react";
+import { SafeAreaView } from "react-native-safe-area-context";
 import "./globals.css";
 
 // Keep the splash screen visible while we fetch resources

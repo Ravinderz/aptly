@@ -4,9 +4,8 @@ import { FileText, Upload, Download, Trash2, Eye, Plus, File } from 'lucide-reac
 import { Button } from './Button';
 import { Card } from './Card';
 import { Document } from '../../types/storage';
-import { DocumentStorage } from '../../utils/storage';
+import { DocumentStorage , formatFileSize } from '../../utils/storage';
 import { showAlert, showErrorAlert, showDeleteConfirmAlert } from '../../utils/alert';
-import { formatFileSize } from '../../utils/storage';
 
 interface DocumentViewerProps {
   documents: Document[];

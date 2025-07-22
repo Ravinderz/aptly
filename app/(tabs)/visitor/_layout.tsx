@@ -13,9 +13,8 @@ const _layout = () => {
           header: (props) => (
             <AptlyStackHeader
               title="Add Visitor"
-              height={20} // Set your desired height here
-              tintColor="#f89b7c"
-              // You can pass other props like showBackButton={false} if needed
+              height={20}
+              tintColor="#6366f1" // Using design system primary color
             />
           ),
         }}
@@ -27,9 +26,8 @@ const _layout = () => {
           header: (props: any) => (
             <AptlyStackHeader
               title={(route.params as { title?: string })?.title || "View All"}
-              height={20} // Set your desired height here
-              tintColor="#f89b7c"
-              // You can pass other props like showBackButton={false} if needed
+              height={20}
+              tintColor="#6366f1" // Using design system primary color
             />
           ),
         })}
