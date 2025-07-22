@@ -3,7 +3,7 @@ import { Text, View } from "react-native";
 
 interface UserAvatarProps {
   name: string;
-  size?: 'sm' | 'md' | 'lg';
+  size?: 'sm' | 'md' | 'lg' | number;
 }
 
 const UserAvatar: React.FC<UserAvatarProps> = ({ name, size = 'md' }) => {
@@ -21,8 +21,22 @@ const UserAvatar: React.FC<UserAvatarProps> = ({ name, size = 'md' }) => {
     lg: 'w-16 h-16 text-lg'
   };
 
+  // Handle numeric size
+  if (typeof size === 'number') {
+    return (
+      <View 
+        className="bg-primary/10 rounded-full items-center justify-center"
+        style={{ width: size, height: size }}
+      >
+        <Text className="text-primary font-bold text-body-medium">
+          {getLetters(name)}
+        </Text>
+      </View>
+    );
+  }
+
   return (
-    <View className={`bg-primary/10 rounded-full items-center justify-center ${sizeClasses[size]}`}>
+    <View className={`bg-primary/10 rounded-full items-center justify-center ${sizeClasses[size as keyof typeof sizeClasses]}`}>
       <Text className="text-primary font-bold">
         {getLetters(name)}
       </Text>

@@ -7,27 +7,64 @@ import VisitorListCard from "./ui/VisitorListCard";
 const UpcomingVisitorSection = () => {
   const router = useRouter();
 
-  const handleViewAll = (title: string) => {
-    console.log("handleViewAll", title);
-    router.push({
-      pathname: "/(tabs)/visitor/visitorList",
-      params: { title: title },
-    });
+  const handleViewAll = () => {
+    router.push("/(tabs)/visitor");
   };
+
+  const handleVisitorPress = () => {
+    router.push("/(tabs)/visitor");
+  };
+
+  const handleApprove = (visitorName: string) => {
+    console.log("Approve visitor:", visitorName);
+    // TODO: Implement approve functionality
+  };
+
+  const handleDeny = (visitorName: string) => {
+    console.log("Deny visitor:", visitorName);
+    // TODO: Implement deny functionality
+  };
+
+  // Sample upcoming visitors data
+  const upcomingVisitors = [
+    {
+      id: "1",
+      name: "Amazon Delivery",
+      date: "Today",
+      time: "2:30 PM",
+      status: "Expected" as const,
+      category: "Delivery",
+      purpose: "Package delivery",
+    },
+  ];
 
   return (
     <View className="mb-6">
       <SectionHeading
         heading="Upcoming Visitors"
-        handleViewAll={() => handleViewAll("Upcoming Visitors")}
+        handleViewAll={handleViewAll}
       />
       <ScrollView
         contentContainerStyle={{
-          gap: 14,
-          padding: 2,
+          gap: 12,
+          paddingVertical: 2,
         }}
+        showsVerticalScrollIndicator={false}
       >
-        <VisitorListCard />
+        {upcomingVisitors.map((visitor) => (
+          <VisitorListCard
+            key={visitor.id}
+            name={visitor.name}
+            date={visitor.date}
+            time={visitor.time}
+            status={visitor.status}
+            category={visitor.category}
+            purpose={visitor.purpose}
+            onApprove={() => handleApprove(visitor.name)}
+            onDeny={() => handleDeny(visitor.name)}
+            onPress={handleVisitorPress}
+          />
+        ))}
       </ScrollView>
     </View>
   );

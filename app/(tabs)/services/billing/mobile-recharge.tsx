@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { SafeAreaView, ScrollView, View, Text, TextInput, TouchableOpacity, Alert } from 'react-native';
+import { SafeAreaView, ScrollView, View, Text, TextInput, TouchableOpacity } from 'react-native';
+import { useAlert } from '@/components/ui/AlertCard';
 import { ArrowLeft, Smartphone, User, Zap, AlertCircle, CreditCard, Gift } from 'lucide-react-native';
 import { router } from 'expo-router';
 import Button from '../../../../components/ui/Button';
@@ -30,6 +31,8 @@ export default function MobileRecharge() {
   const [customAmount, setCustomAmount] = useState('');
   const [isDetecting, setIsDetecting] = useState(false);
   const [rechargeType, setRechargeType] = useState<'prepaid' | 'postpaid'>('prepaid');
+  
+  const { showAlert, AlertComponent } = useAlert();
 
   const operators: Operator[] = [
     { id: 'airtel', name: 'Airtel', logo: '📶', color: '#D32F2F' },
@@ -55,7 +58,15 @@ export default function MobileRecharge() {
 
   const detectOperator = async () => {
     if (phoneNumber.length !== 10) {
-      Alert.alert('Invalid Number', 'Please enter a valid 10-digit mobile number');
+      showAlert({
+        type: 'error',
+        title: 'Invalid Number',
+        message: 'Please enter a valid 10-digit mobile number',
+        primaryAction: {
+          label: 'OK',
+          onPress: () => {},
+        },
+      });
       return;
     }
 
@@ -81,13 +92,29 @@ export default function MobileRecharge() {
 
   const handleRecharge = () => {
     if (!phoneNumber || !selectedOperator) {
-      Alert.alert('Missing Information', 'Please enter phone number and select operator');
+      showAlert({
+        type: 'warning',
+        title: 'Missing Information',
+        message: 'Please enter phone number and select operator',
+        primaryAction: {
+          label: 'OK',
+          onPress: () => {},
+        },
+      });
       return;
     }
 
     const amount = selectedPlan?.amount || parseInt(customAmount);
     if (!amount || amount < 10) {
-      Alert.alert('Invalid Amount', 'Please select a plan or enter a valid amount (minimum ₹10)');
+      showAlert({
+        type: 'warning',
+        title: 'Invalid Amount',
+        message: 'Please select a plan or enter a valid amount (minimum ₹10)',
+        primaryAction: {
+          label: 'OK',
+          onPress: () => {},
+        },
+      });
       return;
     }
 
@@ -358,6 +385,9 @@ export default function MobileRecharge() {
           </Button>
         </View>
       )}
+      
+      {/* Custom Alert Component */}
+      {AlertComponent}
     </SafeAreaView>
   );
 }

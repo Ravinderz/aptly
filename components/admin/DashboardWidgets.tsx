@@ -435,10 +435,391 @@ export const SummaryCard: React.FC<SummaryCardProps> = ({
   );
 };
 
+// Multi-society comparison widget
+interface MultiSocietyComparisonProps {
+  title: string;
+  societies: {
+    id: string;
+    name: string;
+    value: number;
+    change?: number;
+    color?: string;
+  }[];
+  unit?: string;
+  showTrend?: boolean;
+  onSocietyPress?: (societyId: string) => void;
+}
+
+export const MultiSocietyComparison: React.FC<MultiSocietyComparisonProps> = ({
+  title,
+  societies,
+  unit = '',
+  showTrend = true,
+  onSocietyPress
+}) => {
+  const maxValue = Math.max(...societies.map(s => s.value));
+  
+  return (
+    <View style={adminStyles.adminCard}>
+      <Text style={[adminStyles.adminSubheading, { marginBottom: 16 }]}>
+        {title}
+      </Text>
+      
+      <View style={{ gap: 12 }}>
+        {societies.map((society) => {
+          const percentage = maxValue > 0 ? (society.value / maxValue) * 100 : 0;
+          const Component = onSocietyPress ? TouchableOpacity : View;
+          
+          return (
+            <Component
+              key={society.id}
+              onPress={() => onSocietyPress?.(society.id)}
+              activeOpacity={onSocietyPress ? 0.7 : 1}
+            >
+              <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
+                <Text style={[adminStyles.adminBody, { flex: 1 }]} numberOfLines={1}>
+                  {society.name}
+                </Text>
+                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                  <Text style={[adminStyles.adminLabel, { 
+                    color: society.color || adminTheme.textPrimary,
+                    fontWeight: '600' 
+                  }]}>
+                    {society.value}{unit}
+                  </Text>
+                  {showTrend && society.change !== undefined && (
+                    <View style={{ flexDirection: 'row', alignItems: 'center', marginLeft: 8 }}>
+                      {society.change > 0 ? (
+                        <TrendingUp size={12} color={adminTheme.success} />
+                      ) : society.change < 0 ? (
+                        <TrendingDown size={12} color={adminTheme.error} />
+                      ) : (
+                        <Minus size={12} color={adminTheme.slate} />
+                      )}
+                      <Text style={[adminStyles.adminCaption, { 
+                        color: society.change > 0 ? adminTheme.success : 
+                               society.change < 0 ? adminTheme.error : adminTheme.slate,
+                        marginLeft: 2,
+                        fontSize: 11
+                      }]}>
+                        {society.change > 0 ? '+' : ''}{society.change}%
+                      </Text>
+                    </View>
+                  )}
+                </View>
+              </View>
+              
+              {/* Progress bar */}
+              <View style={{
+                backgroundColor: adminTheme.surfaceElevated,
+                height: 6,
+                borderRadius: 3,
+                overflow: 'hidden'
+              }}>
+                <View style={{
+                  backgroundColor: society.color || adminTheme.primary,
+                  height: '100%',
+                  width: `${Math.min(percentage, 100)}%`
+                }} />
+              </View>
+            </Component>
+          );
+        })}
+      </View>
+    </View>
+  );
+};
+
+// Society selector widget
+interface SocietySelectorWidgetProps {
+  currentSociety: {
+    id: string;
+    name: string;
+    code: string;
+    activeUsers: number;
+    totalUsers: number;
+  };
+  availableSocieties: number;
+  onSwitchPress: () => void;
+}
+
+export const SocietySelectorWidget: React.FC<SocietySelectorWidgetProps> = ({
+  currentSociety,
+  availableSocieties,
+  onSwitchPress
+}) => {
+  const occupancyRate = currentSociety.totalUsers > 0 
+    ? (currentSociety.activeUsers / currentSociety.totalUsers) * 100 
+    : 0;
+
+  return (
+    <TouchableOpacity style={adminStyles.adminCard} onPress={onSwitchPress} activeOpacity={0.8}>
+      <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 12 }}>
+        <View style={{ flex: 1 }}>
+          <Text style={[adminStyles.adminCaption, { color: adminTheme.textSecondary }]}>
+            Current Society
+          </Text>
+          <Text style={[adminStyles.adminSubheading, { marginBottom: 4 }]}>
+            {currentSociety.name}
+          </Text>
+          <Text style={[adminStyles.adminCaption, { color: adminTheme.textTertiary }]}>
+            {currentSociety.code}
+          </Text>
+        </View>
+        
+        <View style={{ alignItems: 'flex-end' }}>
+          <Text style={[adminStyles.adminCaption, { color: adminTheme.textSecondary }]}>
+            Available: {availableSocieties}
+          </Text>
+          <ChevronRight size={16} color={adminTheme.textTertiary} style={{ marginTop: 4 }} />
+        </View>
+      </View>
+      
+      <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+        <Text style={[adminStyles.adminBody, { color: adminTheme.textSecondary }]}>
+          Occupancy Rate
+        </Text>
+        <Text style={[adminStyles.adminLabel, { 
+          color: occupancyRate > 80 ? adminTheme.success : 
+                 occupancyRate > 60 ? adminTheme.warning : adminTheme.error,
+          fontWeight: '600'
+        }]}>
+          {occupancyRate.toFixed(1)}%
+        </Text>
+      </View>
+      
+      <View style={{
+        backgroundColor: adminTheme.surfaceElevated,
+        height: 6,
+        borderRadius: 3,
+        overflow: 'hidden',
+        marginTop: 8
+      }}>
+        <View style={{
+          backgroundColor: occupancyRate > 80 ? adminTheme.success : 
+                           occupancyRate > 60 ? adminTheme.warning : adminTheme.error,
+          height: '100%',
+          width: `${Math.min(occupancyRate, 100)}%`
+        }} />
+      </View>
+    </TouchableOpacity>
+  );
+};
+
+// Cross-society alert widget
+interface CrossSocietyAlertProps {
+  alerts: {
+    id: string;
+    type: 'system' | 'billing' | 'security' | 'maintenance';
+    title: string;
+    affectedSocieties: number;
+    severity: 'low' | 'medium' | 'high' | 'critical';
+    timestamp: string;
+  }[];
+  onViewAll?: () => void;
+}
+
+export const CrossSocietyAlert: React.FC<CrossSocietyAlertProps> = ({
+  alerts,
+  onViewAll
+}) => {
+  const getSeverityColor = (severity: string) => {
+    switch (severity) {
+      case 'critical': return adminTheme.error;
+      case 'high': return adminTheme.warning;
+      case 'medium': return adminTheme.info;
+      default: return adminTheme.textSecondary;
+    }
+  };
+
+  if (alerts.length === 0) {
+    return (
+      <View style={adminStyles.adminCard}>
+        <View style={{ alignItems: 'center', padding: 16 }}>
+          <CheckCircle size={32} color={adminTheme.success} />
+          <Text style={[adminStyles.adminLabel, { 
+            color: adminTheme.success, 
+            marginTop: 8,
+            textAlign: 'center'
+          }]}>
+            All Systems Normal
+          </Text>
+          <Text style={[adminStyles.adminCaption, { 
+            color: adminTheme.textSecondary,
+            textAlign: 'center',
+            marginTop: 4
+          }]}>
+            No cross-society alerts
+          </Text>
+        </View>
+      </View>
+    );
+  }
+
+  return (
+    <View style={adminStyles.adminCard}>
+      <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+        <Text style={adminStyles.adminSubheading}>
+          Platform Alerts
+        </Text>
+        {onViewAll && (
+          <TouchableOpacity onPress={onViewAll}>
+            <Text style={[adminStyles.adminCaption, { color: adminTheme.primary }]}>
+              View All
+            </Text>
+          </TouchableOpacity>
+        )}
+      </View>
+      
+      <View style={{ gap: 12 }}>
+        {alerts.slice(0, 3).map((alert) => (
+          <View key={alert.id} style={{
+            flexDirection: 'row',
+            alignItems: 'flex-start',
+            padding: 12,
+            backgroundColor: adminTheme.surfaceElevated,
+            borderRadius: 8,
+            borderLeftWidth: 3,
+            borderLeftColor: getSeverityColor(alert.severity)
+          }}>
+            <AlertCircle size={16} color={getSeverityColor(alert.severity)} style={{ marginRight: 8, marginTop: 2 }} />
+            
+            <View style={{ flex: 1 }}>
+              <Text style={[adminStyles.adminLabel, { fontWeight: '600' }]}>
+                {alert.title}
+              </Text>
+              <Text style={[adminStyles.adminCaption, { 
+                color: adminTheme.textSecondary,
+                marginTop: 2
+              }]}>
+                Affects {alert.affectedSocieties} {alert.affectedSocieties === 1 ? 'society' : 'societies'} • {alert.severity.toUpperCase()}
+              </Text>
+            </View>
+          </View>
+        ))}
+      </View>
+    </View>
+  );
+};
+
+// Multi-society performance widget
+interface PerformanceMetric {
+  label: string;
+  societies: {
+    id: string;
+    name: string;
+    value: number;
+    target?: number;
+  }[];
+  unit?: string;
+  type: 'percentage' | 'currency' | 'number';
+}
+
+interface MultiSocietyPerformanceProps {
+  title: string;
+  metrics: PerformanceMetric[];
+  timeframe: string;
+  onDetailPress?: () => void;
+}
+
+export const MultiSocietyPerformance: React.FC<MultiSocietyPerformanceProps> = ({
+  title,
+  metrics,
+  timeframe,
+  onDetailPress
+}) => {
+  const formatValue = (value: number, type: string, unit?: string) => {
+    switch (type) {
+      case 'percentage':
+        return `${value.toFixed(1)}%`;
+      case 'currency':
+        return `₹${(value / 100000).toFixed(1)}L`;
+      case 'number':
+        return `${value}${unit || ''}`;
+      default:
+        return `${value}`;
+    }
+  };
+
+  return (
+    <View style={adminStyles.adminCard}>
+      <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+        <View>
+          <Text style={adminStyles.adminSubheading}>
+            {title}
+          </Text>
+          <Text style={[adminStyles.adminCaption, { color: adminTheme.textSecondary }]}>
+            {timeframe}
+          </Text>
+        </View>
+        {onDetailPress && (
+          <TouchableOpacity onPress={onDetailPress}>
+            <ChevronRight size={16} color={adminTheme.textTertiary} />
+          </TouchableOpacity>
+        )}
+      </View>
+      
+      <View style={{ gap: 16 }}>
+        {metrics.map((metric, index) => (
+          <View key={index}>
+            <Text style={[adminStyles.adminLabel, { 
+              color: adminTheme.textSecondary,
+              marginBottom: 8
+            }]}>
+              {metric.label}
+            </Text>
+            
+            <View style={{ gap: 6 }}>
+              {metric.societies.map((society) => {
+                const achievement = society.target 
+                  ? (society.value / society.target) * 100 
+                  : 100;
+                
+                return (
+                  <View key={society.id} style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <Text style={[adminStyles.adminBody, { flex: 1 }]} numberOfLines={1}>
+                      {society.name}
+                    </Text>
+                    
+                    <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                      <Text style={[adminStyles.adminLabel, { 
+                        color: achievement >= 100 ? adminTheme.success : 
+                               achievement >= 80 ? adminTheme.warning : adminTheme.error,
+                        fontWeight: '600',
+                        minWidth: 60,
+                        textAlign: 'right'
+                      }]}>
+                        {formatValue(society.value, metric.type, metric.unit)}
+                      </Text>
+                      
+                      {society.target && (
+                        <Text style={[adminStyles.adminCaption, { 
+                          color: adminTheme.textTertiary,
+                          marginLeft: 4
+                        }]}>
+                          / {formatValue(society.target, metric.type, metric.unit)}
+                        </Text>
+                      )}
+                    </View>
+                  </View>
+                );
+              })}
+            </View>
+          </View>
+        ))}
+      </View>
+    </View>
+  );
+};
+
 export default {
   StatWidget,
   ProgressWidget,
   QuickActionWidget,
   AlertWidget,
-  SummaryCard
+  SummaryCard,
+  MultiSocietyComparison,
+  SocietySelectorWidget,
+  CrossSocietyAlert,
+  MultiSocietyPerformance
 };

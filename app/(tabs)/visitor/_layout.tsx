@@ -1,4 +1,4 @@
-import AptlyStackHeader from "@/components/ui/AptlyStackHeader";
+import { StackHeader } from "@/components/ui/headers";
 import { Stack } from "expo-router";
 import React from "react";
 
@@ -9,12 +9,13 @@ const _layout = () => {
       <Stack.Screen
         name="addVisitor"
         options={{
-          headerShown: true, // Show header specifically for this screen
+          headerShown: true,
           header: (props) => (
-            <AptlyStackHeader
+            <StackHeader
               title="Add Visitor"
-              height={20}
-              tintColor="#6366f1" // Using design system primary color
+              subtitle="Register new visitor for entry approval"
+              showBackButton={true}
+              contentSpacing={false}
             />
           ),
         }}
@@ -22,12 +23,13 @@ const _layout = () => {
       <Stack.Screen
         name="visitorList"
         options={({ route, navigation }) => ({
-          headerShown: true, // Show header specifically for this screen
+          headerShown: true,
           header: (props: any) => (
-            <AptlyStackHeader
+            <StackHeader
               title={(route.params as { title?: string })?.title || "View All"}
-              height={20}
-              tintColor="#6366f1" // Using design system primary color
+              subtitle="Manage visitor entries and approvals"
+              showBackButton={true}
+              contentSpacing={false}
             />
           ),
         })}

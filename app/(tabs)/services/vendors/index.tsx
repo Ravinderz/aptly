@@ -12,10 +12,10 @@ import {
   Car,
   Phone,
   MessageCircle,
-  AlertTriangle,
-  ArrowLeft
+  AlertTriangle
 } from 'lucide-react-native';
 import HighlightCard from '@/components/ui/HighlightCard';
+import { StackHeader } from '@/components/ui/headers';
 
 // Service categories with icons and descriptions
 const serviceCategories = [
@@ -236,21 +236,12 @@ export default function VendorDirectory() {
     : serviceCategories.slice(0, 4);
 
   return (
-    <SafeAreaView className="flex-1 bg-background">
-      {/* Header with Back Button */}
-      <View className="flex-row items-center px-6 py-4 border-b border-divider">
-        <TouchableOpacity onPress={() => router.back()} className="mr-4">
-          <ArrowLeft size={24} color="#212121" />
-        </TouchableOpacity>
-        <View className="flex-1">
-          <Text className="text-xl font-bold text-text-primary">
-            Vendor Directory
-          </Text>
-          <Text className="text-text-secondary text-sm">
-            Find trusted service providers
-          </Text>
-        </View>
-      </View>
+    <View className="flex-1 bg-background">
+      <StackHeader 
+        title="Vendor Directory"
+        subtitle="Find trusted service providers"
+        showBackButton={true}
+      />
 
       <ScrollView 
         className="flex-1" 
@@ -310,6 +301,6 @@ export default function VendorDirectory() {
           )}
         </View>
       </ScrollView>
-    </SafeAreaView>
+    </View>
   );
 }

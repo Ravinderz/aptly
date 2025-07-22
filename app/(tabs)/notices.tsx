@@ -1,8 +1,8 @@
 import AptlySearchBar from "@/components/ui/AptlySearchBar";
-import Button from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
+import { StackHeader } from "@/components/ui/headers";
 import { router } from "expo-router";
-import { ArrowLeft, Bell } from "lucide-react-native";
+import { Bell } from "lucide-react-native";
 import React, { useEffect, useState } from "react";
 import {
   RefreshControl,
@@ -218,30 +218,18 @@ export default function NoticesPage() {
 
   return (
     <SafeAreaView className="flex-1 bg-background">
-      {/* Header */}
-      <View className="flex-row items-center justify-between p-4 border-b border-divider bg-surface">
-        <View className="flex-row items-center">
-          <Button
-            variant="ghost"
-            size="sm"
-            onPress={() => router.back()}
-            className="mr-2 p-2"
-          >
-            <ArrowLeft size={20} color="#6366f1" />
-          </Button>
-          <Bell size={20} color="#6366f1" />
-          <Text className="text-text-primary text-headline-large font-semibold ml-2">
-            All Notices
-          </Text>
-        </View>
-        {unreadCount > 0 && (
-          <View className="bg-error rounded-full px-2 py-1 min-w-[24px] items-center">
-            <Text className="text-white text-xs font-bold">
-              {unreadCount > 99 ? "99+" : unreadCount}
-            </Text>
-          </View>
-        )}
-      </View>
+      <StackHeader 
+        title="All Notices"
+        subtitle="Society announcements and updates"
+        showBackButton={true}
+        contentSpacing={false}
+        actions={[
+          {
+            icon: Bell,
+            onPress: () => console.log("Filter notices"),
+          }
+        ]}
+      />
 
       {/* Search Bar */}
       <View className="p-4 pb-2">

@@ -1,11 +1,39 @@
 import React, { ReactNode } from "react";
 import { ScrollView, View } from "react-native";
-import HomeHeader from "../HomeHeader";
+import { TabHeader } from "./headers";
 
-const Header = ({ children }: { children: ReactNode }) => {
+interface HeaderProps {
+  children: ReactNode;
+  onNotificationPress?: () => void;
+  onHelpPress?: () => void;
+  notificationCount?: number;
+}
+
+const Header = ({ 
+  children, 
+  onNotificationPress, 
+  onHelpPress, 
+  notificationCount = 3 // Mock notification count - replace with real data
+}: HeaderProps) => {
+  const handleNotificationPress = () => {
+    console.log("Opening notifications...");
+    onNotificationPress?.();
+    // TODO: Navigate to notifications page
+  };
+
+  const handleHelpPress = () => {
+    console.log("Opening help...");
+    onHelpPress?.();
+    // TODO: Open help modal or navigate to help page
+  };
+
   return (
     <View className="flex flex-1">
-      <HomeHeader />
+      <TabHeader 
+        onNotificationPress={handleNotificationPress}
+        onHelpPress={handleHelpPress}
+        notificationCount={notificationCount}
+      />
       <ScrollView
         className="flex flex-1"
         contentContainerStyle={{ flexGrow: 1 }}

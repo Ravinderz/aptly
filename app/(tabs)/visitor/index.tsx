@@ -3,8 +3,8 @@ import Header from "@/components/ui/Header";
 import VisitorListItem from "@/components/ui/VisitorListItem";
 import VisitorQRModal from "@/components/ui/VisitorQRModal";
 import { router } from "expo-router";
-import { Calendar, Filter, Plus, Users } from "lucide-react-native";
-import React, { useEffect, useState } from "react";
+import { Calendar, Filter, Plus, Users, X } from "lucide-react-native";
+import React, { useEffect, useState, useCallback, startTransition } from "react";
 import {
   RefreshControl,
   ScrollView,
@@ -111,6 +111,16 @@ export default function VisitorDashboard() {
           category: "Personal",
           phone: "+91 9876543214",
           purpose: "Home consultation"
+        },
+        {
+          id: "6",
+          name: "Unknown Visitor",
+          date: "Yesterday",
+          time: "02:00 PM", 
+          status: "Rejected",
+          category: "Personal",
+          phone: "+91 9876543215",
+          purpose: "Unscheduled visit"
         }
       ];
       
@@ -181,18 +191,43 @@ export default function VisitorDashboard() {
 
   const handleVisitorAction = (visitor: Visitor, action: string) => {
     console.log(`${action} visitor:`, visitor.name);
-    // TODO: Implement visitor actions
+    
+    if (action === "approve") {
+      // Update visitor status to approved
+      setVisitors(prevVisitors => 
+        prevVisitors.map(v => 
+          v.id === visitor.id 
+            ? { ...v, status: "Approved" as const }
+            : v
+        )
+      );
+    } else if (action === "reject") {
+      // Update visitor status to rejected
+      setVisitors(prevVisitors => 
+        prevVisitors.map(v => 
+          v.id === visitor.id 
+            ? { ...v, status: "Rejected" as const }
+            : v
+        )
+      );
+    }
+    // TODO: Implement other visitor actions (view, reschedule, etc.)
   };
 
-  const handleViewQR = (visitor: Visitor) => {
-    setSelectedVisitor(visitor);
-    setShowQRModal(true);
-  };
+  const handleViewQR = useCallback((visitor: Visitor) => {
+    // Use startTransition to mark this as a non-urgent update
+    startTransition(() => {
+      setSelectedVisitor(visitor);
+      setShowQRModal(true);
+    });
+  }, []);
 
-  const handleCloseQRModal = () => {
-    setShowQRModal(false);
-    setSelectedVisitor(null);
-  };
+  const handleCloseQRModal = useCallback(() => {
+    startTransition(() => {
+      setShowQRModal(false);
+      setSelectedVisitor(null);
+    });
+  }, []);
 
   const getUpcomingCount = () => visitors.filter(v => v.status !== "Completed" && v.status !== "Rejected").length;
   const getPendingCount = () => visitors.filter(v => v.status === "Pending").length;
@@ -213,30 +248,53 @@ export default function VisitorDashboard() {
           </TouchableOpacity>
         </View>
 
-        {/* Quick Stats */}
-        <View className="flex-row gap-4 mb-4">
-          <View className="flex-1 bg-surface border border-divider rounded-xl p-4">
-            <Text className="text-headline-small font-semibold text-text-primary">
-              {getUpcomingCount()}
-            </Text>
-            <Text className="text-body-medium text-text-secondary">
+        {/* Enhanced Quick Stats */}
+        <View className="flex-row gap-3 mb-6">
+          {/* Upcoming Visitors */}
+          <View className="flex-1 bg-primary/10 border border-primary/20 rounded-xl p-4">
+            <View className="flex-row items-center justify-between mb-2">
+              <Text className="text-display-small font-bold text-primary">
+                {getUpcomingCount()}
+              </Text>
+              <View className="w-2 h-2 bg-primary rounded-full" />
+            </View>
+            <Text className="text-label-large font-medium text-text-primary">
               Upcoming
             </Text>
-          </View>
-          <View className="flex-1 bg-surface border border-divider rounded-xl p-4">
-            <Text className="text-headline-small font-semibold text-warning">
-              {getPendingCount()}
-            </Text>
-            <Text className="text-body-medium text-text-secondary">
-              Pending Approval
+            <Text className="text-label-small text-text-secondary">
+              Scheduled visits
             </Text>
           </View>
-          <View className="flex-1 bg-secondary/5 border border-secondary/20 rounded-xl p-4">
-            <Text className="text-headline-small font-semibold text-secondary">
-              {visitors.filter(v => v.date === "Today").length}
+
+          {/* Pending Approval */}
+          <View className="flex-1 bg-warning/10 border border-warning/20 rounded-xl p-4">
+            <View className="flex-row items-center justify-between mb-2">
+              <Text className="text-display-small font-bold text-warning">
+                {getPendingCount()}
+              </Text>
+              <View className="w-2 h-2 bg-warning rounded-full" />
+            </View>
+            <Text className="text-label-large font-medium text-text-primary">
+              Pending
             </Text>
-            <Text className="text-body-medium text-text-secondary">
-              Today's Visits
+            <Text className="text-label-small text-text-secondary">
+              Need approval
+            </Text>
+          </View>
+
+          {/* Today's Visits */}
+          <View className="flex-1 bg-success/10 border border-success/20 rounded-xl p-4">
+            <View className="flex-row items-center justify-between mb-2">
+              <Text className="text-display-small font-bold text-success">
+                {visitors.filter(v => v.date === "Today").length}
+              </Text>
+              <View className="w-2 h-2 bg-success rounded-full" />
+            </View>
+            <Text className="text-label-large font-medium text-text-primary">
+              Today
+            </Text>
+            <Text className="text-label-small text-text-secondary">
+              Active visits
             </Text>
           </View>
         </View>
@@ -343,34 +401,84 @@ export default function VisitorDashboard() {
                 time={visitor.time}
                 status={visitor.status}
                 category={visitor.category}
+                purpose={visitor.purpose}
+                phone={visitor.phone}
                 type={visitor.status === "Completed" || visitor.status === "Rejected" ? "past" : "upcoming"}
                 onViewQR={() => handleViewQR(visitor)}
+                onApprove={() => handleVisitorAction(visitor, "approve")}
+                onReject={() => handleVisitorAction(visitor, "reject")}
                 handleClick={() => handleVisitorAction(visitor, "view")}
               />
             ))}
           </>
         ) : (
-          <View className="flex-1 items-center justify-center py-12">
-            <Users size={48} className="text-text-disabled mb-4" />
-            <Text className="text-text-primary text-headline-small font-semibold mb-2">
-              {searchQuery.trim() ? "No Matching Visitors" : "No Visitors Found"}
+          <View className="flex-1 items-center justify-center py-16">
+            {/* Empty State Icon */}
+            <View className="bg-primary/5 p-6 rounded-full mb-6">
+              <Users size={48} className="text-primary" strokeWidth={1.5} />
+            </View>
+            
+            {/* Empty State Content */}
+            <Text className="text-text-primary text-headline-medium font-bold mb-3 text-center">
+              {searchQuery.trim() || selectedFilter !== "all" || selectedCategory !== "all" 
+                ? "No Matching Visitors" 
+                : "No Visitors Yet"}
             </Text>
-            <Text className="text-text-secondary text-center px-8 mb-6">
-              {searchQuery.trim() 
-                ? "Try adjusting your search or filter criteria."
-                : "Add your first visitor to get started with visitor management."
+            
+            <Text className="text-text-secondary text-center px-8 mb-8 leading-6">
+              {searchQuery.trim() || selectedFilter !== "all" || selectedCategory !== "all"
+                ? "Try clearing your search or adjusting the filters to see more visitors."
+                : "Start managing your visitors by adding your first entry. You can pre-approve guests, track deliveries, and generate QR codes for easy access."
               }
             </Text>
-            {!searchQuery.trim() && (
+
+            {/* Action Buttons */}
+            <View className="flex-row gap-4">
+              {(searchQuery.trim() || selectedFilter !== "all" || selectedCategory !== "all") ? (
+                <TouchableOpacity
+                  onPress={() => {
+                    setSearchQuery("");
+                    setSelectedFilter("all");
+                    setSelectedCategory("all");
+                  }}
+                  className="bg-surface border border-divider px-6 py-3 rounded-xl flex-row items-center"
+                >
+                  <X size={16} className="text-text-secondary" strokeWidth={2} />
+                  <Text className="text-text-secondary font-semibold ml-2">
+                    Clear Filters
+                  </Text>
+                </TouchableOpacity>
+              ) : null}
+              
               <TouchableOpacity
                 onPress={handleAddVisitor}
-                className="bg-primary px-6 py-3 rounded-lg flex-row items-center"
+                className="bg-primary px-6 py-3 rounded-xl flex-row items-center"
               >
                 <Plus size={16} color="white" strokeWidth={2} />
                 <Text className="text-white font-semibold ml-2">
                   Add Visitor
                 </Text>
               </TouchableOpacity>
+            </View>
+
+            {/* Quick Tips */}
+            {!searchQuery.trim() && selectedFilter === "all" && selectedCategory === "all" && (
+              <View className="mt-8 bg-primary/5 border border-primary/10 rounded-xl p-4 mx-8">
+                <Text className="text-primary text-body-medium font-semibold mb-3">
+                  💡 Quick Tips
+                </Text>
+                <View className="space-y-2">
+                  <Text className="text-text-secondary text-label-large leading-5">
+                    • Pre-approve family and friends for faster entry
+                  </Text>
+                  <Text className="text-text-secondary text-label-large leading-5">
+                    • Track deliveries from Amazon, Flipkart, and food apps
+                  </Text>
+                  <Text className="text-text-secondary text-label-large leading-5">
+                    • Generate QR codes for contactless gate entry
+                  </Text>
+                </View>
+              </View>
             )}
           </View>
         )}

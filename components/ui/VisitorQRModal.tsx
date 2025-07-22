@@ -2,13 +2,13 @@ import { Image } from "expo-image";
 import { Download, Share2, X } from "lucide-react-native";
 import React from "react";
 import {
-  Alert,
   Modal,
   Share,
   Text,
   TouchableOpacity,
   View,
 } from "react-native";
+import { useAlert } from "./AlertCard";
 
 interface Visitor {
   id: string;
@@ -28,6 +28,8 @@ interface VisitorQRModalProps {
 }
 
 export default function VisitorQRModal({ visible, visitor, onClose }: VisitorQRModalProps) {
+  const { showAlert, AlertComponent } = useAlert();
+  
   if (!visitor) return null;
 
   const getLetters = (str: string) => {
@@ -46,13 +48,28 @@ export default function VisitorQRModal({ visible, visitor, onClose }: VisitorQRM
       });
     } catch (error) {
       console.error("Error sharing QR code:", error);
-      Alert.alert("Error", "Failed to share QR code");
+      showAlert({
+        type: 'error',
+        title: 'Share Failed',
+        message: 'Unable to share QR code. Please try again.',
+        primaryAction: {
+          label: 'OK',
+          onPress: () => {},
+        },
+      });
     }
   };
 
   const handleDownloadQR = () => {
-    // TODO: Implement QR code download functionality
-    Alert.alert("Download", "QR code download functionality coming soon!");
+    showAlert({
+      type: 'info',
+      title: 'Coming Soon',
+      message: 'QR code download functionality will be available in the next update!',
+      primaryAction: {
+        label: 'OK',
+        onPress: () => {},
+      },
+    });
   };
 
   const getStatusColor = (status: string) => {
@@ -73,103 +90,116 @@ export default function VisitorQRModal({ visible, visitor, onClose }: VisitorQRM
     <Modal
       visible={visible}
       transparent={true}
-      animationType="slide"
+      animationType="fade"
       statusBarTranslucent={true}
     >
-      <View className="flex-1 bg-black/50 justify-center items-center p-4">
-        <View className="bg-surface rounded-2xl w-full max-w-sm">
+      <View className="flex-1 bg-black/60 justify-center items-center p-4">
+        <View className="bg-surface rounded-3xl w-full max-w-sm">
           {/* Header */}
-          <View className="flex-row items-center justify-between p-6 border-b border-divider">
-            <View className="flex-row items-center flex-1">
-              <View className="bg-primary rounded-full w-12 h-12 items-center justify-center mr-3">
-                <Text className="text-white font-bold text-body-medium">
+          <View className="relative p-6 border-b border-divider/50">
+            <View className="flex-row items-center">
+              <View className="bg-primary rounded-full w-14 h-14 items-center justify-center mr-4">
+                <Text className="text-white font-bold text-body-large">
                   {getLetters(visitor.name)}
                 </Text>
               </View>
               <View className="flex-1">
-                <Text className="text-headline-medium font-semibold text-text-primary">
+                <Text className="text-headline-medium font-bold text-text-primary mb-1">
                   {visitor.name}
                 </Text>
-                {visitor.category && (
-                  <Text className="text-label-medium text-text-secondary">
-                    {visitor.category}
-                  </Text>
-                )}
+                <View className="flex-row items-center">
+                  {visitor.category && (
+                    <Text className="text-label-medium font-medium text-text-secondary capitalize mr-2">
+                      {visitor.category} Visit
+                    </Text>
+                  )}
+                  <View className={`px-2 py-1 rounded-full ${getStatusColor(visitor.status)}`}>
+                    <Text className={`text-label-small font-medium ${getStatusColor(visitor.status).split(' ')[1]}`}>
+                      {visitor.status}
+                    </Text>
+                  </View>
+                </View>
               </View>
             </View>
             <TouchableOpacity
               onPress={onClose}
-              className="p-2"
+              className="absolute top-4 right-4 p-2 bg-surface/80 rounded-full"
               activeOpacity={0.7}
             >
-              <X size={20} className="text-text-secondary" />
+              <X size={20} className="text-text-secondary" strokeWidth={2} />
             </TouchableOpacity>
           </View>
 
-          {/* QR Code */}
-          <View className="items-center py-6">
-            <View className="bg-white p-4 rounded-xl shadow-sm mb-4">
+          {/* QR Code Section */}
+          <View className="items-center py-8">
+            <View className="bg-white p-6 rounded-2xl mb-6">
               <Image
-                style={{ width: 180, height: 180 }}
+                style={{ width: 200, height: 200 }}
                 source={require("../../assets/images/QR_Code.png")}
                 contentFit="cover"
-                transition={300}
               />
             </View>
             
             {/* Visit Details */}
-            <View className="items-center mb-4">
-              <View className="flex-row items-center mb-2">
-                <Text className="text-body-large font-medium text-text-primary mr-2">
-                  {visitor.date}
-                </Text>
-                <Text className="text-body-large font-medium text-text-primary">
-                  {visitor.time}
+            <View className="items-center">
+              <View className="bg-primary/5 px-4 py-2 rounded-full mb-3">
+                <Text className="text-primary text-body-large font-bold">
+                  {visitor.date} • {visitor.time}
                 </Text>
               </View>
               
-              <View className={`px-3 py-1 rounded-full ${getStatusColor(visitor.status)}`}>
-                <Text className={`text-body-medium font-medium ${getStatusColor(visitor.status).split(' ')[1]}`}>
-                  {visitor.status}
+              {visitor.purpose && (
+                <Text className="text-text-secondary text-center px-4 text-body-medium">
+                  {visitor.purpose}
                 </Text>
-              </View>
+              )}
             </View>
           </View>
 
           {/* Action Buttons */}
-          <View className="flex-row p-4 gap-3">
-            <TouchableOpacity
-              onPress={handleShareQR}
-              className="flex-1 bg-primary py-3 px-4 rounded-xl flex-row items-center justify-center"
-              activeOpacity={0.8}
-            >
-              <Share2 size={16} color="white" strokeWidth={2} />
-              <Text className="text-white font-semibold ml-2">Share QR</Text>
-            </TouchableOpacity>
-            
-            <TouchableOpacity
-              onPress={handleDownloadQR}
-              className="flex-1 bg-surface border border-divider py-3 px-4 rounded-xl flex-row items-center justify-center"
-              activeOpacity={0.8}
-            >
-              <Download size={16} className="text-primary" strokeWidth={2} />
-              <Text className="text-primary font-semibold ml-2">Download</Text>
-            </TouchableOpacity>
-          </View>
+          <View className="px-6 pb-6">
+            <View className="flex-row gap-3 mb-4">
+              <TouchableOpacity
+                onPress={handleShareQR}
+                className="flex-1 bg-primary py-4 px-4 rounded-2xl flex-row items-center justify-center"
+                activeOpacity={0.8}
+              >
+                <Share2 size={18} color="white" strokeWidth={2} />
+                <Text className="text-white font-bold ml-2 text-body-medium">Share QR</Text>
+              </TouchableOpacity>
+              
+              <TouchableOpacity
+                onPress={handleDownloadQR}
+                className="flex-1 bg-surface border-2 border-primary/20 py-4 px-4 rounded-2xl flex-row items-center justify-center"
+                activeOpacity={0.8}
+              >
+                <Download size={18} className="text-primary" strokeWidth={2} />
+                <Text className="text-primary font-bold ml-2 text-body-medium">Save</Text>
+              </TouchableOpacity>
+            </View>
 
-          {/* Info */}
-          <View className="p-4 pt-0">
-            <View className="bg-primary/5 rounded-lg p-3">
-              <Text className="text-primary text-body-medium font-medium mb-1">
-                📱 Instructions
-              </Text>
-              <Text className="text-text-secondary text-label-large leading-4">
-                Show this QR code at the gate for quick entry. The security guard will scan it for verification.
-              </Text>
+            {/* Instructions */}
+            <View className="bg-primary/10 border border-primary/20 rounded-2xl p-4">
+              <View className="flex-row items-start">
+                <View className="bg-primary/20 p-2 rounded-full mr-3">
+                  <Text className="text-primary text-body-medium">📱</Text>
+                </View>
+                <View className="flex-1">
+                  <Text className="text-primary text-body-medium font-bold mb-2">
+                    Gate Entry Instructions
+                  </Text>
+                  <Text className="text-text-secondary text-label-large leading-5">
+                    Show this QR code to the security guard for quick verification and contactless entry.
+                  </Text>
+                </View>
+              </View>
             </View>
           </View>
         </View>
       </View>
+      
+      {/* Custom Alert Component */}
+      {AlertComponent}
     </Modal>
   );
 }
