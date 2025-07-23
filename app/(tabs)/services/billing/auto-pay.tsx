@@ -125,7 +125,7 @@ export default function AutoPaySetup() {
     );
   };
 
-  const handleDeleteRule = (ruleId: string) => {
+  const _handleDeleteRule = (ruleId: string) => {
     const rule = autoPayRules.find(r => r.id === ruleId);
     if (!rule) return;
 
@@ -379,7 +379,7 @@ export default function AutoPaySetup() {
               >
                 <Text className="text-text-secondary leading-5">
                   • Auto payments will be processed only if sufficient balance is available{'\n'}
-                  • You'll receive notifications 24 hours before auto payment{'\n'}
+                  • You&apos;ll receive notifications 24 hours before auto payment{'\n'}
                   • You can cancel or modify auto payments anytime{'\n'}
                   • Failed payments will retry once after 24 hours
                 </Text>

@@ -1,7 +1,6 @@
 import AptlySearchBar from "@/components/ui/AptlySearchBar";
 import { Card } from "@/components/ui/Card";
 import { StackHeader } from "@/components/ui/headers";
-import { router } from "expo-router";
 import { Bell } from "lucide-react-native";
 import React, { useEffect, useState } from "react";
 import {
@@ -214,7 +213,6 @@ export default function NoticesPage() {
     );
   };
 
-  const unreadCount = notices.filter((n) => !n.isRead).length;
 
   return (
     <SafeAreaView className="flex-1 bg-background">

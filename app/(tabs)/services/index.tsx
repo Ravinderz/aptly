@@ -1,11 +1,14 @@
 import { TabHeader } from "@/components/ui/headers";
 import { useRouter } from "expo-router";
 import {
+  BarChart3,
   Clock,
   Plus,
   Receipt,
+  Shield,
   TrendingUp,
   Users,
+  Vote,
   Wrench,
 } from "lucide-react-native";
 import React from "react";
@@ -156,7 +159,7 @@ export default function Services() {
               </View>
             </TouchableOpacity>
 
-            <View className="flex-row gap-4">
+            <View className="flex-row gap-4 mb-4">
               {/* Maintenance Requests Card */}
               <TouchableOpacity
                 className="flex-1 bg-surface rounded-2xl p-6 border border-divider"
@@ -198,6 +201,54 @@ export default function Services() {
                   <View className="bg-error/20 rounded-full px-3 py-1">
                     <Text className="text-error text-xs font-medium">
                       ₹6,100 Due
+                    </Text>
+                  </View>
+                </View>
+              </TouchableOpacity>
+            </View>
+
+            <View className="flex-row gap-4">
+              {/* Governance Card */}
+              <TouchableOpacity
+                className="flex-1 bg-surface rounded-2xl p-6 border border-divider"
+                onPress={() => router.push("/(tabs)/services/governance")}
+              >
+                <View className="bg-indigo-500/10 rounded-full w-12 h-12 items-center justify-center mb-5">
+                  <Vote size={24} color="#6366f1" />
+                </View>
+                <Text className="text-lg font-semibold text-text-primary mb-2">
+                  Governance
+                </Text>
+                <Text className="text-text-secondary text-sm mb-4">
+                  Vote, policies, and emergency alerts
+                </Text>
+                <View className="flex-row items-center">
+                  <View className="bg-primary/20 rounded-full px-3 py-1">
+                    <Text className="text-primary text-xs font-medium">
+                      1 Active Vote
+                    </Text>
+                  </View>
+                </View>
+              </TouchableOpacity>
+
+              {/* Analytics Card */}
+              <TouchableOpacity
+                className="flex-1 bg-surface rounded-2xl p-6 border border-divider"
+                onPress={() => router.push("/(tabs)/services/analytics")}
+              >
+                <View className="bg-purple-500/10 rounded-full w-12 h-12 items-center justify-center mb-5">
+                  <BarChart3 size={24} color="#8B5CF6" />
+                </View>
+                <Text className="text-lg font-semibold text-text-primary mb-2">
+                  Analytics
+                </Text>
+                <Text className="text-text-secondary text-sm mb-4">
+                  Insights, reports, and performance
+                </Text>
+                <View className="flex-row items-center">
+                  <View className="bg-purple-500/20 rounded-full px-3 py-1">
+                    <Text className="text-purple-700 text-xs font-medium">
+                      92% Health
                     </Text>
                   </View>
                 </View>

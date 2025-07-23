@@ -11,6 +11,8 @@ const _layout = () => {
       <Stack.Screen name="documents" options={{ headerShown: false }} />
       <Stack.Screen name="notifications" options={{ headerShown: false }} />
       <Stack.Screen name="emergency-contacts" options={{ headerShown: false }} />
+      <Stack.Screen name="governance-settings" options={{ headerShown: false }} />
+      <Stack.Screen name="analytics-settings" options={{ headerShown: false }} />
     </Stack>
   );
 };

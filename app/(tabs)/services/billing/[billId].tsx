@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { SafeAreaView, ScrollView, Text, TouchableOpacity, View, Linking } from 'react-native';
+import { SafeAreaView, ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import { showConfirmAlert, showSuccessAlert, showAlert } from '@/utils/alert';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { 
@@ -12,10 +12,8 @@ import {
   Smartphone,
   QrCode,
   Building,
-  Receipt,
   Clock,
   Share,
-  FileText,
   DollarSign
 } from 'lucide-react-native';
 
@@ -168,7 +166,7 @@ export default function BillDetail() {
   const router = useRouter();
   const { billId } = useLocalSearchParams<{ billId: string }>();
   const [showPaymentMethods, setShowPaymentMethods] = useState(false);
-  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<{method: string, gateway: string} | null>(null);
+  const [, setSelectedPaymentMethod] = useState<{method: string, gateway: string} | null>(null);
 
   // Get bill details
   const bill = mockBillDetails[billId as keyof typeof mockBillDetails];

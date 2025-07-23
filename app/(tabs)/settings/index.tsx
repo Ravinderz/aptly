@@ -14,7 +14,9 @@ import {
   LogOut,
   HelpCircle,
   Settings as SettingsIcon,
-  Camera
+  Camera,
+  Vote,
+  BarChart3
 } from 'lucide-react-native';
 import ProfileHeader from '../../../components/ui/ProfileHeader';
 import ProfileSection, { ProfileItem } from '../../../components/ui/ProfileSection';
@@ -177,6 +179,20 @@ export default function Profile() {
             title="Emergency Contacts"
             subtitle="2 verified contacts"
             onPress={handleEmergencyContacts}
+          />
+          <View className="h-px bg-divider mx-4" />
+          <ProfileItem
+            icon={<Vote size={20} color="#6366f1" />}
+            title="Governance Settings"
+            subtitle="Voting preferences, emergency alerts"
+            onPress={() => router.push("/(tabs)/settings/governance-settings")}
+          />
+          <View className="h-px bg-divider mx-4" />
+          <ProfileItem
+            icon={<BarChart3 size={20} color="#8B5CF6" />}
+            title="Analytics Settings"
+            subtitle="Performance monitoring, data preferences"
+            onPress={() => router.push("/(tabs)/settings/analytics-settings")}
           />
         </ProfileSection>
 
