@@ -1,4 +1,5 @@
 import AuthService, { UserProfile } from "@/services/auth.service";
+import BiometricService from "@/services/biometric.service";
 import React, {
   createContext,
   ReactNode,
@@ -14,6 +15,8 @@ interface AuthContextType {
   login: (user: UserProfile) => void;
   logout: () => Promise<void>;
   checkAuthStatus: () => Promise<void>;
+  authenticateWithBiometrics: () => Promise<boolean>;
+  isBiometricEnabled: () => Promise<boolean>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -80,6 +83,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const logout = async () => {
     try {
       await AuthService.logout();
+      await BiometricService.disableBiometricAuth();
       setUser(null);
       setIsAuthenticated(false);
     } catch (error) {
@@ -88,6 +92,36 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       setUser(null);
       setIsAuthenticated(false);
     }
+  };
+
+  const authenticateWithBiometrics = async (): Promise<boolean> => {
+    try {
+      const biometricResult = await BiometricService.authenticateWithBiometrics();
+      
+      if (biometricResult.success) {
+        const userId = await BiometricService.getBiometricUserId();
+        if (userId) {
+          // Check if user still has valid session
+          const isAuth = await AuthService.isAuthenticated();
+          if (isAuth) {
+            const storedProfile = await AuthService.getStoredProfile();
+            if (storedProfile && storedProfile.id === userId) {
+              setUser(storedProfile);
+              setIsAuthenticated(true);
+              return true;
+            }
+          }
+        }
+      }
+      return false;
+    } catch (error) {
+      console.error("Biometric authentication failed:", error);
+      return false;
+    }
+  };
+
+  const isBiometricEnabled = async (): Promise<boolean> => {
+    return await BiometricService.isBiometricEnabled();
   };
 
   useEffect(() => {
@@ -101,6 +135,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     login,
     logout,
     checkAuthStatus,
+    authenticateWithBiometrics,
+    isBiometricEnabled,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

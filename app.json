@@ -26,7 +26,8 @@
         "resizeMode": "contain",
         "backgroundColor": "#6366f1"
       },
-      "edgeToEdgeEnabled": true
+      "edgeToEdgeEnabled": true,
+      "package": "com.ravinderz.aptly"
     },
     "web": {
       "bundler": "metro",
@@ -50,6 +51,12 @@
     ],
     "experiments": {
       "typedRoutes": true
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "8ffa1fda-c80e-4b24-8b4d-a7201541df2e"
+      }
     }
   }
 }

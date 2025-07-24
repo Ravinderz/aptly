@@ -8,6 +8,10 @@
     "android": "expo start --android",
     "ios": "expo start --ios",
     "web": "expo start --web",
+    "build:android": "eas build --platform android --profile development",
+    "build:android-apk": "eas build --platform android --profile development-apk",
+    "build:android-local": "expo run:android --variant debug",
+    "build:android-preview": "eas build --platform android --profile preview --local",
     "lint": "expo lint",
     "test": "jest",
     "test:watch": "jest --watch",
@@ -58,7 +62,8 @@
     "react-native-swiper": "^1.6.0",
     "react-native-web": "~0.20.0",
     "react-native-webview": "13.13.5",
-    "tailwindcss": "^3.4.17"
+    "tailwindcss": "^3.4.17",
+    "expo-dev-client": "~5.2.4"
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",

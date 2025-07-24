@@ -173,7 +173,7 @@ export default function ProfileSetup() {
         "Your profile has been set up successfully. Welcome to Aptly!",
         () => {
           // The auth context will handle navigation
-          router.replace("/(tabs)");
+          router.replace("/auth/biometric-setup");
         }
       );
     } catch (error) {

@@ -240,7 +240,7 @@ export default function BroadbandRecharge() {
         <Button
           variant="ghost"
           size="sm"
-          onPress={() => router.back()}
+          onPress={() => router.canGoBack() ? router.back() : router.replace('/(tabs)')}
           className="mr-2 p-2"
         >
           <ArrowLeft size={20} color="#6366f1" />

@@ -172,7 +172,7 @@ export default function Billing() {
         {/* Header */}
         <View className="flex-row items-center px-6 py-4 border-b border-divider bg-surface">
           <TouchableOpacity onPress={() => router.back()} className="mr-4 p-2">
-            <LucideIcons name="chevron-forward" size={20} color="#6366f1" />
+            <LucideIcons name="arrow-left" size={20} color="#6366f1" />
           </TouchableOpacity>
           <View className="flex-1">
             <Text className="text-headline-large font-semibold text-text-primary">Billing</Text>

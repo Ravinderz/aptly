@@ -91,7 +91,6 @@ const NoticeSection = () => {
           title={notices[0].title}
           variant={notices[0].variant}
           size="lg"
-          className="mb-4"
         >
           <Text className="text-text-secondary leading-6 mb-3">
             {notices[0].description}
@@ -111,54 +110,6 @@ const NoticeSection = () => {
             </View>
           </View>
         </HighlightCard>
-      )}
-
-      {/* Additional Notices - Compact */}
-      {notices.length > 1 && (
-        <View className="space-y-3">
-          {notices.slice(1, 3).map((notice) => (
-            <HighlightCard
-              key={notice.id}
-              title={notice.title}
-              variant={notice.variant}
-              size="sm"
-            >
-              <Text className="text-text-secondary leading-5 mb-2">
-                {notice.description.length > 100 
-                  ? `${notice.description.substring(0, 100)}...` 
-                  : notice.description
-                }
-              </Text>
-              <View className="flex-row items-center justify-between">
-                <View className="flex-row items-center">
-                  <Calendar size={16} className="text-text-secondary" />
-                  <Text className="text-text-secondary text-label-large ml-1">
-                    {formatDate(notice.date)}
-                  </Text>
-                </View>
-                <View className="flex-row items-center">
-                  {notice.icon}
-                  <Text className="text-text-secondary text-label-large ml-1 capitalize">
-                    {notice.category}
-                  </Text>
-                </View>
-              </View>
-            </HighlightCard>
-          ))}
-        </View>
-      )}
-
-      {/* Show more if there are additional notices */}
-      {notices.length > 3 && (
-        <TouchableOpacity 
-          className="mt-4 bg-surface border border-divider rounded-xl p-4 items-center"
-          onPress={() => router.push('/(tabs)/notices')}
-          activeOpacity={0.7}
-        >
-          <Text className="text-primary font-medium">
-            + {notices.length - 3} more notices
-          </Text>
-        </TouchableOpacity>
       )}
     </View>
   );

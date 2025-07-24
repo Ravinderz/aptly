@@ -20,6 +20,11 @@ module.exports = {
           light: "#81C784",
           dark: "#2E7D32",
         },
+        success: {
+          DEFAULT: "#4CAF50", // Success Green (same as secondary for consistency)
+          light: "#81C784",
+          dark: "#2E7D32",
+        },
         warning: "#FF9800",   // Warning Amber
         error: "#D32F2F",     // Error Red
         

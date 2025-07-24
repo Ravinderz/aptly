@@ -1,19 +1,66 @@
 import { useRouter, useLocalSearchParams } from "expo-router";
-import { ArrowLeft, Phone, Shield } from "lucide-react-native";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { SafeAreaView, Text, TextInput, TouchableOpacity, View, KeyboardAvoidingView, Platform } from "react-native";
 import { Button } from "@/components/ui/Button";
+import LucideIcons from "@/components/ui/LucideIcons";
 import AuthService from "@/services/auth.service";
+import BiometricService from "@/services/biometric.service";
+import { useAuth } from "@/contexts/AuthContext";
 import { showErrorAlert } from "@/utils/alert";
 
 export default function PhoneRegistration() {
   const router = useRouter();
   const { mode } = useLocalSearchParams<{ mode?: string }>();
+  const { authenticateWithBiometrics } = useAuth();
   const isSignIn = mode === "signin";
   const [phoneNumber, setPhoneNumber] = useState("");
   const [societyCode, setSocietyCode] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [isBiometricLoading, setIsBiometricLoading] = useState(false);
+  const [showBiometricOption, setShowBiometricOption] = useState(false);
+  const [biometricType, setBiometricType] = useState<string>("");
   const [errors, setErrors] = useState<{phone?: string; society?: string}>({});
+
+  useEffect(() => {
+    checkBiometricAvailability();
+  }, []);
+
+  const checkBiometricAvailability = async () => {
+    if (!isSignIn) return; // Only show for sign in
+    
+    const biometricConfig = await BiometricService.checkBiometricSupport();
+    const isEnabled = await BiometricService.isBiometricEnabled();
+    
+    if (biometricConfig.hasHardware && biometricConfig.isEnrolled && isEnabled) {
+      setShowBiometricOption(true);
+      setBiometricType(BiometricService.getBiometricTypeName(biometricConfig.supportedTypes));
+    }
+  };
+
+  const handleBiometricLogin = async () => {
+    setIsBiometricLoading(true);
+    
+    try {
+      const success = await authenticateWithBiometrics();
+      
+      if (success) {
+        router.replace("/(tabs)");
+      } else {
+        showErrorAlert(
+          "Authentication Failed", 
+          "Biometric authentication failed. Please try again or use your phone number."
+        );
+      }
+    } catch (error) {
+      console.error("Biometric login error:", error);
+      showErrorAlert(
+        "Error", 
+        "An error occurred during biometric authentication. Please try again."
+      );
+    } finally {
+      setIsBiometricLoading(false);
+    }
+  };
 
   // Indian phone number validation
   const validatePhoneNumber = (phone: string): boolean => {
@@ -177,7 +224,7 @@ export default function PhoneRegistration() {
         {/* Header */}
         <View className="flex-row items-center px-4 py-4">
           <TouchableOpacity onPress={() => router.back()} className="mr-4">
-            <ArrowLeft size={24} color="#212121" />
+            <LucideIcons name="arrow-left" size={24} color="#212121" />
           </TouchableOpacity>
           <Text className="text-xl font-bold text-text-primary">{isSignIn ? "Sign In" : "Sign Up"}</Text>
         </View>
@@ -186,7 +233,7 @@ export default function PhoneRegistration() {
           {/* Welcome Section */}
           <View className="items-center mb-8">
             <View className="bg-primary/10 rounded-full w-20 h-20 items-center justify-center mb-4">
-              <Phone size={32} color="#6366f1" />
+              <LucideIcons name="call-outline" size={32} color="#6366f1" />
             </View>
             <Text className="text-2xl font-bold text-text-primary mb-2 text-center">
               Welcome to Aptly
@@ -231,7 +278,7 @@ export default function PhoneRegistration() {
           <View className="mb-8">
             <Text className="text-text-primary font-semibold mb-3">Society Code</Text>
             <View className="flex-row items-center bg-surface rounded-xl border border-divider px-4 py-4">
-              <Shield size={20} color="#6366f1" className="mr-3" />
+              <LucideIcons name="shield-outline" size={20} color="#6366f1" />
               <TextInput
                 className="flex-1 text-text-primary text-lg"
                 placeholder="Enter society code"
@@ -262,6 +309,41 @@ export default function PhoneRegistration() {
           >
             Send OTP
           </Button>
+
+          {/* Biometric Login Option */}
+          {showBiometricOption && (
+            <View className="mb-6">
+              <View className="flex-row items-center mb-4">
+                <View className="flex-1 h-px bg-divider" />
+                <Text className="text-text-secondary text-sm mx-4">or</Text>
+                <View className="flex-1 h-px bg-divider" />
+              </View>
+              
+              <TouchableOpacity
+                onPress={handleBiometricLogin}
+                disabled={isBiometricLoading}
+                className="bg-surface border border-primary/20 rounded-xl p-4 flex-row items-center justify-center"
+                activeOpacity={0.8}
+              >
+                <View className="bg-primary/10 rounded-full w-10 h-10 items-center justify-center mr-3">
+                  <LucideIcons name="fingerprint" size={20} color="#6366f1" />
+                </View>
+                <View className="flex-1">
+                  <Text className="text-text-primary font-semibold">
+                    Sign in with {biometricType}
+                  </Text>
+                  <Text className="text-text-secondary text-sm">
+                    Quick and secure access to your account
+                  </Text>
+                </View>
+                {isBiometricLoading && (
+                  <View className="ml-3">
+                    <Text className="text-primary text-sm">Loading...</Text>
+                  </View>
+                )}
+              </TouchableOpacity>
+            </View>
+          )}
 
           {/* Help Section */}
           <View className="bg-primary/5 rounded-xl p-4">

@@ -1,9 +1,9 @@
 import { Button } from "@/components/ui/Button";
 import HighlightCard from "@/components/ui/HighlightCard";
+import LucideIcons from "@/components/ui/LucideIcons";
 import { useAuth } from "@/contexts/AuthContext";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useRouter } from "expo-router";
-import { Building, Shield, Smartphone, Users, Zap } from "lucide-react-native";
 import React from "react";
 import {
   SafeAreaView,
@@ -58,22 +58,22 @@ export default function Welcome() {
 
   const features = [
     {
-      icon: <Building size={32} className="text-primary" />,
+      icon: <LucideIcons name="building" size={32} color="#6366f1" />,
       title: "Digital Society Management",
       description: "Manage your housing society digitally with ease",
     },
     {
-      icon: <Shield size={32} className="text-secondary" />,
+      icon: <LucideIcons name="shield-outline" size={32} color="#6366f1" />,
       title: "Secure & Private",
       description: "Your data is protected with bank-level security",
     },
     {
-      icon: <Users size={32} className="text-warning" />,
+      icon: <LucideIcons name="people" size={32} color="#6366f1" />,
       title: "Community Connect",
       description: "Stay connected with your society members",
     },
     {
-      icon: <Smartphone size={32} className="text-error" />,
+      icon: <LucideIcons name="smartphone" size={32} color="#6366f1" />,
       title: "Mobile First",
       description: "Designed specifically for Indian mobile users",
     },
@@ -89,7 +89,7 @@ export default function Welcome() {
             className="bg-warning/90 rounded-full px-3 py-2 flex-row items-center shadow-sm"
             activeOpacity={0.8}
           >
-            <Zap size={16} color="white" />
+            <LucideIcons name="zap" size={16} color="white" />
             <Text className="text-white text-label-large font-bold ml-1">
               DEV SKIP
             </Text>
@@ -101,7 +101,7 @@ export default function Welcome() {
         {/* Hero Section */}
         <View className="items-center px-6 py-12">
           <View className="bg-primary/10 rounded-full w-24 h-24 items-center justify-center mb-6">
-            <Building size={48} className="text-primary" />
+            <LucideIcons name="building" size={48} color="#6366f1" />
           </View>
 
           <Text className="text-display-large text-text-primary mb-4 text-center">
@@ -134,7 +134,7 @@ export default function Welcome() {
                 className="bg-surface rounded-2xl p-6 border border-divider"
               >
                 <View className="flex-row items-center mb-3">
-                  <View className="bg-background rounded-full w-16 h-16 items-center justify-center mr-4">
+                  <View className="bg-primary/10 rounded-full w-16 h-16 items-center justify-center mr-4">
                     {feature.icon}
                   </View>
                   <View className="flex-1">

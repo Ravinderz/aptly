@@ -1,3 +1,4 @@
+import BillerSection from "@/components/BillerSection";
 import NoticeSection from "@/components/NoticeSection";
 import QuickActions from "@/components/QuickActions";
 import { SocietyOverview } from "@/components/SocietyOverview";
@@ -9,6 +10,7 @@ export default function HomePage() {
     <Header>
       <NoticeSection />
       <UpcomingVisitorSection />
+      <BillerSection />
       <QuickActions />
       <SocietyOverview />
     </Header>
