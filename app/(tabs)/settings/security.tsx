@@ -17,7 +17,7 @@ import * as LocalAuthentication from 'expo-local-authentication';
 // UI Components
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
-import { StackHeader } from '@/components/ui/headers/StackHeader';
+import StackHeader from '@/components/ui/headers/StackHeader';
 
 // Default security preferences
 const defaultPreferences = {
@@ -334,19 +334,19 @@ export default function SecuritySettingsPage() {
         {/* Action Buttons */}
         <View className="space-y-3">
           <Button
-            title={isSaving ? "Saving..." : "Save Security Settings"}
             variant="primary"
             onPress={handleSavePreferences}
             disabled={isSaving}
-            icon="shield-outline"
-          />
+          >
+            {isSaving ? "Saving..." : "Save Security Settings"}
+          </Button>
           
           <Button
-            title="Reset to Defaults"
             variant="destructive"
             onPress={handleResetSecurity}
-            icon="refresh-outline"
-          />
+          >
+            Reset to Defaults
+          </Button>
         </View>
       </ScrollView>
     </SafeAreaView>

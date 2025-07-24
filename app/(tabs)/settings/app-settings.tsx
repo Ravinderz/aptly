@@ -16,7 +16,7 @@ import { showSuccessAlert, showErrorAlert } from '@/utils/alert';
 // UI Components
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
-import { StackHeader } from '@/components/ui/headers/StackHeader';
+import StackHeader from '@/components/ui/headers/StackHeader';
 
 // Default app preferences
 const defaultPreferences = {
@@ -397,19 +397,19 @@ export default function AppSettingsPage() {
         {/* Action Buttons */}
         <View className="space-y-3">
           <Button
-            title={isSaving ? "Saving..." : "Save App Settings"}
             variant="primary"
             onPress={handleSavePreferences}
             disabled={isSaving}
-            icon="settings-outline"
-          />
+          >
+            {isSaving ? "Saving..." : "Save App Settings"}
+          </Button>
           
           <Button
-            title="Reset to Defaults"
             variant="destructive"
             onPress={handleResetSettings}
-            icon="refresh-outline"
-          />
+          >
+            Reset to Defaults
+          </Button>
         </View>
       </ScrollView>
     </SafeAreaView>

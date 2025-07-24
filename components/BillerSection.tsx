@@ -21,7 +21,7 @@ const BillerSection = () => {
       id: "mobile",
       name: "Mobile",
       icon: <LucideIcons name="smartphone" size={24} color="#4CAF50" />,
-      route: "/(tabs)/services/billing/mobile-recharge",
+      route: "/billing/mobile-recharge",
       color: "#4CAF50",
       bgColor: "bg-green-50",
     },
@@ -29,7 +29,7 @@ const BillerSection = () => {
       id: "gas",
       name: "Gas",
       icon: <LucideIcons name="fuel" size={24} color="#FF9800" />,
-      route: "/(tabs)/services/billing/gas-recharge",
+      route: "/billing/gas-recharge",
       color: "#FF9800",
       bgColor: "bg-orange-50",
     },
@@ -37,7 +37,7 @@ const BillerSection = () => {
       id: "electricity",
       name: "Electricity",
       icon: <LucideIcons name="zap" size={24} color="#2196F3" />,
-      route: "/(tabs)/services/billing/electricity-recharge",
+      route: "/billing/electricity-recharge",
       color: "#2196F3",
       bgColor: "bg-blue-50",
     },
@@ -45,7 +45,7 @@ const BillerSection = () => {
       id: "broadband",
       name: "Broadband",
       icon: <LucideIcons name="wifi" size={24} color="#9C27B0" />,
-      route: "/(tabs)/services/billing/broadband-recharge",
+      route: "/billing/broadband-recharge",
       color: "#9C27B0",
       bgColor: "bg-purple-50",
     },
@@ -56,7 +56,7 @@ const BillerSection = () => {
   };
 
   const handleBillerPress = (route: string) => {
-    router.replace(route as any);
+    router.push(route as any);
   };
 
   return (

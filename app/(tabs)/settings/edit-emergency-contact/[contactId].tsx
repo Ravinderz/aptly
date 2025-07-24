@@ -17,7 +17,7 @@ import { validateEmergencyContact } from '@/utils/validation';
 // UI Components
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
-import { StackHeader } from '@/components/ui/headers/StackHeader';
+import StackHeader from '@/components/ui/headers/StackHeader';
 
 interface EmergencyContact {
   id: string;
@@ -325,19 +325,20 @@ export default function EditEmergencyContactPage() {
           {/* Action Buttons */}
           <View className="space-y-3">
             <Button
-              title={isSaving ? "Updating Contact..." : "Update Emergency Contact"}
               variant="primary"
               onPress={handleSave}
               disabled={isSaving}
-              icon="person-outline"
-            />
+            >
+              {isSaving ? "Updating Contact..." : "Update Emergency Contact"}
+            </Button>
             
             <Button
-              title="Cancel"
               variant="secondary"
               onPress={() => router.back()}
               disabled={isSaving}
-            />
+            >
+              Cancel
+            </Button>
           </View>
         </ScrollView>
       </KeyboardAvoidingView>

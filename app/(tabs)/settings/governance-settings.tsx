@@ -15,7 +15,7 @@ import { showSuccessAlert, showErrorAlert } from '@/utils/alert';
 // UI Components
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
-import { StackHeader } from '@/components/ui/headers/StackHeader';
+import StackHeader from '@/components/ui/headers/StackHeader';
 
 // Default governance preferences
 const defaultPreferences = {
@@ -167,12 +167,12 @@ export default function GovernanceSettingsPage() {
               Manage your emergency contact list for escalation chains
             </Text>
             <Button
-              title="Manage Emergency Contacts"
               variant="secondary"
               size="sm"
               onPress={() => {/* Navigate to emergency contacts management */}}
-              icon="people-outline"
-            />
+            >
+              Manage Emergency Contacts
+            </Button>
           </View>
         </View>
       </View>
@@ -214,12 +214,12 @@ export default function GovernanceSettingsPage() {
           ].map((permission) => (
             <View key={permission.action} className="flex-row items-center">
               <LucideIcons 
-                name={canUserPerformAction(permission.action) ? "checkmark-circle" : "close-circle"} 
+                name={canUserPerformAction(permission.action, state.userRole) ? "checkmark-circle" : "close-circle"} 
                 size={16} 
-                color={canUserPerformAction(permission.action) ? "#4CAF50" : "#D32F2F"} 
+                color={canUserPerformAction(permission.action, state.userRole) ? "#4CAF50" : "#D32F2F"} 
               />
               <Text className={`text-body-small ml-2 ${
-                canUserPerformAction(permission.action) ? 'text-text-primary' : 'text-text-secondary'
+                canUserPerformAction(permission.action, state.userRole) ? 'text-text-primary' : 'text-text-secondary'
               }`}>
                 {permission.label}
               </Text>
@@ -325,7 +325,7 @@ export default function GovernanceSettingsPage() {
             <LucideIcons name="warning-outline" size={20} color="#757575" />
           </TouchableOpacity>
 
-          {canUserPerformAction('view_analytics') && (
+          {canUserPerformAction('view_analytics', state.userRole) && (
             <TouchableOpacity
               className="flex-row items-center justify-between py-2"
               onPress={() => router.push('/(tabs)/services/analytics')}
@@ -366,12 +366,12 @@ export default function GovernanceSettingsPage() {
         {/* Save Button */}
         <View className="pt-4">
           <Button
-            title={isSaving ? "Saving..." : "Save Preferences"}
             variant="primary"
             onPress={handleSavePreferences}
             disabled={isSaving || JSON.stringify(preferences) === JSON.stringify(state.preferences)}
-            icon="save-outline"
-          />
+          >
+            {isSaving ? "Saving..." : "Save Preferences"}
+          </Button>
         </View>
 
         {/* Last Updated */}

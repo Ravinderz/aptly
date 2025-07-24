@@ -16,7 +16,7 @@ import { showSuccessAlert, showErrorAlert } from '@/utils/alert';
 // UI Components
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
-import { StackHeader } from '@/components/ui/headers/StackHeader';
+import StackHeader from '@/components/ui/headers/StackHeader';
 
 // Default analytics preferences
 const defaultPreferences = {
@@ -429,11 +429,11 @@ export default function AnalyticsSettingsPage() {
           
           {/* Back Button under content */}
           <Button
-            title="Go Back"
             variant="secondary"
             onPress={() => router.back()}
-            icon="arrow-back-outline"
-          />
+          >
+            Go Back
+          </Button>
         </View>
       </SafeAreaView>
     );
@@ -455,12 +455,12 @@ export default function AnalyticsSettingsPage() {
         {/* Save Button */}
         <View className="pt-4">
           <Button
-            title={isSaving ? "Saving..." : "Save Preferences"}
             variant="primary"
             onPress={handleSavePreferences}
             disabled={isSaving || JSON.stringify(preferences) === JSON.stringify(state.preferences)}
-            icon="save-outline"
-          />
+          >
+            {isSaving ? "Saving..." : "Save Preferences"}
+          </Button>
         </View>
 
         {/* Last Updated */}

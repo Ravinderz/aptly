@@ -203,7 +203,7 @@ const LucideIcons = ({ name, color = "#000", size = 24 }: IconProps) => {
     // Actions
     "add-circle": Plus,
     close: X,
-    "checkmark-circle": Check,
+    "checkmark-circle": CheckCircle,
     "checkmark-circle-outline": CheckCircle,
     "close-circle": XCircle,
     "alert-circle": AlertCircle,

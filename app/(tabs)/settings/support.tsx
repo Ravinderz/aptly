@@ -15,7 +15,7 @@ import { showSuccessAlert, showErrorAlert } from '@/utils/alert';
 // UI Components
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
-import { StackHeader } from '@/components/ui/headers/StackHeader';
+import StackHeader from '@/components/ui/headers/StackHeader';
 
 export default function SupportPage() {
   const [feedbackMessage, setFeedbackMessage] = useState('');

@@ -17,7 +17,7 @@ import { validateEmergencyContact, formatIndianPhoneNumber } from '@/utils/valid
 // UI Components
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
-import { StackHeader } from '@/components/ui/headers/StackHeader';
+import StackHeader from '@/components/ui/headers/StackHeader';
 
 interface EmergencyContactForm {
   name: string;
@@ -288,19 +288,20 @@ export default function AddEmergencyContactPage() {
           {/* Action Buttons */}
           <View className="space-y-3">
             <Button
-              title={isSaving ? "Adding Contact..." : "Add Emergency Contact"}
               variant="primary"
               onPress={handleSave}
               disabled={isSaving}
-              icon="person-add-outline"
-            />
+            >
+              {isSaving ? "Adding Contact..." : "Add Emergency Contact"}
+            </Button>
             
             <Button
-              title="Cancel"
               variant="secondary"
               onPress={() => router.back()}
               disabled={isSaving}
-            />
+            >
+              Cancel
+            </Button>
           </View>
         </ScrollView>
       </KeyboardAvoidingView>

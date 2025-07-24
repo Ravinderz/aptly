@@ -14,7 +14,7 @@ import { showSuccessAlert, showErrorAlert } from '@/utils/alert';
 // UI Components
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
-import { StackHeader } from '@/components/ui/headers/StackHeader';
+import StackHeader from '@/components/ui/headers/StackHeader';
 
 interface VotingPreferences {
   anonymousVoting: boolean;
@@ -239,12 +239,12 @@ export default function VotingPreferencesPage() {
 
         {/* Save Button */}
         <Button
-          title={isSaving ? "Saving..." : "Save Preferences"}
           variant="primary"
           onPress={savePreferences}
           disabled={isSaving}
-          icon="save-outline"
-        />
+        >
+          {isSaving ? "Saving..." : "Save Preferences"}
+        </Button>
       </ScrollView>
     </SafeAreaView>
   );

@@ -17,7 +17,7 @@ import { validateName, validateIndianPhoneNumber, validateAadharNumber } from '@
 // UI Components
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
-import { StackHeader } from '@/components/ui/headers/StackHeader';
+import StackHeader from '@/components/ui/headers/StackHeader';
 
 interface FamilyMemberForm {
   name: string;
@@ -326,19 +326,20 @@ export default function AddFamilyMemberPage() {
           {/* Action Buttons */}
           <View className="space-y-3">
             <Button
-              title={isSaving ? "Adding Member..." : "Add Family Member"}
               variant="primary"
               onPress={handleSave}
               disabled={isSaving}
-              icon="person-add-outline"
-            />
+            >
+              {isSaving ? "Adding Member..." : "Add Family Member"}
+            </Button>
             
             <Button
-              title="Cancel"
               variant="secondary"
               onPress={() => router.back()}
               disabled={isSaving}
-            />
+            >
+              Cancel
+            </Button>
           </View>
 
           {/* Info Card */}

@@ -16,7 +16,7 @@ import { validateIndianPhoneNumber } from '@/utils/validation';
 // UI Components
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
-import { StackHeader } from '@/components/ui/headers/StackHeader';
+import StackHeader from '@/components/ui/headers/StackHeader';
 
 interface EmergencySettings {
   receiveAlerts: boolean;
@@ -351,12 +351,12 @@ export default function EmergencySettingsPage() {
 
         {/* Save Button */}
         <Button
-          title={isSaving ? "Saving..." : "Save Settings"}
           variant="primary"
           onPress={saveSettings}
           disabled={isSaving}
-          icon="save-outline"
-        />
+        >
+          {isSaving ? "Saving..." : "Save Settings"}
+        </Button>
       </ScrollView>
     </SafeAreaView>
   );
