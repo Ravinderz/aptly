@@ -28,7 +28,7 @@ export default function HeaderAction({
     Animated.parallel([
       Animated.spring(scaleAnim, {
         toValue: 0.92,
-        useNativeDriver: true,
+        useNativeDriver: false,
         tension: 300,
         friction: 10,
       }),
@@ -44,7 +44,7 @@ export default function HeaderAction({
     Animated.parallel([
       Animated.spring(scaleAnim, {
         toValue: 1,
-        useNativeDriver: true,
+        useNativeDriver: false,
         tension: 300,
         friction: 10,
       }),
@@ -111,3 +111,5 @@ export default function HeaderAction({
     </TouchableOpacity>
   );
 }
+
+HeaderAction.displayName = 'HeaderAction';

@@ -1,10 +1,11 @@
-import React, { useState, useEffect } from 'react';
-import { SafeAreaView, ScrollView, View, Text, TextInput, TouchableOpacity, Alert } from 'react-native';
+import React, { useState } from 'react';
+import { SafeAreaView, ScrollView, View, Text, TextInput, TouchableOpacity } from 'react-native';
 import { ArrowLeft, Zap, MapPin, Calendar, AlertCircle, CreditCard, Gift, Clock } from 'lucide-react-native';
 import { router } from 'expo-router';
-import Button from '../../../../components/ui/Button';
+import { Button } from '../../../../components/ui/Button';
 import { Card } from '../../../../components/ui/Card';
 import HighlightCard from '../../../../components/ui/HighlightCard';
+import { showErrorAlert } from '@/utils/alert';
 
 interface CylinderOption {
   id: string;
@@ -85,7 +86,7 @@ export default function CylinderBooking() {
 
   const detectProvider = async () => {
     if (customerId.length < 8) {
-      Alert.alert('Invalid Customer ID', 'Please enter a valid LPG customer ID (minimum 8 characters)');
+      showErrorAlert('Invalid Customer ID', 'Please enter a valid LPG customer ID (minimum 8 characters)');
       return;
     }
 
@@ -109,12 +110,12 @@ export default function CylinderBooking() {
 
   const handleBooking = () => {
     if (!customerId || !selectedProvider || !selectedCylinder) {
-      Alert.alert('Missing Information', 'Please fill all required details');
+      showErrorAlert('Missing Information', 'Please fill all required details');
       return;
     }
 
     if (!selectedSlot) {
-      Alert.alert('Select Delivery Slot', 'Please choose a preferred delivery slot');
+      showErrorAlert('Select Delivery Slot', 'Please choose a preferred delivery slot');
       return;
     }
 

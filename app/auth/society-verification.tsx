@@ -87,7 +87,7 @@ export default function SocietyVerification() {
           <TouchableOpacity onPress={() => router.back()} className="mr-4">
             <ArrowLeft size={24} color="#212121" />
           </TouchableOpacity>
-          <Text className="text-xl font-bold text-text-primary">Society Verification</Text>
+          <Text className="text-headline-large font-bold text-text-primary">Society Verification</Text>
         </View>
         
         <View className="flex-1 items-center justify-center px-6">
@@ -110,7 +110,7 @@ export default function SocietyVerification() {
           <TouchableOpacity onPress={() => router.back()} className="mr-4">
             <ArrowLeft size={24} color="#212121" />
           </TouchableOpacity>
-          <Text className="text-xl font-bold text-text-primary">Society Verification</Text>
+          <Text className="text-headline-large font-bold text-text-primary">Society Verification</Text>
         </View>
         
         <View className="flex-1 items-center justify-center px-6">
@@ -118,7 +118,7 @@ export default function SocietyVerification() {
             <Building size={32} color="#D32F2F" />
           </View>
           
-          <Text className="text-xl font-bold text-text-primary mb-4 text-center">
+          <Text className="text-headline-large font-bold text-text-primary mb-4 text-center">
             Society Not Found
           </Text>
           
@@ -132,7 +132,7 @@ export default function SocietyVerification() {
           
           <View className="bg-primary/5 rounded-xl p-4 mt-4">
             <Text className="text-primary font-semibold mb-2">Need Help?</Text>
-            <Text className="text-text-secondary text-sm leading-5">
+            <Text className="text-text-secondary text-body-medium leading-5">
               Contact your society management or housing committee to get the correct society code.
             </Text>
           </View>
@@ -148,7 +148,7 @@ export default function SocietyVerification() {
         <TouchableOpacity onPress={() => router.back()} className="mr-4">
           <ArrowLeft size={24} color="#212121" />
         </TouchableOpacity>
-        <Text className="text-xl font-bold text-text-primary">Society Verification</Text>
+        <Text className="text-headline-large font-bold text-text-primary">Society Verification</Text>
       </View>
 
       <View className="flex-1 px-6 py-8">
@@ -157,7 +157,7 @@ export default function SocietyVerification() {
           <View className="bg-success/10 rounded-full w-20 h-20 items-center justify-center mb-4">
             <CheckCircle size={32} color="#4CAF50" />
           </View>
-          <Text className="text-2xl font-bold text-text-primary mb-2 text-center">
+          <Text className="text-display-small font-bold text-text-primary mb-2 text-center">
             Society Verified!
           </Text>
           <Text className="text-text-secondary text-center leading-6">
@@ -170,10 +170,10 @@ export default function SocietyVerification() {
           {/* Society Name and Code */}
           <View className="flex-row items-start justify-between mb-4">
             <View className="flex-1">
-              <Text className="text-xl font-bold text-text-primary mb-1">
+              <Text className="text-headline-large font-bold text-text-primary mb-1">
                 {society.name}
               </Text>
-              <Text className="text-text-secondary text-sm">
+              <Text className="text-text-secondary text-body-medium">
                 Society Code: {society.code}
               </Text>
             </View>
@@ -193,18 +193,18 @@ export default function SocietyVerification() {
           {/* Stats */}
           <View className="flex-row justify-between mb-4">
             <View className="items-center">
-              <Text className="text-2xl font-bold text-text-primary">{society.totalFlats}</Text>
-              <Text className="text-text-secondary text-sm">Total Flats</Text>
+              <Text className="text-display-small font-bold text-text-primary">{society.totalFlats}</Text>
+              <Text className="text-text-secondary text-body-medium">Total Flats</Text>
             </View>
             <View className="items-center">
-              <Text className="text-2xl font-bold text-success">{society.registeredResidents}</Text>
-              <Text className="text-text-secondary text-sm">Registered</Text>
+              <Text className="text-display-small font-bold text-success">{society.registeredResidents}</Text>
+              <Text className="text-text-secondary text-body-medium">Registered</Text>
             </View>
             <View className="items-center">
-              <Text className="text-2xl font-bold text-primary">
+              <Text className="text-display-small font-bold text-primary">
                 {Math.round((society.registeredResidents / society.totalFlats) * 100)}%
               </Text>
-              <Text className="text-text-secondary text-sm">Active</Text>
+              <Text className="text-text-secondary text-body-medium">Active</Text>
             </View>
           </View>
 
@@ -214,7 +214,7 @@ export default function SocietyVerification() {
             <View className="flex-row flex-wrap gap-2">
               {society.amenities.map((amenity, index) => (
                 <View key={index} className="bg-primary/10 rounded-full px-3 py-1">
-                  <Text className="text-primary text-sm font-medium">{amenity}</Text>
+                  <Text className="text-primary text-body-medium font-medium">{amenity}</Text>
                 </View>
               ))}
             </View>
@@ -227,7 +227,7 @@ export default function SocietyVerification() {
             <CheckCircle size={16} color="#4CAF50" />
             <Text className="text-success font-semibold ml-2">Verification Successful</Text>
           </View>
-          <Text className="text-text-secondary text-sm leading-5">
+          <Text className="text-text-secondary text-body-medium leading-5">
             Your phone number and society code have been verified. You can now proceed to set up your profile.
           </Text>
         </View>

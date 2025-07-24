@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { SafeAreaView, ScrollView, View, Text, TouchableOpacity, Alert } from 'react-native';
+import { SafeAreaView, ScrollView, View, Text, TouchableOpacity } from 'react-native';
+import { showErrorAlert } from '@/utils/alert';
 import { ArrowLeft, CreditCard, Smartphone, Building, Shield, CheckCircle, Gift } from 'lucide-react-native';
 import { router, useLocalSearchParams } from 'expo-router';
-import Button from '../../../../components/ui/Button';
+import { Button } from '../../../../components/ui/Button';
 import { Card } from '../../../../components/ui/Card';
 import HighlightCard from '../../../../components/ui/HighlightCard';
 
@@ -61,7 +62,7 @@ export default function PaymentPage() {
 
   const handlePayment = async () => {
     if (!selectedPaymentMethod) {
-      Alert.alert('Select Payment Method', 'Please choose a payment method to continue');
+      showErrorAlert('Select Payment Method', 'Please choose a payment method to continue');
       return;
     }
 
@@ -208,7 +209,7 @@ export default function PaymentPage() {
               <View className="flex-row items-center">
                 <Gift size={16} color="#4CAF50" />
                 <Text className="text-text-secondary text-body-medium ml-2">
-                  Total cashback you'll earn
+                  Total cashback you&apos;ll earn
                 </Text>
               </View>
               <Text className="text-success text-body-large font-bold">

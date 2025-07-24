@@ -106,7 +106,7 @@ const CommentInput: React.FC<CommentInputProps> = ({
           ) : (
             <Send 
               size={18} 
-              color={canSubmit && !disabled ? "white" : "#9CA3AF"} 
+              color={canSubmit && !disabled ? "white" : "#757575"} 
             />
           )}
         </TouchableOpacity>

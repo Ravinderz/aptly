@@ -6,43 +6,98 @@ import {
   Text, 
   TouchableOpacity,
   Switch,
-  Alert,
   Slider
 } from 'react-native';
 import { router } from 'expo-router';
-import { Ionicons } from '@expo/vector-icons';
-
-// Import context
-import { useAnalytics } from '@/contexts/AnalyticsContext';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import LucideIcons from '@/components/ui/LucideIcons';
+import { showSuccessAlert, showErrorAlert } from '@/utils/alert';
 
 // UI Components
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
-import { TabHeader } from '@/components/ui/headers';
+import { StackHeader } from '@/components/ui/headers/StackHeader';
+
+// Default analytics preferences
+const defaultPreferences = {
+  autoRefresh: true,
+  dataRetention: 90,
+  reportFormat: 'json' as 'json' | 'csv' | 'pdf',
+  alertThresholds: {
+    performance: 500,
+    errors: 5,
+    usage: 80
+  }
+};
+
+// Default state
+const defaultState = {
+  userRole: 'resident' as 'resident' | 'committee_member' | 'admin',
+  preferences: defaultPreferences,
+  lastUpdated: null as string | null
+};
+
+// Helper function to check user access permissions
+const canUserAccessAnalytics = (userRole: string): boolean => {
+  return ['admin', 'committee_member'].includes(userRole);
+};
+
+const canUserExportData = (userRole: string): boolean => {
+  return ['admin', 'committee_member'].includes(userRole);
+};
+
+const canUserManageNotifications = (userRole: string): boolean => {
+  return ['admin', 'committee_member'].includes(userRole);
+};
+
+// Helper function to update preferences
+const updateAnalyticsPreferences = async (newPreferences: typeof defaultPreferences): Promise<void> => {
+  try {
+    await AsyncStorage.setItem('analytics_preferences', JSON.stringify(newPreferences));
+    await AsyncStorage.setItem('analytics_last_updated', new Date().toISOString());
+  } catch (error) {
+    throw new Error('Failed to save preferences');
+  }
+};
+
+// Helper function to load preferences
+const loadAnalyticsPreferences = async () => {
+  try {
+    const prefsString = await AsyncStorage.getItem('analytics_preferences');
+    const roleString = await AsyncStorage.getItem('user_role') || 'resident';
+    const lastUpdated = await AsyncStorage.getItem('analytics_last_updated');
+    
+    return {
+      userRole: roleString as 'resident' | 'committee_member' | 'admin',
+      preferences: prefsString ? JSON.parse(prefsString) : defaultPreferences,
+      lastUpdated
+    };
+  } catch (error) {
+    return defaultState;
+  }
+};
 
 export default function AnalyticsSettingsPage() {
-  const { 
-    state, 
-    updateAnalyticsPreferences, 
-    canUserAccessAnalytics, 
-    canUserExportData,
-    canUserManageNotifications 
-  } = useAnalytics();
-  
-  const [preferences, setPreferences] = useState(state.preferences);
+  const [state, setState] = useState(defaultState);
+  const [preferences, setPreferences] = useState(defaultPreferences);
   const [isSaving, setIsSaving] = useState(false);
 
   useEffect(() => {
-    setPreferences(state.preferences);
-  }, [state.preferences]);
+    // Load preferences on component mount
+    loadAnalyticsPreferences().then(loadedState => {
+      setState(loadedState);
+      setPreferences(loadedState.preferences);
+    });
+  }, []);
 
   const handleSavePreferences = async () => {
     try {
       setIsSaving(true);
       await updateAnalyticsPreferences(preferences);
-      Alert.alert('Success', 'Analytics preferences updated successfully');
+      setState(prev => ({ ...prev, preferences, lastUpdated: new Date().toISOString() }));
+      showSuccessAlert('Success', 'Analytics preferences updated successfully');
     } catch (error) {
-      Alert.alert('Error', 'Failed to update preferences');
+      showErrorAlert('Error', 'Failed to update preferences');
     } finally {
       setIsSaving(false);
     }
@@ -92,7 +147,7 @@ export default function AnalyticsSettingsPage() {
               value={preferences.autoRefresh}
               onValueChange={handleToggleAutoRefresh}
               trackColor={{ false: '#D1D5DB', true: '#6366f1' }}
-              thumbColor={preferences.autoRefresh ? '#FFFFFF' : '#9CA3AF'}
+              thumbColor={preferences.autoRefresh ? '#FFFFFF' : '#757575'}
             />
           </View>
 
@@ -270,17 +325,17 @@ export default function AnalyticsSettingsPage() {
 
         <View className="space-y-2">
           {[
-            { check: canUserAccessAnalytics(), label: 'View detailed analytics' },
-            { check: canUserExportData(), label: 'Export analytics data' },
-            { check: canUserManageNotifications(), label: 'Manage notification campaigns' },
+            { check: canUserAccessAnalytics(state.userRole), label: 'View detailed analytics' },
+            { check: canUserExportData(state.userRole), label: 'Export analytics data' },
+            { check: canUserManageNotifications(state.userRole), label: 'Manage notification campaigns' },
             { check: state.userRole === 'admin', label: 'Apply system optimizations' },
             { check: state.userRole === 'admin', label: 'View audit logs' }
           ].map((permission, index) => (
             <View key={index} className="flex-row items-center">
-              <Ionicons 
+              <LucideIcons 
                 name={permission.check ? "checkmark-circle" : "close-circle"} 
                 size={16} 
-                color={permission.check ? "#10B981" : "#EF4444"} 
+                color={permission.check ? "#4CAF50" : "#D32F2F"} 
               />
               <Text className={`text-body-small ml-2 ${
                 permission.check ? 'text-text-primary' : 'text-text-secondary'
@@ -302,7 +357,7 @@ export default function AnalyticsSettingsPage() {
         </Text>
         
         <View className="space-y-4">
-          {canUserExportData() && (
+          {canUserExportData(state.userRole) && (
             <TouchableOpacity
               className="flex-row items-center justify-between py-2"
               onPress={() => {/* Trigger data export */}}
@@ -315,7 +370,7 @@ export default function AnalyticsSettingsPage() {
                   Download complete analytics report in {preferences.reportFormat.toUpperCase()} format
                 </Text>
               </View>
-              <Ionicons name="download-outline" size={20} color="#6B7280" />
+              <LucideIcons name="download-outline" size={20} color="#757575" />
             </TouchableOpacity>
           )}
 
@@ -331,10 +386,10 @@ export default function AnalyticsSettingsPage() {
                 Remove locally cached analytics data
               </Text>
             </View>
-            <Ionicons name="trash-outline" size={20} color="#6B7280" />
+            <LucideIcons name="trash-outline" size={20} color="#757575" />
           </TouchableOpacity>
 
-          {canUserAccessAnalytics() && (
+          {canUserAccessAnalytics(state.userRole) && (
             <TouchableOpacity
               className="flex-row items-center justify-between py-2"
               onPress={() => router.push('/(tabs)/services/analytics')}
@@ -347,7 +402,7 @@ export default function AnalyticsSettingsPage() {
                   View detailed performance metrics and insights
                 </Text>
               </View>
-              <Ionicons name="analytics-outline" size={20} color="#6B7280" />
+              <LucideIcons name="analytics-outline" size={20} color="#757575" />
             </TouchableOpacity>
           )}
         </View>
@@ -355,27 +410,30 @@ export default function AnalyticsSettingsPage() {
     </Card>
   );
 
-  if (!canUserAccessAnalytics()) {
+  if (!canUserAccessAnalytics(state.userRole)) {
     return (
       <SafeAreaView className="flex-1 bg-background">
-        <TabHeader
+        <StackHeader
           title="Analytics Settings"
-          subtitle="Configure analytics preferences"
-          onNotificationPress={() => console.log('Notifications pressed')}
-          onHelpPress={() => console.log('Help pressed')}
-          notificationCount={0}
-          showBackButton
           onBackPress={() => router.back()}
         />
         
         <View className="flex-1 items-center justify-center p-4">
-          <Ionicons name="analytics-outline" size={64} color="#9CA3AF" />
+          <LucideIcons name="analytics-outline" size={64} color="#757575" />
           <Text className="text-headline-small text-text-secondary mt-4 mb-2">
             Access Restricted
           </Text>
-          <Text className="text-body-medium text-text-secondary text-center">
+          <Text className="text-body-medium text-text-secondary text-center mb-8">
             Analytics settings are only available to committee members and administrators.
           </Text>
+          
+          {/* Back Button under content */}
+          <Button
+            title="Go Back"
+            variant="secondary"
+            onPress={() => router.back()}
+            icon="arrow-back-outline"
+          />
         </View>
       </SafeAreaView>
     );
@@ -383,13 +441,8 @@ export default function AnalyticsSettingsPage() {
 
   return (
     <SafeAreaView className="flex-1 bg-background">
-      <TabHeader
+      <StackHeader
         title="Analytics Settings"
-        subtitle="Configure performance monitoring and data preferences"
-        onNotificationPress={() => console.log('Notifications pressed')}
-        onHelpPress={() => console.log('Help pressed')}
-        notificationCount={0}
-        showBackButton
         onBackPress={() => router.back()}
       />
 

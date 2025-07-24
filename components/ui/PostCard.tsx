@@ -1,4 +1,4 @@
-import { Heart, MessageSquareText, Trash2, Edit3, MoreHorizontal } from "lucide-react-native";
+import LucideIcons from "@/components/ui/LucideIcons";
 import React, { useState } from "react";
 import { Text, View, TouchableOpacity, ActivityIndicator, Image } from "react-native";
 import UserAvatar from "./UserAvatar";
@@ -107,7 +107,7 @@ const PostCard: React.FC<PostCardProps> = ({ post, onLike, onComment, onDelete, 
                 onPress={toggleActions}
                 className="p-1"
               >
-                <MoreHorizontal size={16} className="text-text-secondary" />
+                <LucideIcons name="settings-outline" size={16} color="#757575" />
               </TouchableOpacity>
               
               {showActions && (
@@ -117,7 +117,7 @@ const PostCard: React.FC<PostCardProps> = ({ post, onLike, onComment, onDelete, 
                       onPress={handleEdit}
                       className="flex-row items-center px-4 py-3 border-b border-divider"
                     >
-                      <Edit3 size={14} className="text-primary" />
+                      <LucideIcons name="document-text-outline" size={14} color="#6366f1" />
                       <Text className="text-primary ml-3 font-medium">Edit</Text>
                     </TouchableOpacity>
                   )}
@@ -133,7 +133,7 @@ const PostCard: React.FC<PostCardProps> = ({ post, onLike, onComment, onDelete, 
                       {deleting ? (
                         <ActivityIndicator size="small" className="text-error" />
                       ) : (
-                        <Trash2 size={14} className="text-error" />
+                        <LucideIcons name="trash-outline" size={14} color="#D32F2F" />
                       )}
                       <Text className="text-error ml-3 font-medium">
                         {deleting ? 'Deleting...' : 'Delete'}
@@ -165,7 +165,7 @@ const PostCard: React.FC<PostCardProps> = ({ post, onLike, onComment, onDelete, 
           className="flex flex-row gap-2 items-center flex-1 py-2"
           activeOpacity={0.7}
         >
-          <MessageSquareText size={18} className="text-text-secondary" strokeWidth={2} />
+          <LucideIcons name="chatbubble-outline" size={18} color="#757575" />
           <Text className="text-body-medium font-medium text-text-secondary">{postStats.comments}</Text>
         </TouchableOpacity>
         
@@ -176,13 +176,12 @@ const PostCard: React.FC<PostCardProps> = ({ post, onLike, onComment, onDelete, 
           activeOpacity={0.7}
         >
           {liking ? (
-            <ActivityIndicator size="small" className="text-error" />
+            <ActivityIndicator size="small" color="#D32F2F" />
           ) : (
-            <Heart 
+            <LucideIcons 
+              name={post.isLikedByUser ? "heart" : "heart-outline"} 
               size={18} 
-              className={post.isLikedByUser ? "text-error" : "text-text-secondary"} 
-              fill={post.isLikedByUser ? "currentColor" : "transparent"}
-              strokeWidth={2} 
+              color={post.isLikedByUser ? "#D32F2F" : "#757575"}
             />
           )}
           <Text className={`text-body-medium font-medium ${

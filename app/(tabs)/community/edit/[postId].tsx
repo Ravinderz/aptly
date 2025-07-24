@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   View,
   Text,
@@ -32,9 +32,9 @@ export default function EditPost() {
     if (postId) {
       loadPost();
     }
-  }, [postId]);
+  }, [postId, loadPost]);
 
-  const loadPost = async () => {
+  const loadPost = useCallback(async () => {
     try {
       setLoading(true);
       const posts = await communityApi.getPosts();
@@ -60,7 +60,7 @@ export default function EditPost() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [postId]);
 
   const handleSave = async () => {
     if (saving || !post) return;
@@ -106,7 +106,7 @@ export default function EditPost() {
           <TouchableOpacity onPress={() => router.back()} className="mr-4">
             <ArrowLeft size={24} color="#212121" />
           </TouchableOpacity>
-          <Text className="text-xl font-bold text-text-primary">Edit Post</Text>
+          <Text className="text-headline-large font-bold text-text-primary">Edit Post</Text>
         </View>
         <View className="flex-1 items-center justify-center">
           <ActivityIndicator size="large" color="#6366f1" />
@@ -123,10 +123,10 @@ export default function EditPost() {
           <TouchableOpacity onPress={() => router.back()} className="mr-4">
             <ArrowLeft size={24} color="#212121" />
           </TouchableOpacity>
-          <Text className="text-xl font-bold text-text-primary">Edit Post</Text>
+          <Text className="text-headline-large font-bold text-text-primary">Edit Post</Text>
         </View>
         <View className="flex-1 items-center justify-center px-8">
-          <Text className="text-xl font-semibold text-text-primary mb-2">Cannot Edit Post</Text>
+          <Text className="text-headline-large font-semibold text-text-primary mb-2">Cannot Edit Post</Text>
           <Text className="text-text-secondary text-center">
             This post cannot be edited or may no longer be available.
           </Text>
@@ -143,7 +143,7 @@ export default function EditPost() {
           <TouchableOpacity onPress={() => router.back()} className="mr-4">
             <ArrowLeft size={24} color="#212121" />
           </TouchableOpacity>
-          <Text className="text-xl font-bold text-text-primary">Edit Post</Text>
+          <Text className="text-headline-large font-bold text-text-primary">Edit Post</Text>
         </View>
         
         <TouchableOpacity
@@ -158,7 +158,7 @@ export default function EditPost() {
           {saving ? (
             <ActivityIndicator size="small" color="white" />
           ) : (
-            <Check size={16} color={hasChanges && characterCount <= MAX_POST_LENGTH && content.trim() ? "white" : "#9CA3AF"} />
+            <Check size={16} color={hasChanges && characterCount <= MAX_POST_LENGTH && content.trim() ? "white" : "#757575"} />
           )}
           <Text className={`ml-2 font-semibold ${
             hasChanges && !saving && characterCount <= MAX_POST_LENGTH && content.trim()
@@ -184,7 +184,7 @@ export default function EditPost() {
           {/* Edit Notice */}
           <View className="bg-warning/10 border border-warning/20 rounded-2xl p-4 mb-6">
             <Text className="text-warning font-semibold mb-2">Editing Post</Text>
-            <Text className="text-text-secondary text-sm">
+            <Text className="text-text-secondary text-body-medium">
               You can edit your post within 30 minutes of posting. After that, the edit option will no longer be available.
             </Text>
           </View>
@@ -195,7 +195,7 @@ export default function EditPost() {
               placeholder="What do you want to share with your community?"
               cursorColor="#6366f1"
               className="w-full min-h-[100px] p-0 text-text-primary text-base leading-6"
-              placeholderTextColor="#9CA3AF"
+              placeholderTextColor="#757575"
               multiline={true}
               textAlignVertical="top"
               value={content}
@@ -214,12 +214,12 @@ export default function EditPost() {
             
             {/* Character count */}
             <View className="flex-row justify-between items-center mt-4 pt-4 border-t border-divider">
-              <Text className={`text-sm ${isNearLimit ? 'text-warning' : 'text-text-secondary'}`}>
+              <Text className={`text-body-medium ${isNearLimit ? 'text-warning' : 'text-text-secondary'}`}>
                 {characterCount}/{MAX_POST_LENGTH}
               </Text>
               
               {hasChanges && (
-                <Text className="text-success text-sm font-medium">
+                <Text className="text-success text-body-medium font-medium">
                   • Unsaved changes
                 </Text>
               )}
@@ -228,17 +228,17 @@ export default function EditPost() {
 
           {/* Post Preview */}
           <View className="mt-6">
-            <Text className="text-lg font-semibold text-text-primary mb-4">Preview</Text>
+            <Text className="text-headline-medium font-semibold text-text-primary mb-4">Preview</Text>
             <View className="bg-surface rounded-2xl p-5 border border-divider">
               <View className="flex-row items-center mb-4">
                 <View className="bg-primary/10 rounded-full w-10 h-10 items-center justify-center mr-3">
-                  <Text className="text-primary font-bold text-sm">
+                  <Text className="text-primary font-bold text-body-medium">
                     {post.userName.split(' ').map(n => n[0]).join('')}
                   </Text>
                 </View>
                 <View>
                   <Text className="font-semibold text-text-primary">{post.userName}</Text>
-                  <Text className="text-text-secondary text-sm">Flat {post.flatNumber}</Text>
+                  <Text className="text-text-secondary text-body-medium">Flat {post.flatNumber}</Text>
                 </View>
               </View>
               
@@ -259,8 +259,8 @@ export default function EditPost() {
               )}
               
               <View className="flex-row items-center justify-between pt-3 border-t border-divider">
-                <Text className="text-text-secondary text-sm">0 comments</Text>
-                <Text className="text-text-secondary text-sm">{post.likesCount} likes</Text>
+                <Text className="text-text-secondary text-body-medium">0 comments</Text>
+                <Text className="text-text-secondary text-body-medium">{post.likesCount} likes</Text>
               </View>
             </View>
           </View>

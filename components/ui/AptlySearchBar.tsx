@@ -32,7 +32,7 @@ const AptlySearchBar: React.FC<SearchBarProps> = ({
           placeholder={placeholder}
           cursorColor={"#6366f1"}
           className="w-full p-3 pr-10 border border-divider rounded-xl bg-surface text-text-primary"
-          placeholderTextColor="#9CA3AF"
+          placeholderTextColor="#757575"
           value={value}
           onChangeText={onChangeText}
           returnKeyType="search"
@@ -44,7 +44,7 @@ const AptlySearchBar: React.FC<SearchBarProps> = ({
             className="absolute right-3 top-1/2 -translate-y-2"
             style={{ transform: [{ translateY: -10 }] }}
           >
-            <X size={16} color="#9CA3AF" />
+            <X size={16} color="#757575" />
           </TouchableOpacity>
         )}
       </View>

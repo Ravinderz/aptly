@@ -1,7 +1,7 @@
 import { router } from "expo-router";
 import { ArrowLeft, LucideIcon } from "lucide-react-native";
 import React, { useEffect, useRef } from "react";
-import { Animated, Platform, Text, TouchableOpacity, View } from "react-native";
+import { Animated, Text, TouchableOpacity, View } from "react-native";
 import HeaderAction from "./HeaderAction";
 
 interface StackHeaderAction {
@@ -138,3 +138,5 @@ export default function StackHeader({
     </>
   );
 }
+
+StackHeader.displayName = 'StackHeader';

@@ -1,13 +1,12 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, Alert } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import React, { useState } from 'react';
+import { View, Text, ScrollView, TouchableOpacity } from 'react-native';
+import { showErrorAlert, showSuccessAlert } from '@/utils/alert';
+import LucideIcons from '../ui/LucideIcons';
 import { router } from 'expo-router';
 
 // Types
 import type { 
   VotingCampaign, 
-  VotingCandidate, 
-  VotingOption,
   VotingAnalytics,
   UserVote 
 } from '../../types/governance';
@@ -15,7 +14,6 @@ import type {
 // UI Components
 import { Card } from '../ui/Card';
 import { Button } from '../ui/Button';
-import { Input } from '../ui/Input';
 import { UserAvatar } from '../ui/UserAvatar';
 import { AlertCard } from '../ui/AlertCard';
 
@@ -48,7 +46,7 @@ export const VotingSystem: React.FC<VotingSystemProps> = ({
   
   const handleVote = async (campaignId: string) => {
     if (!selectedCandidate && !selectedOption) {
-      Alert.alert('Selection Required', 'Please select a candidate or option before voting.');
+      showErrorAlert('Selection Required', 'Please select a candidate or option before voting.');
       return;
     }
 
@@ -71,12 +69,12 @@ export const VotingSystem: React.FC<VotingSystemProps> = ({
         }
       }));
 
-      Alert.alert('Vote Cast', 'Your vote has been recorded successfully!');
+      showSuccessAlert('Vote Cast', 'Your vote has been recorded successfully!');
       setSelectedCampaign(null);
       setSelectedCandidate(null);
       setSelectedOption(null);
-    } catch (error) {
-      Alert.alert('Voting Error', 'Failed to cast your vote. Please try again.');
+    } catch {
+      showErrorAlert('Voting Error', 'Failed to cast your vote. Please try again.');
     } finally {
       setIsVoting(false);
     }
@@ -120,7 +118,7 @@ export const VotingSystem: React.FC<VotingSystemProps> = ({
               </View>
               {campaign.isAnonymous && (
                 <View className="flex-row items-center">
-                  <Ionicons name="shield-checkmark" size={12} color="#10B981" />
+                  <LucideIcons name="shield-check" size={12} color="#4CAF50" />
                   <Text className="text-label-small text-success ml-1">Anonymous</Text>
                 </View>
               )}
@@ -148,7 +146,7 @@ export const VotingSystem: React.FC<VotingSystemProps> = ({
           {/* Time Remaining */}
           {campaign.status === 'active' && (
             <View className="flex-row items-center mb-3">
-              <Ionicons name="time-outline" size={16} color="#6B7280" />
+              <LucideIcons name="clock" size={16} color="#757575" />
               <Text className="text-body-small text-text-secondary ml-2">
                 {timeRemaining}
               </Text>
@@ -192,7 +190,7 @@ export const VotingSystem: React.FC<VotingSystemProps> = ({
             {userHasVoted ? (
               <View className="flex-1 bg-success/10 border border-success/20 rounded-lg p-3">
                 <View className="flex-row items-center justify-center">
-                  <Ionicons name="checkmark-circle" size={16} color="#10B981" />
+                  <LucideIcons name="check-circle" size={16} color="#4CAF50" />
                   <Text className="text-body-medium font-medium text-success ml-2">
                     Vote Submitted
                   </Text>
@@ -202,7 +200,7 @@ export const VotingSystem: React.FC<VotingSystemProps> = ({
               <Button
                 title="Vote Now"
                 variant="primary"
-                size="medium"
+                size="md"
                 onPress={() => setSelectedCampaign(campaign)}
                 icon="ballot-outline"
                 className="flex-1"
@@ -217,7 +215,7 @@ export const VotingSystem: React.FC<VotingSystemProps> = ({
               <Button
                 title="View Results"
                 variant="secondary"
-                size="medium"
+                size="md"
                 onPress={() => router.push(`/governance/voting/${campaign.id}`)}
                 className="flex-1"
               />
@@ -226,7 +224,7 @@ export const VotingSystem: React.FC<VotingSystemProps> = ({
             <Button
               title="Details"
               variant="ghost"
-              size="medium"
+              size="md"
               onPress={() => router.push(`/governance/voting/${campaign.id}`)}
               icon="information-circle-outline"
             />
@@ -249,7 +247,7 @@ export const VotingSystem: React.FC<VotingSystemProps> = ({
                 Cast Your Vote
               </Text>
               <TouchableOpacity onPress={() => setSelectedCampaign(null)}>
-                <Ionicons name="close" size={24} color="#6B7280" />
+                <LucideIcons name="x" size={24} color="#757575" />
               </TouchableOpacity>
             </View>
             <Text className="text-body-medium text-text-secondary mt-1">
@@ -303,7 +301,7 @@ export const VotingSystem: React.FC<VotingSystemProps> = ({
                       )}
                     </View>
                     {selectedCandidate === candidate.id && (
-                      <Ionicons name="checkmark-circle" size={24} color="#6366f1" />
+                      <LucideIcons name="check-circle" size={24} color="#6366f1" />
                     )}
                   </TouchableOpacity>
                 ))}
@@ -339,7 +337,7 @@ export const VotingSystem: React.FC<VotingSystemProps> = ({
                         </Text>
                       </View>
                       {selectedOption === option.id && (
-                        <Ionicons name="checkmark-circle" size={24} color="#6366f1" />
+                        <LucideIcons name="check-circle" size={24} color="#6366f1" />
                       )}
                     </View>
                   </TouchableOpacity>
@@ -354,14 +352,14 @@ export const VotingSystem: React.FC<VotingSystemProps> = ({
               <Button
                 title="Cancel"
                 variant="secondary"
-                size="medium"
+                size="md"
                 onPress={() => setSelectedCampaign(null)}
                 className="flex-1"
               />
               <Button
                 title={isVoting ? "Submitting..." : "Submit Vote"}
                 variant="primary"
-                size="medium"
+                size="md"
                 onPress={() => handleVote(selectedCampaign.id)}
                 disabled={(!selectedCandidate && !selectedOption) || isVoting}
                 className="flex-1"
@@ -383,7 +381,7 @@ export const VotingSystem: React.FC<VotingSystemProps> = ({
           className="p-4 items-center"
         >
           <View className="w-16 h-16 bg-primary/10 rounded-full items-center justify-center mb-3">
-            <Ionicons name="add-circle" size={32} color="#6366f1" />
+            <LucideIcons name="plus-circle" size={32} color="#6366f1" />
           </View>
           <Text className="text-headline-small font-medium text-text-primary mb-1">
             Create Voting Campaign
@@ -447,7 +445,7 @@ export const VotingSystem: React.FC<VotingSystemProps> = ({
                 activeCampaigns.map(renderCampaignCard)
               ) : (
                 <View className="items-center py-8">
-                  <Ionicons name="ballot-outline" size={48} color="#9CA3AF" />
+                  <LucideIcons name="vote" size={48} color="#757575" />
                   <Text className="text-headline-small text-text-secondary mt-4 mb-2">
                     No Active Campaigns
                   </Text>
@@ -466,7 +464,7 @@ export const VotingSystem: React.FC<VotingSystemProps> = ({
                 completedCampaigns.map(renderCampaignCard)
               ) : (
                 <View className="items-center py-8">
-                  <Ionicons name="archive-outline" size={48} color="#9CA3AF" />
+                  <LucideIcons name="archive" size={48} color="#757575" />
                   <Text className="text-headline-small text-text-secondary mt-4 mb-2">
                     No Completed Campaigns
                   </Text>

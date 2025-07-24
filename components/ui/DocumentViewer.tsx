@@ -1,11 +1,14 @@
 import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, ScrollView, Alert } from 'react-native';
-import { FileText, Upload, Download, Trash2, Eye, Plus, File } from 'lucide-react-native';
+import { View, Text, TouchableOpacity, ScrollView, Alert, Linking } from 'react-native';
+import { FileText, Upload, Download, Trash2, Eye, Plus } from 'lucide-react-native';
 import { Button } from './Button';
 import { Card } from './Card';
 import { Document } from '../../types/storage';
 import { DocumentStorage , formatFileSize } from '../../utils/storage';
-import { showAlert, showErrorAlert, showDeleteConfirmAlert } from '../../utils/alert';
+import { showAlert, showErrorAlert, showDeleteConfirmAlert, showSuccessAlert } from '../../utils/alert';
+import * as DocumentPicker from 'expo-document-picker';
+import * as FileSystem from 'expo-file-system';
+import * as Sharing from 'expo-sharing';
 
 interface DocumentViewerProps {
   documents: Document[];
@@ -35,31 +38,75 @@ const DocumentUploadForm = ({
   const [formData, setFormData] = useState({
     name: '',
     type: 'other' as keyof typeof DOCUMENT_TYPES,
-    description: ''
+    description: '',
+    selectedFile: null as any
   });
 
-  const handleMockUpload = () => {
+  const handleFileSelection = async () => {
+    try {
+      const result = await DocumentPicker.getDocumentAsync({
+        type: ['application/pdf', 'image/jpeg', 'image/png', 'image/jpg'],
+        copyToCacheDirectory: true,
+      });
+
+      if (!result.canceled && result.assets[0]) {
+        const file = result.assets[0];
+        setFormData(prev => ({
+          ...prev,
+          selectedFile: file,
+          name: prev.name || file.name.split('.')[0] // Auto-populate name if empty
+        }));
+        showSuccessAlert('File Selected', `Selected: ${file.name}`);
+      }
+    } catch (error) {
+      showErrorAlert('Error', 'Failed to select document');
+    }
+  };
+
+  const handleUpload = async () => {
     if (!formData.name.trim()) {
       showErrorAlert('Error', 'Document name is required');
       return;
     }
 
-    // Mock file upload - in real implementation, use expo-document-picker
-    const mockDocument = {
-      ...formData,
-      fileUri: `mock://documents/${Date.now()}.pdf`,
-      mimeType: 'application/pdf',
-      size: Math.floor(Math.random() * 5000000) + 100000 // Random size between 100KB - 5MB
-    };
+    if (!formData.selectedFile) {
+      showErrorAlert('Error', 'Please select a document file first');
+      return;
+    }
 
-    onSubmit(mockDocument);
-    
-    // Reset form
-    setFormData({
-      name: '',
-      type: 'other',
-      description: ''
-    });
+    try {
+      // Copy file to app's document directory
+      const fileName = `${Date.now()}_${formData.selectedFile.name}`;
+      const destPath = `${FileSystem.documentDirectory}documents/${fileName}`;
+      
+      // Ensure documents directory exists
+      await FileSystem.makeDirectoryAsync(`${FileSystem.documentDirectory}documents/`, { intermediates: true });
+      
+      // Copy file
+      await FileSystem.copyAsync({
+        from: formData.selectedFile.uri,
+        to: destPath
+      });
+
+      const documentData = {
+        ...formData,
+        fileUri: destPath,
+        mimeType: formData.selectedFile.mimeType,
+        size: formData.selectedFile.size
+      };
+
+      onSubmit(documentData);
+      
+      // Reset form
+      setFormData({
+        name: '',
+        type: 'other',
+        description: '',
+        selectedFile: null
+      });
+    } catch (error) {
+      showErrorAlert('Error', 'Failed to upload document');
+    }
   };
 
   if (!visible) return null;
@@ -155,14 +202,27 @@ const DocumentUploadForm = ({
         </TouchableOpacity>
       </View>
 
-      {/* Mock File Selection */}
+      {/* File Selection */}
       <TouchableOpacity
-        onPress={() => showAlert('File Selection', 'In a real app, this would open document picker to select files')}
-        className="bg-primary/10 border-2 border-dashed border-primary/30 rounded-lg p-6 items-center justify-center mb-4"
+        onPress={handleFileSelection}
+        className={`border-2 border-dashed rounded-lg p-6 items-center justify-center mb-4 ${
+          formData.selectedFile 
+            ? 'bg-success/10 border-success/30' 
+            : 'bg-primary/10 border-primary/30'
+        }`}
       >
-        <Upload size={32} color="#6366f1" />
-        <Text className="text-primary font-semibold mt-2">Select Document</Text>
-        <Text className="text-text-secondary text-sm">PDF, JPG, PNG (Max 10MB)</Text>
+        <Upload size={32} color={formData.selectedFile ? "#4CAF50" : "#6366f1"} />
+        <Text className={`font-semibold mt-2 ${
+          formData.selectedFile ? 'text-success' : 'text-primary'
+        }`}>
+          {formData.selectedFile ? 'File Selected' : 'Select Document'}
+        </Text>
+        <Text className="text-text-secondary text-sm">
+          {formData.selectedFile 
+            ? `${formData.selectedFile.name} (${formatFileSize(formData.selectedFile.size)})`
+            : 'PDF, JPG, PNG (Max 10MB)'
+          }
+        </Text>
       </TouchableOpacity>
 
       {/* Action Buttons */}
@@ -170,7 +230,11 @@ const DocumentUploadForm = ({
         <Button variant="outline" className="flex-1" onPress={onCancel}>
           Cancel
         </Button>
-        <Button className="flex-1" onPress={handleMockUpload}>
+        <Button 
+          className="flex-1" 
+          onPress={handleUpload}
+          disabled={!formData.selectedFile || !formData.name.trim()}
+        >
           Upload Document
         </Button>
       </View>
@@ -204,18 +268,58 @@ export default function DocumentViewer({
     }
   };
 
-  const handleViewDocument = (document: Document) => {
-    showAlert(
-      'View Document',
-      `${document.name}\n\nIn a real app, this would open the document viewer with the file from: ${document.fileUri}`
-    );
+  const handleViewDocument = async (document: Document) => {
+    try {
+      // Check if file exists
+      const fileInfo = await FileSystem.getInfoAsync(document.fileUri);
+      if (!fileInfo.exists) {
+        showErrorAlert('File Not Found', 'The document file could not be found. It may have been moved or deleted.');
+        return;
+      }
+
+      // For PDFs and images, we can try to open with the system viewer
+      if (document.mimeType === 'application/pdf' || document.mimeType?.startsWith('image/')) {
+        const isAvailable = await Sharing.isAvailableAsync();
+        if (isAvailable) {
+          await Sharing.shareAsync(document.fileUri, {
+            mimeType: document.mimeType,
+            dialogTitle: `View ${document.name}`,
+            UTI: document.mimeType === 'application/pdf' ? 'com.adobe.pdf' : 'public.image'
+          });
+        } else {
+          showAlert('View Document', 'Document viewer is not available on this device');
+        }
+      } else {
+        showAlert('View Document', `${document.name}\n\nFile type: ${document.mimeType}\nSize: ${formatFileSize(document.size)}`);
+      }
+    } catch (error) {
+      showErrorAlert('Error', 'Failed to open document');
+    }
   };
 
-  const handleDownloadDocument = (document: Document) => {
-    showAlert(
-      'Download Document',
-      `Downloading ${document.name}\n\nIn a real app, this would download the file to device storage.`
-    );
+  const handleDownloadDocument = async (document: Document) => {
+    try {
+      // Check if file exists
+      const fileInfo = await FileSystem.getInfoAsync(document.fileUri);
+      if (!fileInfo.exists) {
+        showErrorAlert('File Not Found', 'The document file could not be found.');
+        return;
+      }
+
+      // Use sharing to allow user to save/download the file
+      const isAvailable = await Sharing.isAvailableAsync();
+      if (isAvailable) {
+        await Sharing.shareAsync(document.fileUri, {
+          mimeType: document.mimeType,
+          dialogTitle: `Save ${document.name}`
+        });
+        showSuccessAlert('Download Started', 'Choose where to save the document');
+      } else {
+        showAlert('Download Not Available', 'File sharing is not available on this device');
+      }
+    } catch (error) {
+      showErrorAlert('Error', 'Failed to download document');
+    }
   };
 
   const handleDeleteDocument = (document: Document) => {

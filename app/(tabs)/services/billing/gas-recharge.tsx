@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
-import { SafeAreaView, ScrollView, View, Text, TextInput, TouchableOpacity, Alert } from 'react-native';
-import { ArrowLeft, Car, MapPin, AlertCircle, CreditCard, Gift } from 'lucide-react-native';
+import { SafeAreaView, ScrollView, View, Text, TextInput, TouchableOpacity } from 'react-native';
+import { ArrowLeft, Car, AlertCircle, CreditCard, Gift } from 'lucide-react-native';
 import { router } from 'expo-router';
-import Button from '../../../../components/ui/Button';
+import { Button } from '../../../../components/ui/Button';
 import { Card } from '../../../../components/ui/Card';
 import HighlightCard from '../../../../components/ui/HighlightCard';
+import { showErrorAlert } from '@/utils/alert';
 
 interface RechargeAmount {
   id: string;
@@ -69,7 +70,7 @@ export default function GasRecharge() {
 
   const detectProvider = async () => {
     if (customerId.length < 8) {
-      Alert.alert('Invalid Customer ID', 'Please enter a valid PNG customer ID (minimum 8 characters)');
+      showErrorAlert('Invalid Customer ID', 'Please enter a valid PNG customer ID (minimum 8 characters)');
       return;
     }
 
@@ -92,13 +93,13 @@ export default function GasRecharge() {
 
   const handleRecharge = () => {
     if (!customerId || !selectedProvider) {
-      Alert.alert('Missing Information', 'Please enter customer ID and select provider');
+      showErrorAlert('Missing Information', 'Please enter customer ID and select provider');
       return;
     }
 
     const amount = selectedAmount?.amount || parseInt(customAmount);
     if (!amount || amount < 100) {
-      Alert.alert('Invalid Amount', 'Please select an amount or enter minimum ₹100');
+      showErrorAlert('Invalid Amount', 'Please select an amount or enter minimum ₹100');
       return;
     }
 

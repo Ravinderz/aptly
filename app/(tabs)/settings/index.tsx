@@ -82,18 +82,15 @@ export default function Profile() {
   };
 
   const handleSecurity = () => {
-    // TODO: Implement security settings screen
-    showSuccessAlert('Coming Soon', 'Security settings will be available in the next update');
+    router.push('/(tabs)/settings/security');
   };
 
   const handleHelp = () => {
-    // TODO: Implement help & support screen
-    showSuccessAlert('Help & Support', 'For assistance, please contact your society management or email support@aptly.app');
+    router.push('/(tabs)/settings/support');
   };
 
   const handleSettings = () => {
-    // TODO: Implement app settings screen
-    showSuccessAlert('Coming Soon', 'App settings will be available in the next update');
+    router.push('/(tabs)/settings/app-settings');
   };
 
   const handleLogout = () => {

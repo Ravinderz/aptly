@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, TextInput, Alert } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import { View, Text, ScrollView, TouchableOpacity, TextInput } from 'react-native';
+import { showSuccessAlert, showErrorAlert } from '@/utils/alert';
+import LucideIcons from '@/components/ui/LucideIcons';
 import { router } from 'expo-router';
 
 // Types
@@ -11,14 +12,14 @@ import type {
   AuditSeverity,
   AuditCategory,
   AuditLogQuery
-} from '../../types/analytics';
+} from '@/types/analytics';
 
 // UI Components
-import { Card } from '../ui/Card';
-import { Button } from '../ui/Button';
-import { Input } from '../ui/Input';
-import { UserAvatar } from '../ui/UserAvatar';
-import { AlertCard } from '../ui/AlertCard';
+import { Card } from '@/components/ui/Card';
+import { Button } from '@/components/ui/Button';
+import { Input } from '@/components/ui/Input';
+import { UserAvatar } from '@/components/ui/UserAvatar';
+import { AlertCard } from '@/components/ui/AlertCard';
 
 interface AuditSystemProps {
   auditLogs: AuditEntry[];
@@ -148,9 +149,9 @@ export const AuditSystem: React.FC<AuditSystemProps> = ({
       };
       
       await onExportLogs(query, format);
-      Alert.alert('Success', `Audit logs exported successfully as ${format.toUpperCase()}`);
+      showSuccessAlert('Success', `Audit logs exported successfully as ${format.toUpperCase()}`);
     } catch (error) {
-      Alert.alert('Export Failed', 'Failed to export audit logs. Please try again.');
+      showErrorAlert('Export Failed', 'Failed to export audit logs. Please try again.');
     } finally {
       setIsExporting(false);
     }
@@ -207,7 +208,7 @@ export const AuditSystem: React.FC<AuditSystemProps> = ({
                 </Text>
                 {entry.context.errorMessage && (
                   <View className="flex-row items-center mt-1">
-                    <Ionicons name="warning-outline" size={12} color="#EF4444" />
+                    <LucideIcons name="warning" size={12} color="#D32F2F" />
                     <Text className="text-label-small text-error ml-1">Error</Text>
                   </View>
                 )}
@@ -390,7 +391,7 @@ export const AuditSystem: React.FC<AuditSystemProps> = ({
             {/* Data Retention Compliance */}
             <View className="flex-row items-center justify-between">
               <View className="flex-row items-center">
-                <Ionicons name="shield-checkmark-outline" size={20} color="#10B981" />
+                <LucideIcons name="shield-outline" size={20} color="#4CAF50" />
                 <Text className="text-body-medium text-text-primary ml-3">
                   Data Retention Policy
                 </Text>
@@ -403,7 +404,7 @@ export const AuditSystem: React.FC<AuditSystemProps> = ({
             {/* GDPR Compliance */}
             <View className="flex-row items-center justify-between">
               <View className="flex-row items-center">
-                <Ionicons name="lock-closed-outline" size={20} color="#10B981" />
+                <LucideIcons name="lock-closed-outline" size={20} color="#4CAF50" />
                 <Text className="text-body-medium text-text-primary ml-3">
                   Privacy Protection
                 </Text>
@@ -416,7 +417,7 @@ export const AuditSystem: React.FC<AuditSystemProps> = ({
             {/* Audit Trail Integrity */}
             <View className="flex-row items-center justify-between">
               <View className="flex-row items-center">
-                <Ionicons name="document-outline" size={20} color="#10B981" />
+                <LucideIcons name="document-text-outline" size={20} color="#4CAF50" />
                 <Text className="text-body-medium text-text-primary ml-3">
                   Audit Trail Integrity
                 </Text>
@@ -429,7 +430,7 @@ export const AuditSystem: React.FC<AuditSystemProps> = ({
             {/* Access Control */}
             <View className="flex-row items-center justify-between">
               <View className="flex-row items-center">
-                <Ionicons name="key-outline" size={20} color="#F59E0B" />
+                <LucideIcons name="key-outline" size={20} color="#FF9800" />
                 <Text className="text-body-medium text-text-primary ml-3">
                   Access Control Review
                 </Text>
@@ -507,7 +508,7 @@ export const AuditSystem: React.FC<AuditSystemProps> = ({
             
           {auditLogs.filter(log => log.category === 'security').length === 0 && (
             <View className="items-center py-4">
-              <Ionicons name="shield-checkmark-outline" size={32} color="#10B981" />
+              <LucideIcons name="shield-outline" size={32} color="#4CAF50" />
               <Text className="text-body-medium text-success mt-2">
                 No security issues detected
               </Text>
@@ -529,34 +530,34 @@ export const AuditSystem: React.FC<AuditSystemProps> = ({
           
           <View className="space-y-2">
             <Button
-              title="Export Last 7 Days (CSV)"
               variant="secondary"
-              size="medium"
+              size="md"
               onPress={() => handleExport('csv')}
               disabled={!canExport || isExporting}
-              icon="download-outline"
               className="w-full"
-            />
+            >
+              Export Last 7 Days (CSV)
+            </Button>
             
             <Button
-              title="Export Last 30 Days (PDF)"
               variant="secondary"
-              size="medium"
+              size="md"
               onPress={() => handleExport('pdf')}
               disabled={!canExport || isExporting}
-              icon="document-outline"
               className="w-full"
-            />
+            >
+              Export Last 30 Days (PDF)
+            </Button>
             
             <Button
-              title="Export Raw Data (JSON)"
               variant="secondary"
-              size="medium"
+              size="md"
               onPress={() => handleExport('json')}
               disabled={!canExport || isExporting}
-              icon="code-outline"
               className="w-full"
-            />
+            >
+              Export Raw Data (JSON)
+            </Button>
           </View>
         </View>
       </Card>
@@ -570,31 +571,31 @@ export const AuditSystem: React.FC<AuditSystemProps> = ({
           
           <View className="space-y-2">
             <Button
-              title="Monthly Compliance Report"
               variant="primary"
-              size="medium"
+              size="md"
               onPress={() => onGenerateReport('monthly', ['security', 'compliance', 'data_privacy'])}
-              icon="shield-outline"
               className="w-full"
-            />
+            >
+              Monthly Compliance Report
+            </Button>
             
             <Button
-              title="User Activity Report"
               variant="primary"
-              size="medium"
+              size="md"
               onPress={() => onGenerateReport('weekly', ['user_activity', 'authentication'])}
-              icon="people-outline"
               className="w-full"
-            />
+            >
+              User Activity Report
+            </Button>
             
             <Button
-              title="System Performance Report"
               variant="primary"
-              size="medium"
+              size="md"
               onPress={() => onGenerateReport('daily', ['performance', 'system_event'])}
-              icon="speedometer-outline"
               className="w-full"
-            />
+            >
+              System Performance Report
+            </Button>
           </View>
         </View>
       </Card>
@@ -653,7 +654,7 @@ export const AuditSystem: React.FC<AuditSystemProps> = ({
                 Audit Log Details
               </Text>
               <TouchableOpacity onPress={() => setSelectedEntry(null)}>
-                <Ionicons name="close" size={24} color="#6B7280" />
+                <LucideIcons name="close" size={24} color="#757575" />
               </TouchableOpacity>
             </View>
           </View>
@@ -782,7 +783,7 @@ export const AuditSystem: React.FC<AuditSystemProps> = ({
   if (!canViewLogs) {
     return (
       <View className="flex-1 items-center justify-center p-4">
-        <Ionicons name="lock-closed-outline" size={64} color="#9CA3AF" />
+        <LucideIcons name="lock-closed-outline" size={64} color="#757575" />
         <Text className="text-headline-small text-text-secondary mt-4 mb-2">
           Access Restricted
         </Text>
@@ -858,10 +859,10 @@ export const AuditSystem: React.FC<AuditSystemProps> = ({
       {/* Tab Navigation */}
       <View className="flex-row bg-surface-primary border-b border-border-primary">
         {[
-          { key: 'logs', label: 'Audit Logs', icon: 'list-outline' },
-          { key: 'analytics', label: 'Analytics', icon: 'analytics-outline' },
-          { key: 'compliance', label: 'Compliance', icon: 'shield-outline' },
-          { key: 'reports', label: 'Reports', icon: 'document-outline' }
+          { key: 'logs', label: 'Audit Logs', icon: 'List' },
+          { key: 'analytics', label: 'Analytics', icon: 'BarChart3' },
+          { key: 'compliance', label: 'Compliance', icon: 'Shield' },
+          { key: 'reports', label: 'Reports', icon: 'FileText' }
         ].map((tab) => (
           <TouchableOpacity
             key={tab.key}
@@ -871,10 +872,10 @@ export const AuditSystem: React.FC<AuditSystemProps> = ({
             }`}
           >
             <View className="items-center">
-              <Ionicons 
-                name={tab.icon as any} 
+              <LucideIcons 
+                name={tab.icon as string} 
                 size={20} 
-                color={activeTab === tab.key ? '#6366f1' : '#6B7280'} 
+                color={activeTab === tab.key ? '#6366f1' : '#757575'} 
               />
               <Text className={`text-body-small font-medium mt-1 ${
                 activeTab === tab.key ? 'text-primary' : 'text-text-secondary'
@@ -894,7 +895,7 @@ export const AuditSystem: React.FC<AuditSystemProps> = ({
               filteredLogs.map(renderLogEntry)
             ) : (
               <View className="items-center py-8">
-                <Ionicons name="document-outline" size={48} color="#9CA3AF" />
+                <LucideIcons name="document-text-outline" size={48} color="#757575" />
                 <Text className="text-headline-small text-text-secondary mt-4 mb-2">
                   No Audit Logs Found
                 </Text>

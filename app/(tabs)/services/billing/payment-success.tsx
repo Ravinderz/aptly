@@ -2,7 +2,7 @@ import React from 'react';
 import { SafeAreaView, ScrollView, View, Text, TouchableOpacity } from 'react-native';
 import { CheckCircle, Download, Share, Home, Gift, Calendar } from 'lucide-react-native';
 import { router, useLocalSearchParams } from 'expo-router';
-import Button from '../../../../components/ui/Button';
+import { Button } from '../../../../components/ui/Button';
 import { Card } from '../../../../components/ui/Card';
 import HighlightCard from '../../../../components/ui/HighlightCard';
 

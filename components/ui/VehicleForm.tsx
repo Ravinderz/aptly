@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, ScrollView, Alert } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, ScrollView } from 'react-native';
 import { Car, Bike, Truck, Palette, Hash, MapPin, Star } from 'lucide-react-native';
 import { Button } from './Button';
 import { Card } from './Card';

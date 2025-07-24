@@ -3,11 +3,11 @@ import {
   SafeAreaView, 
   View, 
   Text, 
-  TouchableOpacity,
-  Alert
+  TouchableOpacity
 } from 'react-native';
 import { router } from 'expo-router';
-import { Ionicons } from '@expo/vector-icons';
+import LucideIcons from '@/components/ui/LucideIcons';
+import { showSuccessAlert, showErrorAlert } from '@/utils/alert';
 
 // Import our analytics components
 import { AnalyticsDashboard } from '@/components/analytics/AnalyticsDashboard';
@@ -450,9 +450,9 @@ export default function AnalyticsPage() {
       // Simulate checking user role (in real app, get from auth context)
       setUserRole('admin'); // or get from auth
       
-    } catch (_error) {
+    } catch {
       console.error('Failed to load analytics data:', error);
-      Alert.alert('Error', 'Failed to load analytics data');
+      showErrorAlert('Error', 'Failed to load analytics data');
     } finally {
       setIsLoading(false);
     }
@@ -462,63 +462,63 @@ export default function AnalyticsPage() {
   const handleExportReport = async (format: 'json' | 'csv' | 'pdf') => {
     try {
       console.log('Exporting report in format:', format);
-      Alert.alert('Success', `Report exported in ${format.toUpperCase()} format`);
-    } catch (_error) {
-      Alert.alert('Error', 'Failed to export report');
+      showSuccessAlert('Success', `Report exported in ${format.toUpperCase()} format`);
+    } catch {
+      showErrorAlert('Error', 'Failed to export report');
     }
   };
 
   const handleCreateNotificationTemplate = async (template: Partial<NotificationTemplate>) => {
     try {
       console.log('Creating notification template:', template);
-      Alert.alert('Success', 'Notification template created');
-    } catch (_error) {
-      Alert.alert('Error', 'Failed to create template');
+      showSuccessAlert('Success', 'Notification template created');
+    } catch {
+      showErrorAlert('Error', 'Failed to create template');
     }
   };
 
   const handleCreateNotificationCampaign = async (campaign: Partial<NotificationCampaign>) => {
     try {
       console.log('Creating notification campaign:', campaign);
-      Alert.alert('Success', 'Notification campaign created');
-    } catch (_error) {
-      Alert.alert('Error', 'Failed to create campaign');
+      showSuccessAlert('Success', 'Notification campaign created');
+    } catch {
+      showErrorAlert('Error', 'Failed to create campaign');
     }
   };
 
   const handleUpdateNotificationPreferences = async (userId: string, preferences: Partial<NotificationPreference>) => {
     try {
       console.log('Updating notification preferences:', { userId, preferences });
-      Alert.alert('Success', 'Preferences updated successfully');
-    } catch (_error) {
-      Alert.alert('Error', 'Failed to update preferences');
+      showSuccessAlert('Success', 'Preferences updated successfully');
+    } catch {
+      showErrorAlert('Error', 'Failed to update preferences');
     }
   };
 
   const handleSendNotification = async (campaignId: string) => {
     try {
       console.log('Sending notification campaign:', campaignId);
-      Alert.alert('Success', 'Notification sent successfully');
-    } catch (_error) {
-      Alert.alert('Error', 'Failed to send notification');
+      showSuccessAlert('Success', 'Notification sent successfully');
+    } catch {
+      showErrorAlert('Error', 'Failed to send notification');
     }
   };
 
   const handleApplyOptimization = async (recommendationId: string) => {
     try {
       console.log('Applying optimization:', recommendationId);
-      Alert.alert('Success', 'Optimization applied successfully');
-    } catch (_error) {
-      Alert.alert('Error', 'Failed to apply optimization');
+      showSuccessAlert('Success', 'Optimization applied successfully');
+    } catch {
+      showErrorAlert('Error', 'Failed to apply optimization');
     }
   };
 
   const handleDismissAlert = async (alertId: string) => {
     try {
       console.log('Dismissing alert:', alertId);
-      Alert.alert('Success', 'Alert dismissed');
-    } catch (_error) {
-      Alert.alert('Error', 'Failed to dismiss alert');
+      showSuccessAlert('Success', 'Alert dismissed');
+    } catch {
+      showErrorAlert('Error', 'Failed to dismiss alert');
     }
   };
 
@@ -616,10 +616,10 @@ export default function AnalyticsPage() {
             }`}
           >
             <View className="items-center relative">
-              <Ionicons 
+              <LucideIcons 
                 name={tab.icon as any} 
                 size={18} 
-                color={activeTab === tab.key ? '#6366f1' : '#6B7280'} 
+                color={activeTab === tab.key ? '#6366f1' : '#757575'} 
               />
               <Text className={`text-label-small font-medium mt-1 ${
                 activeTab === tab.key ? 'text-primary' : 'text-text-secondary'
@@ -628,7 +628,7 @@ export default function AnalyticsPage() {
               </Text>
               {tab.count && tab.count > 0 && (
                 <View className="absolute -top-1 -right-1 bg-error rounded-full min-w-[16px] h-4 px-1 items-center justify-center">
-                  <Text className="text-white text-xs font-medium">
+                  <Text className="text-white text-label-large font-medium">
                     {tab.count > 99 ? '99+' : tab.count}
                   </Text>
                 </View>

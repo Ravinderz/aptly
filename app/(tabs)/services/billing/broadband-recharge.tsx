@@ -9,7 +9,6 @@ import {
 } from "lucide-react-native";
 import React, { useState } from "react";
 import {
-  Alert,
   SafeAreaView,
   ScrollView,
   Text,
@@ -17,9 +16,10 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import Button from "../../../../components/ui/Button";
-import { Card } from "../../../../components/ui/Card";
-import HighlightCard from "../../../../components/ui/HighlightCard";
+import { Button } from "@/components/ui/Button";
+import { Card } from "@/components/ui/Card";
+import HighlightCard from "@/components/ui/HighlightCard";
+import { showErrorAlert } from '@/utils/alert';
 
 interface Plan {
   id: string;
@@ -171,7 +171,7 @@ export default function BroadbandRecharge() {
 
   const detectProvider = async () => {
     if (customerId.length < 6) {
-      Alert.alert(
+      showErrorAlert(
         "Invalid ID",
         "Please enter a valid customer ID (minimum 6 characters)"
       );
@@ -199,7 +199,7 @@ export default function BroadbandRecharge() {
 
   const handleRecharge = () => {
     if (!customerId || !selectedProvider) {
-      Alert.alert(
+      showErrorAlert(
         "Missing Information",
         "Please enter customer ID and select provider"
       );
@@ -208,7 +208,7 @@ export default function BroadbandRecharge() {
 
     const amount = selectedPlan?.price || parseInt(customAmount);
     if (!amount || amount < 100) {
-      Alert.alert(
+      showErrorAlert(
         "Invalid Amount",
         "Please select a plan or enter a valid amount (minimum ₹100)"
       );

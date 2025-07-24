@@ -4,11 +4,11 @@ import {
   ScrollView, 
   View, 
   Text, 
-  TouchableOpacity,
-  Alert
+  TouchableOpacity
 } from 'react-native';
 import { router } from 'expo-router';
-import { Ionicons } from '@expo/vector-icons';
+import LucideIcons from '@/components/ui/LucideIcons';
+import { showSuccessAlert, showErrorAlert } from '@/utils/alert';
 
 // Import our governance components
 import { GovernanceDashboard } from '@/components/governance/GovernanceDashboard';
@@ -142,6 +142,19 @@ export default function GovernancePage() {
         nextElectionDate: '2024-01-15T00:00:00Z',
         committeeMembersCount: 7,
         emergencyContactsCount: 12,
+        activeVotingCampaigns: mockVotingCampaigns.filter(c => c.status === 'active').length,
+        averageParticipation: 55.3,
+        lastEmergencyDate: '2024-01-15T00:00:00Z',
+        succession: {
+          planExists: false,
+          deputiesAssigned: 0
+        },
+        implementedPoliciesThisYear: 5,
+        communityEngagement: {
+          eventsThisMonth: 3,
+          averageAttendance: 65,
+          satisfactionScore: 4.2
+        },
         recentActivities: [
           {
             id: 'activity-1',
@@ -178,7 +191,7 @@ export default function GovernancePage() {
       
     } catch (error) {
       console.error('Failed to load governance data:', error);
-      Alert.alert('Error', 'Failed to load governance data');
+      showErrorAlert('Error', 'Failed to load governance data');
     } finally {
       setIsLoading(false);
     }
@@ -189,10 +202,10 @@ export default function GovernancePage() {
     try {
       // API call to create campaign
       console.log('Creating campaign:', campaign);
-      Alert.alert('Success', 'Campaign created successfully');
+      showSuccessAlert('Success', 'Campaign created successfully');
       await loadGovernanceData(); // Refresh data
     } catch (error) {
-      Alert.alert('Error', 'Failed to create campaign');
+      showErrorAlert('Error', 'Failed to create campaign');
     }
   };
 
@@ -200,10 +213,10 @@ export default function GovernancePage() {
     try {
       // API call to submit vote
       console.log('Submitting vote:', { campaignId, candidateId });
-      Alert.alert('Success', 'Vote submitted successfully');
+      showSuccessAlert('Success', 'Vote submitted successfully');
       await loadGovernanceData(); // Refresh data
     } catch (error) {
-      Alert.alert('Error', 'Failed to submit vote');
+      showErrorAlert('Error', 'Failed to submit vote');
     }
   };
 
@@ -211,10 +224,10 @@ export default function GovernancePage() {
     try {
       // API call to create emergency alert
       console.log('Creating emergency alert:', alert);
-      Alert.alert('Success', 'Emergency alert created');
+      showSuccessAlert('Success', 'Emergency alert created');
       await loadGovernanceData(); // Refresh data
     } catch (error) {
-      Alert.alert('Error', 'Failed to create emergency alert');
+      showErrorAlert('Error', 'Failed to create emergency alert');
     }
   };
 
@@ -222,10 +235,10 @@ export default function GovernancePage() {
     try {
       // API call to resolve emergency
       console.log('Resolving emergency:', alertId);
-      Alert.alert('Success', 'Emergency resolved');
+      showSuccessAlert('Success', 'Emergency resolved');
       await loadGovernanceData(); // Refresh data
     } catch (error) {
-      Alert.alert('Error', 'Failed to resolve emergency');
+      showErrorAlert('Error', 'Failed to resolve emergency');
     }
   };
 
@@ -233,10 +246,10 @@ export default function GovernancePage() {
     try {
       // API call to create succession plan
       console.log('Creating succession plan:', plan);
-      Alert.alert('Success', 'Succession plan created');
+      showSuccessAlert('Success', 'Succession plan created');
       await loadGovernanceData(); // Refresh data
     } catch (error) {
-      Alert.alert('Error', 'Failed to create succession plan');
+      showErrorAlert('Error', 'Failed to create succession plan');
     }
   };
 
@@ -244,10 +257,10 @@ export default function GovernancePage() {
     try {
       // API call to trigger succession
       console.log('Triggering succession:', planId);
-      Alert.alert('Success', 'Succession triggered');
+      showSuccessAlert('Success', 'Succession triggered');
       await loadGovernanceData(); // Refresh data
     } catch (error) {
-      Alert.alert('Error', 'Failed to trigger succession');
+      showErrorAlert('Error', 'Failed to trigger succession');
     }
   };
 
@@ -255,10 +268,10 @@ export default function GovernancePage() {
     try {
       // API call to create policy proposal
       console.log('Creating policy proposal:', proposal);
-      Alert.alert('Success', 'Policy proposal created');
+      showSuccessAlert('Success', 'Policy proposal created');
       await loadGovernanceData(); // Refresh data
     } catch (error) {
-      Alert.alert('Error', 'Failed to create policy proposal');
+      showErrorAlert('Error', 'Failed to create policy proposal');
     }
   };
 
@@ -266,10 +279,10 @@ export default function GovernancePage() {
     try {
       // API call to vote on policy
       console.log('Voting on policy:', { proposalId, vote });
-      Alert.alert('Success', 'Vote on policy submitted');
+      showSuccessAlert('Success', 'Vote on policy submitted');
       await loadGovernanceData(); // Refresh data
     } catch (error) {
-      Alert.alert('Error', 'Failed to vote on policy');
+      showErrorAlert('Error', 'Failed to vote on policy');
     }
   };
 
@@ -288,11 +301,13 @@ export default function GovernancePage() {
       case 'dashboard':
         return mockData.dashboardData ? (
           <GovernanceDashboard
-            data={mockData.dashboardData}
-            votingAnalytics={mockData.votingAnalytics}
-            emergencyAnalytics={mockData.emergencyAnalytics}
+            dashboardData={mockData.dashboardData}
+            votingCampaigns={mockData.votingCampaigns}
+            emergencyAlerts={mockData.emergencyAlerts}
+            successionPlan={mockData.successionPlans[0]}
+            policyProposals={mockData.policyProposals}
+            currentUserId={currentUserId}
             userRole={userRole}
-            onRefresh={loadGovernanceData}
           />
         ) : null;
 
@@ -395,10 +410,10 @@ export default function GovernancePage() {
             }`}
           >
             <View className="items-center relative">
-              <Ionicons 
+              <LucideIcons 
                 name={tab.icon as any} 
                 size={18} 
-                color={activeTab === tab.key ? '#6366f1' : '#6B7280'} 
+                color={activeTab === tab.key ? '#6366f1' : '#757575'} 
               />
               <Text className={`text-label-small font-medium mt-1 ${
                 activeTab === tab.key ? 'text-primary' : 'text-text-secondary'
@@ -407,7 +422,7 @@ export default function GovernancePage() {
               </Text>
               {tab.count && tab.count > 0 && (
                 <View className="absolute -top-1 -right-1 bg-error rounded-full min-w-[16px] h-4 px-1 items-center justify-center">
-                  <Text className="text-white text-xs font-medium">
+                  <Text className="text-white text-label-large font-medium">
                     {tab.count > 99 ? '99+' : tab.count}
                   </Text>
                 </View>

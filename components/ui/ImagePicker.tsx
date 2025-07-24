@@ -1,4 +1,4 @@
-import { Image, ImagePlus, X } from 'lucide-react-native';
+import { ImagePlus, X } from 'lucide-react-native';
 import React, { useState } from 'react';
 import { 
   View, 
@@ -19,7 +19,6 @@ interface ImagePickerProps {
 }
 
 const { width } = Dimensions.get('window');
-const maxImageWidth = width - 60; // Account for padding
 
 const ImagePicker: React.FC<ImagePickerProps> = ({
   onImageSelected,
@@ -136,7 +135,7 @@ const ImagePicker: React.FC<ImagePickerProps> = ({
           <X size={16} color="white" />
         </TouchableOpacity>
         <View className="absolute bottom-3 left-3 bg-black/50 rounded-full px-3 py-1">
-          <Text className="text-white text-xs font-medium">Tap X to remove</Text>
+          <Text className="text-white text-label-large font-medium">Tap X to remove</Text>
         </View>
       </View>
     );
@@ -163,7 +162,7 @@ const ImagePicker: React.FC<ImagePickerProps> = ({
           <View className="bg-primary/10 rounded-full w-16 h-16 items-center justify-center mb-4">
             <ImagePlus size={28} color="#6366f1" />
           </View>
-          <Text className="text-text-primary font-semibold text-lg mb-2">Add Photo</Text>
+          <Text className="text-text-primary font-semibold text-headline-medium mb-2">Add Photo</Text>
           <Text className="text-text-secondary text-center leading-5">
             Share a photo with your community.{'\n'}
             Tap to choose from library or camera.

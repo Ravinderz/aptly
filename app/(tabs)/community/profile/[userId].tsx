@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { ScrollView, SafeAreaView, View, Text, RefreshControl, ActivityIndicator } from 'react-native';
 import { ArrowLeft, MessageSquare, Users, Calendar, MapPin } from 'lucide-react-native';
 import { router, useLocalSearchParams } from 'expo-router';
-import Button from '../../../../components/ui/Button';
+import { Button } from '../../../../components/ui/Button';
 import PostCard from '../../../../components/ui/PostCard';
 import UserAvatar from '../../../../components/ui/UserAvatar';
 import { Card } from '../../../../components/ui/Card';
@@ -201,7 +201,7 @@ export default function UserProfile() {
             ))
           ) : (
             <Card className="items-center py-12">
-              <MessageSquare size={48} color="#9CA3AF" />
+              <MessageSquare size={48} color="#757575" />
               <Text className="text-text-primary text-headline-small font-semibold mt-4 mb-2">
                 No Posts Yet
               </Text>

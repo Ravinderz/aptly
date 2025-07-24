@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, Alert } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import React, { useState } from 'react';
+import { View, Text, ScrollView, TouchableOpacity } from 'react-native';
+import LucideIcons from '@/components/ui/LucideIcons';
 import { router } from 'expo-router';
+import { showConfirmAlert, showSuccessAlert, showErrorAlert } from '@/utils/alert';
 
 // Types
 import type { 
@@ -10,13 +11,13 @@ import type {
   HandoverTask,
   SuccessionStatus,
   TriggerType 
-} from '../../types/governance';
+} from '@/types/governance';
 
 // UI Components
-import { Card } from '../ui/Card';
-import { Button } from '../ui/Button';
-import { UserAvatar } from '../ui/UserAvatar';
-import { AlertCard } from '../ui/AlertCard';
+import { Card } from '@/components/ui/Card';
+import { Button } from '@/components/ui/Button';
+import { UserAvatar } from '@/components/ui/UserAvatar';
+import { AlertCard } from '@/components/ui/AlertCard';
 
 interface SuccessionManagementProps {
   successionPlan?: SuccessionPlan;
@@ -47,7 +48,7 @@ export const SuccessionManagement: React.FC<SuccessionManagementProps> = ({
   userRole
 }) => {
   const [activeTab, setActiveTab] = useState<'overview' | 'deputies' | 'tasks' | 'history'>('overview');
-  const [selectedDeputy, setSelectedDeputy] = useState<DeputyAssignment | null>(null);
+  const [, setSelectedDeputy] = useState<DeputyAssignment | null>(null);
   const [isProcessingTask, setIsProcessingTask] = useState<string | null>(null);
 
   const isCurrentCM = currentUserId === currentCM.id;
@@ -61,24 +62,21 @@ export const SuccessionManagement: React.FC<SuccessionManagementProps> = ({
   const handleTriggerSuccession = async (reason: string) => {
     if (!successionPlan) return;
 
-    Alert.alert(
+    showConfirmAlert(
       'Trigger Succession',
       'This will initiate the succession process. Are you sure you want to continue?',
-      [
-        { text: 'Cancel', style: 'cancel' },
-        {
-          text: 'Continue',
-          style: 'destructive',
-          onPress: async () => {
-            try {
-              await onTriggerSuccession(successionPlan.id, reason);
-              Alert.alert('Success', 'Succession process has been initiated.');
-            } catch (error) {
-              Alert.alert('Error', 'Failed to trigger succession process.');
-            }
-          }
+      async () => {
+        try {
+          await onTriggerSuccession(successionPlan.id, reason);
+          showSuccessAlert('Success', 'Succession process has been initiated.');
+        } catch {
+          showErrorAlert('Error', 'Failed to trigger succession process.');
         }
-      ]
+      },
+      undefined,
+      'Continue',
+      'Cancel',
+      true
     );
   };
 
@@ -86,9 +84,9 @@ export const SuccessionManagement: React.FC<SuccessionManagementProps> = ({
     try {
       setIsProcessingTask(task.id);
       await onCompleteTask(task.id);
-      Alert.alert('Success', 'Task marked as completed.');
-    } catch (error) {
-      Alert.alert('Error', 'Failed to complete task.');
+      showSuccessAlert('Success', 'Task marked as completed.');
+    } catch {
+      showErrorAlert('Error', 'Failed to complete task.');
     } finally {
       setIsProcessingTask(null);
     }
@@ -117,7 +115,7 @@ export const SuccessionManagement: React.FC<SuccessionManagementProps> = ({
                 {currentCM.role}
               </Text>
               <View className="flex-row items-center mt-1">
-                <Ionicons name="calendar-outline" size={14} color="#6B7280" />
+                <LucideIcons name="calendar" size={14} color="#757575" />
                 <Text className="text-body-small text-text-secondary ml-1">
                   Term: {new Date(currentCM.termStart).toLocaleDateString()}
                   {currentCM.termEnd && ` - ${new Date(currentCM.termEnd).toLocaleDateString()}`}
@@ -147,12 +145,13 @@ export const SuccessionManagement: React.FC<SuccessionManagementProps> = ({
                   message="Create a succession plan to ensure smooth leadership transitions."
                 />
                 <Button
-                  title="Create Succession Plan"
                   variant="primary"
-                  size="medium"
+                  size="md"
                   onPress={() => router.push('/governance/succession/create')}
                   className="mt-3"
-                />
+                >
+                  Create Succession Plan
+                </Button>
               </View>
             )}
           </View>
@@ -185,12 +184,13 @@ export const SuccessionManagement: React.FC<SuccessionManagementProps> = ({
             
             {canManageSuccession && (
               <Button
-                title="Trigger Manual Succession"
-                variant="warning"
-                size="medium"
+                variant="secondary"
+                size="md"
                 onPress={() => handleTriggerSuccession('Manual succession initiated')}
                 className="mt-3"
-              />
+              >
+                Trigger Manual Succession
+              </Button>
             )}
           </View>
         </Card>
@@ -256,7 +256,7 @@ export const SuccessionManagement: React.FC<SuccessionManagementProps> = ({
                     </View>
                     {deputy.performanceRating && (
                       <View className="flex-row items-center ml-2">
-                        <Ionicons name="star" size={14} color="#F59E0B" />
+                        <LucideIcons name="star" size={14} color="#FF9800" />
                         <Text className="text-body-small text-text-secondary ml-1">
                           {deputy.performanceRating.toFixed(1)}
                         </Text>
@@ -284,9 +284,9 @@ export const SuccessionManagement: React.FC<SuccessionManagementProps> = ({
             </View>
 
             {/* Assignment Details */}
-            <View className="flex-row items-center justify-between text-sm">
+            <View className="flex-row items-center justify-between">
               <View className="flex-row items-center">
-                <Ionicons name="calendar-outline" size={14} color="#6B7280" />
+                <LucideIcons name="calendar" size={14} color="#757575" />
                 <Text className="text-body-small text-text-secondary ml-1">
                   Assigned: {new Date(deputy.assignedAt).toLocaleDateString()}
                 </Text>
@@ -296,14 +296,14 @@ export const SuccessionManagement: React.FC<SuccessionManagementProps> = ({
                 className="flex-row items-center"
               >
                 <Text className="text-body-small text-primary mr-1">Details</Text>
-                <Ionicons name="chevron-forward" size={14} color="#6366f1" />
+                <LucideIcons name="chevron-right" size={14} color="#6366f1" />
               </TouchableOpacity>
             </View>
           </View>
         </Card>
       )) || (
         <View className="items-center py-8">
-          <Ionicons name="people-outline" size={48} color="#9CA3AF" />
+          <LucideIcons name="users" size={48} color="#757575" />
           <Text className="text-headline-small text-text-secondary mt-4 mb-2">
             No Deputies Assigned
           </Text>
@@ -312,12 +312,13 @@ export const SuccessionManagement: React.FC<SuccessionManagementProps> = ({
           </Text>
           {canManageSuccession && (
             <Button
-              title="Assign Deputy"
               variant="primary"
-              size="medium"
+              size="md"
               onPress={() => router.push('/governance/succession/deputies')}
               className="mt-4"
-            />
+            >
+              Assign Deputy
+            </Button>
           )}
         </View>
       )}
@@ -369,7 +370,7 @@ export const SuccessionManagement: React.FC<SuccessionManagementProps> = ({
 
                 <View className="flex-row items-center justify-between mt-3 pt-3 border-t border-border-primary">
                   <View className="flex-row items-center">
-                    <Ionicons name="calendar-outline" size={14} color="#6B7280" />
+                    <LucideIcons name="calendar" size={14} color="#757575" />
                     <Text className="text-body-small text-text-secondary ml-1">
                       Due: {new Date(task.dueDate).toLocaleDateString()}
                     </Text>
@@ -377,12 +378,13 @@ export const SuccessionManagement: React.FC<SuccessionManagementProps> = ({
                   
                   {task.assignedTo === currentUserId && (
                     <Button
-                      title={isProcessingTask === task.id ? "Completing..." : "Mark Complete"}
                       variant="success"
-                      size="small"
+                      size="sm"
                       onPress={() => handleCompleteTask(task)}
                       disabled={isProcessingTask === task.id}
-                    />
+                    >
+                      {isProcessingTask === task.id ? "Completing..." : "Mark Complete"}
+                    </Button>
                   )}
                 </View>
               </View>
@@ -406,7 +408,7 @@ export const SuccessionManagement: React.FC<SuccessionManagementProps> = ({
                     {task.title}
                   </Text>
                   <View className="flex-row items-center">
-                    <Ionicons name="checkmark-circle" size={16} color="#10B981" />
+                    <LucideIcons name="check-circle" size={16} color="#4CAF50" />
                     <Text className="text-body-small text-success ml-1">
                       {task.completedAt ? new Date(task.completedAt).toLocaleDateString() : 'Completed'}
                     </Text>
@@ -424,7 +426,7 @@ export const SuccessionManagement: React.FC<SuccessionManagementProps> = ({
 
       {pendingTasks.length === 0 && completedTasks.length === 0 && (
         <View className="items-center py-8">
-          <Ionicons name="checkmark-done-outline" size={48} color="#9CA3AF" />
+          <LucideIcons name="check-check" size={48} color="#757575" />
           <Text className="text-headline-small text-text-secondary mt-4 mb-2">
             No Handover Tasks
           </Text>
@@ -465,7 +467,7 @@ export const SuccessionManagement: React.FC<SuccessionManagementProps> = ({
         </Card>
       )) || (
         <View className="items-center py-8">
-          <Ionicons name="time-outline" size={48} color="#9CA3AF" />
+          <LucideIcons name="clock" size={48} color="#757575" />
           <Text className="text-headline-small text-text-secondary mt-4 mb-2">
             No History Available
           </Text>
@@ -502,10 +504,10 @@ export const SuccessionManagement: React.FC<SuccessionManagementProps> = ({
       {/* Tab Navigation */}
       <View className="flex-row bg-surface-primary border-b border-border-primary">
         {[
-          { key: 'overview', label: 'Overview', icon: 'home-outline' },
-          { key: 'deputies', label: 'Deputies', icon: 'people-outline' },
-          { key: 'tasks', label: 'Tasks', icon: 'list-outline' },
-          { key: 'history', label: 'History', icon: 'time-outline' }
+          { key: 'overview', label: 'Overview', icon: 'home' },
+          { key: 'deputies', label: 'Deputies', icon: 'users' },
+          { key: 'tasks', label: 'Tasks', icon: 'list' },
+          { key: 'history', label: 'History', icon: 'clock' }
         ].map((tab) => (
           <TouchableOpacity
             key={tab.key}
@@ -515,10 +517,10 @@ export const SuccessionManagement: React.FC<SuccessionManagementProps> = ({
             }`}
           >
             <View className="items-center">
-              <Ionicons 
+              <LucideIcons 
                 name={tab.icon as any} 
                 size={20} 
-                color={activeTab === tab.key ? '#6366f1' : '#6B7280'} 
+                color={activeTab === tab.key ? '#6366f1' : '#757575'} 
               />
               <Text className={`text-body-small font-medium mt-1 ${
                 activeTab === tab.key ? 'text-primary' : 'text-text-secondary'

@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, Dimensions, Alert } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import { View, Text, ScrollView, TouchableOpacity, Dimensions } from 'react-native';
+import { showConfirmAlert, showSuccessAlert, showErrorAlert } from '@/utils/alert';
+import LucideIcons from '@/components/ui/LucideIcons';
 import { LineChart, BarChart, PieChart } from 'react-native-chart-kit';
 
 // Types
@@ -14,12 +15,12 @@ import type {
   ResourceMetric,
   Alert as SystemAlert,
   Incident
-} from '../../types/analytics';
+} from '@/types/analytics';
 
 // UI Components
-import { Card } from '../ui/Card';
-import { Button } from '../ui/Button';
-import { AlertCard } from '../ui/AlertCard';
+import { Card } from '@/components/ui/Card';
+import { Button } from '@/components/ui/Button';
+import { AlertCard } from '@/components/ui/AlertCard';
 
 interface PerformanceOptimizerProps {
   performanceMetrics: PerformanceMetrics[];
@@ -88,37 +89,31 @@ export const PerformanceOptimizer: React.FC<PerformanceOptimizerProps> = ({
     try {
       await onRefreshMetrics();
     } catch (error) {
-      Alert.alert('Error', 'Failed to refresh metrics');
+      showErrorAlert('Error', 'Failed to refresh metrics');
     } finally {
       setRefreshing(false);
     }
   };
 
   const handleApplyOptimization = async (recommendation: OptimizationRecommendation) => {
-    Alert.alert(
+    showConfirmAlert(
       'Apply Optimization',
       `Apply "${recommendation.title}"?\n\nThis will ${recommendation.proposedSolution}`,
-      [
-        { text: 'Cancel', style: 'cancel' },
-        {
-          text: 'Apply',
-          onPress: async () => {
-            setProcessingOptimizations(prev => new Set([...prev, recommendation.id]));
-            try {
-              await onApplyOptimization(recommendation.id);
-              Alert.alert('Success', 'Optimization applied successfully');
-            } catch (error) {
-              Alert.alert('Error', 'Failed to apply optimization');
-            } finally {
-              setProcessingOptimizations(prev => {
-                const newSet = new Set(prev);
-                newSet.delete(recommendation.id);
-                return newSet;
-              });
-            }
-          }
+      async () => {
+        setProcessingOptimizations(prev => new Set([...prev, recommendation.id]));
+        try {
+          await onApplyOptimization(recommendation.id);
+          showSuccessAlert('Success', 'Optimization applied successfully');
+        } catch (error) {
+          showErrorAlert('Error', 'Failed to apply optimization');
+        } finally {
+          setProcessingOptimizations(prev => {
+            const newSet = new Set(prev);
+            newSet.delete(recommendation.id);
+            return newSet;
+          });
         }
-      ]
+      },
     );
   };
 
@@ -151,7 +146,7 @@ export const PerformanceOptimizer: React.FC<PerformanceOptimizerProps> = ({
           <Card>
             <View className="p-4 items-center">
               <View className="flex-row items-center mb-2">
-                <Ionicons name="warning" size={20} color="#EF4444" />
+                <LucideIcons name="warning" size={20} color="#D32F2F" />
                 <Text className="text-display-medium font-bold text-error ml-2">
                   {criticalAlerts}
                 </Text>
@@ -165,7 +160,7 @@ export const PerformanceOptimizer: React.FC<PerformanceOptimizerProps> = ({
           <Card>
             <View className="p-4 items-center">
               <View className="flex-row items-center mb-2">
-                <Ionicons name="alert" size={20} color="#F59E0B" />
+                <LucideIcons name="alert-circle" size={20} color="#FF9800" />
                 <Text className="text-display-medium font-bold text-warning ml-2">
                   {warningAlerts}
                 </Text>
@@ -179,7 +174,7 @@ export const PerformanceOptimizer: React.FC<PerformanceOptimizerProps> = ({
           <Card>
             <View className="p-4 items-center">
               <View className="flex-row items-center mb-2">
-                <Ionicons name="trending-up" size={20} color="#10B981" />
+                <LucideIcons name="trending-up" size={20} color="#4CAF50" />
                 <Text className="text-display-medium font-bold text-success ml-2">
                   {systemHealth.uptime.toFixed(1)}%
                 </Text>
@@ -193,7 +188,7 @@ export const PerformanceOptimizer: React.FC<PerformanceOptimizerProps> = ({
           <Card>
             <View className="p-4 items-center">
               <View className="flex-row items-center mb-2">
-                <Ionicons name="build" size={20} color="#6366F1" />
+                <LucideIcons name="settings-outline" size={20} color="#6366F1" />
                 <Text className="text-display-medium font-bold text-primary ml-2">
                   {highPriorityRecommendations}
                 </Text>
@@ -250,10 +245,10 @@ export const PerformanceOptimizer: React.FC<PerformanceOptimizerProps> = ({
                     <Text className="text-body-large font-semibold text-text-primary">
                       {performanceMetrics[performanceMetrics.length - 1]?.application.responseTime}ms
                     </Text>
-                    <Ionicons 
-                      name={performanceTrends.responseTime.direction === 'up' ? 'trending-up' : 'trending-down'} 
+                    <LucideIcons 
+                      name={performanceTrends.responseTime.direction === 'up' ? 'TrendingUp' : 'TrendingDown'} 
                       size={16} 
-                      color={performanceTrends.responseTime.isImprovement ? '#10B981' : '#EF4444'} 
+                      color={performanceTrends.responseTime.isImprovement ? '#4CAF50' : '#D32F2F'} 
                       style={{ marginLeft: 4 }}
                     />
                   </View>
@@ -265,10 +260,10 @@ export const PerformanceOptimizer: React.FC<PerformanceOptimizerProps> = ({
                     <Text className="text-body-large font-semibold text-text-primary">
                       {performanceMetrics[performanceMetrics.length - 1]?.application.errorRate.toFixed(2)}%
                     </Text>
-                    <Ionicons 
-                      name={performanceTrends.errorRate.direction === 'up' ? 'trending-up' : 'trending-down'} 
+                    <LucideIcons 
+                      name={performanceTrends.errorRate.direction === 'up' ? 'TrendingUp' : 'TrendingDown'} 
                       size={16} 
-                      color={performanceTrends.errorRate.isImprovement ? '#10B981' : '#EF4444'} 
+                      color={performanceTrends.errorRate.isImprovement ? '#4CAF50' : '#D32F2F'} 
                       style={{ marginLeft: 4 }}
                     />
                   </View>
@@ -282,20 +277,20 @@ export const PerformanceOptimizer: React.FC<PerformanceOptimizerProps> = ({
         {canManageSystem && (
           <View className="flex-row gap-3">
             <Button
-              title="Refresh Metrics"
               variant="secondary"
               onPress={handleRefresh}
               disabled={refreshing}
               className="flex-1"
-              icon="refresh"
-            />
+            >
+              Refresh Metrics
+            </Button>
             <Button
-              title="View Reports"
               variant="primary"
               onPress={() => setActiveTab('performance')}
               className="flex-1"
-              icon="analytics"
-            />
+            >
+              View Reports
+            </Button>
           </View>
         )}
       </ScrollView>
@@ -306,7 +301,7 @@ export const PerformanceOptimizer: React.FC<PerformanceOptimizerProps> = ({
     if (performanceMetrics.length === 0) {
       return (
         <View className="flex-1 items-center justify-center p-4">
-          <Ionicons name="analytics-outline" size={64} color="#9CA3AF" />
+          <LucideIcons name="analytics-outline" size={64} color="#757575" />
           <Text className="text-headline-small text-text-secondary mt-4 mb-2">
             No Performance Data
           </Text>
@@ -506,7 +501,7 @@ export const PerformanceOptimizer: React.FC<PerformanceOptimizerProps> = ({
                   Avg: {metric.average} {metric.unit}
                 </Text>
                 <View className="flex-row items-center">
-                  <Ionicons 
+                  <LucideIcons 
                     name={getTrendIcon(metric.trend)} 
                     size={12} 
                     color={getTrendColor(metric.trend)} 
@@ -527,7 +522,7 @@ export const PerformanceOptimizer: React.FC<PerformanceOptimizerProps> = ({
     <ScrollView className="p-4">
       {optimizationRecommendations.length === 0 ? (
         <View className="flex-1 items-center justify-center p-4">
-          <Ionicons name="checkmark-circle-outline" size={64} color="#10B981" />
+          <LucideIcons name="checkmark-circle" size={64} color="#4CAF50" />
           <Text className="text-headline-small text-text-secondary mt-4 mb-2">
             All Optimized
           </Text>
@@ -638,14 +633,14 @@ export const PerformanceOptimizer: React.FC<PerformanceOptimizerProps> = ({
                 <View className="flex-row gap-2">
                   {canManageSystem && recommendation.status === 'pending' ? (
                     <Button
-                      title={processingOptimizations.has(recommendation.id) ? "Applying..." : "Apply Optimization"}
                       variant="primary"
-                      size="small"
+                      size="sm"
                       onPress={() => handleApplyOptimization(recommendation)}
                       disabled={processingOptimizations.has(recommendation.id)}
                       className="flex-1"
-                      icon="build"
-                    />
+                    >
+                      {processingOptimizations.has(recommendation.id) ? "Applying..." : "Apply Optimization"}
+                    </Button>
                   ) : (
                     <View className={`flex-1 px-3 py-2 rounded-lg ${getStatusStyle(recommendation.status).bg} border ${getStatusStyle(recommendation.status).border}`}>
                       <Text className={`text-body-small text-center ${getStatusStyle(recommendation.status).text}`}>
@@ -655,12 +650,12 @@ export const PerformanceOptimizer: React.FC<PerformanceOptimizerProps> = ({
                   )}
                   
                   <Button
-                    title="Details"
                     variant="ghost"
-                    size="small"
+                    size="sm"
                     onPress={() => {/* Navigate to details */}}
-                    icon="information-circle-outline"
-                  />
+                  >
+                    Details
+                  </Button>
                 </View>
               </View>
             </Card>
@@ -685,7 +680,7 @@ export const PerformanceOptimizer: React.FC<PerformanceOptimizerProps> = ({
       <View className={`p-4 border-b border-border-primary ${getHealthScoreStyle(healthScore).banner}`}>
         <View className="flex-row items-center justify-between">
           <View className="flex-row items-center">
-            <Ionicons 
+            <LucideIcons 
               name={getHealthScoreIcon(healthScore)} 
               size={24} 
               color={getHealthScoreStyle(healthScore).iconColor} 
@@ -700,7 +695,7 @@ export const PerformanceOptimizer: React.FC<PerformanceOptimizerProps> = ({
             </View>
           </View>
           <TouchableOpacity onPress={handleRefresh} disabled={refreshing}>
-            <Ionicons name="refresh" size={20} color="#6B7280" />
+            <LucideIcons name="refresh" size={20} color="#757575" />
           </TouchableOpacity>
         </View>
       </View>
@@ -708,10 +703,10 @@ export const PerformanceOptimizer: React.FC<PerformanceOptimizerProps> = ({
       {/* Tab Navigation */}
       <View className="flex-row bg-surface-primary border-b border-border-primary">
         {[
-          { key: 'overview', label: 'Overview', icon: 'speedometer-outline' },
-          { key: 'performance', label: 'Performance', icon: 'analytics-outline' },
-          { key: 'health', label: 'Health', icon: 'heart-outline', count: systemHealth.activeAlerts.length },
-          { key: 'recommendations', label: 'Optimize', icon: 'build-outline', count: optimizationRecommendations.filter(r => r.priority === 'critical' || r.priority === 'high').length }
+          { key: 'overview', label: 'Overview', icon: 'Gauge' },
+          { key: 'performance', label: 'Performance', icon: 'BarChart3' },
+          { key: 'health', label: 'Health', icon: 'Heart', count: systemHealth.activeAlerts.length },
+          { key: 'recommendations', label: 'Optimize', icon: 'Settings', count: optimizationRecommendations.filter(r => r.priority === 'critical' || r.priority === 'high').length }
         ].map((tab) => (
           <TouchableOpacity
             key={tab.key}
@@ -721,10 +716,10 @@ export const PerformanceOptimizer: React.FC<PerformanceOptimizerProps> = ({
             }`}
           >
             <View className="items-center relative">
-              <Ionicons 
-                name={tab.icon as any} 
+              <LucideIcons 
+                name={getTabIcon(tab.icon)} 
                 size={20} 
-                color={activeTab === tab.key ? '#6366f1' : '#6B7280'} 
+                color={activeTab === tab.key ? '#6366f1' : '#757575'} 
               />
               <Text className={`text-body-small font-medium mt-1 ${
                 activeTab === tab.key ? 'text-primary' : 'text-text-secondary'
@@ -733,7 +728,7 @@ export const PerformanceOptimizer: React.FC<PerformanceOptimizerProps> = ({
               </Text>
               {tab.count && tab.count > 0 && (
                 <View className="absolute -top-1 -right-1 bg-error rounded-full min-w-[16px] h-4 px-1 items-center justify-center">
-                  <Text className="text-white text-xs font-medium">
+                  <Text className="text-white text-label-large font-medium">
                     {tab.count > 99 ? '99+' : tab.count}
                   </Text>
                 </View>
@@ -769,29 +764,29 @@ const getHealthScoreStyle = (score: number) => {
       bg: 'bg-success/10',
       text: 'text-success',
       banner: 'bg-success/5',
-      iconColor: '#10B981'
+      iconColor: '#4CAF50'
     };
   } else if (score >= 70) {
     return {
       bg: 'bg-warning/10',
       text: 'text-warning',
       banner: 'bg-warning/5',
-      iconColor: '#F59E0B'
+      iconColor: '#FF9800'
     };
   } else {
     return {
       bg: 'bg-error/10',
       text: 'text-error',
       banner: 'bg-error/5',
-      iconColor: '#EF4444'
+      iconColor: '#D32F2F'
     };
   }
 };
 
-const getHealthScoreIcon = (score: number): any => {
-  if (score >= 90) return 'checkmark-circle';
-  if (score >= 70) return 'warning';
-  return 'alert-circle';
+const getHealthScoreIcon = (score: number): string => {
+  if (score >= 90) return 'CheckCircle';
+  if (score >= 70) return 'AlertTriangle';
+  return 'AlertCircle';
 };
 
 const getHealthStatusStyle = (status: HealthStatus) => {
@@ -852,12 +847,22 @@ const getResourceUsageColor = (metric: ResourceMetric): string => {
   return 'bg-success';
 };
 
-const getTrendIcon = (trend: string): any => {
-  return trend === 'up' ? 'trending-up' : trend === 'down' ? 'trending-down' : 'remove';
+const getTrendIcon = (trend: string): string => {
+  return trend === 'up' ? 'TrendingUp' : trend === 'down' ? 'TrendingDown' : 'Minus';
 };
 
 const getTrendColor = (trend: string): string => {
-  return trend === 'up' ? '#EF4444' : trend === 'down' ? '#10B981' : '#6B7280';
+  return trend === 'up' ? '#D32F2F' : trend === 'down' ? '#4CAF50' : '#757575';
+};
+
+const getTabIcon = (iconName: string): string => {
+  const iconMap: { [key: string]: string } = {
+    'Gauge': 'Gauge',
+    'BarChart3': 'BarChart3',
+    'Heart': 'Heart',
+    'Settings': 'Settings'
+  };
+  return iconMap[iconName] || iconName;
 };
 
 const prepareChartData = (metrics: PerformanceMetrics[]) => {
@@ -881,10 +886,10 @@ const prepareChartData = (metrics: PerformanceMetrics[]) => {
       }]
     },
     errorDistribution: [
-      { name: 'Application', count: 15, color: '#EF4444', legendFontColor: '#7F7F7F', legendFontSize: 12 },
-      { name: 'Network', count: 8, color: '#F59E0B', legendFontColor: '#7F7F7F', legendFontSize: 12 },
+      { name: 'Application', count: 15, color: '#D32F2F', legendFontColor: '#7F7F7F', legendFontSize: 12 },
+      { name: 'Network', count: 8, color: '#FF9800', legendFontColor: '#7F7F7F', legendFontSize: 12 },
       { name: 'Database', count: 3, color: '#6366F1', legendFontColor: '#7F7F7F', legendFontSize: 12 },
-      { name: 'System', count: 2, color: '#10B981', legendFontColor: '#7F7F7F', legendFontSize: 12 }
+      { name: 'System', count: 2, color: '#4CAF50', legendFontColor: '#7F7F7F', legendFontSize: 12 }
     ]
   };
 };

@@ -8,12 +8,13 @@ Aptly is a React Native mobile app built with Expo for housing society managemen
 
 **Tech Stack:**
 - React Native with Expo SDK 53
-- TypeScript with strict mode
+- TypeScript with strict mode enabled
 - NativeWind (Tailwind CSS for React Native)
-- Expo Router for file-based routing
+- Expo Router v5 with file-based routing and typed routes
 - React Hook Form for form handling
-- Axios for API communication
+- Axios for API communication with centralized service
 - AsyncStorage for local data persistence
+- Jest with React Native Testing Library for testing
 
 ## Development Commands
 
@@ -31,10 +32,14 @@ npm run android    # Android emulator
 npm run ios        # iOS simulator
 npm run web        # Web browser
 
-# Linting
-npm run lint
-# or
-expo lint
+# Testing
+npm run test          # Run tests once
+npm run test:watch    # Run tests in watch mode
+npm run test:coverage # Run tests with coverage report
+
+# Type checking and linting
+npm run typecheck     # TypeScript type checking
+npm run lint          # ESLint with Expo config
 
 # Reset project (moves starter to app-example/)
 npm run reset-project
@@ -105,10 +110,12 @@ npm run reset-project
 - `utils/` - Utility functions
 
 **API Integration:**
-- All API calls use the centralized `APIService` class
-- Automatic retry logic with exponential backoff
-- Token refresh handled automatically
-- Network state awareness with offline queueing
+- Centralized `APIService` singleton with interceptors in `services/api.service.ts`
+- Automatic token refresh and retry logic with exponential backoff
+- Network state awareness with offline request queueing
+- Base URL: `https://api.aptly.app/v4`
+- File upload support with progress tracking
+- Error handling with custom `APIError` interface
 
 **Design System:**
 - Use existing UI components in `components/ui/`
@@ -116,11 +123,40 @@ npm run reset-project
 - Maintain consistency with NativeWind classes
 - Prefer composition over prop drilling for component variants
 
-**Testing:**
-- No test framework currently configured
-- Manual testing on iOS/Android simulators via Expo
+**Testing Framework:**
+- Jest with React Native Testing Library configured
+- Test setup file: `__tests__/setup.ts` with mocks for Expo modules
+- Coverage collection enabled for TypeScript files
+- Mock configurations for common React Native and Expo components
+- Tests organized by feature: components/, screens/, utils/, admin/
 
 **Code Quality:**
-- TypeScript strict mode enabled
-- ESLint with Expo config
-- Path aliases configured: `@/*` maps to project root
+- TypeScript strict mode enabled with path aliases (`@/*` maps to project root)
+- ESLint with Expo configuration
+- Expo's new architecture enabled for better performance
+
+## Advanced Features
+
+**Admin System:**
+- Multi-society management with role-based access control (RBAC)
+- Adaptive admin layout with permission gates
+- Dynamic navigation based on user roles
+- Components in `components/admin/` with index exports
+
+**Analytics & Governance:**
+- Built-in analytics dashboard with audit system
+- Voting system with emergency management
+- Policy governance with succession management
+- Performance optimization components
+
+**Multi-Context Architecture:**
+- `AuthContext` - Authentication state and user management
+- `AdminContext` - Admin-specific state and multi-society management
+- `AnalyticsContext` - Analytics data and performance tracking
+- `GovernanceContext` - Voting, policies, and emergency management
+- `SocietyContext` - Society-specific data and settings
+
+## Development Best Practices
+
+- Use custom alert component when using alerts
+- Always run npm test and npm run lint before committing code

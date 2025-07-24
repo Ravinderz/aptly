@@ -14,7 +14,7 @@ import {
 } from "lucide-react-native";
 import React from "react";
 import { Text, View } from "react-native";
-import { cn } from "../../utils/cn";
+import { cn } from "@/utils/cn";
 
 // Define props interface
 interface ServiceTileProps {

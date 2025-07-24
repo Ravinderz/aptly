@@ -213,14 +213,14 @@ export default function BillingNotifications() {
           <ArrowLeft size={24} color="#212121" />
         </TouchableOpacity>
         <View className="flex-1">
-          <Text className="text-xl font-bold text-text-primary">Notifications</Text>
+          <Text className="text-headline-large font-bold text-text-primary">Notifications</Text>
           {activeTab === "notifications" && unreadCount > 0 && (
-            <Text className="text-text-secondary text-sm">{unreadCount} unread notifications</Text>
+            <Text className="text-text-secondary text-body-medium">{unreadCount} unread notifications</Text>
           )}
         </View>
         {activeTab === "notifications" && notifications.length > 0 && (
           <TouchableOpacity onPress={handleMarkAllAsRead} className="mr-2">
-            <Text className="text-primary font-medium text-sm">Mark All Read</Text>
+            <Text className="text-primary font-medium text-body-medium">Mark All Read</Text>
           </TouchableOpacity>
         )}
       </View>
@@ -262,9 +262,9 @@ export default function BillingNotifications() {
               <View className="w-20 h-20 rounded-full bg-primary/10 items-center justify-center mb-4">
                 <Bell size={32} color="#6366f1" />
               </View>
-              <Text className="text-text-primary text-lg font-semibold mb-2">No Notifications</Text>
+              <Text className="text-text-primary text-headline-medium font-semibold mb-2">No Notifications</Text>
               <Text className="text-text-secondary text-center">
-                You're all caught up! Billing notifications will appear here.
+                You&apos;re all caught up! Billing notifications will appear here.
               </Text>
             </View>
           ) : (
@@ -284,7 +284,7 @@ export default function BillingNotifications() {
                       </View>
                       <View className="flex-1">
                         <View className="flex-row items-center mb-1">
-                          <Text className={`text-lg font-semibold ${
+                          <Text className={`text-headline-medium font-semibold ${
                             notification.urgent ? "text-error" : "text-text-primary"
                           }`}>
                             {notification.title}
@@ -293,7 +293,7 @@ export default function BillingNotifications() {
                             <View className="w-2 h-2 bg-primary rounded-full ml-2" />
                           )}
                         </View>
-                        <Text className="text-text-secondary text-sm">
+                        <Text className="text-text-secondary text-body-medium">
                           {formatTimestamp(notification.timestamp)}
                         </Text>
                       </View>
@@ -340,7 +340,7 @@ export default function BillingNotifications() {
           <View className="space-y-6">
             {/* Notification Types */}
             <Card>
-              <Text className="text-lg font-semibold text-text-primary mb-4">Notification Types</Text>
+              <Text className="text-headline-medium font-semibold text-text-primary mb-4">Notification Types</Text>
               <View className="space-y-4">
                 {[
                   { key: "paymentReminders", label: "Payment Reminders", description: "Get notified before bills are due" },
@@ -352,7 +352,7 @@ export default function BillingNotifications() {
                   <View key={setting.key} className="flex-row items-center justify-between">
                     <View className="flex-1 mr-4">
                       <Text className="text-text-primary font-medium mb-1">{setting.label}</Text>
-                      <Text className="text-text-secondary text-sm">{setting.description}</Text>
+                      <Text className="text-text-secondary text-body-medium">{setting.description}</Text>
                     </View>
                     <Switch
                       value={settings[setting.key as keyof NotificationSettings] as boolean}
@@ -367,22 +367,22 @@ export default function BillingNotifications() {
 
             {/* Delivery Methods */}
             <Card>
-              <Text className="text-lg font-semibold text-text-primary mb-4">Delivery Methods</Text>
+              <Text className="text-headline-medium font-semibold text-text-primary mb-4">Delivery Methods</Text>
               <View className="space-y-4">
                 <View className="flex-row items-center justify-between">
                   <View className="flex-1 mr-4">
                     <Text className="text-text-primary font-medium mb-1">Push Notifications</Text>
-                    <Text className="text-text-secondary text-sm">Always enabled for critical notifications</Text>
+                    <Text className="text-text-secondary text-body-medium">Always enabled for critical notifications</Text>
                   </View>
                   <View className="w-12 h-6 bg-success rounded-full items-center justify-center">
-                    <Text className="text-white text-xs font-bold">ON</Text>
+                    <Text className="text-white text-label-large font-bold">ON</Text>
                   </View>
                 </View>
                 
                 <View className="flex-row items-center justify-between">
                   <View className="flex-1 mr-4">
                     <Text className="text-text-primary font-medium mb-1">SMS Notifications</Text>
-                    <Text className="text-text-secondary text-sm">Receive notifications via SMS</Text>
+                    <Text className="text-text-secondary text-body-medium">Receive notifications via SMS</Text>
                   </View>
                   <Switch
                     value={settings.smsNotifications}
@@ -395,7 +395,7 @@ export default function BillingNotifications() {
                 <View className="flex-row items-center justify-between">
                   <View className="flex-1 mr-4">
                     <Text className="text-text-primary font-medium mb-1">Email Notifications</Text>
-                    <Text className="text-text-secondary text-sm">Receive notifications via email</Text>
+                    <Text className="text-text-secondary text-body-medium">Receive notifications via email</Text>
                   </View>
                   <Switch
                     value={settings.emailNotifications}
@@ -409,11 +409,11 @@ export default function BillingNotifications() {
 
             {/* Timing Settings */}
             <Card>
-              <Text className="text-lg font-semibold text-text-primary mb-4">Timing Settings</Text>
+              <Text className="text-headline-medium font-semibold text-text-primary mb-4">Timing Settings</Text>
               <View className="space-y-4">
                 <View>
                   <Text className="text-text-primary font-medium mb-2">Reminder Days Before Due</Text>
-                  <Text className="text-text-secondary text-sm mb-3">
+                  <Text className="text-text-secondary text-body-medium mb-3">
                     Get payment reminders {settings.reminderDays} days before the due date
                   </Text>
                   <View className="flex-row gap-2">

@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, TextInput, Switch, Alert } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import { View, Text, ScrollView, TouchableOpacity, TextInput, Switch } from 'react-native';
+import { showConfirmAlert, showSuccessAlert, showErrorAlert } from '@/utils/alert';
+import LucideIcons from '@/components/ui/LucideIcons';
 import { router } from 'expo-router';
 
 // Types
@@ -13,14 +14,14 @@ import type {
   NotificationCategory,
   NotificationPriority,
   CampaignStatus
-} from '../../types/analytics';
+} from '@/types/analytics';
 
 // UI Components
-import { Card } from '../ui/Card';
-import { Button } from '../ui/Button';
-import { Input } from '../ui/Input';
-import { UserAvatar } from '../ui/UserAvatar';
-import { AlertCard } from '../ui/AlertCard';
+import { Card } from '@/components/ui/Card';
+import { Button } from '@/components/ui/Button';
+import { Input } from '@/components/ui/Input';
+import { UserAvatar } from '@/components/ui/UserAvatar';
+import { AlertCard } from '@/components/ui/AlertCard';
 
 interface NotificationManagerProps {
   templates: NotificationTemplate[];
@@ -85,26 +86,20 @@ export const NotificationManager: React.FC<NotificationManagerProps> = ({
   }, [campaigns]);
 
   const handleSendCampaign = async (campaign: NotificationCampaign) => {
-    Alert.alert(
+    showConfirmAlert(
       'Send Campaign',
       `Send "${campaign.name}" to ${campaign.recipientCount} recipients?`,
-      [
-        { text: 'Cancel', style: 'cancel' },
-        {
-          text: 'Send',
-          onPress: async () => {
-            try {
-              setIsProcessing(true);
-              await onSendNotification(campaign.id);
-              Alert.alert('Success', 'Campaign sent successfully!');
-            } catch (error) {
-              Alert.alert('Error', 'Failed to send campaign.');
-            } finally {
-              setIsProcessing(false);
-            }
-          }
+      async () => {
+        try {
+          setIsProcessing(true);
+          await onSendNotification(campaign.id);
+          showSuccessAlert('Success', 'Campaign sent successfully!');
+        } catch (error) {
+          showErrorAlert('Error', 'Failed to send campaign.');
+        } finally {
+          setIsProcessing(false);
         }
-      ]
+      },
     );
   };
 
@@ -199,13 +194,14 @@ export const NotificationManager: React.FC<NotificationManagerProps> = ({
             <View className="flex-row gap-2">
               {campaign.status === 'draft' && canCreateCampaigns ? (
                 <Button
-                  title="Send Now"
                   variant="primary"
-                  size="small"
+                  size="sm"
                   onPress={() => handleSendCampaign(campaign)}
                   disabled={isProcessing}
                   className="flex-1"
-                />
+                >
+                  Send Now
+                </Button>
               ) : campaign.status === 'scheduled' ? (
                 <View className="flex-1 bg-warning/10 border border-warning/20 rounded-lg p-2">
                   <Text className="text-body-small text-warning text-center">
@@ -220,21 +216,22 @@ export const NotificationManager: React.FC<NotificationManagerProps> = ({
                 </View>
               ) : (
                 <Button
-                  title="View Report"
                   variant="secondary"
-                  size="small"
+                  size="sm"
                   onPress={() => router.push(`/notifications/campaigns/${campaign.id}`)}
                   className="flex-1"
-                />
+                >
+                  View Report
+                </Button>
               )}
               
               <Button
-                title="Details"
                 variant="ghost"
-                size="small"
+                size="sm"
                 onPress={() => setSelectedCampaign(campaign)}
-                icon="information-circle-outline"
-              />
+              >
+                Details
+              </Button>
             </View>
           </View>
         </Card>
@@ -315,21 +312,23 @@ export const NotificationManager: React.FC<NotificationManagerProps> = ({
             <View className="flex-row gap-2">
               {canCreateCampaigns && (
                 <Button
-                  title="Create Campaign"
                   variant="primary"
-                  size="small"
+                  size="sm"
                   onPress={() => router.push(`/notifications/campaigns/create?template=${template.id}`)}
                   className="flex-1"
-                />
+                >
+                  Create Campaign
+                </Button>
               )}
               
               <Button
-                title="Preview"
                 variant="secondary"
-                size="small"
+                size="sm"
                 onPress={() => setSelectedTemplate(template)}
                 className="flex-1"
-              />
+              >
+                Preview
+              </Button>
             </View>
           </View>
         </Card>
@@ -341,7 +340,7 @@ export const NotificationManager: React.FC<NotificationManagerProps> = ({
     if (!userPrefs) {
       return (
         <View className="flex-1 items-center justify-center p-4">
-          <Ionicons name="settings-outline" size={64} color="#9CA3AF" />
+          <LucideIcons name="settings-outline" size={64} color="#757575" />
           <Text className="text-headline-small text-text-secondary mt-4 mb-2">
             No Preferences Set
           </Text>
@@ -389,10 +388,10 @@ export const NotificationManager: React.FC<NotificationManagerProps> = ({
               {Object.entries(userPrefs.channels).map(([channel, preference]) => (
                 <View key={channel} className="flex-row items-center justify-between">
                   <View className="flex-row items-center flex-1">
-                    <Ionicons 
+                    <LucideIcons 
                       name={getChannelIcon(channel as NotificationChannel)} 
                       size={20} 
-                      color="#6B7280" 
+                      color="#757575" 
                     />
                     <Text className="text-body-medium text-text-primary ml-3">
                       {formatChannel(channel as NotificationChannel)}
@@ -402,7 +401,7 @@ export const NotificationManager: React.FC<NotificationManagerProps> = ({
                     value={preference.enabled}
                     onValueChange={(enabled) => updateChannelPreference(channel as NotificationChannel, enabled)}
                     trackColor={{ false: '#D1D5DB', true: '#6366f1' }}
-                    thumbColor={preference.enabled ? '#FFFFFF' : '#9CA3AF'}
+                    thumbColor={preference.enabled ? '#FFFFFF' : '#757575'}
                   />
                 </View>
               ))}
@@ -432,7 +431,7 @@ export const NotificationManager: React.FC<NotificationManagerProps> = ({
                     value={preference.enabled}
                     onValueChange={(enabled) => updateCategoryPreference(category as NotificationCategory, enabled)}
                     trackColor={{ false: '#D1D5DB', true: '#6366f1' }}
-                    thumbColor={preference.enabled ? '#FFFFFF' : '#9CA3AF'}
+                    thumbColor={preference.enabled ? '#FFFFFF' : '#757575'}
                   />
                 </View>
               ))}
@@ -462,7 +461,7 @@ export const NotificationManager: React.FC<NotificationManagerProps> = ({
                   await onUpdatePreferences(currentUserId, updatedPrefs);
                 }}
                 trackColor={{ false: '#D1D5DB', true: '#6366f1' }}
-                thumbColor={userPrefs.quietHours.enabled ? '#FFFFFF' : '#9CA3AF'}
+                thumbColor={userPrefs.quietHours.enabled ? '#FFFFFF' : '#757575'}
               />
             </View>
             
@@ -510,7 +509,7 @@ export const NotificationManager: React.FC<NotificationManagerProps> = ({
                     await onUpdatePreferences(currentUserId, updatedPrefs);
                   }}
                   trackColor={{ false: '#D1D5DB', true: '#6366f1' }}
-                  thumbColor={userPrefs.dataProcessingConsent ? '#FFFFFF' : '#9CA3AF'}
+                  thumbColor={userPrefs.dataProcessingConsent ? '#FFFFFF' : '#757575'}
                 />
               </View>
               
@@ -531,7 +530,7 @@ export const NotificationManager: React.FC<NotificationManagerProps> = ({
                     await onUpdatePreferences(currentUserId, updatedPrefs);
                   }}
                   trackColor={{ false: '#D1D5DB', true: '#6366f1' }}
-                  thumbColor={userPrefs.analyticsConsent ? '#FFFFFF' : '#9CA3AF'}
+                  thumbColor={userPrefs.analyticsConsent ? '#FFFFFF' : '#757575'}
                 />
               </View>
             </View>
@@ -606,10 +605,10 @@ export const NotificationManager: React.FC<NotificationManagerProps> = ({
           ].map((data) => (
             <View key={data.channel} className="flex-row items-center justify-between py-2">
               <View className="flex-row items-center flex-1">
-                <Ionicons 
+                <LucideIcons 
                   name={getChannelIcon(data.channel as NotificationChannel)} 
                   size={16} 
-                  color="#6B7280" 
+                  color="#757575" 
                 />
                 <Text className="text-body-medium text-text-primary ml-3 flex-1">
                   {formatChannel(data.channel as NotificationChannel)}
@@ -709,7 +708,7 @@ export const NotificationManager: React.FC<NotificationManagerProps> = ({
           className="p-4 items-center"
         >
           <View className="w-16 h-16 bg-primary/10 rounded-full items-center justify-center mb-3">
-            <Ionicons name="add-circle" size={32} color="#6366f1" />
+            <LucideIcons name="add-circle" size={32} color="#6366f1" />
           </View>
           <Text className="text-headline-small font-medium text-text-primary mb-1">
             Create Campaign
@@ -759,10 +758,10 @@ export const NotificationManager: React.FC<NotificationManagerProps> = ({
       {/* Tab Navigation */}
       <View className="flex-row bg-surface-primary border-b border-border-primary">
         {[
-          { key: 'campaigns', label: 'Campaigns', icon: 'megaphone-outline', count: campaigns.filter(c => c.status === 'running').length },
-          { key: 'templates', label: 'Templates', icon: 'document-outline', count: templates.filter(t => t.isActive).length },
-          { key: 'preferences', label: 'Preferences', icon: 'settings-outline' },
-          { key: 'analytics', label: 'Analytics', icon: 'analytics-outline' }
+          { key: 'campaigns', label: 'Campaigns', icon: 'Megaphone', count: campaigns.filter(c => c.status === 'running').length },
+          { key: 'templates', label: 'Templates', icon: 'FileText', count: templates.filter(t => t.isActive).length },
+          { key: 'preferences', label: 'Preferences', icon: 'Settings' },
+          { key: 'analytics', label: 'Analytics', icon: 'BarChart3' }
         ].map((tab) => (
           <TouchableOpacity
             key={tab.key}
@@ -772,10 +771,10 @@ export const NotificationManager: React.FC<NotificationManagerProps> = ({
             }`}
           >
             <View className="items-center relative">
-              <Ionicons 
-                name={tab.icon as any} 
+              <LucideIcons 
+                name={tab.icon} 
                 size={20} 
-                color={activeTab === tab.key ? '#6366f1' : '#6B7280'} 
+                color={activeTab === tab.key ? '#6366f1' : '#757575'} 
               />
               <Text className={`text-body-small font-medium mt-1 ${
                 activeTab === tab.key ? 'text-primary' : 'text-text-secondary'
@@ -784,7 +783,7 @@ export const NotificationManager: React.FC<NotificationManagerProps> = ({
               </Text>
               {tab.count && tab.count > 0 && (
                 <View className="absolute -top-1 -right-1 bg-error rounded-full min-w-[16px] h-4 px-1 items-center justify-center">
-                  <Text className="text-white text-xs font-medium">
+                  <Text className="text-white text-label-large font-medium">
                     {tab.count > 99 ? '99+' : tab.count}
                   </Text>
                 </View>
@@ -814,7 +813,7 @@ export const NotificationManager: React.FC<NotificationManagerProps> = ({
                 .map(renderCampaignCard)
             ) : (
               <View className="items-center py-8">
-                <Ionicons name="megaphone-outline" size={48} color="#9CA3AF" />
+                <LucideIcons name="megaphone-outline" size={48} color="#757575" />
                 <Text className="text-headline-small text-text-secondary mt-4 mb-2">
                   No Campaigns Yet
                 </Text>
@@ -835,7 +834,7 @@ export const NotificationManager: React.FC<NotificationManagerProps> = ({
                   className="p-4 items-center"
                 >
                   <View className="w-16 h-16 bg-success/10 rounded-full items-center justify-center mb-3">
-                    <Ionicons name="add-circle" size={32} color="#10B981" />
+                    <LucideIcons name="add-circle" size={32} color="#4CAF50" />
                   </View>
                   <Text className="text-headline-small font-medium text-text-primary mb-1">
                     Create Template
@@ -853,7 +852,7 @@ export const NotificationManager: React.FC<NotificationManagerProps> = ({
                 .map(renderTemplateCard)
             ) : (
               <View className="items-center py-8">
-                <Ionicons name="document-outline" size={48} color="#9CA3AF" />
+                <LucideIcons name="document-text-outline" size={48} color="#757575" />
                 <Text className="text-headline-small text-text-secondary mt-4 mb-2">
                   No Templates Available
                 </Text>
@@ -908,15 +907,15 @@ const getPriorityStyle = (priority: NotificationPriority) => {
   return styles[priority] || styles.normal;
 };
 
-const getChannelIcon = (channel: NotificationChannel) => {
+const getChannelIcon = (channel: NotificationChannel): string => {
   const icons = {
-    push: 'notifications-outline',
-    email: 'mail-outline',
-    sms: 'chatbox-outline',
-    in_app: 'phone-portrait-outline',
-    whatsapp: 'logo-whatsapp'
+    push: 'Bell',
+    email: 'Mail',
+    sms: 'MessageSquare',
+    in_app: 'Smartphone',
+    whatsapp: 'MessageCircle'
   };
-  return icons[channel] || 'notifications-outline';
+  return icons[channel] || 'Bell';
 };
 
 const formatChannel = (channel: NotificationChannel): string => {

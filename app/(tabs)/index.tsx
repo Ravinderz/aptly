@@ -1,6 +1,6 @@
 import NoticeSection from "@/components/NoticeSection";
 import QuickActions from "@/components/QuickActions";
-import SocietyOverview from "@/components/SocietyOverview";
+import { SocietyOverview } from "@/components/SocietyOverview";
 import Header from "@/components/ui/Header";
 import UpcomingVisitorSection from "@/components/UpcomingVisitorSection";
 

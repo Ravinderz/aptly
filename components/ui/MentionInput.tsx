@@ -131,7 +131,7 @@ const MentionInput: React.FC<MentionInputProps> = ({
         onChangeText={handleTextChange}
         onSelectionChange={handleSelectionChange}
         placeholder={placeholder}
-        placeholderTextColor="#9CA3AF"
+        placeholderTextColor="#757575"
         maxLength={maxLength}
         editable={!disabled}
         {...textInputProps}

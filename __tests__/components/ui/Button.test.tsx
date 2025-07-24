@@ -9,9 +9,9 @@ describe('Button Component', () => {
     mockOnPress.mockClear();
   });
 
-  test('renders correctly with title', () => {
+  test('renders correctly with children', () => {
     const { getByText } = render(
-      <Button title="Test Button" onPress={mockOnPress} />
+      <Button onPress={mockOnPress}>Test Button</Button>
     );
 
     expect(getByText('Test Button')).toBeTruthy();
@@ -19,7 +19,7 @@ describe('Button Component', () => {
 
   test('calls onPress when pressed', () => {
     const { getByText } = render(
-      <Button title="Test Button" onPress={mockOnPress} />
+      <Button onPress={mockOnPress}>Test Button</Button>
     );
 
     fireEvent.press(getByText('Test Button'));
@@ -28,7 +28,7 @@ describe('Button Component', () => {
 
   test('does not call onPress when disabled', () => {
     const { getByText } = render(
-      <Button title="Test Button" onPress={mockOnPress} disabled />
+      <Button onPress={mockOnPress} disabled>Test Button</Button>
     );
 
     fireEvent.press(getByText('Test Button'));
@@ -37,41 +37,41 @@ describe('Button Component', () => {
 
   test('renders with different variants', () => {
     const { rerender, getByTestId } = render(
-      <Button title="Primary" onPress={mockOnPress} variant="primary" testID="button" />
+      <Button onPress={mockOnPress} variant="primary" testID="button">Primary</Button>
     );
     expect(getByTestId('button')).toBeTruthy();
 
     rerender(
-      <Button title="Secondary" onPress={mockOnPress} variant="secondary" testID="button" />
+      <Button onPress={mockOnPress} variant="secondary" testID="button">Secondary</Button>
     );
     expect(getByTestId('button')).toBeTruthy();
 
     rerender(
-      <Button title="Outline" onPress={mockOnPress} variant="outline" testID="button" />
+      <Button onPress={mockOnPress} variant="outline" testID="button">Outline</Button>
     );
     expect(getByTestId('button')).toBeTruthy();
   });
 
   test('renders with different sizes', () => {
     const { rerender, getByTestId } = render(
-      <Button title="Small" onPress={mockOnPress} size="small" testID="button" />
+      <Button onPress={mockOnPress} size="sm" testID="button">Small</Button>
     );
     expect(getByTestId('button')).toBeTruthy();
 
     rerender(
-      <Button title="Medium" onPress={mockOnPress} size="medium" testID="button" />
+      <Button onPress={mockOnPress} size="md" testID="button">Medium</Button>
     );
     expect(getByTestId('button')).toBeTruthy();
 
     rerender(
-      <Button title="Large" onPress={mockOnPress} size="large" testID="button" />
+      <Button onPress={mockOnPress} size="lg" testID="button">Large</Button>
     );
     expect(getByTestId('button')).toBeTruthy();
   });
 
   test('renders loading state', () => {
     const { getByTestId, queryByText } = render(
-      <Button title="Loading" onPress={mockOnPress} loading testID="button" />
+      <Button onPress={mockOnPress} loading testID="button">Loading</Button>
     );
 
     expect(getByTestId('button')).toBeTruthy();
@@ -81,13 +81,14 @@ describe('Button Component', () => {
   test('is accessible', () => {
     const { getByTestId } = render(
       <Button 
-        title="Accessible Button" 
         onPress={mockOnPress} 
         testID="button"
         accessible={true}
         accessibilityLabel="Test button for accessibility"
         accessibilityHint="Double tap to perform action"
-      />
+      >
+        Accessible Button
+      </Button>
     );
 
     const button = getByTestId('button');
@@ -98,21 +99,20 @@ describe('Button Component', () => {
 
   test('renders with fullWidth style', () => {
     const { getByTestId } = render(
-      <Button title="Full Width" onPress={mockOnPress} fullWidth testID="button" />
+      <Button onPress={mockOnPress} fullWidth testID="button">Full Width</Button>
     );
 
     expect(getByTestId('button')).toBeTruthy();
   });
 
-  test('renders with icon', () => {
+  test('renders without icon prop (icon prop removed)', () => {
     const { getByTestId } = render(
       <Button 
-        title="With Icon" 
         onPress={mockOnPress} 
-        icon="plus"
-        iconPosition="left"
         testID="button" 
-      />
+      >
+        Without Icon
+      </Button>
     );
 
     expect(getByTestId('button')).toBeTruthy();

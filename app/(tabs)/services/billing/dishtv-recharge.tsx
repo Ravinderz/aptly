@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
-import { SafeAreaView, ScrollView, View, Text, TextInput, TouchableOpacity, Alert } from 'react-native';
-import { ArrowLeft, Tv, Calendar, AlertCircle, CreditCard, Gift, Play } from 'lucide-react-native';
+import { SafeAreaView, ScrollView, View, Text, TextInput, TouchableOpacity } from 'react-native';
+import { ArrowLeft, Tv, Calendar, AlertCircle, Gift, Play } from 'lucide-react-native';
 import { router } from 'expo-router';
-import Button from '../../../../components/ui/Button';
+import { Button } from '../../../../components/ui/Button';
 import { Card } from '../../../../components/ui/Card';
 import HighlightCard from '../../../../components/ui/HighlightCard';
+import { showErrorAlert } from '@/utils/alert';
 
 interface RechargePlan {
   id: string;
@@ -83,7 +84,7 @@ export default function DishTVRecharge() {
 
   const detectProvider = async () => {
     if (customerId.length < 8) {
-      Alert.alert('Invalid Customer ID', 'Please enter a valid DTH customer ID (minimum 8 characters)');
+      showErrorAlert('Invalid Customer ID', 'Please enter a valid DTH customer ID (minimum 8 characters)');
       return;
     }
 
@@ -107,13 +108,13 @@ export default function DishTVRecharge() {
 
   const handleRecharge = () => {
     if (!customerId || !selectedProvider) {
-      Alert.alert('Missing Information', 'Please enter customer ID and select provider');
+      showErrorAlert('Missing Information', 'Please enter customer ID and select provider');
       return;
     }
 
     const amount = selectedPlan?.amount || parseInt(customAmount);
     if (!amount || amount < 50) {
-      Alert.alert('Invalid Amount', 'Please select a plan or enter minimum ₹50');
+      showErrorAlert('Invalid Amount', 'Please select a plan or enter minimum ₹50');
       return;
     }
 

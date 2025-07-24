@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { ScrollView, SafeAreaView, View, Text, TouchableOpacity } from 'react-native';
 import { ArrowLeft, Plus, Edit3, Trash2, User } from 'lucide-react-native';
 import { router } from 'expo-router';
-import Button from '../../../components/ui/Button';
+import { Button } from '../../../components/ui/Button';
 import { Card } from '../../../components/ui/Card';
 import { cn } from '../../../utils/cn';
 import { showDeleteConfirmAlert } from '../../../utils/alert';
@@ -45,14 +45,11 @@ export default function FamilyMembers() {
   ]);
 
   const handleAddMember = () => {
-    // Navigate to add family member screen
-    console.log('Add family member pressed');
-    // router.push('/settings/add-family-member');
+    router.push('/(tabs)/settings/add-family-member');
   };
 
   const handleEditMember = (member: FamilyMember) => {
-    console.log('Edit member:', member.name);
-    // router.push(`/settings/edit-family-member/${member.id}`);
+    router.push(`/(tabs)/settings/edit-family-member/${member.id}`);
   };
 
   const handleDeleteMember = (member: FamilyMember) => {
@@ -120,7 +117,7 @@ export default function FamilyMembers() {
               {/* Member Info */}
               <View className="flex-1">
                 <View className="flex-row items-center justify-between mb-2">
-                  <Text className="text-text-primary text-lg font-semibold">
+                  <Text className="text-text-primary text-headline-medium font-semibold">
                     {member.name}
                   </Text>
                   <View className="flex-row gap-2">
@@ -147,7 +144,7 @@ export default function FamilyMembers() {
                   style={{ backgroundColor: `${getRelationshipColor(member.relationship)}15` }}
                 >
                   <Text 
-                    className="text-xs font-medium"
+                    className="text-label-large font-medium"
                     style={{ color: getRelationshipColor(member.relationship) }}
                   >
                     {member.relationship}
@@ -156,24 +153,24 @@ export default function FamilyMembers() {
 
                 {/* Member Details */}
                 <View className="space-y-1">
-                  <Text className="text-text-secondary text-sm">
+                  <Text className="text-text-secondary text-body-medium">
                     Age: {member.age} years
                   </Text>
                   
                   {member.phoneNumber && (
-                    <Text className="text-text-secondary text-sm">
+                    <Text className="text-text-secondary text-body-medium">
                       Phone: {member.phoneNumber}
                     </Text>
                   )}
                   
                   {member.occupation && (
-                    <Text className="text-text-secondary text-sm">
+                    <Text className="text-text-secondary text-body-medium">
                       Occupation: {member.occupation}
                     </Text>
                   )}
                   
                   {member.aadharNumber && (
-                    <Text className="text-text-secondary text-sm">
+                    <Text className="text-text-secondary text-body-medium">
                       Aadhar: {member.aadharNumber}
                     </Text>
                   )}
@@ -189,7 +186,7 @@ export default function FamilyMembers() {
             <View className="w-24 h-24 rounded-full bg-primary/10 items-center justify-center mb-4">
               <User size={32} color="#6366f1" />
             </View>
-            <Text className="text-text-primary text-lg font-semibold mb-2">
+            <Text className="text-text-primary text-headline-medium font-semibold mb-2">
               No Family Members Added
             </Text>
             <Text className="text-text-secondary text-center mb-6 px-4">
@@ -221,10 +218,10 @@ export default function FamilyMembers() {
 
         {/* Info Card */}
         <Card className="mt-6 bg-secondary/10 border-secondary/20">
-          <Text className="text-secondary text-sm font-medium mb-2">
+          <Text className="text-secondary text-body-medium font-medium mb-2">
             💡 Family Member Benefits
           </Text>
-          <Text className="text-text-secondary text-sm leading-5">
+          <Text className="text-text-secondary text-body-medium leading-5">
             • Pre-approve visitors for family members{'\n'}
             • Emergency contact management{'\n'}
             • Society directory access{'\n'}

@@ -44,6 +44,8 @@ export const Card: React.FC<CardProps> = ({
   );
 };
 
+Card.displayName = 'Card';
+
 export const CardHeader: React.FC<ViewProps & { className?: string }> = ({
   children,
   className,
@@ -53,6 +55,8 @@ export const CardHeader: React.FC<ViewProps & { className?: string }> = ({
     {children}
   </View>
 );
+
+CardHeader.displayName = 'CardHeader';
 
 export const CardContent: React.FC<ViewProps & { className?: string }> = ({
   children,
@@ -64,6 +68,8 @@ export const CardContent: React.FC<ViewProps & { className?: string }> = ({
   </View>
 );
 
+CardContent.displayName = 'CardContent';
+
 export const CardFooter: React.FC<ViewProps & { className?: string }> = ({
   children,
   className,
@@ -73,5 +79,9 @@ export const CardFooter: React.FC<ViewProps & { className?: string }> = ({
     {children}
   </View>
 );
+
+CardFooter.displayName = 'CardFooter';
+
+Card.displayName = 'Card';
 
 export default Card;

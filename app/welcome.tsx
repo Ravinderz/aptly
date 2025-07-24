@@ -109,7 +109,7 @@ export default function Welcome() {
           </Text>
 
           <Text className="text-body-large text-text-secondary text-center leading-7 mb-8">
-            India's most trusted housing society management app. Simplify
+            India&apos;s most trusted housing society management app. Simplify
             maintenance, billing, and community management.
           </Text>
 
@@ -215,7 +215,7 @@ export default function Welcome() {
         <View className="mx-6 mb-6">
           <HighlightCard title="Demo Mode" variant="warning" size="md">
             This is a demonstration version. In production, you would connect to
-            your society's actual management system.
+            your society&apos;s actual management system.
           </HighlightCard>
         </View>
       </ScrollView>

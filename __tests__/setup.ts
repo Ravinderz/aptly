@@ -14,9 +14,7 @@ jest.mock('expo-router', () => ({
   },
 }));
 
-jest.mock('@expo/vector-icons', () => ({
-  Ionicons: 'Ionicons',
-}));
+// Expo Vector Icons removed - using Lucide React Native instead
 
 jest.mock('expo-image-picker', () => ({
   launchImageLibraryAsync: jest.fn(),

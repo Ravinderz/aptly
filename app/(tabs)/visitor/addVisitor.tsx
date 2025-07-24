@@ -6,7 +6,7 @@ import {
 import { formatDate } from "@/utils/dateUtils";
 import { router } from "expo-router";
 import { useAlert } from "@/components/ui/AlertCard";
-import { Calendar, Clock, FileText, Phone, User } from "lucide-react-native";
+import { Calendar, Clock, FileText, Phone, User, Shield, CheckCircle } from "lucide-react-native";
 import React, { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import {
@@ -24,6 +24,7 @@ interface VisitorFormData {
   visitTime: string;
   visitPurpose: string;
   category: "Personal" | "Delivery" | "Service" | "Official";
+  preApproved: boolean;
 }
 
 const VISITOR_CATEGORIES = [
@@ -72,6 +73,7 @@ export default function AddVisitor() {
   const [showTimePicker, setShowTimePicker] = useState(false);
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [selectedTime, setSelectedTime] = useState<string>("");
+  const [preApproved, setPreApproved] = useState(false);
   
   const { showAlert, AlertComponent } = useAlert();
 
@@ -88,6 +90,7 @@ export default function AddVisitor() {
       visitTime: "",
       visitPurpose: "",
       category: "Personal",
+      preApproved: false,
     },
   });
 
@@ -137,6 +140,7 @@ export default function AddVisitor() {
       ...data,
       contactNumber: cleanedPhone,
       category: selectedCategory,
+      preApproved: preApproved,
     });
 
     showAlert({
@@ -160,7 +164,11 @@ export default function AddVisitor() {
 
   return (
     <View className="flex-1 bg-background">
-      <ScrollView className="flex-1 px-4" showsVerticalScrollIndicator={false}>
+      <ScrollView 
+        className="flex-1 px-4" 
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={{ paddingBottom: 120 }}
+      >
         {/* Quick Templates */}
         <View className="mb-6 mt-4">
           <View className="flex-row items-center justify-between mb-3">
@@ -244,6 +252,74 @@ export default function AddVisitor() {
               </TouchableOpacity>
             ))}
           </View>
+        </View>
+
+        {/* Pre-Approval Option */}
+        <View className="mb-6">
+          <Text className="text-headline-medium font-bold text-text-primary mb-4">
+            Pre-Approval Settings
+          </Text>
+          <TouchableOpacity
+            onPress={() => {
+              setPreApproved(!preApproved);
+              setValue("preApproved", !preApproved);
+            }}
+            className={`p-5 rounded-2xl border-2 flex-row items-center ${
+              preApproved
+                ? "bg-success/10 border-success/30"
+                : "bg-surface border-divider"
+            }`}
+            activeOpacity={0.8}
+          >
+            <View className={`w-12 h-12 rounded-full items-center justify-center mr-4 ${
+              preApproved ? "bg-success/20" : "bg-primary/10"
+            }`}>
+              {preApproved ? (
+                <CheckCircle size={24} className="text-success" />
+              ) : (
+                <Shield size={24} className="text-primary" />
+              )}
+            </View>
+            <View className="flex-1">
+              <Text className={`text-body-large font-bold mb-1 ${
+                preApproved ? "text-success" : "text-text-primary"
+              }`}>
+                {preApproved ? "Pre-Approved Visitor" : "Regular Approval Process"}
+              </Text>
+              <Text className="text-text-secondary text-label-medium leading-4">
+                {preApproved
+                  ? "Visitor will get direct gate access without security approval. Use for trusted visitors."
+                  : "Visitor will need security approval at the gate. Recommended for new or unknown visitors."
+                }
+              </Text>
+            </View>
+            <View className={`w-6 h-6 rounded-full border-2 items-center justify-center ml-3 ${
+              preApproved
+                ? "border-success bg-success"
+                : "border-divider"
+            }`}>
+              {preApproved && (
+                <CheckCircle size={14} color="white" />
+              )}
+            </View>
+          </TouchableOpacity>
+
+          {/* Pre-Approval Info */}
+          {preApproved && (
+            <View className="mt-3 bg-warning/10 border border-warning/20 rounded-xl p-4">
+              <View className="flex-row items-start">
+                <Text className="text-warning mr-2">⚠️</Text>
+                <View className="flex-1">
+                  <Text className="text-warning text-body-medium font-medium mb-1">
+                    Pre-Approval Responsibility
+                  </Text>
+                  <Text className="text-text-secondary text-label-medium leading-4">
+                    By pre-approving this visitor, you take full responsibility for their identity and purpose of visit. Security will allow direct entry based on your approval.
+                  </Text>
+                </View>
+              </View>
+            </View>
+          )}
         </View>
 
         {/* Visitor Name */}
@@ -432,19 +508,28 @@ export default function AddVisitor() {
           )}
         </View>
 
-        {/* Submit Button */}
-        <TouchableOpacity
-          onPress={handleSubmit(onSubmit)}
-          className="bg-primary p-5 rounded-2xl mb-6"
-          activeOpacity={0.8}
-        >
-          <Text className="text-white text-center font-bold text-headline-medium">
-            Add Visitor
-          </Text>
-          <Text className="text-white/80 text-center font-medium text-label-large mt-1">
-            Generate QR Code & Send Notification
-          </Text>
-        </TouchableOpacity>
+        {/* Submit Button - Always Visible */}
+        <View className="my-6">
+          <TouchableOpacity
+            onPress={handleSubmit(onSubmit)}
+            className="p-5 rounded-2xl border-2"
+            style={{
+              backgroundColor: preApproved ? '#4CAF50' : '#6366f1',
+              borderColor: preApproved ? '#4CAF50' : '#6366f1',
+            }}
+            activeOpacity={0.8}
+          >
+            <Text className="text-white text-center font-bold text-headline-medium">
+              {preApproved ? "Submit Pre-Approved Visitor" : "Add Visitor"}
+            </Text>
+            <Text className="text-white text-center font-medium text-label-large mt-1" style={{ opacity: 0.9 }}>
+              {preApproved 
+                ? "Add to visitor list with pre-approved status"
+                : "Submit for approval & generate QR code"
+              }
+            </Text>
+          </TouchableOpacity>
+        </View>
 
         {/* Enhanced Info Cards */}
         <View className="gap-4 mb-6">

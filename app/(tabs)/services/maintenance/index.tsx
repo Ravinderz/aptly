@@ -159,13 +159,6 @@ export default function MaintenanceRequests() {
             <Building size={20} color="white" />
             <Text className="text-white font-semibold ml-3">Common Area Request</Text>
           </TouchableOpacity>
-          <TouchableOpacity 
-            onPress={() => router.push("/(tabs)/services/maintenance/create")}
-            className="flex-1 bg-surface border border-divider rounded-xl p-5 flex-row items-center justify-center"
-          >
-            <Wrench size={20} color="#6366f1" />
-            <Text className="text-primary font-semibold ml-3">Individual Request</Text>
-          </TouchableOpacity>
         </View>
       </View>
 

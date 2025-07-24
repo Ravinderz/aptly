@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { SafeAreaView, ScrollView, Text, TouchableOpacity, View, Linking } from 'react-native';
+import { SafeAreaView, ScrollView, Text, TouchableOpacity, View, Linking, TextInput, KeyboardAvoidingView, Platform } from 'react-native';
 import { showSuccessAlert } from '@/utils/alert';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { 
@@ -223,6 +223,8 @@ export default function CommonAreaRequestDetail() {
   const { requestId } = useLocalSearchParams<{ requestId: string }>();
   const [activeTab, setActiveTab] = useState<'timeline' | 'details' | 'community'>('timeline');
   const [hasVoted, setHasVoted] = useState(false);
+  const [newComment, setNewComment] = useState('');
+  const [isSubmittingComment, setIsSubmittingComment] = useState(false);
 
   // Get request data
   const request = mockRequestData[requestId as keyof typeof mockRequestData];
@@ -258,6 +260,26 @@ export default function CommonAreaRequestDetail() {
 
   const handleVoteDown = () => {
     showSuccessAlert('Vote Recorded', 'Your feedback has been noted.');
+  };
+
+  const handleSubmitComment = async () => {
+    if (!newComment.trim()) return;
+    
+    try {
+      setIsSubmittingComment(true);
+      // In a real app, this would make an API call to submit the comment
+      console.log('Submitting comment:', newComment);
+      
+      // Simulate API call delay
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      setNewComment('');
+      showSuccessAlert('Comment Posted', 'Your comment has been added to the discussion.');
+    } catch (error) {
+      console.error('Error submitting comment:', error);
+    } finally {
+      setIsSubmittingComment(false);
+    }
   };
 
   const renderTimeline = () => (
@@ -494,6 +516,42 @@ export default function CommonAreaRequestDetail() {
         <Text className="text-headline-medium font-semibold text-text-primary mb-4">
           Community Comments ({request.comments.length})
         </Text>
+        
+        {/* Add Comment Input */}
+        <View className="bg-surface rounded-xl p-4 border border-divider mb-4">
+          <Text className="text-headline-small font-semibold text-text-primary mb-3">
+            Add your comment
+          </Text>
+          <TextInput
+            className="bg-background rounded-lg p-3 text-text-primary border border-divider min-h-[80px]"
+            placeholder="Share your thoughts about this maintenance request..."
+            placeholderTextColor="#757575"
+            multiline
+            textAlignVertical="top"
+            value={newComment}
+            onChangeText={setNewComment}
+            editable={!isSubmittingComment}
+          />
+          <TouchableOpacity
+            onPress={handleSubmitComment}
+            disabled={!newComment.trim() || isSubmittingComment}
+            className={`mt-3 rounded-lg p-3 flex-row items-center justify-center ${
+              !newComment.trim() || isSubmittingComment
+                ? 'bg-text-secondary/20'
+                : 'bg-primary'
+            }`}
+          >
+            <MessageCircle size={16} color={!newComment.trim() || isSubmittingComment ? '#757575' : 'white'} />
+            <Text className={`font-semibold ml-2 ${
+              !newComment.trim() || isSubmittingComment
+                ? 'text-text-secondary'
+                : 'text-white'
+            }`}>
+              {isSubmittingComment ? 'Posting...' : 'Post Comment'}
+            </Text>
+          </TouchableOpacity>
+        </View>
+        
         {request.comments.map((comment) => (
           <CommentItem key={comment.id} comment={comment} />
         ))}
@@ -503,59 +561,66 @@ export default function CommonAreaRequestDetail() {
 
   return (
     <SafeAreaView className="flex-1 bg-background">
-      {/* Header */}
-      <View className="flex-row items-center px-4 py-4 border-b border-divider">
-        <TouchableOpacity onPress={() => router.back()} className="mr-4">
-          <ArrowLeft size={24} color="#212121" />
-        </TouchableOpacity>
-        <View className="flex-1">
-          <Text className="text-headline-large font-semibold text-text-primary">
-            {request.title}
-          </Text>
-          <View className="flex-row items-center mt-1">
-            <View className={`${statusInfo.bg} rounded-full px-3 py-1 mr-3`}>
-              <Text className={`${statusInfo.color} text-label-large font-medium`}>
-                {request.status.replace('_', ' ')}
-              </Text>
-            </View>
-            <View className={`${priorityInfo.bg} rounded-full px-3 py-1`}>
-              <Text className={`${priorityInfo.color} text-label-large font-medium`}>
-                {request.priority} priority
-              </Text>
+      <KeyboardAvoidingView 
+        className="flex-1" 
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        keyboardVerticalOffset={Platform.OS === 'ios' ? 90 : 0}
+      >
+        {/* Header */}
+        <View className="flex-row items-center px-4 py-4 border-b border-divider">
+          <TouchableOpacity onPress={() => router.back()} className="mr-4">
+            <ArrowLeft size={24} color="#212121" />
+          </TouchableOpacity>
+          <View className="flex-1">
+            <Text className="text-headline-large font-semibold text-text-primary">
+              {request.title}
+            </Text>
+            <View className="flex-row items-center mt-1">
+              <View className={`${statusInfo.bg} rounded-full px-3 py-1 mr-3`}>
+                <Text className={`${statusInfo.color} text-label-large font-medium`}>
+                  {request.status.replace('_', ' ')}
+                </Text>
+              </View>
+              <View className={`${priorityInfo.bg} rounded-full px-3 py-1`}>
+                <Text className={`${priorityInfo.color} text-label-large font-medium`}>
+                  {request.priority} priority
+                </Text>
+              </View>
             </View>
           </View>
         </View>
-      </View>
 
-      {/* Tabs */}
-      <View className="flex-row bg-surface border-b border-divider">
-        {(['timeline', 'details', 'community'] as const).map((tab) => (
-          <TouchableOpacity
-            key={tab}
-            onPress={() => setActiveTab(tab)}
-            className={`flex-1 py-4 items-center border-b-2 ${
-              activeTab === tab ? 'border-primary' : 'border-transparent'
-            }`}
-          >
-            <Text className={`text-body-large font-semibold capitalize ${
-              activeTab === tab ? 'text-primary' : 'text-text-secondary'
-            }`}>
-              {tab}
-            </Text>
-          </TouchableOpacity>
-        ))}
-      </View>
+        {/* Tabs */}
+        <View className="flex-row bg-surface border-b border-divider">
+          {(['timeline', 'details', 'community'] as const).map((tab) => (
+            <TouchableOpacity
+              key={tab}
+              onPress={() => setActiveTab(tab)}
+              className={`flex-1 py-4 items-center border-b-2 ${
+                activeTab === tab ? 'border-primary' : 'border-transparent'
+              }`}
+            >
+              <Text className={`text-body-large font-semibold capitalize ${
+                activeTab === tab ? 'text-primary' : 'text-text-secondary'
+              }`}>
+                {tab}
+              </Text>
+            </TouchableOpacity>
+          ))}
+        </View>
 
-      {/* Tab Content */}
-      <ScrollView 
-        className="flex-1" 
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ paddingBottom: 20 }}
-      >
-        {activeTab === 'timeline' && renderTimeline()}
-        {activeTab === 'details' && renderDetails()}
-        {activeTab === 'community' && renderCommunity()}
-      </ScrollView>
+        {/* Tab Content */}
+        <ScrollView 
+          className="flex-1" 
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={{ paddingBottom: 20 }}
+          keyboardShouldPersistTaps="handled"
+        >
+          {activeTab === 'timeline' && renderTimeline()}
+          {activeTab === 'details' && renderDetails()}
+          {activeTab === 'community' && renderCommunity()}
+        </ScrollView>
+      </KeyboardAvoidingView>
     </SafeAreaView>
   );
 }

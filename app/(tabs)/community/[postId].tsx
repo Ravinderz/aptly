@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   View,
   Text,
@@ -36,7 +36,7 @@ export default function PostDetail() {
     }
   }, [postId]);
 
-  const loadPostData = async () => {
+  const loadPostData = useCallback(async () => {
     try {
       setLoading(true);
       const [postsData, commentsData] = await Promise.all([
@@ -58,7 +58,7 @@ export default function PostDetail() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [postId]);
 
   const refreshData = async () => {
     try {
@@ -150,7 +150,7 @@ export default function PostDetail() {
           <TouchableOpacity onPress={() => router.back()} className="mr-4">
             <ArrowLeft size={24} color="#212121" />
           </TouchableOpacity>
-          <Text className="text-xl font-bold text-text-primary">Post</Text>
+          <Text className="text-headline-large font-bold text-text-primary">Post</Text>
         </View>
         <View className="flex-1 items-center justify-center">
           <ActivityIndicator size="large" color="#6366f1" />
@@ -167,10 +167,10 @@ export default function PostDetail() {
           <TouchableOpacity onPress={() => router.back()} className="mr-4">
             <ArrowLeft size={24} color="#212121" />
           </TouchableOpacity>
-          <Text className="text-xl font-bold text-text-primary">Post</Text>
+          <Text className="text-headline-large font-bold text-text-primary">Post</Text>
         </View>
         <View className="flex-1 items-center justify-center px-8">
-          <Text className="text-xl font-semibold text-text-primary mb-2">Post Not Found</Text>
+          <Text className="text-headline-large font-semibold text-text-primary mb-2">Post Not Found</Text>
           <Text className="text-text-secondary text-center">
             This post may have been deleted or is no longer available.
           </Text>
@@ -194,7 +194,7 @@ export default function PostDetail() {
             <TouchableOpacity onPress={() => router.back()} className="mr-4">
               <ArrowLeft size={24} color="#212121" />
             </TouchableOpacity>
-            <Text className="text-xl font-bold text-text-primary">Post</Text>
+            <Text className="text-headline-large font-bold text-text-primary">Post</Text>
           </View>
           {post.canDelete && (
             <TouchableOpacity onPress={handleDeletePost} className="p-1">
@@ -222,18 +222,18 @@ export default function PostDetail() {
               <View className="flex-row items-center flex-1">
                 <UserAvatar name={post.userName} />
                 <View className="ml-3 flex-1">
-                  <Text className="text-lg font-semibold text-text-primary">{post.userName}</Text>
+                  <Text className="text-headline-medium font-semibold text-text-primary">{post.userName}</Text>
                   <View className="flex-row items-center gap-2 mt-1">
-                    <Text className="text-sm text-text-secondary">Flat {post.flatNumber}</Text>
+                    <Text className="text-body-medium text-text-secondary">Flat {post.flatNumber}</Text>
                     <View className="w-1 h-1 bg-text-secondary rounded-full" />
                     <View className="bg-primary/10 px-2 py-1 rounded-full flex-row items-center">
-                      <Text className="text-xs mr-1">{categoryDisplay.icon}</Text>
-                      <Text className="text-primary text-xs font-medium">{categoryDisplay.name}</Text>
+                      <Text className="text-label-large mr-1">{categoryDisplay.icon}</Text>
+                      <Text className="text-primary text-label-large font-medium">{categoryDisplay.name}</Text>
                     </View>
                   </View>
                 </View>
               </View>
-              <Text className="text-sm text-text-secondary">{formatTimeAgo(post.createdAt)}</Text>
+              <Text className="text-body-medium text-text-secondary">{formatTimeAgo(post.createdAt)}</Text>
             </View>
 
             {/* Post Content */}
@@ -285,7 +285,7 @@ export default function PostDetail() {
 
           {/* Comments Section */}
           <View className="mx-4 mt-6 mb-4">
-            <Text className="text-lg font-semibold text-text-primary mb-4">
+            <Text className="text-headline-medium font-semibold text-text-primary mb-4">
               Comments ({comments.length})
             </Text>
             
@@ -299,8 +299,8 @@ export default function PostDetail() {
               ))
             ) : (
               <View className="bg-surface rounded-2xl p-8 border border-divider items-center">
-                <MessageSquareText size={32} color="#9CA3AF" />
-                <Text className="text-text-primary font-semibold text-lg mt-4 mb-2">
+                <MessageSquareText size={32} color="#757575" />
+                <Text className="text-text-primary font-semibold text-headline-medium mt-4 mb-2">
                   No comments yet
                 </Text>
                 <Text className="text-text-secondary text-center">

@@ -360,7 +360,7 @@ export default function NoticesPage() {
           ))
         ) : (
           <View className="flex-1 items-center justify-center py-12">
-            <Bell size={48} color="#9CA3AF" />
+            <Bell size={48} color="#757575" />
             <Text className="text-text-primary text-headline-small font-semibold mt-4 mb-2">
               No Notices Found
             </Text>

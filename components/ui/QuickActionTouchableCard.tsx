@@ -1,7 +1,7 @@
 import React from "react";
 import { Text, TouchableOpacity, View } from "react-native";
-import LucideIcons from "./LucideIcons";
-import { cn } from "../../utils/cn";
+import LucideIcons from "@/components/ui/LucideIcons";
+import { cn } from "@/utils/cn";
 
 const QuickActionTouchableCard = ({
   label,

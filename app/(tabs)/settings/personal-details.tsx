@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ScrollView, SafeAreaView, View, Text } from 'react-native';
+import { ScrollView, SafeAreaView, View, Text, KeyboardAvoidingView, Platform } from 'react-native';
 import { ArrowLeft, Save } from 'lucide-react-native';
 import { router } from 'expo-router';
 import Input from '../../../components/ui/Input';
@@ -75,11 +75,17 @@ export default function PersonalDetails() {
         )}
       </View>
 
-      <ScrollView 
-        className="flex-1 p-4" 
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ paddingBottom: 20 }}
+      <KeyboardAvoidingView 
+        className="flex-1" 
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        keyboardVerticalOffset={Platform.OS === 'ios' ? 90 : 0}
       >
+        <ScrollView 
+          className="flex-1 p-4" 
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={{ paddingBottom: 20 }}
+          keyboardShouldPersistTaps="handled"
+        >
         {/* Basic Information */}
         <Card className="mb-6">
           <Text className="text-text-primary text-lg font-semibold mb-4">
@@ -223,7 +229,8 @@ export default function PersonalDetails() {
             </Text>
           </View>
         )}
-      </ScrollView>
+        </ScrollView>
+      </KeyboardAvoidingView>
     </SafeAreaView>
   );
 }

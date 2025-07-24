@@ -40,13 +40,11 @@ export default function EmergencyContacts() {
   ]);
 
   const handleAddContact = () => {
-    console.log('Add emergency contact pressed');
-    // router.push('/settings/add-emergency-contact');
+    router.push('/(tabs)/settings/add-emergency-contact');
   };
 
   const handleEditContact = (contact: EmergencyContact) => {
-    console.log('Edit contact:', contact.name);
-    // router.push(`/settings/edit-emergency-contact/${contact.id}`);
+    router.push(`/(tabs)/settings/edit-emergency-contact/${contact.id}`);
   };
 
   const handleDeleteContact = (contact: EmergencyContact) => {
@@ -68,20 +66,31 @@ export default function EmergencyContacts() {
   };
 
   const handleCallContact = (phoneNumber: string) => {
-    // Validate phone number before calling
-    const validation = validateEmergencyContact(phoneNumber);
-    if (!validation.isValid) {
-      showErrorAlert('Invalid Phone Number', validation.error || 'Invalid phone number format');
-      return;
+    // Emergency service numbers (100, 101, 108) don't need validation
+    const emergencyNumbers = ['100', '101', '108'];
+    
+    if (!emergencyNumbers.includes(phoneNumber)) {
+      // Validate phone number before calling for regular contacts
+      const validation = validateEmergencyContact(phoneNumber);
+      if (!validation.isValid) {
+        showErrorAlert('Invalid Phone Number', validation.error || 'Invalid phone number format');
+        return;
+      }
     }
 
-    const phoneUrl = `tel:+91${phoneNumber}`;
+    // Format phone URL correctly
+    const phoneUrl = emergencyNumbers.includes(phoneNumber) 
+      ? `tel:${phoneNumber}` 
+      : `tel:+91${phoneNumber}`;
+      
     Linking.canOpenURL(phoneUrl).then((supported) => {
       if (supported) {
         Linking.openURL(phoneUrl);
       } else {
-        showErrorAlert('Error', 'Unable to make phone call');
+        showErrorAlert('Error', 'Unable to make phone call from this device');
       }
+    }).catch(() => {
+      showErrorAlert('Error', 'Unable to make phone call');
     });
   };
 

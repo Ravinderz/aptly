@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { View, Text, ScrollView, TouchableOpacity, Dimensions } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import LucideIcons from '../ui/LucideIcons';
 import { router } from 'expo-router';
 
 // Types
@@ -58,7 +58,7 @@ export const AnalyticsDashboard: React.FC<AnalyticsDashboardProps> = ({
 
   const renderKPICard = (title: string, value: number, unit: string, trend: 'up' | 'down' | 'stable', target?: number) => {
     const trendColor = trend === 'up' ? 'text-success' : trend === 'down' ? 'text-error' : 'text-text-secondary';
-    const trendIcon = trend === 'up' ? 'trending-up' : trend === 'down' ? 'trending-down' : 'remove';
+    const trendIcon = trend === 'up' ? 'trending-up' : trend === 'down' ? 'trending-down' : 'analytics-outline';
     const isOnTarget = target ? value >= target : true;
 
     return (
@@ -73,7 +73,7 @@ export const AnalyticsDashboard: React.FC<AnalyticsDashboardProps> = ({
                 {title}
               </Text>
             </View>
-            <Ionicons name={trendIcon} size={20} color={trendColor === 'text-success' ? '#10B981' : trendColor === 'text-error' ? '#EF4444' : '#6B7280'} />
+            <LucideIcons name={trendIcon as any} size={20} color={trendColor === 'text-success' ? '#4CAF50' : trendColor === 'text-error' ? '#D32F2F' : '#757575'} />
           </View>
           
           {target && (
@@ -209,8 +209,8 @@ export const AnalyticsDashboard: React.FC<AnalyticsDashboardProps> = ({
               
               <View className="flex-row items-center justify-between">
                 <View className="flex-row items-center">
-                  <Ionicons 
-                    name={getTrendIcon(insight.trend)} 
+                  <LucideIcons 
+                    name={getTrendIcon(insight.trend) as any} 
                     size={16} 
                     color={getTrendColor(insight.trend)} 
                   />
@@ -263,12 +263,13 @@ export const AnalyticsDashboard: React.FC<AnalyticsDashboardProps> = ({
                 
                 {canImplementRecommendations && (
                   <Button
-                    title="Implement"
                     variant="primary"
-                    size="small"
+                    size="sm"
                     onPress={() => onImplementRecommendation(recommendation.id)}
                     className="self-start"
-                  />
+                  >
+                    Implement
+                  </Button>
                 )}
               </View>
             </Card>
@@ -290,7 +291,7 @@ export const AnalyticsDashboard: React.FC<AnalyticsDashboardProps> = ({
                   <Text className="text-body-medium text-text-primary">Community Engagement</Text>
                 </View>
                 <View className="flex-row items-center">
-                  <Ionicons name="trending-up" size={16} color="#10B981" />
+                  <LucideIcons name="trending-up" size={16} color="#4CAF50" />
                   <Text className="text-body-small text-success ml-1">+12%</Text>
                 </View>
               </View>
@@ -301,7 +302,7 @@ export const AnalyticsDashboard: React.FC<AnalyticsDashboardProps> = ({
                   <Text className="text-body-medium text-text-primary">Digital Adoption</Text>
                 </View>
                 <View className="flex-row items-center">
-                  <Ionicons name="trending-up" size={16} color="#10B981" />
+                  <LucideIcons name="trending-up" size={16} color="#4CAF50" />
                   <Text className="text-body-small text-success ml-1">+8%</Text>
                 </View>
               </View>
@@ -312,7 +313,7 @@ export const AnalyticsDashboard: React.FC<AnalyticsDashboardProps> = ({
                   <Text className="text-body-medium text-text-primary">Maintenance Costs</Text>
                 </View>
                 <View className="flex-row items-center">
-                  <Ionicons name="trending-down" size={16} color="#EF4444" />
+                  <LucideIcons name="trending-down" size={16} color="#D32F2F" />
                   <Text className="text-body-small text-error ml-1">+5%</Text>
                 </View>
               </View>
@@ -534,8 +535,8 @@ export const AnalyticsDashboard: React.FC<AnalyticsDashboardProps> = ({
                   ₹{(expense.amount / 1000).toFixed(0)}K
                 </Text>
                 <View className="flex-row items-center">
-                  <Ionicons 
-                    name={getTrendIcon(expense.trend)} 
+                  <LucideIcons 
+                    name={getTrendIcon(expense.trend) as any} 
                     size={12} 
                     color={getTrendColor(expense.trend)} 
                   />
@@ -793,8 +794,8 @@ export const AnalyticsDashboard: React.FC<AnalyticsDashboardProps> = ({
                 
                 <View className="items-end">
                   <View className="flex-row items-center mb-1">
-                    <Ionicons 
-                      name={getTrendIcon(insight.trend)} 
+                    <LucideIcons 
+                      name={getTrendIcon(insight.trend) as any} 
                       size={16} 
                       color={getTrendColor(insight.trend)} 
                     />
@@ -850,7 +851,7 @@ export const AnalyticsDashboard: React.FC<AnalyticsDashboardProps> = ({
                   </Text>
                   
                   <View className="flex-row items-center">
-                    <Ionicons name="time-outline" size={14} color="#6B7280" />
+                    <LucideIcons name="time-outline" size={14} color="#757575" />
                     <Text className="text-body-small text-text-secondary ml-1">
                       {recommendation.timeframe}
                     </Text>
@@ -861,19 +862,21 @@ export const AnalyticsDashboard: React.FC<AnalyticsDashboardProps> = ({
               {canImplementRecommendations && (
                 <View className="flex-row gap-2">
                   <Button
-                    title="View Details"
                     variant="secondary"
-                    size="small"
+                    size="sm"
                     onPress={() => router.push(`/analytics/recommendations/${recommendation.id}`)}
                     className="flex-1"
-                  />
+                  >
+                    View Details
+                  </Button>
                   <Button
-                    title="Implement"
                     variant="primary"
-                    size="small"
+                    size="sm"
                     onPress={() => onImplementRecommendation(recommendation.id)}
                     className="flex-1"
-                  />
+                  >
+                    Implement
+                  </Button>
                 </View>
               )}
             </View>
@@ -886,7 +889,7 @@ export const AnalyticsDashboard: React.FC<AnalyticsDashboardProps> = ({
   if (!canViewDetailedAnalytics && activeTab !== 'overview') {
     return (
       <View className="flex-1 items-center justify-center p-4">
-        <Ionicons name="analytics-outline" size={64} color="#9CA3AF" />
+        <LucideIcons name="analytics-outline" size={64} color="#757575" />
         <Text className="text-headline-small text-text-secondary mt-4 mb-2">
           Limited Access
         </Text>
@@ -927,10 +930,10 @@ export const AnalyticsDashboard: React.FC<AnalyticsDashboardProps> = ({
             }`}
           >
             <View className="items-center">
-              <Ionicons 
+              <LucideIcons 
                 name={tab.icon as any} 
                 size={18} 
-                color={activeTab === tab.key ? '#6366f1' : '#6B7280'} 
+                color={activeTab === tab.key ? '#6366f1' : '#757575'} 
               />
               <Text className={`text-label-small font-medium mt-1 ${
                 activeTab === tab.key ? 'text-primary' : 'text-text-secondary'
@@ -1002,20 +1005,20 @@ const getTrendIcon = (trend: string) => {
   const icons = {
     up: 'trending-up',
     down: 'trending-down',
-    stable: 'remove',
+    stable: 'analytics-outline',
     volatile: 'pulse-outline'
   };
-  return icons[trend as keyof typeof icons] || 'remove';
+  return icons[trend as keyof typeof icons] || 'analytics-outline';
 };
 
 const getTrendColor = (trend: string) => {
   const colors = {
-    up: '#10B981',
-    down: '#EF4444',
-    stable: '#6B7280',
-    volatile: '#F59E0B'
+    up: '#4CAF50',    // secondary (success)
+    down: '#D32F2F',  // error
+    stable: '#757575', // text-secondary
+    volatile: '#FF9800' // warning
   };
-  return colors[trend as keyof typeof colors] || '#6B7280';
+  return colors[trend as keyof typeof colors] || '#757575';
 };
 
 const formatCategory = (category: string): string => {

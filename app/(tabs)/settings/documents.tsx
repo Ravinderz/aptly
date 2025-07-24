@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { SafeAreaView, View, Text, TouchableOpacity } from 'react-native';
 import { ArrowLeft } from 'lucide-react-native';
 import { router, useFocusEffect } from 'expo-router';
-import Button from '../../../components/ui/Button';
+import { Button } from '../../../components/ui/Button';
 import DocumentViewer from '../../../components/ui/DocumentViewer';
 import { DocumentStorage, Document, initializeMockData } from '../../../utils/storage';
 

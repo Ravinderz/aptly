@@ -1,5 +1,5 @@
 import React from 'react';
-import { TouchableOpacity, Text, ActivityIndicator, View } from 'react-native';
+import { TouchableOpacity, Text, ActivityIndicator } from 'react-native';
 import { cn } from '../../utils/cn';
 
 export interface ButtonProps {
@@ -84,5 +84,7 @@ export const Button: React.FC<ButtonProps> = ({
     </TouchableOpacity>
   );
 };
+
+Button.displayName = 'Button';
 
 export default Button;

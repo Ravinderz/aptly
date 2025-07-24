@@ -3,7 +3,7 @@ import { SafeAreaView, ScrollView, View, Text, TextInput, TouchableOpacity } fro
 import { useAlert } from '@/components/ui/AlertCard';
 import { ArrowLeft, Smartphone, User, Zap, AlertCircle, CreditCard, Gift } from 'lucide-react-native';
 import { router } from 'expo-router';
-import Button from '../../../../components/ui/Button';
+import { Button } from '../../../../components/ui/Button';
 import { Card } from '../../../../components/ui/Card';
 import HighlightCard from '../../../../components/ui/HighlightCard';
 
@@ -196,13 +196,13 @@ export default function MobileRecharge() {
             </Text>
             
             <View className="flex-row items-center p-4 bg-primary/5 rounded-xl border border-primary/20">
-              <Text className="text-2xl mr-3">{selectedOperator.logo}</Text>
+              <Text className="text-display-small mr-3">{selectedOperator.logo}</Text>
               <View className="flex-1">
                 <Text className="text-text-primary font-semibold">{selectedOperator.name}</Text>
-                <Text className="text-text-secondary text-sm">Operator detected</Text>
+                <Text className="text-text-secondary text-body-medium">Operator detected</Text>
               </View>
               <TouchableOpacity onPress={() => setSelectedOperator(null)}>
-                <Text className="text-primary text-sm font-medium">Change</Text>
+                <Text className="text-primary text-body-medium font-medium">Change</Text>
               </TouchableOpacity>
             </View>
           </Card>
@@ -264,7 +264,7 @@ export default function MobileRecharge() {
                   {plan.popular && (
                     <View className="absolute -top-2 left-4">
                       <View className="bg-success rounded-full px-3 py-1">
-                        <Text className="text-white text-xs font-bold">POPULAR</Text>
+                        <Text className="text-white text-label-large font-bold">POPULAR</Text>
                       </View>
                     </View>
                   )}
@@ -311,7 +311,7 @@ export default function MobileRecharge() {
               <TextInput
                 className="flex-1 text-text-primary text-body-large"
                 placeholder="Enter amount (₹10 - ₹5000)"
-                placeholderTextColor="#9CA3AF"
+                placeholderTextColor="#757575"
                 value={customAmount}
                 onChangeText={setCustomAmount}
                 keyboardType="numeric"
@@ -330,7 +330,7 @@ export default function MobileRecharge() {
           >
             <View className="flex-row items-center">
               <Gift size={16} color="#4CAF50" />
-              <Text className="text-text-secondary text-sm ml-2">
+              <Text className="text-text-secondary text-body-medium ml-2">
                 Earn 2% cashback (up to ₹50) on this recharge
               </Text>
             </View>
@@ -347,19 +347,19 @@ export default function MobileRecharge() {
           <View className="space-y-2">
             <View className="flex-row items-start">
               <AlertCircle size={14} color="#6366f1" className="mt-0.5 mr-2" />
-              <Text className="text-text-secondary text-sm flex-1">
+              <Text className="text-text-secondary text-body-medium flex-1">
                 Recharge will be processed instantly upon successful payment
               </Text>
             </View>
             <View className="flex-row items-start">
               <AlertCircle size={14} color="#6366f1" className="mt-0.5 mr-2" />
-              <Text className="text-text-secondary text-sm flex-1">
+              <Text className="text-text-secondary text-body-medium flex-1">
                 Cashback will be credited within 24-48 hours
               </Text>
             </View>
             <View className="flex-row items-start">
               <AlertCircle size={14} color="#6366f1" className="mt-0.5 mr-2" />
-              <Text className="text-text-secondary text-sm flex-1">
+              <Text className="text-text-secondary text-body-medium flex-1">
                 For failed transactions, refund takes 3-5 business days
               </Text>
             </View>

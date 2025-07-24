@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, Alert, Linking } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import { View, Text, ScrollView, TouchableOpacity, Linking } from 'react-native';
+import { showErrorAlert, showSuccessAlert } from '@/utils/alert';
+import LucideIcons from '../ui/LucideIcons';
 import { router } from 'expo-router';
 
 // Types
@@ -59,10 +60,10 @@ export const EmergencyManagement: React.FC<EmergencyManagementProps> = ({
       if (canCall) {
         await Linking.openURL(phoneNumber);
       } else {
-        Alert.alert('Call Failed', 'Unable to make phone calls from this device.');
+        showErrorAlert('Call Failed', 'Unable to make phone calls from this device.');
       }
     } catch (error) {
-      Alert.alert('Call Error', 'Failed to initiate call.');
+      showErrorAlert('Call Error', 'Failed to initiate call.');
     }
   };
 
@@ -70,9 +71,9 @@ export const EmergencyManagement: React.FC<EmergencyManagementProps> = ({
     try {
       setIsResponding(true);
       await onAcknowledgeAlert(alert.id, response);
-      Alert.alert('Response Recorded', 'Your emergency response has been logged.');
+      showSuccessAlert('Response Recorded', 'Your emergency response has been logged.');
     } catch (error) {
-      Alert.alert('Response Error', 'Failed to record your response.');
+      showErrorAlert('Response Error', 'Failed to record your response.');
     } finally {
       setIsResponding(false);
     }
@@ -92,7 +93,7 @@ export const EmergencyManagement: React.FC<EmergencyManagementProps> = ({
             <View className="flex-1 mr-3">
               <View className="flex-row items-center mb-2">
                 <View className={`p-2 rounded-full mr-3 ${severityStyle.iconBg}`}>
-                  <Ionicons name={typeIcon} size={20} color={severityStyle.iconColor} />
+                  <LucideIcons name={typeIcon} size={20} color={severityStyle.iconColor} />
                 </View>
                 <View className="flex-1">
                   <Text className="text-headline-small font-semibold text-text-primary">
@@ -128,7 +129,7 @@ export const EmergencyManagement: React.FC<EmergencyManagementProps> = ({
           {/* Location and Contact */}
           {alert.location && (
             <View className="flex-row items-center mb-2">
-              <Ionicons name="location-outline" size={16} color="#6B7280" />
+              <LucideIcons name="map-pin" size={16} color="#757575" />
               <Text className="text-body-small text-text-secondary ml-2">
                 Location: {alert.location}
               </Text>
@@ -136,7 +137,7 @@ export const EmergencyManagement: React.FC<EmergencyManagementProps> = ({
           )}
           
           <View className="flex-row items-center mb-3">
-            <Ionicons name="person-outline" size={16} color="#6B7280" />
+            <LucideIcons name="user" size={16} color="#757575" />
             <Text className="text-body-small text-text-secondary ml-2">
               Contact: {alert.contactPerson} ({alert.contactNumber})
             </Text>
@@ -162,7 +163,7 @@ export const EmergencyManagement: React.FC<EmergencyManagementProps> = ({
           {alert.escalationLevel > 0 && (
             <View className="mb-3">
               <View className="flex-row items-center">
-                <Ionicons name="arrow-up-circle-outline" size={16} color="#EF4444" />
+                <LucideIcons name="arrow-up-circle" size={16} color="#D32F2F" />
                 <Text className="text-body-small text-error ml-2">
                   Escalation Level {alert.escalationLevel}
                 </Text>
@@ -205,21 +206,23 @@ export const EmergencyManagement: React.FC<EmergencyManagementProps> = ({
                 {!userAcknowledged ? (
                   <>
                     <Button
-                      title="I'm Responding"
                       variant="primary"
-                      size="small"
+                      size="sm"
                       onPress={() => handleAcknowledgeAlert(alert, 'responding')}
                       disabled={isResponding}
                       className="flex-1"
-                    />
+                    >
+                      I&apos;m Responding
+                    </Button>
                     <Button
-                      title="Acknowledged"
                       variant="secondary"
-                      size="small"
+                      size="sm"
                       onPress={() => handleAcknowledgeAlert(alert, 'acknowledged')}
                       disabled={isResponding}
                       className="flex-1"
-                    />
+                    >
+                      Acknowledged
+                    </Button>
                   </>
                 ) : (
                   <View className="flex-1 bg-success/10 border border-success/20 rounded-lg p-2">
@@ -231,9 +234,8 @@ export const EmergencyManagement: React.FC<EmergencyManagementProps> = ({
                 
                 {/* Emergency Call Button */}
                 <Button
-                  title=""
-                  variant="danger"
-                  size="small"
+                  variant="secondary"
+                  size="sm"
                   onPress={() => handleEmergencyCall({
                     id: 'emergency',
                     society_id: '',
@@ -244,17 +246,19 @@ export const EmergencyManagement: React.FC<EmergencyManagementProps> = ({
                     responseTime: 'immediate',
                     isActive: true
                   } as EmergencyContact)}
-                  icon="call"
-                />
+                >
+                  Call
+                </Button>
               </>
             ) : (
               <Button
-                title="View Details"
                 variant="secondary"
-                size="small"
+                size="sm"
                 onPress={() => router.push(`/governance/emergency/${alert.id}`)}
                 className="flex-1"
-              />
+              >
+                View Details
+              </Button>
             )}
           </View>
         </View>
@@ -272,7 +276,7 @@ export const EmergencyManagement: React.FC<EmergencyManagementProps> = ({
             <View className="flex-1 mr-3">
               <View className="flex-row items-center mb-1">
                 <View className="p-2 bg-primary/10 rounded-full mr-3">
-                  <Ionicons name={categoryIcon} size={20} color="#6366f1" />
+                  <LucideIcons name={categoryIcon} size={20} color="#6366f1" />
                 </View>
                 <View className="flex-1">
                   <Text className="text-body-large font-medium text-text-primary">
@@ -287,7 +291,7 @@ export const EmergencyManagement: React.FC<EmergencyManagementProps> = ({
               </View>
               
               <View className="flex-row items-center mb-1">
-                <Ionicons name="call-outline" size={14} color="#6B7280" />
+                <LucideIcons name="phone" size={14} color="#757575" />
                 <Text className="text-body-small text-text-secondary ml-2">
                   {contact.primaryPhone}
                 </Text>
@@ -299,7 +303,7 @@ export const EmergencyManagement: React.FC<EmergencyManagementProps> = ({
               </View>
               
               <View className="flex-row items-center">
-                <Ionicons name="time-outline" size={14} color="#6B7280" />
+                <LucideIcons name="clock" size={14} color="#757575" />
                 <Text className="text-body-small text-text-secondary ml-2">
                   Response: {contact.responseTime}
                 </Text>
@@ -308,12 +312,12 @@ export const EmergencyManagement: React.FC<EmergencyManagementProps> = ({
             
             {/* Call Button */}
             <Button
-              title=""
               variant="primary"
-              size="small"
+              size="sm"
               onPress={() => handleEmergencyCall(contact)}
-              icon="call"
-            />
+            >
+              Call
+            </Button>
           </View>
         </View>
       </Card>
@@ -328,7 +332,7 @@ export const EmergencyManagement: React.FC<EmergencyManagementProps> = ({
           className="p-4 items-center"
         >
           <View className="w-16 h-16 bg-error/10 rounded-full items-center justify-center mb-3">
-            <Ionicons name="alert-circle" size={32} color="#EF4444" />
+            <LucideIcons name="alert-circle" size={32} color="#D32F2F" />
           </View>
           <Text className="text-headline-small font-medium text-text-primary mb-1">
             Report Emergency
@@ -396,10 +400,10 @@ export const EmergencyManagement: React.FC<EmergencyManagementProps> = ({
               {Object.entries(analytics.incidentBreakdown.byType).map(([type, count]) => (
                 <View key={type} className="flex-row items-center justify-between">
                   <View className="flex-row items-center flex-1">
-                    <Ionicons 
+                    <LucideIcons 
                       name={getEmergencyTypeIcon(type as EmergencyType)} 
                       size={16} 
-                      color="#6B7280" 
+                      color="#757575" 
                     />
                     <Text className="text-body-medium text-text-secondary ml-2 flex-1">
                       {formatEmergencyType(type)}
@@ -529,7 +533,7 @@ export const EmergencyManagement: React.FC<EmergencyManagementProps> = ({
               alerts.map(renderEmergencyAlert)
             ) : (
               <View className="items-center py-8">
-                <Ionicons name="shield-checkmark-outline" size={48} color="#10B981" />
+                <LucideIcons name="shield-check" size={48} color="#4CAF50" />
                 <Text className="text-headline-small text-success mt-4 mb-2">
                   All Clear
                 </Text>
@@ -609,34 +613,34 @@ const getStatusStyle = (status: string) => {
 
 const getEmergencyTypeIcon = (type: EmergencyType | string) => {
   const icons = {
-    fire: 'flame-outline',
-    medical: 'medical-outline',
-    security: 'shield-outline',
-    natural_disaster: 'thunderstorm-outline',
-    infrastructure: 'construct-outline',
-    power_outage: 'flash-off-outline',
-    water_shortage: 'water-outline',
-    gas_leak: 'warning-outline',
-    elevator: 'arrow-up-circle-outline',
-    other: 'alert-circle-outline'
+    fire: 'flame',
+    medical: 'heart-pulse',
+    security: 'shield',
+    natural_disaster: 'cloud-lightning',
+    infrastructure: 'hammer',
+    power_outage: 'zap-off',
+    water_shortage: 'droplets',
+    gas_leak: 'triangle-alert',
+    elevator: 'arrow-up-circle',
+    other: 'alert-circle'
   };
-  return icons[type as keyof typeof icons] || 'alert-circle-outline';
+  return icons[type as keyof typeof icons] || 'alert-circle';
 };
 
 const getContactCategoryIcon = (category: string) => {
   const icons = {
-    police: 'shield-outline',
-    fire: 'flame-outline',
-    medical: 'medical-outline',
-    gas: 'warning-outline',
-    electricity: 'flash-outline',
-    water: 'water-outline',
-    elevator: 'arrow-up-circle-outline',
-    security: 'lock-closed-outline',
-    municipal: 'business-outline',
-    other: 'call-outline'
+    police: 'shield',
+    fire: 'flame',
+    medical: 'heart-pulse',
+    gas: 'triangle-alert',
+    electricity: 'zap',
+    water: 'droplets',
+    elevator: 'arrow-up-circle',
+    security: 'lock',
+    municipal: 'building',
+    other: 'phone'
   };
-  return icons[category as keyof typeof icons] || 'call-outline';
+  return icons[category as keyof typeof icons] || 'phone';
 };
 
 const getResponseStyle = (response: EmergencyResponse) => {

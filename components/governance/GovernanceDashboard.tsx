@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, ScrollView, TouchableOpacity } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import LucideIcons from '../ui/LucideIcons';
 import { router } from 'expo-router';
 
 // Components
@@ -44,15 +44,15 @@ export const GovernanceDashboard: React.FC<GovernanceDashboardProps> = ({
 }) => {
   const [activeSection, setActiveSection] = useState<'overview' | 'voting' | 'emergency' | 'succession' | 'policies'>('overview');
 
-  const activeEmergencies = emergencyAlerts.filter(alert => 
+  const activeEmergencies = (emergencyAlerts || []).filter(alert => 
     alert.status === 'active' || alert.status === 'escalated'
   );
 
-  const activeVoting = votingCampaigns.filter(campaign => 
+  const activeVoting = (votingCampaigns || []).filter(campaign => 
     campaign.status === 'active'
   );
 
-  const pendingPolicies = policyProposals.filter(policy => 
+  const pendingPolicies = (policyProposals || []).filter(policy => 
     policy.status === 'voting' || policy.status === 'public_consultation'
   );
 
@@ -79,7 +79,7 @@ export const GovernanceDashboard: React.FC<GovernanceDashboardProps> = ({
           <Card className="h-24">
             <View className="p-4 items-center justify-center h-full">
               <View className="flex-row items-center mb-1">
-                <Ionicons name="ballot-outline" size={20} color="#6366f1" />
+                <LucideIcons name="checkmark-circle-outline" size={20} color="#6366f1" />
                 <Text className="text-display-small font-bold text-primary ml-2">
                   {dashboardData.activeVotingCampaigns}
                 </Text>
@@ -104,10 +104,10 @@ export const GovernanceDashboard: React.FC<GovernanceDashboardProps> = ({
           <Card className="h-24">
             <View className="p-4 items-center justify-center h-full">
               <View className="flex-row items-center mb-1">
-                <Ionicons 
-                  name="alert-circle-outline" 
+                <LucideIcons 
+                  name="alert-circle" 
                   size={20} 
-                  color={activeEmergencies.length > 0 ? "#EF4444" : "#10B981"} 
+                  color={activeEmergencies.length > 0 ? "#D32F2F" : "#4CAF50"} 
                 />
                 <Text className={`text-display-small font-bold ml-2 ${
                   activeEmergencies.length > 0 ? 'text-error' : 'text-success'
@@ -135,7 +135,7 @@ export const GovernanceDashboard: React.FC<GovernanceDashboardProps> = ({
           <Card className="h-24">
             <View className="p-4 items-center justify-center h-full">
               <View className="flex-row items-center mb-1">
-                <Ionicons name="document-text-outline" size={20} color="#F59E0B" />
+                <LucideIcons name="document-text-outline" size={20} color="#FF9800" />
                 <Text className="text-display-small font-bold text-warning ml-2">
                   {dashboardData.pendingPolicies}
                 </Text>
@@ -158,10 +158,10 @@ export const GovernanceDashboard: React.FC<GovernanceDashboardProps> = ({
           <Card className="h-24">
             <View className="p-4 items-center justify-center h-full">
               <View className="flex-row items-center mb-1">
-                <Ionicons 
+                <LucideIcons 
                   name="people-outline" 
                   size={20} 
-                  color={dashboardData.succession.planExists ? "#10B981" : "#EF4444"} 
+                  color={dashboardData.succession.planExists ? "#4CAF50" : "#D32F2F"} 
                 />
                 <Text className={`text-display-small font-bold ml-2 ${
                   dashboardData.succession.planExists ? 'text-success' : 'text-error'
@@ -192,7 +192,7 @@ export const GovernanceDashboard: React.FC<GovernanceDashboardProps> = ({
           <View className="space-y-3">
             <View className="flex-row items-center justify-between">
               <View className="flex-row items-center">
-                <Ionicons name="calendar-outline" size={16} color="#6B7280" />
+                <LucideIcons name="calendar-outline" size={16} color="#757575" />
                 <Text className="text-body-medium text-text-secondary ml-2">
                   Events This Month
                 </Text>
@@ -204,7 +204,7 @@ export const GovernanceDashboard: React.FC<GovernanceDashboardProps> = ({
             
             <View className="flex-row items-center justify-between">
               <View className="flex-row items-center">
-                <Ionicons name="people-outline" size={16} color="#6B7280" />
+                <LucideIcons name="people-outline" size={16} color="#757575" />
                 <Text className="text-body-medium text-text-secondary ml-2">
                   Average Attendance
                 </Text>
@@ -216,7 +216,7 @@ export const GovernanceDashboard: React.FC<GovernanceDashboardProps> = ({
             
             <View className="flex-row items-center justify-between">
               <View className="flex-row items-center">
-                <Ionicons name="star-outline" size={16} color="#6B7280" />
+                <LucideIcons name="star-outline" size={16} color="#757575" />
                 <Text className="text-body-medium text-text-secondary ml-2">
                   Satisfaction Score
                 </Text>
@@ -227,11 +227,11 @@ export const GovernanceDashboard: React.FC<GovernanceDashboardProps> = ({
                 </Text>
                 <View className="flex-row">
                   {[1,2,3,4,5].map(i => (
-                    <Ionicons 
+                    <LucideIcons 
                       key={i}
                       name={i <= dashboardData.communityEngagement.satisfactionScore ? "star" : "star-outline"}
                       size={12} 
-                      color="#F59E0B" 
+                      color="#FF9800" 
                     />
                   ))}
                 </View>
@@ -251,35 +251,35 @@ export const GovernanceDashboard: React.FC<GovernanceDashboardProps> = ({
           <View className="space-y-2">
             {activeVoting.length > 0 && (
               <Button
-                title={`Vote in ${activeVoting.length} Campaign${activeVoting.length > 1 ? 's' : ''}`}
                 variant="primary"
-                size="medium"
+                size="md"
                 onPress={() => setActiveSection('voting')}
-                icon="ballot-outline"
                 className="w-full"
-              />
+              >
+                {`Vote in ${activeVoting.length} Campaign${activeVoting.length > 1 ? 's' : ''}`}
+              </Button>
             )}
             
             {pendingPolicies.length > 0 && (
               <Button
-                title={`Review ${pendingPolicies.length} Policy Proposal${pendingPolicies.length > 1 ? 's' : ''}`}
                 variant="secondary"
-                size="medium"
+                size="md"
                 onPress={() => setActiveSection('policies')}
-                icon="document-text-outline"
                 className="w-full"
-              />
+              >
+                {`Review ${pendingPolicies.length} Policy Proposal${pendingPolicies.length > 1 ? 's' : ''}`}
+              </Button>
             )}
             
             {(userRole === 'committee_member' || userRole === 'admin') && (
               <Button
-                title="Report Emergency"
-                variant="danger"
-                size="medium"
+                variant="secondary"
+                size="md"
                 onPress={() => router.push('/governance/emergency/create')}
-                icon="alert-circle-outline"
                 className="w-full"
-              />
+              >
+                Report Emergency
+              </Button>
             )}
           </View>
         </View>
@@ -298,7 +298,7 @@ export const GovernanceDashboard: React.FC<GovernanceDashboardProps> = ({
               <View className="w-2 h-2 bg-primary rounded-full mt-2 mr-3" />
               <View className="flex-1">
                 <Text className="text-body-medium text-text-primary">
-                  New policy proposal: "Updated Parking Rules"
+                  New policy proposal: &quot;Updated Parking Rules&quot;
                 </Text>
                 <Text className="text-body-small text-text-secondary">
                   2 hours ago • Public consultation phase
@@ -310,7 +310,7 @@ export const GovernanceDashboard: React.FC<GovernanceDashboardProps> = ({
               <View className="w-2 h-2 bg-success rounded-full mt-2 mr-3" />
               <View className="flex-1">
                 <Text className="text-body-medium text-text-primary">
-                  Voting completed: "Committee Member Election"
+                  Voting completed: &quot;Committee Member Election&quot;
                 </Text>
                 <Text className="text-body-small text-text-secondary">
                   1 day ago • 87% participation rate
@@ -322,7 +322,7 @@ export const GovernanceDashboard: React.FC<GovernanceDashboardProps> = ({
               <View className="w-2 h-2 bg-warning rounded-full mt-2 mr-3" />
               <View className="flex-1">
                 <Text className="text-body-medium text-text-primary">
-                  Emergency resolved: "Elevator maintenance"
+                  Emergency resolved: &quot;Elevator maintenance&quot;
                 </Text>
                 <Text className="text-body-small text-text-secondary">
                   3 days ago • Response time: 15 minutes
@@ -338,11 +338,11 @@ export const GovernanceDashboard: React.FC<GovernanceDashboardProps> = ({
   const renderSectionNavigation = () => (
     <View className="flex-row bg-surface-primary border-b border-border-primary">
       {[
-        { key: 'overview', label: 'Overview', icon: 'home-outline' },
-        { key: 'voting', label: 'Voting', icon: 'ballot-outline', badge: activeVoting.length },
-        { key: 'emergency', label: 'Emergency', icon: 'alert-circle-outline', badge: activeEmergencies.length },
-        { key: 'succession', label: 'Succession', icon: 'people-outline' },
-        { key: 'policies', label: 'Policies', icon: 'document-text-outline', badge: pendingPolicies.length }
+        { key: 'overview', label: 'Overview', icon: 'home' },
+        { key: 'voting', label: 'Voting', icon: 'vote', badge: activeVoting.length },
+        { key: 'emergency', label: 'Emergency', icon: 'alert-circle', badge: activeEmergencies.length },
+        { key: 'succession', label: 'Succession', icon: 'users' },
+        { key: 'policies', label: 'Policies', icon: 'file-text', badge: pendingPolicies.length }
       ].map((section) => (
         <TouchableOpacity
           key={section.key}
@@ -352,10 +352,10 @@ export const GovernanceDashboard: React.FC<GovernanceDashboardProps> = ({
           }`}
         >
           <View className="items-center relative">
-            <Ionicons 
+            <LucideIcons 
               name={section.icon as any} 
               size={18} 
-              color={activeSection === section.key ? '#6366f1' : '#6B7280'} 
+              color={activeSection === section.key ? '#6366f1' : '#757575'} 
             />
             <Text className={`text-label-small font-medium mt-1 ${
               activeSection === section.key ? 'text-primary' : 'text-text-secondary'
@@ -364,7 +364,7 @@ export const GovernanceDashboard: React.FC<GovernanceDashboardProps> = ({
             </Text>
             {section.badge && section.badge > 0 && (
               <View className="absolute -top-1 -right-1 bg-error rounded-full min-w-[16px] h-4 px-1 items-center justify-center">
-                <Text className="text-white text-xs font-medium">
+                <Text className="text-white text-label-large font-medium">
                   {section.badge > 99 ? '99+' : section.badge}
                 </Text>
               </View>

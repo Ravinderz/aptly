@@ -1,13 +1,12 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, Alert, TextInput } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import React, { useState } from 'react';
+import { View, Text, ScrollView, TouchableOpacity, TextInput } from 'react-native';
+import { showConfirmAlert, showSuccessAlert, showErrorAlert } from '@/utils/alert';
+import LucideIcons from '../ui/LucideIcons';
 import { router } from 'expo-router';
 
 // Types
 import type { 
   PolicyProposal, 
-  PolicyChange, 
-  PolicyComment,
   PolicyCategory,
   PolicyStatus 
 } from '../../types/governance';
@@ -15,7 +14,6 @@ import type {
 // UI Components
 import { Card } from '../ui/Card';
 import { Button } from '../ui/Button';
-import { UserAvatar } from '../ui/UserAvatar';
 import { AlertCard } from '../ui/AlertCard';
 
 interface PolicyGovernanceProps {
@@ -48,26 +46,19 @@ export const PolicyGovernance: React.FC<PolicyGovernanceProps> = ({
   const implementedProposals = proposals.filter(p => p.status === 'implemented');
 
   const canCreateProposal = userRole === 'committee_member' || userRole === 'admin';
-  const canReviewProposal = userRole === 'committee_member' || userRole === 'admin';
 
   const handleVote = async (proposal: PolicyProposal, vote: 'approve' | 'reject') => {
-    Alert.alert(
+    showConfirmAlert(
       'Confirm Vote',
       `Are you sure you want to ${vote} this policy proposal?`,
-      [
-        { text: 'Cancel', style: 'cancel' },
-        {
-          text: 'Confirm',
-          onPress: async () => {
-            try {
-              await onVoteOnProposal(proposal.id, vote);
-              Alert.alert('Success', `Your ${vote} vote has been recorded.`);
-            } catch (error) {
-              Alert.alert('Error', 'Failed to record your vote.');
-            }
-          }
+      async () => {
+        try {
+          await onVoteOnProposal(proposal.id, vote);
+          showSuccessAlert('Success', `Your ${vote} vote has been recorded.`);
+        } catch {
+          showErrorAlert('Error', 'Failed to record your vote.');
         }
-      ]
+      }
     );
   };
 
@@ -78,9 +69,9 @@ export const PolicyGovernance: React.FC<PolicyGovernanceProps> = ({
       setIsSubmitting(true);
       await onCommentOnProposal(proposalId, commentText);
       setCommentText('');
-      Alert.alert('Success', 'Your comment has been added.');
-    } catch (error) {
-      Alert.alert('Error', 'Failed to add comment.');
+      showSuccessAlert('Success', 'Your comment has been added.');
+    } catch {
+      showErrorAlert('Error', 'Failed to add comment.');
     } finally {
       setIsSubmitting(false);
     }
@@ -128,7 +119,7 @@ export const PolicyGovernance: React.FC<PolicyGovernanceProps> = ({
           <View className="mb-3">
             <View className="flex-row items-center justify-between">
               <View className="flex-row items-center">
-                <Ionicons name="people-outline" size={16} color="#6B7280" />
+                <LucideIcons name="users" size={16} color="#757575" />
                 <Text className="text-body-small text-text-secondary ml-1">
                   Affects: {proposal.impact.affectedResidents} residents
                 </Text>
@@ -136,7 +127,7 @@ export const PolicyGovernance: React.FC<PolicyGovernanceProps> = ({
               
               {proposal.impact.financialImpact > 0 && (
                 <View className="flex-row items-center">
-                  <Ionicons name="cash-outline" size={16} color="#6B7280" />
+                  <LucideIcons name="dollar-sign" size={16} color="#757575" />
                   <Text className="text-body-small text-text-secondary ml-1">
                     ₹{proposal.impact.financialImpact.toLocaleString()}
                   </Text>
@@ -224,14 +215,14 @@ export const PolicyGovernance: React.FC<PolicyGovernanceProps> = ({
                 <Button
                   title="Support"
                   variant="success"
-                  size="small"
+                  size="sm"
                   onPress={() => handleVote(proposal, 'approve')}
                   className="flex-1"
                 />
                 <Button
                   title="Oppose"
                   variant="danger"
-                  size="small"
+                  size="sm"
                   onPress={() => handleVote(proposal, 'reject')}
                   className="flex-1"
                 />
@@ -246,7 +237,7 @@ export const PolicyGovernance: React.FC<PolicyGovernanceProps> = ({
               <Button
                 title="Add Comment"
                 variant="secondary"
-                size="small"
+                size="sm"
                 onPress={() => setSelectedProposal(proposal)}
                 className="flex-1"
               />
@@ -255,7 +246,7 @@ export const PolicyGovernance: React.FC<PolicyGovernanceProps> = ({
             <Button
               title="Details"
               variant="ghost"
-              size="small"
+              size="sm"
               onPress={() => router.push(`/governance/policies/${proposal.id}`)}
               icon="information-circle-outline"
             />
@@ -278,7 +269,7 @@ export const PolicyGovernance: React.FC<PolicyGovernanceProps> = ({
                 Add Comment
               </Text>
               <TouchableOpacity onPress={() => setSelectedProposal(null)}>
-                <Ionicons name="close" size={24} color="#6B7280" />
+                <LucideIcons name="x" size={24} color="#757575" />
               </TouchableOpacity>
             </View>
             <Text className="text-body-medium text-text-secondary mt-1" numberOfLines={1}>
@@ -297,7 +288,7 @@ export const PolicyGovernance: React.FC<PolicyGovernanceProps> = ({
                 multiline
                 numberOfLines={4}
                 placeholder="Share your thoughts on this policy proposal..."
-                placeholderTextColor="#9CA3AF"
+                placeholderTextColor="#757575"
                 value={commentText}
                 onChangeText={setCommentText}
                 style={{ textAlignVertical: 'top' }}
@@ -320,7 +311,7 @@ export const PolicyGovernance: React.FC<PolicyGovernanceProps> = ({
               <Button
                 title="Cancel"
                 variant="secondary"
-                size="medium"
+                size="md"
                 onPress={() => {
                   setSelectedProposal(null);
                   setCommentText('');
@@ -330,7 +321,7 @@ export const PolicyGovernance: React.FC<PolicyGovernanceProps> = ({
               <Button
                 title={isSubmitting ? "Submitting..." : "Submit Comment"}
                 variant="primary"
-                size="medium"
+                size="md"
                 onPress={() => handleComment(selectedProposal.id)}
                 disabled={!commentText.trim() || isSubmitting}
                 className="flex-1"
@@ -352,7 +343,7 @@ export const PolicyGovernance: React.FC<PolicyGovernanceProps> = ({
           className="p-4 items-center"
         >
           <View className="w-16 h-16 bg-primary/10 rounded-full items-center justify-center mb-3">
-            <Ionicons name="document-text-outline" size={32} color="#6366f1" />
+            <LucideIcons name="file-text" size={32} color="#6366f1" />
           </View>
           <Text className="text-headline-small font-medium text-text-primary mb-1">
             Create Policy Proposal
@@ -368,22 +359,22 @@ export const PolicyGovernance: React.FC<PolicyGovernanceProps> = ({
   const renderEmptyState = (type: string) => {
     const emptyStates = {
       active: {
-        icon: 'document-outline',
+        icon: 'file',
         title: 'No Active Proposals',
         message: 'No policy proposals are currently open for discussion.'
       },
       review: {
-        icon: 'eye-outline',
+        icon: 'eye',
         title: 'No Proposals Under Review',
         message: 'No proposals are currently being reviewed by the committee.'
       },
       voting: {
-        icon: 'ballot-outline',
+        icon: 'vote',
         title: 'No Voting in Progress',
         message: 'No policy proposals are currently open for voting.'
       },
       implemented: {
-        icon: 'checkmark-done-outline',
+        icon: 'check-check',
         title: 'No Implemented Policies',
         message: 'No policies have been implemented yet.'
       }
@@ -393,7 +384,7 @@ export const PolicyGovernance: React.FC<PolicyGovernanceProps> = ({
 
     return (
       <View className="items-center py-8">
-        <Ionicons name={state.icon as any} size={48} color="#9CA3AF" />
+        <LucideIcons name={state.icon as any} size={48} color="#757575" />
         <Text className="text-headline-small text-text-secondary mt-4 mb-2">
           {state.title}
         </Text>

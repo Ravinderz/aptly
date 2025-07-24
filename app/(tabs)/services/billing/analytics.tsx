@@ -39,8 +39,8 @@ const analyticsData = {
   categoryBreakdown: [
     { category: 'Maintenance', amount: 21000, percentage: 55, color: '#6366f1' },
     { category: 'Water', amount: 3400, percentage: 18, color: '#3B82F6' },
-    { category: 'Security', amount: 8000, percentage: 21, color: '#10B981' },
-    { category: 'Common Area', amount: 3304, percentage: 6, color: '#F59E0B' },
+    { category: 'Security', amount: 8000, percentage: 21, color: '#4CAF50' },
+    { category: 'Common Area', amount: 3304, percentage: 6, color: '#FF9800' },
   ],
   paymentHistory: [
     {

@@ -125,19 +125,6 @@ export default function AutoPaySetup() {
     );
   };
 
-  const _handleDeleteRule = (ruleId: string) => {
-    const rule = autoPayRules.find(r => r.id === ruleId);
-    if (!rule) return;
-
-    showDeleteConfirmAlert(
-      "Delete Auto Pay Rule",
-      `Are you sure you want to delete the auto pay rule for ${rule.billType}?`,
-      () => {
-        setAutoPayRules(prev => prev.filter(r => r.id !== ruleId));
-        showAlert("Rule Deleted", "Auto pay rule has been deleted successfully");
-      }
-    );
-  };
 
   const handleTestAutoPayment = () => {
     showAlert(

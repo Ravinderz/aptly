@@ -348,7 +348,7 @@ export default function VendorProfile() {
       >
         {/* Vendor Header */}
         <View className="bg-surface px-6 py-6 border-b border-divider">
-          <View className="flex-row items-start justify-between mb-4">
+          <View className="flex-row items-center justify-between mb-4">
             <View className="flex-1">
               <View className="flex-row items-center mb-2">
                 <Text className="text-display-small font-bold text-text-primary mr-2">

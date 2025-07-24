@@ -5,36 +5,91 @@ import {
   View, 
   Text, 
   TouchableOpacity,
-  Switch,
-  Alert
+  Switch
 } from 'react-native';
 import { router } from 'expo-router';
-import { Ionicons } from '@expo/vector-icons';
-
-// Import context
-import { useGovernance } from '@/contexts/GovernanceContext';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import LucideIcons from '@/components/ui/LucideIcons';
+import { showSuccessAlert, showErrorAlert } from '@/utils/alert';
 
 // UI Components
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
-import { TabHeader } from '@/components/ui/headers';
+import { StackHeader } from '@/components/ui/headers/StackHeader';
+
+// Default governance preferences
+const defaultPreferences = {
+  notifications: true,
+  emailAlerts: false,
+  emergencyContacts: []
+};
+
+// Default state
+const defaultState = {
+  userRole: 'resident' as 'resident' | 'committee_member' | 'admin',
+  preferences: defaultPreferences,
+  lastUpdated: null as string | null
+};
+
+// Helper function to check user permissions
+const canUserPerformAction = (action: string, userRole: string): boolean => {
+  const permissions = {
+    'create_campaign': ['admin', 'committee_member'],
+    'manage_emergency': ['admin', 'committee_member'],
+    'view_analytics': ['admin', 'committee_member'],
+    'manage_policies': ['admin']
+  };
+  
+  return permissions[action as keyof typeof permissions]?.includes(userRole) || false;
+};
+
+// Helper function to update preferences
+const updateUserPreferences = async (newPreferences: typeof defaultPreferences): Promise<void> => {
+  try {
+    await AsyncStorage.setItem('governance_preferences', JSON.stringify(newPreferences));
+    await AsyncStorage.setItem('governance_last_updated', new Date().toISOString());
+  } catch (error) {
+    throw new Error('Failed to save preferences');
+  }
+};
+
+// Helper function to load preferences
+const loadUserPreferences = async () => {
+  try {
+    const prefsString = await AsyncStorage.getItem('governance_preferences');
+    const roleString = await AsyncStorage.getItem('user_role') || 'resident';
+    const lastUpdated = await AsyncStorage.getItem('governance_last_updated');
+    
+    return {
+      userRole: roleString as 'resident' | 'committee_member' | 'admin',
+      preferences: prefsString ? JSON.parse(prefsString) : defaultPreferences,
+      lastUpdated
+    };
+  } catch (error) {
+    return defaultState;
+  }
+};
 
 export default function GovernanceSettingsPage() {
-  const { state, updateUserPreferences, canUserPerformAction } = useGovernance();
-  const [preferences, setPreferences] = useState(state.preferences);
+  const [state, setState] = useState(defaultState);
+  const [preferences, setPreferences] = useState(defaultPreferences);
   const [isSaving, setIsSaving] = useState(false);
 
   useEffect(() => {
-    setPreferences(state.preferences);
-  }, [state.preferences]);
+    // Load preferences on component mount
+    loadUserPreferences().then(loadedState => {
+      setState(loadedState);
+      setPreferences(loadedState.preferences);
+    });
+  }, []);
 
   const handleSavePreferences = async () => {
     try {
       setIsSaving(true);
       await updateUserPreferences(preferences);
-      Alert.alert('Success', 'Governance preferences updated successfully');
+      showSuccessAlert('Success', 'Governance preferences updated successfully');
     } catch (error) {
-      Alert.alert('Error', 'Failed to update preferences');
+      showErrorAlert('Error', 'Failed to update preferences');
     } finally {
       setIsSaving(false);
     }
@@ -70,7 +125,7 @@ export default function GovernanceSettingsPage() {
               value={preferences.notifications}
               onValueChange={handleToggleNotifications}
               trackColor={{ false: '#D1D5DB', true: '#6366f1' }}
-              thumbColor={preferences.notifications ? '#FFFFFF' : '#9CA3AF'}
+              thumbColor={preferences.notifications ? '#FFFFFF' : '#757575'}
             />
           </View>
 
@@ -88,7 +143,7 @@ export default function GovernanceSettingsPage() {
               value={preferences.emailAlerts}
               onValueChange={handleToggleEmailAlerts}
               trackColor={{ false: '#D1D5DB', true: '#6366f1' }}
-              thumbColor={preferences.emailAlerts ? '#FFFFFF' : '#9CA3AF'}
+              thumbColor={preferences.emailAlerts ? '#FFFFFF' : '#757575'}
             />
           </View>
 
@@ -105,16 +160,16 @@ export default function GovernanceSettingsPage() {
                 <Text className="text-primary text-body-small mr-1">
                   {preferences.emergencyContacts.length} contacts
                 </Text>
-                <Ionicons name="chevron-forward" size={16} color="#6366f1" />
+                <LucideIcons name="chevron-forward" size={16} color="#6366f1" />
               </TouchableOpacity>
             </View>
             <Text className="text-body-small text-text-secondary mb-3">
               Manage your emergency contact list for escalation chains
             </Text>
             <Button
-              title="Manage Contacts"
+              title="Manage Emergency Contacts"
               variant="secondary"
-              size="small"
+              size="sm"
               onPress={() => {/* Navigate to emergency contacts management */}}
               icon="people-outline"
             />
@@ -158,10 +213,10 @@ export default function GovernanceSettingsPage() {
             { action: 'view_analytics', label: 'View governance analytics' }
           ].map((permission) => (
             <View key={permission.action} className="flex-row items-center">
-              <Ionicons 
+              <LucideIcons 
                 name={canUserPerformAction(permission.action) ? "checkmark-circle" : "close-circle"} 
                 size={16} 
-                color={canUserPerformAction(permission.action) ? "#10B981" : "#EF4444"} 
+                color={canUserPerformAction(permission.action) ? "#4CAF50" : "#D32F2F"} 
               />
               <Text className={`text-body-small ml-2 ${
                 canUserPerformAction(permission.action) ? 'text-text-primary' : 'text-text-secondary'
@@ -195,7 +250,7 @@ export default function GovernanceSettingsPage() {
                 Download your voting history and participation data
               </Text>
             </View>
-            <Ionicons name="download-outline" size={20} color="#6B7280" />
+            <LucideIcons name="download-outline" size={20} color="#757575" />
           </TouchableOpacity>
 
           <TouchableOpacity
@@ -210,7 +265,7 @@ export default function GovernanceSettingsPage() {
                 Manage how your data is used in governance processes
               </Text>
             </View>
-            <Ionicons name="shield-outline" size={20} color="#6B7280" />
+            <LucideIcons name="shield-outline" size={20} color="#757575" />
           </TouchableOpacity>
 
           <TouchableOpacity
@@ -225,7 +280,7 @@ export default function GovernanceSettingsPage() {
                 View your governance activity history
               </Text>
             </View>
-            <Ionicons name="time-outline" size={20} color="#6B7280" />
+            <LucideIcons name="time-outline" size={20} color="#757575" />
           </TouchableOpacity>
         </View>
       </View>
@@ -242,7 +297,7 @@ export default function GovernanceSettingsPage() {
         <View className="space-y-4">
           <TouchableOpacity
             className="flex-row items-center justify-between py-2"
-            onPress={() => {/* Navigate to voting preferences */}}
+            onPress={() => router.push('/(tabs)/settings/governance-voting-preferences')}
           >
             <View className="flex-1">
               <Text className="text-body-medium font-medium text-text-primary">
@@ -252,12 +307,12 @@ export default function GovernanceSettingsPage() {
                 Configure anonymous voting and reminder settings
               </Text>
             </View>
-            <Ionicons name="ballot-outline" size={20} color="#6B7280" />
+            <LucideIcons name="ballot-outline" size={20} color="#757575" />
           </TouchableOpacity>
 
           <TouchableOpacity
             className="flex-row items-center justify-between py-2"
-            onPress={() => {/* Navigate to emergency settings */}}
+            onPress={() => router.push('/(tabs)/settings/governance-emergency-settings')}
           >
             <View className="flex-1">
               <Text className="text-body-medium font-medium text-text-primary">
@@ -267,7 +322,7 @@ export default function GovernanceSettingsPage() {
                 Configure emergency alert preferences and escalation
               </Text>
             </View>
-            <Ionicons name="warning-outline" size={20} color="#6B7280" />
+            <LucideIcons name="warning-outline" size={20} color="#757575" />
           </TouchableOpacity>
 
           {canUserPerformAction('view_analytics') && (
@@ -283,7 +338,7 @@ export default function GovernanceSettingsPage() {
                   View detailed governance analytics and insights
                 </Text>
               </View>
-              <Ionicons name="analytics-outline" size={20} color="#6B7280" />
+              <LucideIcons name="analytics-outline" size={20} color="#757575" />
             </TouchableOpacity>
           )}
         </View>
@@ -293,17 +348,16 @@ export default function GovernanceSettingsPage() {
 
   return (
     <SafeAreaView className="flex-1 bg-background">
-      <TabHeader
+      <StackHeader
         title="Governance Settings"
-        subtitle="Configure your democratic participation preferences"
-        onNotificationPress={() => console.log('Notifications pressed')}
-        onHelpPress={() => console.log('Help pressed')}
-        notificationCount={0}
-        showBackButton
         onBackPress={() => router.back()}
       />
 
-      <ScrollView className="flex-1 p-4">
+      <ScrollView 
+        className="flex-1" 
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={{ padding: 16, paddingBottom: 100 }}
+      >
         {renderNotificationSettings()}
         {renderPermissionsInfo()}
         {renderDataSettings()}

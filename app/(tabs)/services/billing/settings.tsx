@@ -1,10 +1,10 @@
 import { useRouter } from "expo-router";
-import { ArrowLeft, CreditCard, Smartphone, Building2, Shield, Bell, Download, Trash2, Plus, Edit3, Check } from "lucide-react-native";
+import { ArrowLeft, CreditCard, Smartphone, Building2, Download, Trash2, Plus, Edit3, Check } from "lucide-react-native";
 import React, { useState } from "react";
 import { SafeAreaView, ScrollView, Text, TouchableOpacity, View, Switch, TextInput } from "react-native";
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
-import { showAlert, showDeleteConfirmAlert } from "@/utils/alert";
+import { showAlert } from "@/utils/alert";
 
 interface PaymentMethod {
   id: string;
@@ -128,11 +128,6 @@ export default function BillingSettings() {
     showAlert("GST Details Saved", "Your GST information has been updated successfully");
   };
 
-  const validateGSTIN = (gstin: string): boolean => {
-    // Basic GSTIN validation (15 characters, alphanumeric)
-    const gstinRegex = /^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/;
-    return gstinRegex.test(gstin);
-  };
 
   return (
     <SafeAreaView className="flex-1 bg-background">
