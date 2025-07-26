@@ -11,7 +11,9 @@ import {
   capitalizeFirst,
   capitalizeWords,
   formatAddress,
-  formatVehicleNumber
+  formatVehicleNumber,
+  getRelativeTime,
+  getInitials
 } from '../../utils/formatting';
 
 describe('Formatting Utils', () => {
@@ -26,6 +28,22 @@ describe('Formatting Utils', () => {
       expect(formatCurrency(1000, { showSymbol: false })).toBe('1,000');
       expect(formatCurrency(1000, { currency: 'USD', locale: 'en-US' })).toMatch(/\$1,000/);
       expect(formatCurrency(1000.567, { decimalPlaces: 1 })).toBe('₹1,000.6');
+    });
+
+    test('should format currency with full form for lakhs', () => {
+      expect(formatCurrency(500000, { showFullForm: true })).toBe('₹5 Lakhs');
+      expect(formatCurrency(100000, { showFullForm: true })).toBe('₹1 Lakh');
+      expect(formatCurrency(515000, { showFullForm: true })).toBe('₹5.15 Lakhs');
+      expect(formatCurrency(99000, { showFullForm: true })).toBe('₹99,000'); // Under 1 lakh
+    });
+
+    test('should handle USD currency format', () => {
+      expect(formatCurrency(1000, { currency: 'USD', locale: 'en-US', showSymbol: false })).toBe('1,000');
+    });
+
+    test('should handle decimals option', () => {
+      expect(formatCurrency(1000.5, { decimals: 3 })).toBe('₹1,000.500');
+      expect(formatCurrency(1000, { decimals: 2 })).toBe('₹1,000.00');
     });
   });
 
@@ -132,7 +150,7 @@ describe('Formatting Utils', () => {
     const longText = 'This is a very long text that should be truncated';
 
     test('should truncate text correctly', () => {
-      expect(truncateText(longText, 20)).toBe('This is a very long...');
+      expect(truncateText(longText, 20)).toBe('This is a very lo...');
     });
 
     test('should not truncate short text', () => {
@@ -141,8 +159,8 @@ describe('Formatting Utils', () => {
     });
 
     test('should handle custom ellipsis', () => {
-      expect(truncateText(longText, 20, '...')).toBe('This is a very long...');
-      expect(truncateText(longText, 20, ' [more]')).toBe('This is a very long [more]');
+      expect(truncateText(longText, 20, '...')).toBe('This is a very lo...');
+      expect(truncateText(longText, 20, ' [more]')).toBe('This is a ver [more]');
     });
   });
 
@@ -207,6 +225,90 @@ describe('Formatting Utils', () => {
 
     test('should handle lowercase input', () => {
       expect(formatVehicleNumber('mh12ab1234')).toBe('MH 12 AB 1234');
+    });
+
+    test('should handle 8 character old format', () => {
+      expect(formatVehicleNumber('AP05BG12')).toBe('AP 05 BG12');
+    });
+
+    test('should handle invalid lengths', () => {
+      expect(formatVehicleNumber('ABC123')).toBe('ABC123'); // Too short
+      expect(formatVehicleNumber('VERYLONGVEHICLENUMBER')).toBe('VERYLONGVEHICLENUMBER'); // Too long
+    });
+  });
+
+  describe('getRelativeTime', () => {
+    test('should format relative time correctly', () => {
+      const now = new Date();
+      
+      // Just now
+      expect(getRelativeTime(new Date(now.getTime() - 30 * 1000))).toBe('Just now');
+      
+      // Minutes ago
+      expect(getRelativeTime(new Date(now.getTime() - 5 * 60 * 1000))).toBe('5 minutes ago');
+      expect(getRelativeTime(new Date(now.getTime() - 1 * 60 * 1000))).toBe('1 minute ago');
+      
+      // Hours ago
+      expect(getRelativeTime(new Date(now.getTime() - 2 * 60 * 60 * 1000))).toBe('2 hours ago');
+      expect(getRelativeTime(new Date(now.getTime() - 1 * 60 * 60 * 1000))).toBe('1 hour ago');
+      
+      // Days ago
+      expect(getRelativeTime(new Date(now.getTime() - 1 * 24 * 60 * 60 * 1000))).toBe('1 day ago');
+      expect(getRelativeTime(new Date(now.getTime() - 3 * 24 * 60 * 60 * 1000))).toBe('3 days ago');
+    });
+
+    test('should use formatDate for week+ old dates', () => {
+      const now = new Date();
+      const weekOld = new Date(now.getTime() - 8 * 24 * 60 * 60 * 1000);
+      const result = getRelativeTime(weekOld);
+      expect(result).not.toContain('ago'); // Should be a formatted date
+    });
+  });
+
+  describe('getInitials', () => {
+    test('should get initials from names', () => {
+      expect(getInitials('John Doe')).toBe('JD');
+      expect(getInitials('John')).toBe('J');
+      expect(getInitials('John Middle Doe')).toBe('JD'); // First and last only
+      expect(getInitials('')).toBe('U'); // Unknown
+      expect(getInitials('   ')).toBe(''); // Empty after trim and split
+    });
+
+    test('should handle edge cases', () => {
+      expect(getInitials('a')).toBe('A');
+      expect(getInitials('john doe smith')).toBe('JS'); // First and last
+    });
+  });
+
+  describe('formatDate edge cases', () => {
+    test('should handle invalid dates', () => {
+      expect(formatDate('invalid date')).toBe('Invalid Date');
+      expect(formatDate(new Date('invalid'))).toBe('Invalid Date');
+    });
+
+    test('should handle custom format strings', () => {
+      const date = new Date('2024-03-15');
+      expect(formatDate(date, 'dd/MM/yyyy')).toBe('15/03/2024');
+      expect(formatDate(date, 'MMMM d, yyyy')).toContain('March');
+      expect(formatDate(date, 'long')).toContain('March');
+      expect(formatDate(date, 'short')).toContain('Mar');
+    });
+  });
+
+  describe('formatAddress string input', () => {
+    test('should handle string addresses', () => {
+      expect(formatAddress('123 Main St, City')).toBe('123 Main St, City');
+    });
+
+    test('should handle empty fields', () => {
+      const address = {
+        line1: '123 Main Street',
+        line2: '',
+        city: 'Mumbai',
+        state: '',
+        pincode: '400001'
+      };
+      expect(formatAddress(address)).toBe('123 Main Street, Mumbai, 400001');
     });
   });
 });

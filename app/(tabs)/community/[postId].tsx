@@ -19,9 +19,10 @@ import { formatTimeAgo, getCategoryDisplay, getPostStats } from '@/utils/communi
 import CommentInput from '@/components/community/CommentInput';
 import CommentCard from '@/components/community/CommentCard';
 import { showErrorAlert, showSuccessAlert, showDeleteConfirmAlert } from '@/utils/alert';
+import { safeGoBack } from '@/utils/navigation';
 
 export default function PostDetail() {
-  const router = useRouter();
+  // const router = useRouter();
   const { postId } = useLocalSearchParams<{ postId: string }>();
   
   const [post, setPost] = useState<Post | null>(null);
@@ -46,7 +47,7 @@ export default function PostDetail() {
       
       const foundPost = postsData.find(p => p.id === postId);
       if (!foundPost) {
-        showErrorAlert('Error', 'Post not found', () => router.back());
+        showErrorAlert('Error', 'Post not found', () => safeGoBack());
         return;
       }
       
@@ -99,7 +100,7 @@ export default function PostDetail() {
       async () => {
         try {
           await communityApi.deletePost(post.id);
-          showSuccessAlert('Success', 'Post deleted successfully.', () => router.back());
+          showSuccessAlert('Success', 'Post deleted successfully.', () => safeGoBack());
         } catch (error) {
           console.error('Error deleting post:', error);
           showErrorAlert('Error', 'Failed to delete post. Please try again.');
@@ -147,7 +148,7 @@ export default function PostDetail() {
     return (
       <SafeAreaView className="flex-1 bg-background">
         <View className="flex-row items-center px-6 py-4 border-b border-divider">
-          <TouchableOpacity onPress={() => router.back()} className="mr-4">
+          <TouchableOpacity onPress={() => safeGoBack()} className="mr-4">
             <ArrowLeft size={24} color="#212121" />
           </TouchableOpacity>
           <Text className="text-headline-large font-bold text-text-primary">Post</Text>
@@ -164,7 +165,7 @@ export default function PostDetail() {
     return (
       <SafeAreaView className="flex-1 bg-background">
         <View className="flex-row items-center px-6 py-4 border-b border-divider">
-          <TouchableOpacity onPress={() => router.back()} className="mr-4">
+          <TouchableOpacity onPress={() => safeGoBack()} className="mr-4">
             <ArrowLeft size={24} color="#212121" />
           </TouchableOpacity>
           <Text className="text-headline-large font-bold text-text-primary">Post</Text>
@@ -191,7 +192,7 @@ export default function PostDetail() {
         {/* Header */}
         <View className="flex-row items-center justify-between px-6 py-4 border-b border-divider">
           <View className="flex-row items-center">
-            <TouchableOpacity onPress={() => router.back()} className="mr-4">
+            <TouchableOpacity onPress={() => safeGoBack()} className="mr-4">
               <ArrowLeft size={24} color="#212121" />
             </TouchableOpacity>
             <Text className="text-headline-large font-bold text-text-primary">Post</Text>

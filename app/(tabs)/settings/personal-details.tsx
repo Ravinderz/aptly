@@ -6,6 +6,7 @@ import Input from '../../../components/ui/Input';
 import Button from '../../../components/ui/Button';
 import { Card } from '../../../components/ui/Card';
 import { showErrorAlert, showSuccessAlert } from '../../../utils/alert';
+import { safeGoBack } from '../../../utils/navigation';
 
 export default function PersonalDetails() {
   const [formData, setFormData] = useState({
@@ -49,7 +50,7 @@ export default function PersonalDetails() {
           <Button
             variant="ghost"
             size="sm"
-            onPress={() => router.back()}
+            onPress={() => safeGoBack()}
             className="mr-2 p-2"
           >
             <ArrowLeft size={20} color="#6366f1" />

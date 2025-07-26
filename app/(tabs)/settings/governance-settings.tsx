@@ -11,6 +11,7 @@ import { router } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import LucideIcons from '@/components/ui/LucideIcons';
 import { showSuccessAlert, showErrorAlert } from '@/utils/alert';
+import { safeGoBack } from '@/utils/navigation';
 
 // UI Components
 import { Card } from '@/components/ui/Card';
@@ -350,7 +351,7 @@ export default function GovernanceSettingsPage() {
     <SafeAreaView className="flex-1 bg-background">
       <StackHeader
         title="Governance Settings"
-        onBackPress={() => router.back()}
+        onBackPress={() => safeGoBack()}
       />
 
       <ScrollView 

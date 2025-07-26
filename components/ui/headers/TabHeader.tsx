@@ -1,7 +1,9 @@
 import { useAuth } from "@/contexts/AuthContext";
-import { Bell, HelpCircle, MapPin } from "lucide-react-native";
+import { ArrowLeft, Bell, HelpCircle, MapPin } from "lucide-react-native";
 import React, { useEffect, useRef, useState } from "react";
 import { Animated, Text, View } from "react-native";
+import { router } from "expo-router";
+import { navigateWithReset } from "@/utils/navigation";
 import HeaderAction from "./HeaderAction";
 
 interface TabHeaderProps {
@@ -9,6 +11,10 @@ interface TabHeaderProps {
   onHelpPress?: () => void;
   notificationCount?: number;
   showAnimatedEntrance?: boolean;
+  title?: string;
+  subtitle?: string;
+  showBackButton?: boolean;
+  onBackPress?: () => void;
 }
 
 export default function TabHeader({
@@ -16,6 +22,10 @@ export default function TabHeader({
   onHelpPress,
   notificationCount = 0,
   showAnimatedEntrance = true,
+  title,
+  subtitle,
+  showBackButton = false,
+  onBackPress,
 }: TabHeaderProps) {
   const { user } = useAuth();
   const [mounted, setMounted] = useState(false);
@@ -48,13 +58,29 @@ export default function TabHeader({
   }, [showAnimatedEntrance, mounted]);
 
   const handleNotificationPress = () => {
-    console.log("Notifications pressed");
-    onNotificationPress?.();
+    if (onNotificationPress) {
+      onNotificationPress();
+    } else {
+      // Default behavior: navigate to notifications page
+      navigateWithReset('/notifications');
+    }
   };
 
   const handleHelpPress = () => {
-    console.log("Help pressed");
-    onHelpPress?.();
+    if (onHelpPress) {
+      onHelpPress();
+    } else {
+      // Default behavior: navigate to support page
+      navigateWithReset('/(tabs)/settings/support');
+    }
+  };
+
+  const handleBackPress = () => {
+    if (onBackPress) {
+      onBackPress();
+    } else {
+      router.back();
+    }
   };
 
   if (!mounted && showAnimatedEntrance) {
@@ -70,21 +96,47 @@ export default function TabHeader({
       className="bg-surface border-b border-divider shadow-sm shadow-primary/5"
     >
       <View className="flex-row items-center justify-between px-6 py-4 pt-6">
-        {/* User Context Section */}
+        {/* Back Button */}
+        {showBackButton && (
+          <HeaderAction
+            icon={ArrowLeft}
+            onPress={handleBackPress}
+            size={20}
+            className="mr-3"
+          />
+        )}
+        
+        {/* Content Section */}
         <View className="flex-1 pr-4">
-          {/* User Name */}
-          <Text className="text-headline-medium font-semibold text-text-primary mb-1">
-            {user?.name || "Welcome"}
-          </Text>
-          
-          {/* Location Info */}
-          <View className="flex-row items-center">
-            <MapPin size={14} className="text-text-secondary mr-1" strokeWidth={1.5} />
-            <Text className="text-body-medium text-text-secondary">
-              {user?.flatNumber ? `${user.flatNumber} • ` : ""}
-              {user?.societyName || "Green Valley Apartments"}
-            </Text>
-          </View>
+          {title ? (
+            <>
+              {/* Custom Title */}
+              <Text className="text-headline-medium font-semibold text-text-primary mb-1">
+                {title}
+              </Text>
+              {subtitle && (
+                <Text className="text-body-medium text-text-secondary">
+                  {subtitle}
+                </Text>
+              )}
+            </>
+          ) : (
+            <>
+              {/* User Context */}
+              <Text className="text-headline-medium font-semibold text-text-primary mb-1">
+                {user?.name || "Welcome"}
+              </Text>
+              
+              {/* Location Info */}
+              <View className="flex-row items-center">
+                <MapPin size={14} className="text-text-secondary mr-1" strokeWidth={1.5} />
+                <Text className="text-body-medium text-text-secondary">
+                  {user?.flatNumber ? `${user.flatNumber} • ` : ""}
+                  {user?.societyName || "Green Valley Apartments"}
+                </Text>
+              </View>
+            </>
+          )}
         </View>
 
         {/* Action Buttons */}

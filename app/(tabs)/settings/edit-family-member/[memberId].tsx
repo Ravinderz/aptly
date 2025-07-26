@@ -4,6 +4,7 @@ import {
   validateIndianPhoneNumber,
   validateName,
 } from "@/utils/validation";
+import { safeGoBack } from "@/utils/navigation";
 import { router, useLocalSearchParams } from "expo-router";
 import React, { useEffect, useState } from "react";
 import {
@@ -130,11 +131,11 @@ export default function EditFamilyMemberPage() {
         });
       } else {
         showErrorAlert("Error", "Invalid family member data");
-        router.back();
+        safeGoBack();
       }
     } else {
       showErrorAlert("Error", "Family member not found");
-      router.back();
+      safeGoBack();
     }
   }, [memberId]);
 
@@ -211,7 +212,7 @@ export default function EditFamilyMemberPage() {
         "Member Updated",
         "Family member has been updated successfully"
       );
-      router.back();
+      safeGoBack();
     } catch (error) {
       showErrorAlert(
         "Error",
@@ -280,7 +281,7 @@ export default function EditFamilyMemberPage() {
     <SafeAreaView className="flex-1 bg-background">
       <StackHeader
         title="Edit Family Member"
-        onBackPress={() => router.back()}
+        onBackPress={() => safeGoBack()}
       />
 
       <KeyboardAvoidingView
@@ -456,7 +457,7 @@ export default function EditFamilyMemberPage() {
 
             <Button
               variant="secondary"
-              onPress={() => router.back()}
+              onPress={() => safeGoBack()}
               disabled={isSaving}
             >
               Cancel

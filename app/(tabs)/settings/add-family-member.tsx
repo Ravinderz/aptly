@@ -13,6 +13,7 @@ import { router } from 'expo-router';
 import { User, Calendar } from 'lucide-react-native';
 import { showSuccessAlert, showErrorAlert } from '@/utils/alert';
 import { validateName, validateIndianPhoneNumber, validateAadharNumber } from '@/utils/validation';
+import { safeGoBack } from '@/utils/navigation';
 
 // UI Components
 import { Card } from '@/components/ui/Card';
@@ -117,7 +118,7 @@ export default function AddFamilyMemberPage() {
       await new Promise(resolve => setTimeout(resolve, 1500));
       
       showSuccessAlert('Member Added', 'Family member has been added successfully');
-      router.back();
+      safeGoBack();
     } catch (error) {
       showErrorAlert('Error', 'Failed to add family member. Please try again.');
     } finally {
@@ -173,7 +174,7 @@ export default function AddFamilyMemberPage() {
     <SafeAreaView className="flex-1 bg-background">
       <StackHeader
         title="Add Family Member"
-        onBackPress={() => router.back()}
+        onBackPress={() => safeGoBack()}
       />
 
       <KeyboardAvoidingView 
@@ -335,7 +336,7 @@ export default function AddFamilyMemberPage() {
             
             <Button
               variant="secondary"
-              onPress={() => router.back()}
+              onPress={() => safeGoBack()}
               disabled={isSaving}
             >
               Cancel

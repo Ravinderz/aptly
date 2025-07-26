@@ -10,6 +10,7 @@ import {
 import { router } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { showSuccessAlert, showErrorAlert } from '@/utils/alert';
+import { safeGoBack } from '@/utils/navigation';
 
 // UI Components
 import { Card } from '@/components/ui/Card';
@@ -81,7 +82,7 @@ export default function VotingPreferencesPage() {
     <SafeAreaView className="flex-1 bg-background">
       <StackHeader
         title="Voting Preferences"
-        onBackPress={() => router.back()}
+        onBackPress={() => safeGoBack()}
       />
 
       <ScrollView 

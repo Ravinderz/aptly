@@ -13,6 +13,7 @@ import { router, useLocalSearchParams } from 'expo-router';
 import LucideIcons from '@/components/ui/LucideIcons';
 import { showSuccessAlert, showErrorAlert } from '@/utils/alert';
 import { validateEmergencyContact } from '@/utils/validation';
+import { safeGoBack } from '@/utils/navigation';
 
 // UI Components
 import { Card } from '@/components/ui/Card';
@@ -67,7 +68,7 @@ export default function EditEmergencyContactPage() {
       setForm(mockContacts[contactId]);
     } else {
       showErrorAlert('Error', 'Contact not found');
-      router.back();
+      safeGoBack();
     }
   }, [contactId]);
 
@@ -124,7 +125,7 @@ export default function EditEmergencyContactPage() {
       await new Promise(resolve => setTimeout(resolve, 1500));
       
       showSuccessAlert('Contact Updated', 'Emergency contact has been updated successfully');
-      router.back();
+      safeGoBack();
     } catch (error) {
       showErrorAlert('Error', 'Failed to update emergency contact. Please try again.');
     } finally {
@@ -187,7 +188,7 @@ export default function EditEmergencyContactPage() {
     <SafeAreaView className="flex-1 bg-background">
       <StackHeader
         title="Edit Emergency Contact"
-        onBackPress={() => router.back()}
+        onBackPress={() => safeGoBack()}
       />
 
       <KeyboardAvoidingView 
@@ -334,7 +335,7 @@ export default function EditEmergencyContactPage() {
             
             <Button
               variant="secondary"
-              onPress={() => router.back()}
+              onPress={() => safeGoBack()}
               disabled={isSaving}
             >
               Cancel

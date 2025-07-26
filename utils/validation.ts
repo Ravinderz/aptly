@@ -38,9 +38,10 @@ export const formatIndianPhoneNumber = (phone: string): string => {
   
   // Add formatting: XXX XXX XXXX
   if (number.length >= 6) {
-    return `${number.substring(0, 3)} ${number.substring(3, 6)} ${number.substring(6, 10)}`;
+    return `${number.substring(0, 3)} ${number.substring(3, 6)} ${number.substring(6, 10)}`.trim();
   } else if (number.length >= 3) {
-    return `${number.substring(0, 3)} ${number.substring(3)}`;
+    const remaining = number.substring(3);
+    return remaining ? `${number.substring(0, 3)} ${remaining}`.trim() : number.substring(0, 3);
   }
   
   return number;
@@ -90,7 +91,20 @@ export const validateEmergencyContact = (phone: string): { isValid: boolean; err
 
 // Email validation
 export const validateEmail = (email: string): boolean => {
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!email) return false;
+  
+  // More comprehensive email validation
+  const emailRegex = /^[a-zA-Z0-9._+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+  
+  // Additional checks for common invalid patterns
+  if (email.includes('..') || email.startsWith('.') || email.endsWith('.')) {
+    return false;
+  }
+  
+  if (email.startsWith('@') || email.endsWith('@')) {
+    return false;
+  }
+  
   return emailRegex.test(email);
 };
 
@@ -354,9 +368,9 @@ export const validatePassword = (password: string): { isValid: boolean; error?: 
   let strength: 'weak' | 'medium' | 'strong' = 'weak';
   const criteriaCount = [hasUppercase, hasLowercase, hasNumbers, hasSpecial].filter(Boolean).length;
   
-  if (criteriaCount >= 3 && password.length >= 12) {
+  if (criteriaCount >= 4 && password.length >= 12) {
     strength = 'strong';
-  } else if (criteriaCount >= 2 && password.length >= 10) {
+  } else if (criteriaCount >= 3 && password.length >= 8) {
     strength = 'medium';
   }
   

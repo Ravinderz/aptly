@@ -12,6 +12,7 @@ import { router } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import LucideIcons from '@/components/ui/LucideIcons';
 import { showSuccessAlert, showErrorAlert } from '@/utils/alert';
+import { safeGoBack } from '@/utils/navigation';
 import * as LocalAuthentication from 'expo-local-authentication';
 
 // UI Components
@@ -319,7 +320,7 @@ export default function SecuritySettingsPage() {
     <SafeAreaView className="flex-1 bg-background">
       <StackHeader
         title="Security Settings"
-        onBackPress={() => router.back()}
+        onBackPress={() => safeGoBack()}
       />
 
       <ScrollView 

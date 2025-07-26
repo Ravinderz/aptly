@@ -8,6 +8,7 @@ import {
 import { router } from 'expo-router';
 import LucideIcons from '@/components/ui/LucideIcons';
 import { showSuccessAlert, showErrorAlert } from '@/utils/alert';
+import { safeGoBack } from '@/utils/navigation';
 
 // Import our analytics components
 import { AnalyticsDashboard } from '@/components/analytics/AnalyticsDashboard';
@@ -593,11 +594,9 @@ export default function AnalyticsPage() {
       <TabHeader
         title="Analytics Center"
         subtitle="Performance insights and intelligent optimization"
-        onNotificationPress={() => console.log('Notifications pressed')}
-        onHelpPress={() => console.log('Help pressed')}
         notificationCount={2}
         showBackButton
-        onBackPress={() => router.back()}
+        onBackPress={() => safeGoBack()}
       />
 
       {/* Tab Navigation */}

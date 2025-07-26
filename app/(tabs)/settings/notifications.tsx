@@ -264,7 +264,7 @@ export default function NotificationPreferences() {
                           style={{ transform: [{ scaleX: 0.8 }, { scaleY: 0.8 }] }}
                         />
                       </View>
-                      {index < setting.subcategories.length - 1 && (
+                      {index < (setting.subcategories?.length || 0) - 1 && (
                         <View className="h-px bg-divider" />
                       )}
                     </View>

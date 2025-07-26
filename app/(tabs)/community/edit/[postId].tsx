@@ -17,6 +17,7 @@ import { communityApi } from '@/services/communityApi';
 import { validatePostContent, canEditPost } from '@/utils/community';
 import ImagePicker from '@/components/ui/ImagePicker';
 import { showErrorAlert, showSuccessAlert } from '@/utils/alert';
+import { safeGoBack } from '@/utils/navigation';
 
 export default function EditPost() {
   const router = useRouter();
@@ -41,13 +42,13 @@ export default function EditPost() {
       const foundPost = posts.find(p => p.id === postId);
       
       if (!foundPost) {
-        showErrorAlert('Error', 'Post not found', () => router.back());
+        showErrorAlert('Error', 'Post not found', () => safeGoBack());
         return;
       }
 
       const currentUser = await communityApi.getCurrentUser();
       if (!canEditPost(foundPost, currentUser.id)) {
-        showErrorAlert('Error', 'You can only edit your own posts within 30 minutes of posting', () => router.back());
+        showErrorAlert('Error', 'You can only edit your own posts within 30 minutes of posting', () => safeGoBack());
         return;
       }
 
@@ -56,7 +57,7 @@ export default function EditPost() {
       setImageUrl(foundPost.imageUrl);
     } catch (error) {
       console.error('Error loading post:', error);
-      showErrorAlert('Error', 'Failed to load post. Please try again.', () => router.back());
+      showErrorAlert('Error', 'Failed to load post. Please try again.', () => safeGoBack());
     } finally {
       setLoading(false);
     }
@@ -78,7 +79,7 @@ export default function EditPost() {
       // For now, we'll simulate the update
       await new Promise(resolve => setTimeout(resolve, 1000));
       
-      showSuccessAlert('Success', 'Post updated successfully!', () => router.back());
+      showSuccessAlert('Success', 'Post updated successfully!', () => safeGoBack());
     } catch (error) {
       console.error('Error updating post:', error);
       showErrorAlert('Error', 'Failed to update post. Please try again.');
@@ -103,7 +104,7 @@ export default function EditPost() {
     return (
       <SafeAreaView className="flex-1 bg-background">
         <View className="flex-row items-center px-6 py-4 border-b border-divider">
-          <TouchableOpacity onPress={() => router.back()} className="mr-4">
+          <TouchableOpacity onPress={() => safeGoBack()} className="mr-4">
             <ArrowLeft size={24} color="#212121" />
           </TouchableOpacity>
           <Text className="text-headline-large font-bold text-text-primary">Edit Post</Text>
@@ -120,7 +121,7 @@ export default function EditPost() {
     return (
       <SafeAreaView className="flex-1 bg-background">
         <View className="flex-row items-center px-6 py-4 border-b border-divider">
-          <TouchableOpacity onPress={() => router.back()} className="mr-4">
+          <TouchableOpacity onPress={() => safeGoBack()} className="mr-4">
             <ArrowLeft size={24} color="#212121" />
           </TouchableOpacity>
           <Text className="text-headline-large font-bold text-text-primary">Edit Post</Text>
@@ -140,7 +141,7 @@ export default function EditPost() {
       {/* Header */}
       <View className="flex-row items-center justify-between px-6 py-4 border-b border-divider">
         <View className="flex-row items-center">
-          <TouchableOpacity onPress={() => router.back()} className="mr-4">
+          <TouchableOpacity onPress={() => safeGoBack()} className="mr-4">
             <ArrowLeft size={24} color="#212121" />
           </TouchableOpacity>
           <Text className="text-headline-large font-bold text-text-primary">Edit Post</Text>

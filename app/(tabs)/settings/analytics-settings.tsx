@@ -12,6 +12,7 @@ import { router } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import LucideIcons from '@/components/ui/LucideIcons';
 import { showSuccessAlert, showErrorAlert } from '@/utils/alert';
+import { safeGoBack } from '@/utils/navigation';
 
 // UI Components
 import { Card } from '@/components/ui/Card';
@@ -415,7 +416,7 @@ export default function AnalyticsSettingsPage() {
       <SafeAreaView className="flex-1 bg-background">
         <StackHeader
           title="Analytics Settings"
-          onBackPress={() => router.back()}
+          onBackPress={() => safeGoBack()}
         />
         
         <View className="flex-1 items-center justify-center p-4">
@@ -430,7 +431,7 @@ export default function AnalyticsSettingsPage() {
           {/* Back Button under content */}
           <Button
             variant="secondary"
-            onPress={() => router.back()}
+            onPress={() => safeGoBack()}
           >
             Go Back
           </Button>
@@ -443,7 +444,7 @@ export default function AnalyticsSettingsPage() {
     <SafeAreaView className="flex-1 bg-background">
       <StackHeader
         title="Analytics Settings"
-        onBackPress={() => router.back()}
+        onBackPress={() => safeGoBack()}
       />
 
       <ScrollView className="flex-1 p-4">

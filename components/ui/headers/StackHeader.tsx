@@ -2,6 +2,7 @@ import { router } from "expo-router";
 import { ArrowLeft, LucideIcon } from "lucide-react-native";
 import React, { useEffect, useRef } from "react";
 import { Animated, Text, TouchableOpacity, View } from "react-native";
+import { safeGoBack } from "@/utils/navigation";
 import HeaderAction from "./HeaderAction";
 
 interface StackHeaderAction {
@@ -62,7 +63,7 @@ export default function StackHeader({
     if (onBackPress) {
       onBackPress();
     } else {
-      router.back();
+      safeGoBack();
     }
   };
 

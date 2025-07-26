@@ -12,6 +12,7 @@ import { router } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { showSuccessAlert, showErrorAlert } from '@/utils/alert';
 import { validateIndianPhoneNumber } from '@/utils/validation';
+import { safeGoBack } from '@/utils/navigation';
 
 // UI Components
 import { Card } from '@/components/ui/Card';
@@ -127,7 +128,7 @@ export default function EmergencySettingsPage() {
     <SafeAreaView className="flex-1 bg-background">
       <StackHeader
         title="Emergency Settings"
-        onBackPress={() => router.back()}
+        onBackPress={() => safeGoBack()}
       />
 
       <ScrollView 

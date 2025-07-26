@@ -15,23 +15,11 @@ const Header = ({
   onHelpPress, 
   notificationCount = 3 // Mock notification count - replace with real data
 }: HeaderProps) => {
-  const handleNotificationPress = () => {
-    console.log("Opening notifications...");
-    onNotificationPress?.();
-    // TODO: Navigate to notifications page
-  };
-
-  const handleHelpPress = () => {
-    console.log("Opening help...");
-    onHelpPress?.();
-    // TODO: Open help modal or navigate to help page
-  };
-
   return (
     <View className="flex flex-1">
       <TabHeader 
-        onNotificationPress={handleNotificationPress}
-        onHelpPress={handleHelpPress}
+        onNotificationPress={onNotificationPress}
+        onHelpPress={onHelpPress}
         notificationCount={notificationCount}
       />
       <ScrollView

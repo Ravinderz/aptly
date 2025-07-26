@@ -11,6 +11,7 @@ import {
 import { router } from 'expo-router';
 import LucideIcons from '@/components/ui/LucideIcons';
 import { showSuccessAlert, showErrorAlert } from '@/utils/alert';
+import { safeGoBack } from '@/utils/navigation';
 
 // UI Components
 import { Card } from '@/components/ui/Card';
@@ -240,13 +241,13 @@ export default function SupportPage() {
         />
 
         <Button
-          title={isSubmittingFeedback ? "Sending..." : "Send Feedback"}
           variant="primary"
           onPress={handleSubmitFeedback}
           disabled={!feedbackMessage.trim() || !selectedCategory || isSubmittingFeedback}
-          icon="send-outline"
           className="mt-4"
-        />
+        >
+          {isSubmittingFeedback ? "Sending..." : "Send Feedback"}
+        </Button>
       </View>
     </Card>
   );
@@ -297,7 +298,7 @@ export default function SupportPage() {
     <SafeAreaView className="flex-1 bg-background">
       <StackHeader
         title="Help & Support"
-        onBackPress={() => router.back()}
+        onBackPress={() => safeGoBack()}
       />
 
       <ScrollView 

@@ -1,7 +1,9 @@
 # Learn more https://docs.github.com/en/get-started/getting-started-with-git/ignoring-files
 
-# dependencies
+# Dependencies
 node_modules/
+.pnp
+.pnp.js
 
 # Expo
 .expo/
@@ -9,7 +11,14 @@ dist/
 web-build/
 expo-env.d.ts
 
-# Native
+# React Native
+.vscode/
+.idea/
+*.iml
+
+# Native builds
+android/
+ios/
 .kotlin/
 *.orig.*
 *.jks
@@ -21,21 +30,172 @@ expo-env.d.ts
 # Metro
 .metro-health-check*
 
-# debug
+# Debug files
 npm-debug.*
 yarn-debug.*
 yarn-error.*
+lerna-debug.log*
+
+# Runtime data
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# Coverage directory used by tools like istanbul
+coverage/
+*.lcov
+
+# nyc test coverage
+.nyc_output
+
+# Grunt intermediate storage
+.grunt
+
+# Bower dependency directory
+bower_components
+
+# node-waf configuration
+.lock-wscript
+
+# Compiled binary addons
+build/Release
+
+# Dependency directories
+jspm_packages/
+
+# Snowpack dependency directory
+web_modules/
+
+# TypeScript cache
+*.tsbuildinfo
+.tsbuildinfo
+
+# Optional npm cache directory
+.npm
+
+# Optional eslint cache
+.eslintcache
+
+# Microbundle cache
+.rpt2_cache/
+.rts2_cache_cjs/
+.rts2_cache_es/
+.rts2_cache_umd/
+
+# Optional REPL history
+.node_repl_history
+
+# Output of 'npm pack'
+*.tgz
+
+# Yarn Integrity file
+.yarn-integrity
+
+# Environment files
+.env
+.env*.local
+.env.development.local
+.env.test.local
+.env.production.local
 
 # macOS
 .DS_Store
+.AppleDouble
+.LSOverride
 *.pem
 
-# local env files
-.env*.local
+# Icon must end with two \r
+Icon
 
-# typescript
-*.tsbuildinfo
+# Thumbnails
+._*
 
-app-example
+# Files that might appear in the root of a volume
+.DocumentRevisions-V100
+.fseventsd
+.Spotlight-V100
+.TemporaryItems
+.Trashes
+.VolumeIcon.icns
+.com.apple.timemachine.donotpresent
 
+# Directories potentially created on remote AFP share
+.AppleDB
+.AppleDesktop
+Network Trash Folder
+Temporary Items
+.apdisk
+
+# Windows
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+ehthumbs_vista.db
+*.stackdump
+[Dd]esktop.ini
+$RECYCLE.BIN/
+*.cab
+*.msi
+*.msix
+*.msm
+*.msp
+*.lnk
+
+# Linux
+*~
+.fuse_hidden*
+.directory
+.Trash-*
+.nfs*
+
+# Logs
+logs
+*.log
+
+# App-specific files
+app-example/
+
+# Build artifacts
 *.apk
+*.aab
+*.ipa
+builds/
+
+# Test artifacts
+coverage/
+*.lcov
+test-results/
+playwright-report/
+test-results.xml
+
+# Documentation builds
+docs/_build/
+site/
+
+# IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Temporary files
+tmp/
+temp/
+.tmp/
+.temp/
+
+# Package manager files
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# EAS Build
+.easignore
+
+# Local Netlify folder
+.netlify
+
+# Sentry Config File
+.sentryclirc

@@ -91,8 +91,6 @@ export default function Services() {
   return (
     <SafeAreaView className="flex-1 bg-background">
       <TabHeader
-        onNotificationPress={() => console.log("Notifications pressed")}
-        onHelpPress={() => console.log("Help pressed")}
         notificationCount={2}
       />
       <ScrollView

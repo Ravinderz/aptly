@@ -5,6 +5,7 @@ import {
 } from "@/components/ui/pickers";
 import { formatDate } from "@/utils/dateUtils";
 import { router } from "expo-router";
+import { safeGoBack } from "@/utils/navigation";
 import { useAlert } from "@/components/ui/AlertCard";
 import { Calendar, Clock, FileText, Phone, User, Shield, CheckCircle } from "lucide-react-native";
 import React, { useState } from "react";
@@ -149,7 +150,7 @@ export default function AddVisitor() {
       message: 'Visitor added successfully! You can now track their entry and generate QR codes.',
       primaryAction: {
         label: 'OK',
-        onPress: () => router.back(),
+        onPress: () => safeGoBack(),
       },
     });
   };

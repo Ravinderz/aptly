@@ -37,11 +37,13 @@ import {
   Gavel,
   Gear,
   Heart,
+  HelpCircle,
   Home,
   Image,
   Info,
   Key,
   Lock,
+  Mail,
   // Location & Transport
   MapPin,
   Megaphone,
@@ -176,6 +178,12 @@ export type IconName =
   | "plus-circle"
   | "shield-check"
 
+  // Help & Support
+  | "help-circle-outline"
+  | "mail-outline"
+  | "logo-whatsapp"
+  | "build-outline"
+
   // Common icons
   | "smartphone"
   | "building"
@@ -285,6 +293,12 @@ const LucideIcons = ({ name, color = "#000", size = 24 }: IconProps) => {
     "refresh-cw": RefreshCw,
     "plus-circle": PlusCircle,
     "shield-check": ShieldCheck,
+
+    // Help & Support
+    "help-circle-outline": HelpCircle,
+    "mail-outline": Mail,
+    "logo-whatsapp": MessageCircle, // WhatsApp not available in Lucide, using MessageCircle as fallback
+    "build-outline": Wrench,
 
     // Common icons
     smartphone: Smartphone,

@@ -9,6 +9,7 @@ import {
 import { router } from 'expo-router';
 import LucideIcons from '@/components/ui/LucideIcons';
 import { showSuccessAlert, showErrorAlert } from '@/utils/alert';
+import { safeGoBack } from '@/utils/navigation';
 
 // Import our governance components
 import { GovernanceDashboard } from '@/components/governance/GovernanceDashboard';
@@ -386,11 +387,9 @@ export default function GovernancePage() {
       <TabHeader
         title="Governance Center"
         subtitle="Democratic participation and emergency management"
-        onNotificationPress={() => console.log('Notifications pressed')}
-        onHelpPress={() => console.log('Help pressed')}
         notificationCount={2}
         showBackButton
-        onBackPress={() => router.back()}
+        onBackPress={() => safeGoBack()}
       />
 
       {/* Tab Navigation */}

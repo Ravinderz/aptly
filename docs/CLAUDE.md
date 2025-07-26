@@ -32,6 +32,12 @@ npm run android    # Android emulator
 npm run ios        # iOS simulator
 npm run web        # Web browser
 
+# Build commands
+npm run build:android           # EAS build for Android (development profile)
+npm run build:android-apk      # EAS build APK (development profile)
+npm run build:android-local    # Local Android build
+npm run build:android-preview  # EAS preview build (local)
+
 # Testing
 npm run test          # Run tests once
 npm run test:watch    # Run tests in watch mode
@@ -156,7 +162,70 @@ npm run reset-project
 - `GovernanceContext` - Voting, policies, and emergency management
 - `SocietyContext` - Society-specific data and settings
 
+## Critical Navigation Architecture
+
+**AppNavigator Flow:**
+The app uses a sophisticated navigation pattern with `AppNavigator.tsx` that manages:
+- First launch detection (onboarding flow)
+- Authentication state routing
+- Automatic route redirects based on auth status
+- Splash screen management during initialization
+
+**Header System Architecture:**
+- `TabHeader`: Primary header with notification/help actions, defaults to functional navigation
+- `StackHeader`: Secondary header for detail pages, includes back navigation
+- `Header` wrapper: Provides ScrollView layout for content pages, passes through TabHeader props
+
+**Navigation Utilities:**
+- `navigateWithReset()`: Uses router.replace() to avoid history accumulation
+- `safeGoBack()`: Safe back navigation with fallback routes
+- All navigation functions located in `utils/navigation.ts`
+
+## Advanced Multi-Context Architecture
+
+**Context Provider Hierarchy:**
+- `AuthProvider` (root level): Authentication state and user management
+- `AdminContext`: Multi-society management with role-based access control (RBAC)
+- `AnalyticsContext`: Performance tracking and audit system
+- `GovernanceContext`: Voting, policies, and emergency management
+- `SocietyContext`: Society-specific data and settings
+
+**Context Usage Patterns:**
+- Settings pages use direct AsyncStorage instead of contexts for simplicity
+- Main feature pages leverage contexts for complex state management
+- Admin features use permission gates with RBAC integration
+
+## File Upload and Storage Architecture
+
+**File Operations:**
+- `expo-document-picker`: Document selection from device
+- `expo-file-system`: File system operations and caching
+- `expo-sharing`: Native sharing capabilities
+- Real file operations implemented in document management features
+
+**Storage Patterns:**
+- AsyncStorage for user preferences and auth tokens
+- File system caching for downloaded documents
+- API service handles file uploads with progress tracking
+
+## Icon and Animation System
+
+**LucideIcons Integration:**
+- Custom mapping system in `LucideIcons.tsx` for comprehensive icon support
+- Consistent icon sizing and color theming across app
+- Fallback handling for unmapped icons
+
+**Animation Architecture:**
+- Native driver optimization where possible (transform animations)
+- Non-native driver for layout/shadow animations to prevent conflicts
+- Consistent animation timing and easing across components
+
 ## Development Best Practices
 
 - Use custom alert component when using alerts
 - Always run npm test and npm run lint before committing code
+- TabHeader provides functional defaults - avoid overriding unless necessary
+- Use StackHeader for detail pages, TabHeader for main sections
+- Test file operations on physical devices for accurate behavior
+- Prefer direct AsyncStorage over contexts in settings pages
+- Check `issues.md` for known technical debt and current status

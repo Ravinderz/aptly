@@ -12,7 +12,21 @@ import {
   validateIFSCCode,
   validatePassword,
   validateAmount,
-  validateForm
+  validateForm,
+  validateRelationship,
+  validateAddress,
+  validateRequired,
+  validateNumeric,
+  validateAadharNumber,
+  validateFileSize,
+  validateFileType,
+  validateDate,
+  validateFutureDate,
+  validateAge,
+  validateURL,
+  getFullIndianPhoneNumber,
+  cleanPhoneNumber,
+  createDebouncedValidator
 } from '../../utils/validation';
 
 describe('Validation Utils', () => {
@@ -242,6 +256,228 @@ describe('Validation Utils', () => {
       expect(result.errors.name).toBe('Name is required');
       expect(result.errors.email).toBe('Invalid email');
       expect(result.errors.phone).toBe('Phone number must be exactly 10 digits');
+    });
+  });
+
+  describe('validateName', () => {
+    test('should validate correct names', () => {
+      expect(validateName('John Doe')).toEqual({ isValid: true });
+      expect(validateName('Mary-Jane O\'Connor')).toEqual({ isValid: true });
+      expect(validateName('Dr. Smith')).toEqual({ isValid: true });
+    });
+
+    test('should reject invalid names', () => {
+      expect(validateName('')).toEqual({ isValid: false, error: 'Name is required' });
+      expect(validateName('A')).toEqual({ isValid: false, error: 'Name must be at least 2 characters long' });
+      expect(validateName('A'.repeat(51))).toEqual({ isValid: false, error: 'Name must be less than 50 characters' });
+      expect(validateName('John123')).toEqual({ isValid: false, error: 'Name can only contain letters, spaces, dots, hyphens, and apostrophes' });
+    });
+  });
+
+  describe('validateRelationship', () => {
+    test('should validate correct relationships', () => {
+      expect(validateRelationship('Father')).toEqual({ isValid: true });
+      expect(validateRelationship('Mother')).toEqual({ isValid: true });
+      expect(validateRelationship('Friend')).toEqual({ isValid: true });
+    });
+
+    test('should reject invalid relationships', () => {
+      expect(validateRelationship('')).toEqual({ isValid: false, error: 'Relationship is required' });
+      expect(validateRelationship('InvalidRelation')).toEqual({ isValid: false, error: 'Please select a valid relationship' });
+    });
+  });
+
+  describe('validateAddress', () => {
+    test('should validate correct addresses', () => {
+      expect(validateAddress('123 Main Street, Anytown')).toEqual({ isValid: true });
+    });
+
+    test('should reject invalid addresses', () => {
+      expect(validateAddress('')).toEqual({ isValid: false, error: 'Address is required' });
+      expect(validateAddress('Short')).toEqual({ isValid: false, error: 'Address must be at least 10 characters long' });
+      expect(validateAddress('A'.repeat(201))).toEqual({ isValid: false, error: 'Address must be less than 200 characters' });
+    });
+  });
+
+  describe('validateRequired', () => {
+    test('should validate required fields', () => {
+      expect(validateRequired('Valid Value', 'Field')).toEqual({ isValid: true });
+    });
+
+    test('should reject empty required fields', () => {
+      expect(validateRequired('', 'Field')).toEqual({ isValid: false, error: 'Field is required' });
+      expect(validateRequired('   ', 'Field')).toEqual({ isValid: false, error: 'Field is required' });
+    });
+  });
+
+  describe('validateNumeric', () => {
+    test('should validate numeric values', () => {
+      expect(validateNumeric('123', 'Amount')).toEqual({ isValid: true });
+      expect(validateNumeric('123.45', 'Amount')).toEqual({ isValid: true });
+    });
+
+    test('should reject non-numeric values', () => {
+      expect(validateNumeric('', 'Amount')).toEqual({ isValid: false, error: 'Amount is required' });
+      expect(validateNumeric('abc', 'Amount')).toEqual({ isValid: false, error: 'Amount must be a valid number' });
+    });
+  });
+
+  describe('validateGSTNumber', () => {
+    test('should validate correct GST numbers', () => {
+      expect(validateGSTNumber('29ABCDE1234F1Z5')).toEqual({ isValid: true });
+    });
+
+    test('should reject invalid GST numbers', () => {
+      expect(validateGSTNumber('')).toEqual({ isValid: false, error: 'GST number is required' });
+      expect(validateGSTNumber('12345')).toEqual({ isValid: false, error: 'GST number must be 15 characters' });
+      expect(validateGSTNumber('INVALIDGSTNUMBER')).toEqual({ isValid: false, error: 'GST number must be 15 characters' });
+    });
+  });
+
+  describe('validateAadharNumber', () => {
+    test('should validate correct Aadhar numbers', () => {
+      expect(validateAadharNumber('234567890123')).toEqual({ isValid: true });
+      expect(validateAadharNumber('2345 6789 0123')).toEqual({ isValid: true });
+    });
+
+    test('should reject invalid Aadhar numbers', () => {
+      expect(validateAadharNumber('')).toEqual({ isValid: false, error: 'Aadhar number is required' });
+      expect(validateAadharNumber('12345')).toEqual({ isValid: false, error: 'Aadhar number must be 12 digits' });
+      expect(validateAadharNumber('abcd12345678')).toEqual({ isValid: false, error: 'Aadhar number must contain only digits' });
+      expect(validateAadharNumber('012345678901')).toEqual({ isValid: false, error: 'Invalid Aadhar number' });
+      expect(validateAadharNumber('112345678901')).toEqual({ isValid: false, error: 'Invalid Aadhar number' });
+    });
+  });
+
+  describe('validatePANNumber', () => {
+    test('should validate correct PAN numbers', () => {
+      expect(validatePANNumber('ABCDE1234F')).toEqual({ isValid: true });
+    });
+
+    test('should reject invalid PAN numbers', () => {
+      expect(validatePANNumber('')).toEqual({ isValid: false, error: 'PAN number is required' });
+      expect(validatePANNumber('12345')).toEqual({ isValid: false, error: 'PAN number must be 10 characters' });
+      expect(validatePANNumber('INVALIDPAN')).toEqual({ isValid: false, error: 'Invalid PAN number format' });
+    });
+  });
+
+  describe('validateIFSCCode', () => {
+    test('should validate correct IFSC codes', () => {
+      expect(validateIFSCCode('SBIN0001234')).toEqual({ isValid: true });
+    });
+
+    test('should reject invalid IFSC codes', () => {
+      expect(validateIFSCCode('')).toEqual({ isValid: false, error: 'IFSC code is required' });
+      expect(validateIFSCCode('12345')).toEqual({ isValid: false, error: 'IFSC code must be 11 characters' });
+      expect(validateIFSCCode('INVALIDIFSC')).toEqual({ isValid: false, error: 'Invalid IFSC code format' });
+    });
+  });
+
+  describe('validateFileSize', () => {
+    test('should validate correct file sizes', () => {
+      expect(validateFileSize(1024 * 1024)).toEqual({ isValid: true }); // 1MB
+      expect(validateFileSize(1024 * 1024 * 3)).toEqual({ isValid: true }); // 3MB
+    });
+
+    test('should reject oversized files', () => {
+      expect(validateFileSize(1024 * 1024 * 6)).toEqual({ isValid: false, error: 'File size must be less than 5MB' });
+      expect(validateFileSize(1024 * 1024 * 11, 10)).toEqual({ isValid: false, error: 'File size must be less than 10MB' });
+    });
+  });
+
+  describe('validateFileType', () => {
+    test('should validate correct file types', () => {
+      expect(validateFileType('document.pdf', ['pdf', 'doc'])).toEqual({ isValid: true });
+      expect(validateFileType('image.jpg', ['jpg', 'png'])).toEqual({ isValid: true });
+    });
+
+    test('should reject invalid file types', () => {
+      expect(validateFileType('document', ['pdf'])).toEqual({ isValid: false, error: 'File type must be one of: pdf' });
+      expect(validateFileType('document.txt', ['pdf', 'doc'])).toEqual({ isValid: false, error: 'File type must be one of: pdf, doc' });
+    });
+  });
+
+  describe('validateDate', () => {
+    test('should validate correct dates', () => {
+      expect(validateDate('2024-01-01')).toEqual({ isValid: true });
+      expect(validateDate(new Date())).toEqual({ isValid: true });
+    });
+
+    test('should reject invalid dates', () => {
+      expect(validateDate('')).toEqual({ isValid: false, error: 'Date is required' });
+      expect(validateDate('invalid-date')).toEqual({ isValid: false, error: 'Date is not a valid date' });
+    });
+  });
+
+  describe('validateFutureDate', () => {
+    test('should validate future dates', () => {
+      const futureDate = new Date();
+      futureDate.setDate(futureDate.getDate() + 1);
+      expect(validateFutureDate(futureDate)).toEqual({ isValid: true });
+    });
+
+    test('should reject past dates', () => {
+      const pastDate = new Date();
+      pastDate.setDate(pastDate.getDate() - 1);
+      expect(validateFutureDate(pastDate)).toEqual({ isValid: false, error: 'Date must be in the future' });
+    });
+  });
+
+  describe('validateAge', () => {
+    test('should validate correct ages', () => {
+      const birthDate = new Date();
+      birthDate.setFullYear(birthDate.getFullYear() - 25);
+      expect(validateAge(birthDate)).toEqual({ isValid: true });
+    });
+
+    test('should reject invalid ages', () => {
+      const tooYoung = new Date();
+      tooYoung.setFullYear(tooYoung.getFullYear() - 10);
+      expect(validateAge(tooYoung)).toEqual({ isValid: false, error: 'Age must be at least 18 years' });
+
+      const tooOld = new Date();
+      tooOld.setFullYear(tooOld.getFullYear() - 150);
+      expect(validateAge(tooOld)).toEqual({ isValid: false, error: 'Age cannot be more than 120 years' });
+    });
+  });
+
+  describe('validateURL', () => {
+    test('should validate correct URLs', () => {
+      expect(validateURL('https://example.com')).toEqual({ isValid: true });
+      expect(validateURL('http://test.org')).toEqual({ isValid: true });
+    });
+
+    test('should reject invalid URLs', () => {
+      expect(validateURL('')).toEqual({ isValid: false, error: 'URL is required' });
+      expect(validateURL('invalid-url')).toEqual({ isValid: false, error: 'Invalid URL format' });
+    });
+  });
+
+  describe('getFullIndianPhoneNumber', () => {
+    test('should add country code to phone numbers', () => {
+      expect(getFullIndianPhoneNumber('9876543210')).toBe('+919876543210');
+      expect(getFullIndianPhoneNumber('+919876543210')).toBe('+919876543210');
+      expect(getFullIndianPhoneNumber('919876543210')).toBe('+919876543210');
+    });
+  });
+
+  describe('cleanPhoneNumber', () => {
+    test('should clean phone numbers', () => {
+      expect(cleanPhoneNumber('+91-987-654-3210')).toBe('919876543210');
+      expect(cleanPhoneNumber('(+91) 987 654 3210')).toBe('919876543210');
+    });
+  });
+
+  describe('createDebouncedValidator', () => {
+    test('should create debounced validator', () => {
+      const validator = (value: string) => ({ isValid: value.length > 5, error: value.length <= 5 ? 'Too short' : undefined });
+      const debouncedValidator = createDebouncedValidator(validator, 50);
+      
+      // Test that the function is created without errors
+      expect(typeof debouncedValidator).toBe('function');
+      
+      // We can't easily test the async behavior in a unit test without more complex setup
+      // So we'll just verify the function creates correctly
     });
   });
 });

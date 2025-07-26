@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { SafeAreaView, ScrollView, Text, TouchableOpacity, View, Linking, TextInput, KeyboardAvoidingView, Platform } from 'react-native';
 import { showSuccessAlert } from '@/utils/alert';
+import { safeGoBack } from '@/utils/navigation';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { 
   ArrowLeft, 
@@ -568,7 +569,7 @@ export default function CommonAreaRequestDetail() {
       >
         {/* Header */}
         <View className="flex-row items-center px-4 py-4 border-b border-divider">
-          <TouchableOpacity onPress={() => router.back()} className="mr-4">
+          <TouchableOpacity onPress={() => safeGoBack()} className="mr-4">
             <ArrowLeft size={24} color="#212121" />
           </TouchableOpacity>
           <View className="flex-1">

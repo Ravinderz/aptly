@@ -13,6 +13,7 @@ import { router } from 'expo-router';
 import LucideIcons from '@/components/ui/LucideIcons';
 import { showSuccessAlert, showErrorAlert } from '@/utils/alert';
 import { validateEmergencyContact, formatIndianPhoneNumber } from '@/utils/validation';
+import { safeGoBack } from '@/utils/navigation';
 
 // UI Components
 import { Card } from '@/components/ui/Card';
@@ -96,7 +97,7 @@ export default function AddEmergencyContactPage() {
       await new Promise(resolve => setTimeout(resolve, 1500));
       
       showSuccessAlert('Contact Added', 'Emergency contact has been added successfully');
-      router.back();
+      safeGoBack();
     } catch (error) {
       showErrorAlert('Error', 'Failed to add emergency contact. Please try again.');
     } finally {
@@ -149,7 +150,7 @@ export default function AddEmergencyContactPage() {
     <SafeAreaView className="flex-1 bg-background">
       <StackHeader
         title="Add Emergency Contact"
-        onBackPress={() => router.back()}
+        onBackPress={() => safeGoBack()}
       />
 
       <KeyboardAvoidingView 
@@ -297,7 +298,7 @@ export default function AddEmergencyContactPage() {
             
             <Button
               variant="secondary"
-              onPress={() => router.back()}
+              onPress={() => safeGoBack()}
               disabled={isSaving}
             >
               Cancel
