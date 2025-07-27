@@ -101,6 +101,7 @@ export interface DeliverySlot {
   isExpress: boolean;
   additionalCharge: number;
   isAvailable: boolean;
+  popular?: boolean;
 }
 
 export interface CylinderBookingRequest {
@@ -247,6 +248,12 @@ export interface SocietyBill {
   gstAmount: number;
   totalAmount: number;
   paymentHistory: BillPayment[];
+  waterUsage?: {
+    previousReading: number;
+    currentReading: number;
+    consumption: number;
+    rate: number;
+  };
   createdAt: string;
   updatedAt: string;
 }

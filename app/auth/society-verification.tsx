@@ -1,7 +1,7 @@
 import { useRouter, useLocalSearchParams } from "expo-router";
 import { ArrowLeft, Building, MapPin, Users, CheckCircle } from "lucide-react-native";
 import React, { useState, useEffect } from "react";
-import { SafeAreaView, Text, TouchableOpacity, View, ActivityIndicator } from "react-native";
+import { SafeAreaView, Text, TouchableOpacity, View, ActivityIndicator, ScrollView, Dimensions } from "react-native";
 import { Button } from "@/components/ui/Button";
 
 interface Society {
@@ -24,6 +24,10 @@ export default function SocietyVerification() {
   const [isLoading, setIsLoading] = useState(true);
   const [society, setSociety] = useState<Society | null>(null);
   const [error, setError] = useState("");
+  
+  // Responsive sizing
+  const { width, height } = Dimensions.get('window');
+  const isSmallScreen = height < 700;
 
   useEffect(() => {
     fetchSocietyDetails();
@@ -151,9 +155,17 @@ export default function SocietyVerification() {
         <Text className="text-headline-large font-bold text-text-primary">Society Verification</Text>
       </View>
 
-      <View className="flex-1 px-6 py-8">
+      <ScrollView 
+        className="flex-1"
+        contentContainerStyle={{ 
+          flexGrow: 1, 
+          paddingHorizontal: 24, 
+          paddingVertical: isSmallScreen ? 16 : 32 
+        }}
+        showsVerticalScrollIndicator={false}
+      >
         {/* Success Header */}
-        <View className="items-center mb-8">
+        <View className={`items-center ${isSmallScreen ? 'mb-6' : 'mb-8'}`}>
           <View className="bg-success/10 rounded-full w-20 h-20 items-center justify-center mb-4">
             <CheckCircle size={32} color="#4CAF50" />
           </View>
@@ -246,7 +258,7 @@ export default function SocietyVerification() {
             Wrong society? <Text className="text-primary font-semibold">Try different code</Text>
           </Text>
         </TouchableOpacity>
-      </View>
+      </ScrollView>
     </SafeAreaView>
   );
 }

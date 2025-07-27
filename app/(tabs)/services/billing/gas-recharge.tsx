@@ -150,7 +150,7 @@ export default function GasRecharge() {
             <Text className="text-text-primary text-body-large mr-3">ID</Text>
             <TextInput
               className="flex-1 text-text-primary text-body-large"
-              placeholder="Enter PNG customer ID or CNG card number"
+              placeholder="Enter PNG customer ID or CNG"
               placeholderTextColor="#757575"
               value={customerId}
               onChangeText={setCustomerId}

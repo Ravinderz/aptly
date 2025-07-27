@@ -3,7 +3,7 @@ import React from "react";
 import { Text, TouchableOpacity, View } from "react-native";
 import { cn } from "@/utils/cn";
 
-const AlertCard = () => {
+const NoticeCard = () => {
   // Mock notice data with priority levels - simulate checking for today's notices
   const todaysNotices = [
     {
@@ -141,4 +141,4 @@ const AlertCard = () => {
   );
 };
 
-export default AlertCard;
+export default NoticeCard;

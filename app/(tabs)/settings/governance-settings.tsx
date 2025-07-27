@@ -1,70 +1,80 @@
-import React, { useState, useEffect } from 'react';
-import { 
-  SafeAreaView, 
-  ScrollView, 
-  View, 
-  Text, 
+import LucideIcons from "@/components/ui/LucideIcons";
+import { showErrorAlert, showSuccessAlert } from "@/utils/alert";
+import { safeGoBack } from "@/utils/navigation";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { router } from "expo-router";
+import React, { useEffect, useState } from "react";
+import {
+  SafeAreaView,
+  ScrollView,
+  Switch,
+  Text,
   TouchableOpacity,
-  Switch
-} from 'react-native';
-import { router } from 'expo-router';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import LucideIcons from '@/components/ui/LucideIcons';
-import { showSuccessAlert, showErrorAlert } from '@/utils/alert';
-import { safeGoBack } from '@/utils/navigation';
+  View,
+} from "react-native";
 
 // UI Components
-import { Card } from '@/components/ui/Card';
-import { Button } from '@/components/ui/Button';
-import StackHeader from '@/components/ui/headers/StackHeader';
+import { Button } from "@/components/ui/Button";
+import { Card } from "@/components/ui/Card";
+import StackHeader from "@/components/ui/headers/StackHeader";
 
 // Default governance preferences
 const defaultPreferences = {
   notifications: true,
   emailAlerts: false,
-  emergencyContacts: []
+  emergencyContacts: [],
 };
 
 // Default state
 const defaultState = {
-  userRole: 'resident' as 'resident' | 'committee_member' | 'admin',
+  userRole: "resident" as "resident" | "committee_member" | "admin",
   preferences: defaultPreferences,
-  lastUpdated: null as string | null
+  lastUpdated: null as string | null,
 };
 
 // Helper function to check user permissions
 const canUserPerformAction = (action: string, userRole: string): boolean => {
   const permissions = {
-    'create_campaign': ['admin', 'committee_member'],
-    'manage_emergency': ['admin', 'committee_member'],
-    'view_analytics': ['admin', 'committee_member'],
-    'manage_policies': ['admin']
+    create_campaign: ["admin", "committee_member"],
+    manage_emergency: ["admin", "committee_member"],
+    view_analytics: ["admin", "committee_member"],
+    manage_policies: ["admin"],
   };
-  
-  return permissions[action as keyof typeof permissions]?.includes(userRole) || false;
+
+  return (
+    permissions[action as keyof typeof permissions]?.includes(userRole) || false
+  );
 };
 
 // Helper function to update preferences
-const updateUserPreferences = async (newPreferences: typeof defaultPreferences): Promise<void> => {
+const updateUserPreferences = async (
+  newPreferences: typeof defaultPreferences
+): Promise<void> => {
   try {
-    await AsyncStorage.setItem('governance_preferences', JSON.stringify(newPreferences));
-    await AsyncStorage.setItem('governance_last_updated', new Date().toISOString());
+    await AsyncStorage.setItem(
+      "governance_preferences",
+      JSON.stringify(newPreferences)
+    );
+    await AsyncStorage.setItem(
+      "governance_last_updated",
+      new Date().toISOString()
+    );
   } catch (error) {
-    throw new Error('Failed to save preferences');
+    throw new Error("Failed to save preferences");
   }
 };
 
 // Helper function to load preferences
 const loadUserPreferences = async () => {
   try {
-    const prefsString = await AsyncStorage.getItem('governance_preferences');
-    const roleString = await AsyncStorage.getItem('user_role') || 'resident';
-    const lastUpdated = await AsyncStorage.getItem('governance_last_updated');
-    
+    const prefsString = await AsyncStorage.getItem("governance_preferences");
+    const roleString = (await AsyncStorage.getItem("user_role")) || "resident";
+    const lastUpdated = await AsyncStorage.getItem("governance_last_updated");
+
     return {
-      userRole: roleString as 'resident' | 'committee_member' | 'admin',
+      userRole: roleString as "resident" | "committee_member" | "admin",
       preferences: prefsString ? JSON.parse(prefsString) : defaultPreferences,
-      lastUpdated
+      lastUpdated,
     };
   } catch (error) {
     return defaultState;
@@ -78,7 +88,7 @@ export default function GovernanceSettingsPage() {
 
   useEffect(() => {
     // Load preferences on component mount
-    loadUserPreferences().then(loadedState => {
+    loadUserPreferences().then((loadedState) => {
       setState(loadedState);
       setPreferences(loadedState.preferences);
     });
@@ -88,20 +98,23 @@ export default function GovernanceSettingsPage() {
     try {
       setIsSaving(true);
       await updateUserPreferences(preferences);
-      showSuccessAlert('Success', 'Governance preferences updated successfully');
+      showSuccessAlert(
+        "Success",
+        "Governance preferences updated successfully"
+      );
     } catch (error) {
-      showErrorAlert('Error', 'Failed to update preferences');
+      showErrorAlert("Error", "Failed to update preferences");
     } finally {
       setIsSaving(false);
     }
   };
 
   const handleToggleNotifications = (enabled: boolean) => {
-    setPreferences(prev => ({ ...prev, notifications: enabled }));
+    setPreferences((prev) => ({ ...prev, notifications: enabled }));
   };
 
   const handleToggleEmailAlerts = (enabled: boolean) => {
-    setPreferences(prev => ({ ...prev, emailAlerts: enabled }));
+    setPreferences((prev) => ({ ...prev, emailAlerts: enabled }));
   };
 
   const renderNotificationSettings = () => (
@@ -110,28 +123,29 @@ export default function GovernanceSettingsPage() {
         <Text className="text-headline-small font-semibold text-text-primary mb-4">
           Notification Preferences
         </Text>
-        
+
         <View className="space-y-4">
           {/* Push Notifications */}
-          <View className="flex-row items-center justify-between">
+          <View className="flex-row items-center justify-between mb-4">
             <View className="flex-1 mr-4">
               <Text className="text-body-medium font-medium text-text-primary">
                 Push Notifications
               </Text>
               <Text className="text-body-small text-text-secondary">
-                Receive notifications for voting, emergencies, and policy updates
+                Receive notifications for voting, emergencies, and policy
+                updates
               </Text>
             </View>
             <Switch
               value={preferences.notifications}
               onValueChange={handleToggleNotifications}
-              trackColor={{ false: '#D1D5DB', true: '#6366f1' }}
-              thumbColor={preferences.notifications ? '#FFFFFF' : '#757575'}
+              trackColor={{ false: "#D1D5DB", true: "#6366f1" }}
+              thumbColor={preferences.notifications ? "#FFFFFF" : "#757575"}
             />
           </View>
 
           {/* Email Alerts */}
-          <View className="flex-row items-center justify-between">
+          <View className="flex-row items-center justify-between mb-4">
             <View className="flex-1 mr-4">
               <Text className="text-body-medium font-medium text-text-primary">
                 Email Alerts
@@ -143,8 +157,8 @@ export default function GovernanceSettingsPage() {
             <Switch
               value={preferences.emailAlerts}
               onValueChange={handleToggleEmailAlerts}
-              trackColor={{ false: '#D1D5DB', true: '#6366f1' }}
-              thumbColor={preferences.emailAlerts ? '#FFFFFF' : '#757575'}
+              trackColor={{ false: "#D1D5DB", true: "#6366f1" }}
+              thumbColor={preferences.emailAlerts ? "#FFFFFF" : "#757575"}
             />
           </View>
 
@@ -155,7 +169,9 @@ export default function GovernanceSettingsPage() {
                 Emergency Contacts
               </Text>
               <TouchableOpacity
-                onPress={() => {/* Navigate to emergency contacts management */}}
+                onPress={() => {
+                  /* Navigate to emergency contacts management */
+                }}
                 className="flex-row items-center"
               >
                 <Text className="text-primary text-body-small mr-1">
@@ -170,7 +186,9 @@ export default function GovernanceSettingsPage() {
             <Button
               variant="secondary"
               size="sm"
-              onPress={() => {/* Navigate to emergency contacts management */}}
+              onPress={() => {
+                /* Navigate to emergency contacts management */
+              }}
             >
               Manage Emergency Contacts
             </Button>
@@ -186,42 +204,60 @@ export default function GovernanceSettingsPage() {
         <Text className="text-headline-small font-semibold text-text-primary mb-4">
           Your Permissions
         </Text>
-        
+
         <View className="bg-surface-secondary p-3 rounded-lg mb-4">
           <View className="flex-row items-center mb-2">
-            <View className={`w-3 h-3 rounded-full mr-2 ${
-              state.userRole === 'admin' ? 'bg-error' :
-              state.userRole === 'committee_member' ? 'bg-warning' : 'bg-success'
-            }`} />
+            <View
+              className={`w-3 h-3 rounded-full mr-2 ${
+                state.userRole === "admin"
+                  ? "bg-error"
+                  : state.userRole === "committee_member"
+                  ? "bg-warning"
+                  : "bg-success"
+              }`}
+            />
             <Text className="text-body-medium font-semibold text-text-primary capitalize">
-              {state.userRole.replace('_', ' ')}
+              {state.userRole.replace("_", " ")}
             </Text>
           </View>
           <Text className="text-body-small text-text-secondary">
-            {state.userRole === 'admin' ? 'Full access to all governance features' :
-             state.userRole === 'committee_member' ? 'Can create campaigns and manage emergencies' :
-             'Can vote and view governance information'
-            }
+            {state.userRole === "admin"
+              ? "Full access to all governance features"
+              : state.userRole === "committee_member"
+              ? "Can create campaigns and manage emergencies"
+              : "Can vote and view governance information"}
           </Text>
         </View>
 
         <View className="space-y-2">
           {[
-            { action: 'vote', label: 'Vote in campaigns and policies' },
-            { action: 'create_campaign', label: 'Create voting campaigns' },
-            { action: 'create_emergency', label: 'Create emergency alerts' },
-            { action: 'create_policy', label: 'Propose new policies' },
-            { action: 'view_analytics', label: 'View governance analytics' }
+            { action: "vote", label: "Vote in campaigns and policies" },
+            { action: "create_campaign", label: "Create voting campaigns" },
+            { action: "create_emergency", label: "Create emergency alerts" },
+            { action: "create_policy", label: "Propose new policies" },
+            { action: "view_analytics", label: "View governance analytics" },
           ].map((permission) => (
             <View key={permission.action} className="flex-row items-center">
-              <LucideIcons 
-                name={canUserPerformAction(permission.action, state.userRole) ? "checkmark-circle" : "close-circle"} 
-                size={16} 
-                color={canUserPerformAction(permission.action, state.userRole) ? "#4CAF50" : "#D32F2F"} 
+              <LucideIcons
+                name={
+                  canUserPerformAction(permission.action, state.userRole)
+                    ? "checkmark-circle"
+                    : "close-circle"
+                }
+                size={16}
+                color={
+                  canUserPerformAction(permission.action, state.userRole)
+                    ? "#4CAF50"
+                    : "#D32F2F"
+                }
               />
-              <Text className={`text-body-small ml-2 ${
-                canUserPerformAction(permission.action, state.userRole) ? 'text-text-primary' : 'text-text-secondary'
-              }`}>
+              <Text
+                className={`text-body-small ml-2 ${
+                  canUserPerformAction(permission.action, state.userRole)
+                    ? "text-text-primary"
+                    : "text-text-secondary"
+                }`}
+              >
                 {permission.label}
               </Text>
             </View>
@@ -237,11 +273,13 @@ export default function GovernanceSettingsPage() {
         <Text className="text-headline-small font-semibold text-text-primary mb-4">
           Data & Privacy
         </Text>
-        
+
         <View className="space-y-4">
           <TouchableOpacity
             className="flex-row items-center justify-between py-2"
-            onPress={() => {/* Navigate to data export */}}
+            onPress={() => {
+              /* Navigate to data export */
+            }}
           >
             <View className="flex-1">
               <Text className="text-body-medium font-medium text-text-primary">
@@ -256,7 +294,9 @@ export default function GovernanceSettingsPage() {
 
           <TouchableOpacity
             className="flex-row items-center justify-between py-2"
-            onPress={() => {/* Navigate to privacy settings */}}
+            onPress={() => {
+              /* Navigate to privacy settings */
+            }}
           >
             <View className="flex-1">
               <Text className="text-body-medium font-medium text-text-primary">
@@ -271,7 +311,9 @@ export default function GovernanceSettingsPage() {
 
           <TouchableOpacity
             className="flex-row items-center justify-between py-2"
-            onPress={() => {/* Show audit log */}}
+            onPress={() => {
+              /* Show audit log */
+            }}
           >
             <View className="flex-1">
               <Text className="text-body-medium font-medium text-text-primary">
@@ -294,11 +336,13 @@ export default function GovernanceSettingsPage() {
         <Text className="text-headline-small font-semibold text-text-primary mb-4">
           Advanced Settings
         </Text>
-        
+
         <View className="space-y-4">
           <TouchableOpacity
             className="flex-row items-center justify-between py-2"
-            onPress={() => router.push('/(tabs)/settings/governance-voting-preferences')}
+            onPress={() =>
+              router.push("/(tabs)/settings/governance-voting-preferences")
+            }
           >
             <View className="flex-1">
               <Text className="text-body-medium font-medium text-text-primary">
@@ -313,7 +357,9 @@ export default function GovernanceSettingsPage() {
 
           <TouchableOpacity
             className="flex-row items-center justify-between py-2"
-            onPress={() => router.push('/(tabs)/settings/governance-emergency-settings')}
+            onPress={() =>
+              router.push("/(tabs)/settings/governance-emergency-settings")
+            }
           >
             <View className="flex-1">
               <Text className="text-body-medium font-medium text-text-primary">
@@ -326,10 +372,10 @@ export default function GovernanceSettingsPage() {
             <LucideIcons name="warning-outline" size={20} color="#757575" />
           </TouchableOpacity>
 
-          {canUserPerformAction('view_analytics', state.userRole) && (
+          {canUserPerformAction("view_analytics", state.userRole) && (
             <TouchableOpacity
               className="flex-row items-center justify-between py-2"
-              onPress={() => router.push('/(tabs)/services/analytics')}
+              onPress={() => router.push("/(tabs)/services/analytics")}
             >
               <View className="flex-1">
                 <Text className="text-body-medium font-medium text-text-primary">
@@ -354,8 +400,8 @@ export default function GovernanceSettingsPage() {
         onBackPress={() => safeGoBack()}
       />
 
-      <ScrollView 
-        className="flex-1" 
+      <ScrollView
+        className="flex-1"
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ padding: 16, paddingBottom: 100 }}
       >
@@ -369,7 +415,10 @@ export default function GovernanceSettingsPage() {
           <Button
             variant="primary"
             onPress={handleSavePreferences}
-            disabled={isSaving || JSON.stringify(preferences) === JSON.stringify(state.preferences)}
+            disabled={
+              isSaving ||
+              JSON.stringify(preferences) === JSON.stringify(state.preferences)
+            }
           >
             {isSaving ? "Saving..." : "Save Preferences"}
           </Button>

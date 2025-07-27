@@ -355,27 +355,43 @@ export const GovernanceProvider: React.FC<GovernanceProviderProps> = ({ children
           id: 'campaign-1',
           title: 'Committee Election 2024',
           description: 'Annual committee member election',
-          type: 'election',
+          type: 'committee_election',
           status: 'active',
+          createdBy: 'admin-1',
+          society_id: 'society-1',
           startDate: '2024-01-15T00:00:00Z',
           endDate: '2024-01-30T23:59:59Z',
           isAnonymous: true,
-          allowMultipleChoices: false,
+          requiresQuorum: false,
+          minimumParticipation: 50,
           candidates: [
             {
               id: 'candidate-1',
+              userId: 'user-123',
               name: 'Rajesh Kumar',
               designation: 'Treasurer',
+              profileImage: undefined,
               bio: 'Experienced in financial management',
-              imageUrl: null,
-              voteCount: 45,
-              manifesto: 'Transparent financial management'
+              manifesto: 'Transparent financial management',
+              nominatedBy: 'user-456',
+              endorsements: [],
+              votes: 45
             }
           ],
           options: [],
+          eligibleVoters: ['user1', 'user2', 'user3'],
+          eligibilityRules: {
+            minimumResidencyMonths: 6,
+            requiredVerification: true,
+            excludedRoles: [],
+            includeOwners: true,
+            includeTenants: true,
+            includeFamilyMembers: false
+          },
           totalVotes: 45,
-          eligibleVoters: 150,
-          createdBy: 'admin-1', 
+          results: undefined,
+          isResultsPublished: false,
+          auditLog: [],
           createdAt: '2024-01-01T10:00:00Z',
           updatedAt: '2024-01-15T10:00:00Z'
         }
@@ -395,16 +411,17 @@ export const GovernanceProvider: React.FC<GovernanceProviderProps> = ({ children
         id: `campaign-${Date.now()}`,
         title: campaignData.title || '',
         description: campaignData.description || '',
-        type: campaignData.type || 'poll',
+        type: campaignData.type || 'emergency_decision',
         status: 'draft',
         startDate: campaignData.startDate || new Date().toISOString(),
         endDate: campaignData.endDate || new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
         isAnonymous: campaignData.isAnonymous || true,
-        allowMultipleChoices: campaignData.allowMultipleChoices || false,
+        requiresQuorum: campaignData.requiresQuorum || false,
+        minimumParticipation: campaignData.minimumParticipation || 30,
         candidates: campaignData.candidates || [],
         options: campaignData.options || [],
         totalVotes: 0,
-        eligibleVoters: 150,
+        eligibleVoters: [], // Will be populated based on eligibility rules
         createdBy: state.userId,
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString()
@@ -445,24 +462,36 @@ export const GovernanceProvider: React.FC<GovernanceProviderProps> = ({ children
           title: 'Water Supply Disruption',
           description: 'Water supply will be disrupted from 2 PM to 6 PM for maintenance',
           severity: 'medium',
-          category: 'utilities',
+          type: 'water_shortage',
           status: 'active',
+          society_id: 'society-1',
+          location: 'Water Tank Area',
           affectedAreas: ['Block A', 'Block B'],
-          instructions: 'Please store water in advance',
-          estimatedDuration: '4 hours',
           contactPerson: 'Maintenance Team',
           contactNumber: '+91-9876543210',
+          declaredBy: 'admin-1',
+          escalationLevel: 1,
           escalationChain: [
             {
               level: 1,
-              contactId: 'contact-1',
-              name: 'Site Engineer',
-              phone: '+91-9876543210',
-              role: 'primary'
+              role: 'maintenance_admin',
+              userId: 'user-engineer',
+              contactMethods: ['push', 'sms'],
+              timeoutMinutes: 30,
+              isActivated: true,
+              activatedAt: '2024-01-20T08:00:00Z',
+              acknowledgedAt: '2024-01-20T08:15:00Z'
             }
           ],
-          isResolved: false,
-          createdBy: 'admin-1',
+          currentResponder: 'user-engineer',
+          notifications: [],
+          acknowledgments: [],
+          resolvedBy: undefined,
+          resolvedAt: undefined,
+          resolutionNotes: undefined,
+          postIncidentReport: undefined,
+          overriddenBy: undefined,
+          overrideReason: undefined,
           createdAt: '2024-01-20T08:00:00Z',
           updatedAt: '2024-01-20T08:00:00Z'
         }
@@ -588,35 +617,24 @@ export const GovernanceProvider: React.FC<GovernanceProviderProps> = ({ children
     try {
       // Mock API call
       const dashboardData: GovernanceDashboardData = {
-        societyId: 'society-1',
-        activeCampaigns: state.votingCampaigns.filter(c => c.status === 'active').length,
-        totalResidents: 150,
+        society_id: 'society-1',
+        activeVotingCampaigns: state.votingCampaigns.filter(c => c.status === 'active').length,
+        totalVoters: 150,
+        averageParticipation: 55.3,
         activeEmergencies: state.emergencyAlerts.filter(a => a.status === 'active').length,
+        lastEmergencyDate: '2024-01-10T08:00:00Z',
         pendingPolicies: 2,
-        participationRate: 55.3,
-        lastElectionDate: '2023-01-15T00:00:00Z',
-        nextElectionDate: '2024-01-15T00:00:00Z',
-        committeeMembersCount: 7,
-        emergencyContactsCount: 12,
-        recentActivities: [
-          {
-            id: 'activity-1',
-            type: 'vote_cast',
-            description: 'New vote cast in Committee Election 2024',
-            timestamp: '2024-01-20T10:30:00Z',
-            userId: 'user-456',
-            metadata: { campaignId: 'campaign-1' }
-          }
-        ],
-        upcomingEvents: [
-          {
-            id: 'event-1',
-            title: 'Committee Meeting',
-            date: '2024-01-25T18:00:00Z',
-            type: 'meeting',
-            location: 'Community Hall'
-          }
-        ]
+        implementedPoliciesThisYear: 5,
+        communityEngagement: {
+          eventsThisMonth: 3,
+          averageAttendance: 85,
+          satisfactionScore: 4.2
+        },
+        succession: {
+          planExists: true,
+          deputiesAssigned: 2,
+          lastReviewDate: '2024-01-01T00:00:00Z'
+        }
       };
 
       dispatch({ type: 'SET_DASHBOARD_DATA', payload: dashboardData });

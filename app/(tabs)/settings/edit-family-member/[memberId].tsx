@@ -317,24 +317,29 @@ export default function EditFamilyMemberPage() {
                 <Text className="text-body-medium font-medium text-text-primary mb-2">
                   Relationship <Text className="text-error">*</Text>
                 </Text>
-                <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-                  <View className="flex-row gap-2">
+                <ScrollView 
+                  horizontal 
+                  showsHorizontalScrollIndicator={false}
+                  contentContainerStyle={{ paddingHorizontal: 4, paddingVertical: 2 }}
+                >
+                  <View className="flex-row gap-3">
                     {relationships.map((relationship) => (
                       <TouchableOpacity
                         key={relationship}
                         onPress={() => updateForm("relationship", relationship)}
-                        className={`px-3 py-2 rounded-full border ${
+                        className={`px-4 py-2 rounded-full border min-w-[80px] flex-shrink-0 ${
                           form.relationship === relationship
                             ? "border-primary bg-primary/10"
                             : "border-divider bg-background"
                         }`}
                       >
                         <Text
-                          className={`text-body-small font-medium ${
+                          className={`text-body-small font-medium text-center ${
                             form.relationship === relationship
                               ? "text-primary"
                               : "text-text-secondary"
                           }`}
+                          numberOfLines={1}
                         >
                           {relationship}
                         </Text>

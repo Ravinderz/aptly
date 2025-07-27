@@ -2,11 +2,14 @@ import { useRouter, useLocalSearchParams } from "expo-router";
 import React, { useState, useEffect } from "react";
 import { SafeAreaView, Text, TextInput, TouchableOpacity, View, KeyboardAvoidingView, Platform } from "react-native";
 import { Button } from "@/components/ui/Button";
+import { ResponsiveContainer, ResponsiveCard, ResponsiveRow, ResponsiveText } from "@/components/ui/ResponsiveContainer";
+import { WithFeatureFlag } from "@/contexts/FeatureFlagContext";
 import LucideIcons from "@/components/ui/LucideIcons";
 import AuthService from "@/services/auth.service";
 import BiometricService from "@/services/biometric.service";
 import { useAuth } from "@/contexts/AuthContext";
 import { showErrorAlert } from "@/utils/alert";
+import { responsive, responsiveClasses, layoutUtils } from "@/utils/responsive";
 
 export default function PhoneRegistration() {
   const router = useRouter();
@@ -134,9 +137,20 @@ export default function PhoneRegistration() {
     // Only allow numbers, spaces, +, -, (, )
     const cleanText = text.replace(/[^0-9\s\-\(\)\+]/g, "");
     
-    // Limit to reasonable length
-    if (cleanText.length <= 15) {
-      setPhoneNumber(formatPhoneNumber(cleanText));
+    // Check if this is a deletion operation
+    const isDeletion = cleanText.length < phoneNumber.length;
+    
+    if (isDeletion) {
+      // For deletion, allow backspace without reformatting
+      const numbersOnly = cleanText.replace(/[^\d]/g, "");
+      if (numbersOnly.length <= 10) {
+        setPhoneNumber(formatPhoneNumber(numbersOnly));
+      }
+    } else {
+      // For addition, apply normal formatting
+      if (cleanText.length <= 15) {
+        setPhoneNumber(formatPhoneNumber(cleanText));
+      }
     }
     
     // Clear phone error when user starts typing
@@ -229,21 +243,32 @@ export default function PhoneRegistration() {
           <Text className="text-xl font-bold text-text-primary">{isSignIn ? "Sign In" : "Sign Up"}</Text>
         </View>
 
-        <View className="flex-1 px-6 py-8">
+        <ResponsiveContainer 
+          type="scroll" 
+          padding="lg" 
+          keyboardAware={true} 
+          preventOverflow={true}
+        >
           {/* Welcome Section */}
           <View className="items-center mb-8">
-            <View className="bg-primary/10 rounded-full w-20 h-20 items-center justify-center mb-4">
-              <LucideIcons name="call-outline" size={32} color="#6366f1" />
+            <View 
+              className="bg-primary/10 rounded-full items-center justify-center mb-4"
+              style={{ 
+                width: responsive.spacing(64), 
+                height: responsive.spacing(64) 
+              }}
+            >
+              <LucideIcons name="call-outline" size={responsive.spacing(32)} color="#6366f1" />
             </View>
-            <Text className="text-2xl font-bold text-text-primary mb-2 text-center">
+            <ResponsiveText variant="display" size="small" className="font-bold mb-2 text-center">
               Welcome to Aptly
-            </Text>
-            <Text className="text-text-secondary text-center leading-6">
+            </ResponsiveText>
+            <ResponsiveText variant="body" size="medium" className="text-text-secondary text-center">
               {isSignIn 
                 ? "Enter your registered mobile number and society code to sign in"
                 : "Enter your mobile number and society code to get started with your housing society management"
               }
-            </Text>
+            </ResponsiveText>
           </View>
 
           {/* Phone Number Input */}
@@ -311,7 +336,8 @@ export default function PhoneRegistration() {
           </Button>
 
           {/* Biometric Login Option */}
-          {showBiometricOption && (
+          <WithFeatureFlag feature="biometric_auth">
+            {showBiometricOption && (
             <View className="mb-6">
               <View className="flex-row items-center mb-4">
                 <View className="flex-1 h-px bg-divider" />
@@ -343,17 +369,18 @@ export default function PhoneRegistration() {
                 )}
               </TouchableOpacity>
             </View>
-          )}
+            )}
+          </WithFeatureFlag>
 
           {/* Help Section */}
-          <View className="bg-primary/5 rounded-xl p-4">
+          <View className="bg-primary/5 rounded-xl p-4 mt-4">
             <Text className="text-primary font-semibold mb-2">Need Help?</Text>
             <Text className="text-text-secondary text-sm leading-5">
               Contact your society manager or housing committee to get your society code. 
               Make sure you're using the mobile number registered with your society.
             </Text>
           </View>
-        </View>
+        </ResponsiveContainer>
       </KeyboardAvoidingView>
     </SafeAreaView>
   );

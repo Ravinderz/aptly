@@ -5,6 +5,8 @@ import { SafeAreaView, ScrollView, Text, TouchableOpacity, View, TextInput } fro
 import { showAlert } from "@/utils/alert";
 import HighlightCard from "@/components/ui/HighlightCard";
 import { Card } from "@/components/ui/Card";
+import { ResponsiveContainer, ResponsiveCard, ResponsiveRow, ResponsiveText } from "@/components/ui/ResponsiveContainer";
+import { layoutUtils } from "@/utils/responsive";
 
 export default function Billing() {
   const router = useRouter();
@@ -164,10 +166,12 @@ export default function Billing() {
 
   return (
     <SafeAreaView className="flex-1 bg-background">
-      <ScrollView 
-        className="flex-1" 
-        contentContainerStyle={{ paddingBottom: 100 }}
-        showsVerticalScrollIndicator={false}
+      <ResponsiveContainer 
+        type="scroll" 
+        padding="none" 
+        preventOverflow={true}
+        showScrollIndicator={false}
+        style={{ paddingBottom: 100 }}
       >
         {/* Header */}
         <View className="flex-row items-center px-6 py-4 border-b border-divider bg-surface">
@@ -368,7 +372,7 @@ export default function Billing() {
             onChangeText={setSearchQuery}
           />
           <TouchableOpacity onPress={() => setShowFilters(!showFilters)}>
-            <LucideIcons name="funnel-outline" size={20} color="#6366f1" />
+            <LucideIcons name="filter-outline" size={20} color="#6366f1" />
           </TouchableOpacity>
         </View>
 
@@ -406,94 +410,138 @@ export default function Billing() {
         <View className="px-6 py-5">
           <View>
             {filteredBills.map((bill, index) => (
-            <TouchableOpacity
-              key={bill.id}
-              className={`bg-surface rounded-2xl p-6 border border-divider ${index > 0 ? 'mt-4' : ''}`}
-              onPress={() => router.push(`/(tabs)/services/billing/${bill.id}`)}
-            >
-            {/* Header */}
-            <View className="flex-row items-start justify-between mb-4">
-              <View className="flex-1">
-                <View className="flex-row items-center mb-1">
-                  <Text className="text-headline-small font-semibold text-text-primary">{bill.title}</Text>
-                  {bill.type === 'common_area' && (
-                    <View className="bg-primary/10 rounded-full px-2 py-1 ml-2">
-                      <Text className="text-primary text-label-small font-medium">Split Bill</Text>
+            <ResponsiveCard key={bill.id} className={`${index > 0 ? 'mt-4' : ''}`}>
+              <TouchableOpacity
+                onPress={() => router.push(`/(tabs)/services/billing/${bill.id}`)}
+                className="p-6"
+              >
+                {/* Header - Fixed Layout */}
+                <View className="mb-4">
+                  <ResponsiveRow justify="between" align="start" wrap={false} className="mb-2">
+                    <View className="flex-1 min-w-0 mr-4">
+                      <ResponsiveRow align="center" wrap={true} className="mb-1">
+                        <ResponsiveText 
+                          variant="headline" 
+                          size="small" 
+                          className="font-semibold" 
+                          numberOfLines={2}
+                          style={layoutUtils.preventTextOverflow}
+                        >
+                          {bill.title}
+                        </ResponsiveText>
+                        {bill.type === 'common_area' && (
+                          <View className="bg-primary/10 rounded-full px-2 py-1 ml-2 mt-1">
+                            <ResponsiveText variant="label" size="small" className="text-primary font-medium">
+                              Split Bill
+                            </ResponsiveText>
+                          </View>
+                        )}
+                      </ResponsiveRow>
+                      <ResponsiveText variant="body" size="medium" className="text-text-secondary">
+                        Bill #{bill.billNumber}
+                      </ResponsiveText>
+                      {bill.type === 'common_area' && (
+                        <ResponsiveText 
+                          variant="label" 
+                          size="small" 
+                          className="text-text-secondary mt-1"
+                          numberOfLines={2}
+                        >
+                          Split between {bill.splitBetween} flats • Your share: {formatCurrency(bill.costPerFlat)}
+                        </ResponsiveText>
+                      )}
                     </View>
-                  )}
+                    <View className="items-end flex-shrink-0">
+                      <ResponsiveText variant="display" size="medium" className="font-bold text-text-primary">
+                        {formatCurrency(bill.totalAmount)}
+                      </ResponsiveText>
+                      <ResponsiveText variant="body" size="medium" className="text-text-secondary">
+                        Inc. GST
+                      </ResponsiveText>
+                    </View>
+                  </ResponsiveRow>
                 </View>
-                <Text className="text-text-secondary text-body-medium">Bill #{bill.billNumber}</Text>
-                {bill.type === 'common_area' && (
-                  <Text className="text-text-secondary text-label-small mt-1">
-                    Split between {bill.splitBetween} flats • Your share: {formatCurrency(bill.costPerFlat)}
-                  </Text>
+
+                {/* Status and Dates */}
+                <ResponsiveRow justify="between" align="center" className="mb-4">
+                  <View className={`flex-row items-center px-3 py-2 rounded-full ${getStatusBgColor(bill.status)}`}>
+                    {getStatusIcon(bill.status)}
+                    <ResponsiveText className={`font-medium ml-2 capitalize ${getStatusColor(bill.status)}`}>
+                      {bill.status}
+                    </ResponsiveText>
+                  </View>
+                  <View className="items-end flex-shrink-0">
+                    <ResponsiveText variant="label" size="small" className="text-text-secondary">
+                      {bill.status === "paid" ? "Paid on" : "Due on"}
+                    </ResponsiveText>
+                    <ResponsiveText 
+                      variant="body" 
+                      size="medium" 
+                      className={`font-medium ${bill.status === "overdue" ? "text-error" : "text-text-primary"}`}
+                    >
+                      {bill.status === "paid" ? formatDate(bill.paidDate!) : formatDate(bill.dueDate)}
+                    </ResponsiveText>
+                  </View>
+                </ResponsiveRow>
+
+                {/* Amount Breakdown */}
+                <View className="bg-background rounded-xl p-4 mb-4">
+                  <ResponsiveText variant="body" size="medium" className="font-medium mb-3">
+                    Amount Breakdown
+                  </ResponsiveText>
+                  <View className="space-y-2">
+                    <ResponsiveRow justify="between" align="center">
+                      <ResponsiveText variant="body" size="medium" className="text-text-secondary">
+                        Bill Amount
+                      </ResponsiveText>
+                      <ResponsiveText variant="body" size="medium" className="text-text-primary font-medium">
+                        {formatCurrency(bill.amount)}
+                      </ResponsiveText>
+                    </ResponsiveRow>
+                    <ResponsiveRow justify="between" align="center">
+                      <ResponsiveText variant="body" size="medium" className="text-text-secondary">
+                        GST (18%)
+                      </ResponsiveText>
+                      <ResponsiveText variant="body" size="medium" className="text-text-primary font-medium">
+                        {formatCurrency(bill.gstAmount)}
+                      </ResponsiveText>
+                    </ResponsiveRow>
+                    <View className="h-px bg-divider my-2" />
+                    <ResponsiveRow justify="between" align="center">
+                      <ResponsiveText variant="body" size="medium" className="text-text-primary font-semibold">
+                        Total
+                      </ResponsiveText>
+                      <ResponsiveText variant="body" size="medium" className="text-text-primary font-bold">
+                        {formatCurrency(bill.totalAmount)}
+                      </ResponsiveText>
+                    </ResponsiveRow>
+                  </View>
+                </View>
+
+                {/* Actions */}
+                {bill.status !== "paid" && (
+                  <ResponsiveRow gap="md" className="mt-2">
+                    <TouchableOpacity className="flex-1 bg-primary rounded-xl py-3 min-h-[48px] items-center justify-center">
+                      <ResponsiveText variant="body" size="medium" className="text-white font-semibold">
+                        Pay Now
+                      </ResponsiveText>
+                    </TouchableOpacity>
+                    <TouchableOpacity className="bg-surface border border-divider rounded-xl p-3 w-12 h-12 items-center justify-center">
+                      <LucideIcons name="download-outline" size={20} color="#6366f1" />
+                    </TouchableOpacity>
+                  </ResponsiveRow>
                 )}
-              </View>
-              <View className="items-end">
-                <Text className="text-display-medium font-bold text-text-primary">{formatCurrency(bill.totalAmount)}</Text>
-                <Text className="text-text-secondary text-body-medium">Inc. GST</Text>
-              </View>
-            </View>
 
-            {/* Status and Dates */}
-            <View className="flex-row items-center justify-between mb-4">
-              <View className={`flex-row items-center px-3 py-2 rounded-full ${getStatusBgColor(bill.status)}`}>
-                {getStatusIcon(bill.status)}
-                <Text className={`font-medium text-body-medium ml-2 capitalize ${getStatusColor(bill.status)}`}>
-                  {bill.status}
-                </Text>
-              </View>
-              <View className="items-end">
-                <Text className="text-text-secondary text-label-small">
-                  {bill.status === "paid" ? "Paid on" : "Due on"}
-                </Text>
-                <Text className={`text-body-medium font-medium ${
-                  bill.status === "overdue" ? "text-error" : "text-text-primary"
-                }`}>
-                  {bill.status === "paid" ? formatDate(bill.paidDate!) : formatDate(bill.dueDate)}
-                </Text>
-              </View>
-            </View>
-
-            {/* Amount Breakdown */}
-            <View className="bg-background rounded-xl p-4">
-              <Text className="text-text-primary font-medium mb-3">Amount Breakdown</Text>
-              <View>
-                <View className="flex-row justify-between mb-2">
-                  <Text className="text-text-secondary">Bill Amount</Text>
-                  <Text className="text-text-primary">{formatCurrency(bill.amount)}</Text>
-                </View>
-                <View className="flex-row justify-between mb-2">
-                  <Text className="text-text-secondary">GST (18%)</Text>
-                  <Text className="text-text-primary">{formatCurrency(bill.gstAmount)}</Text>
-                </View>
-                <View className="h-px bg-divider my-2" />
-                <View className="flex-row justify-between">
-                  <Text className="text-text-primary font-semibold">Total</Text>
-                  <Text className="text-text-primary font-bold">{formatCurrency(bill.totalAmount)}</Text>
-                </View>
-              </View>
-            </View>
-
-            {/* Actions */}
-            {bill.status !== "paid" && (
-              <View className="flex-row gap-3 mt-4">
-                <TouchableOpacity className="flex-1 bg-primary rounded-xl py-3">
-                  <Text className="text-white font-semibold text-center">Pay Now</Text>
-                </TouchableOpacity>
-                <TouchableOpacity className="bg-surface border border-divider rounded-xl p-3">
-                  <LucideIcons name="download-outline" size={20} color="#6366f1" />
-                </TouchableOpacity>
-              </View>
-            )}
-
-            {bill.status === "paid" && (
-              <TouchableOpacity className="flex-row items-center justify-center mt-4 py-3 bg-background rounded-xl">
-                <LucideIcons name="download-outline" size={16} color="#6366f1" />
-                <Text className="text-primary font-medium ml-2">Download Receipt</Text>
+                {bill.status === "paid" && (
+                  <TouchableOpacity className="flex-row items-center justify-center mt-2 py-3 bg-background rounded-xl min-h-[48px]">
+                    <LucideIcons name="download-outline" size={16} color="#6366f1" />
+                    <ResponsiveText variant="body" size="medium" className="text-primary font-medium ml-2">
+                      Download Receipt
+                    </ResponsiveText>
+                  </TouchableOpacity>
+                )}
               </TouchableOpacity>
-              )}
-              </TouchableOpacity>
+            </ResponsiveCard>
             ))}
 
             {filteredBills.length === 0 && (
@@ -520,7 +568,7 @@ export default function Billing() {
             )}
           </View>
         </View>
-      </ScrollView>
+      </ResponsiveContainer>
     </SafeAreaView>
   );
 }

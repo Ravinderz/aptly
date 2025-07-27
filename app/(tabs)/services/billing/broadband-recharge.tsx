@@ -262,7 +262,7 @@ export default function BroadbandRecharge() {
             <Search size={20} color="#757575" />
             <TextInput
               className="flex-1 text-text-primary text-body-large ml-3"
-              placeholder="Enter customer ID or registered number"
+              placeholder="Enter customer ID or number"
               placeholderTextColor="#757575"
               value={customerId}
               onChangeText={setCustomerId}

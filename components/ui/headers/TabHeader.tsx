@@ -62,7 +62,7 @@ export default function TabHeader({
       onNotificationPress();
     } else {
       // Default behavior: navigate to notifications page
-      navigateWithReset('/notifications');
+      router.push('/notifications');
     }
   };
 

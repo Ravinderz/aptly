@@ -42,7 +42,10 @@ export interface Permission {
 export type PermissionAction = 
   | 'create' | 'read' | 'update' | 'delete' 
   | 'approve' | 'reject' | 'assign' | 'escalate'
-  | 'bulk_action' | 'export' | 'import';
+  | 'bulk_action' | 'bulk_approve' | 'export' | 'import'
+  | 'broadcast' | 'declare' | 'generate' | 'incidents'
+  | 'billing_notices' | 'security_alerts' | 'maintenance_updates'
+  | '*'; // wildcard for super admin
 
 export type PermissionScope = 'global' | 'society' | 'own' | 'assigned';
 

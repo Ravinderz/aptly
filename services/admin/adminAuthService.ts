@@ -171,7 +171,7 @@ export class AdminAuthService {
         { id: '22', resource: 'visitors', action: 'update', scope: 'society' },
         { id: '23', resource: 'visitors', action: 'approve', scope: 'society' },
         { id: '24', resource: 'visitors', action: 'reject', scope: 'society' },
-        { id: '25', resource: 'visitors', action: 'bulk_actions', scope: 'society' },
+        { id: '25', resource: 'visitors', action: 'bulk_action', scope: 'society' },
         { id: '26', resource: 'security', action: 'incidents', scope: 'society' },
         { id: '27', resource: 'residents', action: 'read', scope: 'society', conditions: [
           { field: 'data_type', operator: 'equals', value: 'contact_info_only' }
@@ -493,7 +493,7 @@ export class AdminAuthService {
     return `${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
   }
 
-  private categorizeEvent(eventType: string): any {
+  private categorizeEvent(eventType: string): 'admin_actions' | 'billing_finance' | 'maintenance_management' | 'security_management' | 'resident_management' | 'emergency_response' {
     const categories = {
       'admin_login': 'admin_actions',
       'role_assigned': 'admin_actions',

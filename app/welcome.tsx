@@ -82,7 +82,8 @@ export default function Welcome() {
   return (
     <SafeAreaView className="flex-1 bg-background">
       {/* Development Skip Button */}
-      {__DEV__ && (
+      {/* {__DEV__ && ( */}
+      {
         <View className="absolute top-12 right-4 z-10">
           <TouchableOpacity
             onPress={handleDevSkip}
@@ -95,7 +96,7 @@ export default function Welcome() {
             </Text>
           </TouchableOpacity>
         </View>
-      )}
+      }
 
       <ScrollView className="flex-1" showsVerticalScrollIndicator={false}>
         {/* Hero Section */}

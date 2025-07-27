@@ -182,10 +182,11 @@ const VendorCard: React.FC<VendorCardProps> = ({ vendor, onPress }) => {
           </Text>
         </View>
 
-        <View className="flex-row gap-2">
+        <View className="flex-row gap-3 items-center">
           <TouchableOpacity
             onPress={handleCall}
             className="bg-primary rounded-full w-10 h-10 items-center justify-center"
+            style={{ marginRight: 4 }}
           >
             <Phone size={16} color="white" />
           </TouchableOpacity>

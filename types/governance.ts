@@ -57,6 +57,7 @@ export interface VotingCandidate {
   id: string;
   userId: string;
   name: string;
+  designation?: string;
   profileImage?: string;
   bio?: string;
   manifesto?: string;

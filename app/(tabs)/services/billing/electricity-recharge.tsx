@@ -38,7 +38,11 @@ export default function ElectricityRecharge() {
 
   const detectProvider = async () => {
     if (!validateConsumerNumber(consumerNumber)) {
-      showAlert('Invalid Consumer Number', 'Please enter a valid consumer number (8-20 digits)', 'error');
+      showAlert({
+        title: 'Invalid Consumer Number',
+        message: 'Please enter a valid consumer number (8-20 digits)',
+        type: 'error'
+      });
       return;
     }
 
@@ -49,18 +53,30 @@ export default function ElectricityRecharge() {
       const randomProvider = providers[Math.floor(Math.random() * providers.length)];
       setSelectedProvider(randomProvider);
       setIsDetecting(false);
-      showAlert('Provider Detected', `Found: ${randomProvider.name} (${randomProvider.state})`, 'success');
+      showAlert({
+        title: 'Provider Detected',
+        message: `Found: ${randomProvider.name} (${randomProvider.state})`,
+        type: 'success'
+      });
     }, 2000);
   };
 
   const handlePayment = () => {
     if (!selectedProvider) {
-      showAlert('Select Provider', 'Please select an electricity provider first', 'warning');
+      showAlert({
+        title: 'Select Provider',
+        message: 'Please select an electricity provider first',
+        type: 'warning'
+      });
       return;
     }
 
     if (!customAmount || parseFloat(customAmount) < 1) {
-      showAlert('Invalid Amount', 'Please enter a valid amount (minimum ₹1)', 'error');
+      showAlert({
+        title: 'Invalid Amount',
+        message: 'Please enter a valid amount (minimum ₹1)',
+        type: 'error'
+      });
       return;
     }
 

@@ -15,9 +15,11 @@ interface PostCardProps {
   onComment?: (postId: string) => void;
   onDelete?: (postId: string) => void;
   onEdit?: (postId: string) => void;
+  onMentionPress?: (mentionUserId: string) => void;
+  showReadMore?: boolean;
 }
 
-const PostCard: React.FC<PostCardProps> = ({ post, onLike, onComment, onDelete, onEdit }) => {
+const PostCard: React.FC<PostCardProps> = ({ post, onLike, onComment, onDelete, onEdit, onMentionPress, showReadMore = true }) => {
   const [liking, setLiking] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [showActions, setShowActions] = useState(false);
@@ -147,7 +149,10 @@ const PostCard: React.FC<PostCardProps> = ({ post, onLike, onComment, onDelete, 
         </View>
       </View>
       <View className="border-b border-divider pb-4 mb-4">
-        <MentionText className="text-body-large leading-6 text-text-primary">
+        <MentionText 
+          className="text-body-large leading-6 text-text-primary"
+          onMentionPress={onMentionPress}
+        >
           {post.content}
         </MentionText>
         {post.imageUrl && (

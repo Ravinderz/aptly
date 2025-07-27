@@ -17,7 +17,7 @@ import {
 } from "react-native";
 import React, { useState, useEffect, useCallback } from "react";
 import { router, useFocusEffect } from "expo-router";
-import { Post, CategoryType, CATEGORY_FILTERS, MAX_POST_LENGTH } from "@/types/community";
+import { Post, CategoryType, CATEGORY_FILTERS, MAX_POST_LENGTH, User } from "@/types/community";
 import { communityApi } from "@/services/communityApi";
 import { filterPosts, validatePostContent } from "@/utils/community";
 import { showErrorAlert, showSuccessAlert } from "@/utils/alert";
@@ -33,8 +33,8 @@ export default function Community() {
   const [postImage, setPostImage] = useState<string | undefined>();
   // const [postCategory, setPostCategory] = useState<CategoryType>('feedback');
   const [isSubmittingPost, setIsSubmittingPost] = useState(false);
-  const [currentUser, setCurrentUser] = useState(null);
-  const [allUsers, setAllUsers] = useState([]);
+  const [currentUser, setCurrentUser] = useState<User | null>(null);
+  const [allUsers, setAllUsers] = useState<User[]>([]);
 
   // Load initial data
   useEffect(() => {
@@ -66,15 +66,12 @@ export default function Community() {
       setCurrentUser(user);
       setPosts(postsData);
       
-      // Load all users for mentions
-      const mockUsers = [
-        user,
-        { id: 'user2', name: 'Priya Sharma', flatNumber: 'B-305', role: 'committee' },
-        { id: 'user3', name: 'Amit Kumar', flatNumber: 'C-102', role: 'resident' },
-        { id: 'user4', name: 'Neha Gupta', flatNumber: 'A-401', role: 'resident' },
-        { id: 'user5', name: 'Society Admin', flatNumber: 'Office', role: 'admin' }
-      ];
-      setAllUsers(mockUsers);
+      // Load all users for mentions (you could also create a getAllUsers method in the API)
+      const allUserIds = ['user1', 'user2', 'user3', 'user4', 'user5'];
+      const allUsers = await Promise.all(
+        allUserIds.map(id => communityApi.getUser(id))
+      );
+      setAllUsers(allUsers.filter(u => u !== null) as User[]);
     } catch (error) {
       console.error('Error loading community data:', error);
       showErrorAlert('Error', 'Failed to load community posts. Please try again.');

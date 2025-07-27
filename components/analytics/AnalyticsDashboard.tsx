@@ -18,7 +18,8 @@ import { Card } from '../ui/Card';
 import { Button } from '../ui/Button';
 import { AlertCard } from '../ui/AlertCard';
 
-const { width: screenWidth } = Dimensions.get('window');
+const { width: screenWidth, height: screenHeight } = Dimensions.get('window');
+const isSmallScreen = screenWidth < 380 || screenHeight < 700;
 
 interface AnalyticsDashboardProps {
   societyAnalytics: SocietyAnalytics;
@@ -374,10 +375,10 @@ export const AnalyticsDashboard: React.FC<AnalyticsDashboardProps> = ({
                 <View key={category} className="flex-row items-center justify-between py-1">
                   <Text className="text-body-small text-text-secondary">{formatCategory(category)}</Text>
                   <View className="flex-row items-center">
-                    <View className="w-16 h-1 bg-surface-secondary rounded-full mr-2">
+                    <View className={`${isSmallScreen ? 'w-12' : 'w-16'} h-1 bg-surface-secondary rounded-full mr-2 overflow-hidden`}>
                       <View 
                         className="h-full bg-primary rounded-full" 
-                        style={{ width: `${percentage}%` }}
+                        style={{ width: `${Math.min(percentage, 100)}%` }}
                       />
                     </View>
                     <Text className="text-body-small font-medium text-text-primary w-8">
@@ -519,10 +520,10 @@ export const AnalyticsDashboard: React.FC<AnalyticsDashboardProps> = ({
               <View className="flex-1">
                 <Text className="text-body-medium text-text-primary">{expense.category}</Text>
                 <View className="flex-row items-center mt-1">
-                  <View className="w-20 h-1 bg-surface-secondary rounded-full mr-2">
+                  <View className={`${isSmallScreen ? 'w-16' : 'w-20'} h-1 bg-surface-secondary rounded-full mr-2 overflow-hidden`}>
                     <View 
                       className="h-full bg-primary rounded-full" 
-                      style={{ width: `${expense.percentage}%` }}
+                      style={{ width: `${Math.min(expense.percentage, 100)}%` }}
                     />
                   </View>
                   <Text className="text-body-small text-text-secondary">
@@ -698,10 +699,10 @@ export const AnalyticsDashboard: React.FC<AnalyticsDashboardProps> = ({
             <View className="flex-row items-center justify-between">
               <Text className="text-body-medium text-text-secondary">Cooperation Index</Text>
               <View className="flex-row items-center">
-                <View className="w-16 h-2 bg-surface-secondary rounded-full mr-2">
+                <View className={`${isSmallScreen ? 'w-12' : 'w-16'} h-2 bg-surface-secondary rounded-full mr-2 overflow-hidden`}>
                   <View 
                     className="h-full bg-success rounded-full" 
-                    style={{ width: `${communityMetrics.communityHealth.cooperationIndex * 100}%` }}
+                    style={{ width: `${Math.min(communityMetrics.communityHealth.cooperationIndex * 100, 100)}%` }}
                   />
                 </View>
                 <Text className="text-body-small font-medium text-text-primary">
@@ -713,10 +714,10 @@ export const AnalyticsDashboard: React.FC<AnalyticsDashboardProps> = ({
             <View className="flex-row items-center justify-between">
               <Text className="text-body-medium text-text-secondary">Wellbeing Index</Text>
               <View className="flex-row items-center">
-                <View className="w-16 h-2 bg-surface-secondary rounded-full mr-2">
+                <View className={`${isSmallScreen ? 'w-12' : 'w-16'} h-2 bg-surface-secondary rounded-full mr-2 overflow-hidden`}>
                   <View 
                     className="h-full bg-primary rounded-full" 
-                    style={{ width: `${communityMetrics.communityHealth.wellbeingIndex * 100}%` }}
+                    style={{ width: `${Math.min(communityMetrics.communityHealth.wellbeingIndex * 100, 100)}%` }}
                   />
                 </View>
                 <Text className="text-body-small font-medium text-text-primary">
@@ -728,10 +729,10 @@ export const AnalyticsDashboard: React.FC<AnalyticsDashboardProps> = ({
             <View className="flex-row items-center justify-between">
               <Text className="text-body-medium text-text-secondary">Inclusion Score</Text>
               <View className="flex-row items-center">
-                <View className="w-16 h-2 bg-surface-secondary rounded-full mr-2">
+                <View className={`${isSmallScreen ? 'w-12' : 'w-16'} h-2 bg-surface-secondary rounded-full mr-2 overflow-hidden`}>
                   <View 
                     className="h-full bg-warning rounded-full" 
-                    style={{ width: `${communityMetrics.communityHealth.inclusionScore * 100}%` }}
+                    style={{ width: `${Math.min(communityMetrics.communityHealth.inclusionScore * 100, 100)}%` }}
                   />
                 </View>
                 <Text className="text-body-small font-medium text-text-primary">

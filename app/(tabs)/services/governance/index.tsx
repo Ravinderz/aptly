@@ -68,7 +68,7 @@ export default function GovernancePage() {
           id: 'campaign-1',
           title: 'Committee Election 2024',
           description: 'Annual committee member election',
-          type: 'election',
+          type: 'committee_election',
           status: 'active',
           startDate: '2024-01-15T00:00:00Z',
           endDate: '2024-01-30T23:59:59Z',
@@ -77,26 +77,32 @@ export default function GovernancePage() {
           candidates: [
             {
               id: 'candidate-1',
+              userId: 'user-123',
               name: 'Rajesh Kumar',
               designation: 'Treasurer',
+              profileImage: undefined,
               bio: 'Experienced in financial management',
-              imageUrl: null,
-              voteCount: 45,
-              manifesto: 'Transparent financial management'
+              manifesto: 'Transparent financial management',
+              nominatedBy: 'user-456',
+              endorsements: [],
+              votes: 45
             },
             {
-              id: 'candidate-2', 
+              id: 'candidate-2',
+              userId: 'user-234',
               name: 'Priya Sharma',
               designation: 'Secretary',
+              profileImage: undefined,
               bio: 'Community organizer',
-              imageUrl: null,
-              voteCount: 38,
-              manifesto: 'Better community engagement'
+              manifesto: 'Better community engagement',
+              nominatedBy: 'user-567',
+              endorsements: [],
+              votes: 38
             }
           ],
           options: [],
           totalVotes: 83,
-          eligibleVoters: 150,
+          eligibleVoters: ['user1', 'user2', 'user3'],
           createdBy: 'admin-1',
           createdAt: '2024-01-01T10:00:00Z',
           updatedAt: '2024-01-15T10:00:00Z'
@@ -119,10 +125,13 @@ export default function GovernancePage() {
           escalationChain: [
             {
               level: 1,
-              contactId: 'contact-1',
-              name: 'Site Engineer',
-              phone: '+91-9876543210',
-              role: 'primary'
+              role: 'maintenance_admin',
+              userId: 'user-engineer',
+              contactMethods: ['push', 'sms'],
+              timeoutMinutes: 30,
+              isActivated: true,
+              activatedAt: '2024-01-20T08:00:00Z',
+              acknowledgedAt: '2024-01-20T08:15:00Z'
             }
           ],
           isResolved: false,
@@ -133,17 +142,11 @@ export default function GovernancePage() {
       ];
 
       const mockDashboardData: GovernanceDashboardData = {
-        societyId: 'society-1',
-        activeCampaigns: mockVotingCampaigns.length,
-        totalResidents: 150,
+        society_id: 'society-1',
+        activeVotingCampaigns: mockVotingCampaigns.filter(c => c.status === 'active').length,
+        totalVoters: 150,
         activeEmergencies: mockEmergencyAlerts.filter(a => a.status === 'active').length,
         pendingPolicies: 2,
-        participationRate: 55.3,
-        lastElectionDate: '2023-01-15T00:00:00Z',
-        nextElectionDate: '2024-01-15T00:00:00Z',
-        committeeMembersCount: 7,
-        emergencyContactsCount: 12,
-        activeVotingCampaigns: mockVotingCampaigns.filter(c => c.status === 'active').length,
         averageParticipation: 55.3,
         lastEmergencyDate: '2024-01-15T00:00:00Z',
         succession: {
@@ -298,26 +301,31 @@ export default function GovernancePage() {
   }
 
   const renderContent = () => {
-    switch (activeTab) {
-      case 'dashboard':
-        return mockData.dashboardData ? (
-          <GovernanceDashboard
-            dashboardData={mockData.dashboardData}
-            votingCampaigns={mockData.votingCampaigns}
-            emergencyAlerts={mockData.emergencyAlerts}
-            successionPlan={mockData.successionPlans[0]}
-            policyProposals={mockData.policyProposals}
-            currentUserId={currentUserId}
-            userRole={userRole}
-          />
-        ) : null;
+    try {
+      switch (activeTab) {
+        case 'dashboard':
+          return mockData.dashboardData ? (
+            <GovernanceDashboard
+              dashboardData={mockData.dashboardData}
+              votingCampaigns={mockData.votingCampaigns}
+              emergencyAlerts={mockData.emergencyAlerts}
+              successionPlan={mockData.successionPlans[0]}
+              policyProposals={mockData.policyProposals}
+              currentUserId={currentUserId}
+              userRole={userRole}
+            />
+          ) : (
+            <View className="flex-1 items-center justify-center p-6">
+              <Text className="text-text-secondary">No dashboard data available</Text>
+            </View>
+          );
 
       case 'voting':
         return (
           <VotingSystem
             campaigns={mockData.votingCampaigns}
             userVotes={[]} // Would come from API
-            analytics={mockData.votingAnalytics}
+            analytics={mockData.votingAnalytics ? [mockData.votingAnalytics] : []}
             onCreateCampaign={handleCreateCampaign}
             onVote={handleVote}
             currentUserId={currentUserId}
@@ -330,10 +338,10 @@ export default function GovernancePage() {
           <EmergencyManagement
             alerts={mockData.emergencyAlerts}
             emergencyContacts={[]} // Would come from API
-            analytics={mockData.emergencyAnalytics}
+            analytics={mockData.emergencyAnalytics || undefined}
             onCreateAlert={handleCreateEmergencyAlert}
             onResolveEmergency={handleResolveEmergency}
-            onEmergencyCall={async (contact) => {
+            onEmergencyCall={async (contact: any) => {
               // Handle emergency call
               console.log('Emergency call to:', contact);
             }}
@@ -345,15 +353,15 @@ export default function GovernancePage() {
       case 'succession':
         return (
           <SuccessionManagement
-            plans={mockData.successionPlans}
+            successionPlans={mockData.successionPlans}
             deputies={[]} // Would come from API
             handoverTasks={[]} // Would come from API
             onCreatePlan={handleCreateSuccessionPlan}
             onTriggerSuccession={handleTriggerSuccession}
-            onAssignDeputy={async (assignment) => {
+            onAssignDeputy={async (assignment: any) => {
               console.log('Assigning deputy:', assignment);
             }}
-            onCompleteHandover={async (taskId) => {
+            onCompleteHandover={async (taskId: any) => {
               console.log('Completing handover task:', taskId);
             }}
             currentUserId={currentUserId}
@@ -377,8 +385,28 @@ export default function GovernancePage() {
           />
         );
 
-      default:
-        return null;
+        default:
+          return (
+            <View className="flex-1 items-center justify-center p-6">
+              <Text className="text-text-secondary">Content not available</Text>
+            </View>
+          );
+      }
+    } catch (error) {
+      console.error('Governance tab render error:', error);
+      return (
+        <View className="flex-1 items-center justify-center p-6">
+          <Text className="text-error text-center">
+            Something went wrong. Please try switching to another tab.
+          </Text>
+          <TouchableOpacity 
+            onPress={() => setActiveTab('dashboard')} 
+            className="mt-4 px-4 py-2 bg-primary rounded-lg"
+          >
+            <Text className="text-white">Go to Dashboard</Text>
+          </TouchableOpacity>
+        </View>
+      );
     }
   };
 

@@ -451,7 +451,7 @@ export default function AnalyticsPage() {
       // Simulate checking user role (in real app, get from auth context)
       setUserRole('admin'); // or get from auth
       
-    } catch {
+    } catch (error) {
       console.error('Failed to load analytics data:', error);
       showErrorAlert('Error', 'Failed to load analytics data');
     } finally {
@@ -538,9 +538,13 @@ export default function AnalyticsPage() {
       case 'dashboard':
         return mockData.societyAnalytics ? (
           <AnalyticsDashboard
-            data={mockData.societyAnalytics}
-            onExportReport={handleExportReport}
-            onRefresh={loadAnalyticsData}
+            societyAnalytics={mockData.societyAnalytics}
+            onGenerateReport={async (period, categories) => {
+              console.log('Generate report for period:', period, 'categories:', categories);
+              await handleExportReport('pdf');
+            }}
+            onImplementRecommendation={async (id) => console.log('Implement recommendation:', id)}
+            currentUserId="current-user-id"
             userRole={userRole}
           />
         ) : null;
@@ -548,9 +552,10 @@ export default function AnalyticsPage() {
       case 'audit':
         return (
           <AuditSystem
-            auditEntries={mockData.auditEntries}
-            onExportAuditLog={handleExportReport}
-            onRefresh={loadAnalyticsData}
+            auditLogs={mockData.auditEntries}
+            onExportLogs={async (query, format) => console.log('Export logs:', format)}
+            onGenerateReport={async (timeframe, categories) => console.log('Generate report:', timeframe)}
+            currentUserId="current-user-id"
             userRole={userRole}
           />
         );

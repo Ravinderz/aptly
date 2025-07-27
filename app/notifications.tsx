@@ -19,6 +19,8 @@ import {
 } from 'lucide-react-native';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
+import { ResponsiveContainer, ResponsiveCard, ResponsiveRow, ResponsiveText } from '@/components/ui/ResponsiveContainer';
+import { safeGoBack } from '@/utils/navigation';
 
 interface Notification {
   id: string;
@@ -180,7 +182,7 @@ export default function NotificationsList() {
           <Button
             variant="ghost"
             size="sm"
-            onPress={() => router.back()}
+            onPress={() => safeGoBack('/(tabs)')}
             className="mr-2 p-2"
           >
             <ArrowLeft size={20} color="#6366f1" />

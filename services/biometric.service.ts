@@ -64,7 +64,6 @@ export class BiometricService {
 
       const result = await LocalAuthentication.authenticateAsync({
         promptMessage: "Authenticate to access Aptly",
-        subtitle: "Use your fingerprint or face to sign in",
         fallbackLabel: "Use PIN/Password",
         cancelLabel: "Cancel",
       });

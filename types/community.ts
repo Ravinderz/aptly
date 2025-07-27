@@ -16,6 +16,11 @@ export interface User {
   flatNumber: string;
   role: 'resident' | 'committee' | 'admin';
   avatar?: string;
+  email?: string;
+  phone?: string;
+  bio?: string;
+  joinedDate?: string;
+  connectionsCount?: number;
 }
 
 export interface Post {

@@ -306,12 +306,12 @@ export default function BillingNotifications() {
                     </TouchableOpacity>
                   </View>
                   
-                  <Text className="text-text-primary leading-5 mb-3">
+                  <Text className="text-text-primary leading-5 mb-4">
                     {notification.message}
                   </Text>
                   
                   {notification.amount && (
-                    <View className="bg-background/50 rounded-lg p-3">
+                    <View className="bg-background/50 rounded-lg p-3 mt-2">
                       <Text className="text-text-primary font-bold">
                         Amount: {formatCurrency(notification.amount)}
                       </Text>

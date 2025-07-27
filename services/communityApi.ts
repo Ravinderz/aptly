@@ -5,16 +5,61 @@ const CURRENT_USER: User = {
   id: 'user1',
   name: 'Ravinder Singh',
   flatNumber: 'A-201',
-  role: 'resident'
+  role: 'resident',
+  email: 'ravinder@example.com',
+  phone: '+91-9876543210',
+  bio: 'Software Developer and tech enthusiast. Always happy to help with tech issues in the society.',
+  joinedDate: '2023-01-15',
+  connectionsCount: 12
 };
 
 // Mock users data
 const MOCK_USERS: User[] = [
   CURRENT_USER,
-  { id: 'user2', name: 'Priya Sharma', flatNumber: 'B-305', role: 'committee' },
-  { id: 'user3', name: 'Amit Kumar', flatNumber: 'C-102', role: 'resident' },
-  { id: 'user4', name: 'Neha Gupta', flatNumber: 'A-401', role: 'resident' },
-  { id: 'user5', name: 'Society Admin', flatNumber: 'Office', role: 'admin' },
+  { 
+    id: 'user2', 
+    name: 'Priya Sharma', 
+    flatNumber: 'B-305', 
+    role: 'committee',
+    email: 'priya.sharma@example.com',
+    phone: '+91-9876543211',
+    bio: 'Committee member handling maintenance and society events.',
+    joinedDate: '2022-08-20',
+    connectionsCount: 24
+  },
+  { 
+    id: 'user3', 
+    name: 'Amit Kumar', 
+    flatNumber: 'C-102', 
+    role: 'resident',
+    email: 'amit.kumar@example.com',
+    phone: '+91-9876543212',
+    bio: 'Marketing professional. Love photography and organizing social events.',
+    joinedDate: '2023-03-10',
+    connectionsCount: 8
+  },
+  { 
+    id: 'user4', 
+    name: 'Neha Gupta', 
+    flatNumber: 'A-401', 
+    role: 'resident',
+    email: 'neha.gupta@example.com',
+    phone: '+91-9876543213',
+    bio: 'Teacher and event coordinator. Always excited about community activities!',
+    joinedDate: '2022-12-05',
+    connectionsCount: 16
+  },
+  { 
+    id: 'user5', 
+    name: 'Society Admin', 
+    flatNumber: 'Office', 
+    role: 'admin',
+    email: 'admin@aptlysociety.com',
+    phone: '+91-9876543214',
+    bio: 'Managing day-to-day operations and resident services.',
+    joinedDate: '2022-01-01',
+    connectionsCount: 45
+  },
 ];
 
 // Mock posts data
@@ -294,5 +339,13 @@ export const communityApi = {
   getUser: async (userId: string): Promise<User | null> => {
     await delay(200);
     return MOCK_USERS.find(user => user.id === userId) || null;
+  },
+
+  // Get posts by user ID
+  getUserPosts: async (userId: string): Promise<Post[]> => {
+    await delay(600);
+    return MOCK_POSTS
+      .filter(post => post.userId === userId && post.status === 'active')
+      .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime()); // Newest first
   }
 };

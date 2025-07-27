@@ -1,6 +1,6 @@
 import React from 'react';
 import { TouchableOpacity, Text, ActivityIndicator } from 'react-native';
-import { cn } from '../../utils/cn';
+import { cn } from '@/utils/cn';
 
 export interface ButtonProps {
   variant?: 'primary' | 'secondary' | 'success' | 'outline' | 'ghost';

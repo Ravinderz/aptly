@@ -29,12 +29,6 @@ export default function EditPost() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
 
-  useEffect(() => {
-    if (postId) {
-      loadPost();
-    }
-  }, [postId, loadPost]);
-
   const loadPost = useCallback(async () => {
     try {
       setLoading(true);
@@ -62,6 +56,12 @@ export default function EditPost() {
       setLoading(false);
     }
   }, [postId]);
+
+  useEffect(() => {
+    if (postId) {
+      loadPost();
+    }
+  }, [postId, loadPost]);
 
   const handleSave = async () => {
     if (saving || !post) return;
