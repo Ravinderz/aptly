@@ -16,7 +16,7 @@ export const WeatherWidget: React.FC = () => {
     temperature: 28,
     condition: 'sunny',
     humidity: 65,
-    location: 'Noida, UP'
+    location: 'Noida, UP',
   };
 
   const getWeatherIcon = (condition: string) => {
@@ -62,7 +62,7 @@ export const WeatherWidget: React.FC = () => {
             {getConditionText(weather.condition)}
           </Text>
         </View>
-        
+
         <View className="items-end">
           <View className="flex-row items-center mb-1">
             <Thermometer size={16} className="text-text-secondary" />

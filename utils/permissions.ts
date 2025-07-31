@@ -3,7 +3,11 @@ import { AdminUser, Permission } from '../types/admin';
 export class PermissionChecker {
   constructor() {}
 
-  hasPermission(user: AdminUser, permission: string, resource?: string): boolean {
+  hasPermission(
+    user: AdminUser,
+    permission: string,
+    resource?: string,
+  ): boolean {
     if (!user || !user.permissions) return false;
     return user.permissions.includes(permission as any);
   }
@@ -20,7 +24,10 @@ export class PermissionChecker {
   }
 }
 
-export const checkPermission = (user: AdminUser, permission: string): boolean => {
+export const checkPermission = (
+  user: AdminUser,
+  permission: string,
+): boolean => {
   const checker = new PermissionChecker();
   return checker.hasPermission(user, permission);
 };

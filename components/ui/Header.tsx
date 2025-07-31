@@ -1,6 +1,6 @@
-import React, { ReactNode } from "react";
-import { ScrollView, View } from "react-native";
-import { TabHeader } from "./headers";
+import React, { ReactNode } from 'react';
+import { ScrollView, View } from 'react-native';
+import { TabHeader } from './headers';
 
 interface HeaderProps {
   children: ReactNode;
@@ -9,15 +9,15 @@ interface HeaderProps {
   notificationCount?: number;
 }
 
-const Header = ({ 
-  children, 
-  onNotificationPress, 
-  onHelpPress, 
-  notificationCount = 3 // Mock notification count - replace with real data
+const Header = ({
+  children,
+  onNotificationPress,
+  onHelpPress,
+  notificationCount = 3, // Mock notification count - replace with real data
 }: HeaderProps) => {
   return (
     <View className="flex flex-1">
-      <TabHeader 
+      <TabHeader
         onNotificationPress={onNotificationPress}
         onHelpPress={onHelpPress}
         notificationCount={notificationCount}
@@ -25,8 +25,7 @@ const Header = ({
       <ScrollView
         className="flex flex-1"
         contentContainerStyle={{ flexGrow: 1 }}
-        showsVerticalScrollIndicator={false}
-      >
+        showsVerticalScrollIndicator={false}>
         <View className="flex h-full px-4 py-4 mb-8 bg-background">
           {children}
         </View>

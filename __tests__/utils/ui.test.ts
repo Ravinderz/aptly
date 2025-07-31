@@ -10,21 +10,21 @@ import {
   triggerHaptic,
   getAccessibilityLabel,
   isDarkMode,
-  getShadowStyle
+  getShadowStyle,
 } from '../../utils/ui';
 import { Dimensions, Platform, StatusBar } from 'react-native';
 
 // Mock React Native modules
 jest.mock('react-native', () => ({
   Dimensions: {
-    get: jest.fn()
+    get: jest.fn(),
   },
   Platform: {
-    OS: 'ios'
+    OS: 'ios',
   },
   StatusBar: {
-    currentHeight: 24
-  }
+    currentHeight: 24,
+  },
 }));
 
 const mockDimensions = Dimensions as jest.Mocked<typeof Dimensions>;
@@ -33,7 +33,7 @@ const mockConsoleLog = jest.spyOn(console, 'log').mockImplementation(() => {});
 describe('UI Utilities', () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    
+
     // Default mock implementations
     mockDimensions.get.mockImplementation((dim) => {
       if (dim === 'window') {
@@ -49,11 +49,16 @@ describe('UI Utilities', () => {
   describe('getDeviceDimensions', () => {
     test('should return window and screen dimensions', () => {
       const result = getDeviceDimensions();
-      
+
       expect(mockDimensions.get).toHaveBeenCalledWith('window');
       expect(mockDimensions.get).toHaveBeenCalledWith('screen');
       expect(result.window).toEqual({ width: 375, height: 812 });
-      expect(result.screen).toEqual({ width: 375, height: 812, scale: 3, fontScale: 1 });
+      expect(result.screen).toEqual({
+        width: 375,
+        height: 812,
+        scale: 3,
+        fontScale: 1,
+      });
     });
 
     test('should detect small device (width < 375)', () => {
@@ -104,14 +109,14 @@ describe('UI Utilities', () => {
     test('should return StatusBar height for Android', () => {
       Platform.OS = 'android';
       StatusBar.currentHeight = 24;
-      
+
       const result = getSafeAreaTop();
       expect(result).toBe(24);
     });
 
     test('should return 0 for iOS', () => {
       Platform.OS = 'ios';
-      
+
       const result = getSafeAreaTop();
       expect(result).toBe(0);
     });
@@ -119,7 +124,7 @@ describe('UI Utilities', () => {
     test('should handle undefined StatusBar height on Android', () => {
       Platform.OS = 'android';
       StatusBar.currentHeight = undefined;
-      
+
       const result = getSafeAreaTop();
       expect(result).toBe(0);
     });
@@ -127,7 +132,7 @@ describe('UI Utilities', () => {
     test('should handle null StatusBar height on Android', () => {
       Platform.OS = 'android';
       StatusBar.currentHeight = null as any;
-      
+
       const result = getSafeAreaTop();
       expect(result).toBe(0);
     });
@@ -154,13 +159,13 @@ describe('UI Utilities', () => {
     test('should return valid Tailwind classes', () => {
       const validColors = [
         'bg-primary',
-        'bg-secondary', 
+        'bg-secondary',
         'bg-warning',
         'bg-error/80',
         'bg-primary/80',
-        'bg-secondary/80'
+        'bg-secondary/80',
       ];
-      
+
       const color = getAvatarColor('Test User');
       expect(validColors).toContain(color);
     });
@@ -169,7 +174,7 @@ describe('UI Utilities', () => {
       const color1 = getAvatarColor('José María');
       const color2 = getAvatarColor('李小明');
       const color3 = getAvatarColor('user@email.com');
-      
+
       expect(color1).toBeDefined();
       expect(color2).toBeDefined();
       expect(color3).toBeDefined();
@@ -177,13 +182,31 @@ describe('UI Utilities', () => {
 
     test('should distribute colors across all options', () => {
       const names = [
-        'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J',
-        'AA', 'BB', 'CC', 'DD', 'EE', 'FF', 'GG', 'HH', 'II', 'JJ'
+        'A',
+        'B',
+        'C',
+        'D',
+        'E',
+        'F',
+        'G',
+        'H',
+        'I',
+        'J',
+        'AA',
+        'BB',
+        'CC',
+        'DD',
+        'EE',
+        'FF',
+        'GG',
+        'HH',
+        'II',
+        'JJ',
       ];
-      
-      const colors = names.map(name => getAvatarColor(name));
+
+      const colors = names.map((name) => getAvatarColor(name));
       const uniqueColors = new Set(colors);
-      
+
       // Should have multiple unique colors (not just one)
       expect(uniqueColors.size).toBeGreaterThan(1);
     });
@@ -196,7 +219,7 @@ describe('UI Utilities', () => {
         background: 'bg-error',
         text: 'text-white',
         border: 'border-error',
-        icon: 'text-error'
+        icon: 'text-error',
       });
     });
 
@@ -206,7 +229,7 @@ describe('UI Utilities', () => {
         background: 'bg-warning',
         text: 'text-white',
         border: 'border-warning',
-        icon: 'text-warning'
+        icon: 'text-warning',
       });
     });
 
@@ -216,7 +239,7 @@ describe('UI Utilities', () => {
         background: 'bg-primary',
         text: 'text-white',
         border: 'border-primary',
-        icon: 'text-primary'
+        icon: 'text-primary',
       });
     });
 
@@ -226,7 +249,7 @@ describe('UI Utilities', () => {
         background: 'bg-secondary',
         text: 'text-white',
         border: 'border-secondary',
-        icon: 'text-secondary'
+        icon: 'text-secondary',
       });
     });
 
@@ -237,60 +260,72 @@ describe('UI Utilities', () => {
         background: 'bg-secondary',
         text: 'text-white',
         border: 'border-secondary',
-        icon: 'text-secondary'
+        icon: 'text-secondary',
       });
     });
   });
 
   describe('getStatusColors', () => {
     test('should return success colors for positive statuses', () => {
-      const successStatuses = ['approved', 'completed', 'success', 'active', 'paid'];
-      
-      successStatuses.forEach(status => {
+      const successStatuses = [
+        'approved',
+        'completed',
+        'success',
+        'active',
+        'paid',
+      ];
+
+      successStatuses.forEach((status) => {
         const colors = getStatusColors(status);
         expect(colors).toEqual({
           background: 'bg-secondary/10',
           text: 'text-secondary',
-          border: 'border-secondary'
+          border: 'border-secondary',
         });
       });
     });
 
     test('should return warning colors for pending statuses', () => {
       const pendingStatuses = ['pending', 'in-progress', 'processing'];
-      
-      pendingStatuses.forEach(status => {
+
+      pendingStatuses.forEach((status) => {
         const colors = getStatusColors(status);
         expect(colors).toEqual({
           background: 'bg-warning/10',
           text: 'text-warning',
-          border: 'border-warning'
+          border: 'border-warning',
         });
       });
     });
 
     test('should return error colors for negative statuses', () => {
-      const errorStatuses = ['rejected', 'failed', 'error', 'cancelled', 'overdue'];
-      
-      errorStatuses.forEach(status => {
+      const errorStatuses = [
+        'rejected',
+        'failed',
+        'error',
+        'cancelled',
+        'overdue',
+      ];
+
+      errorStatuses.forEach((status) => {
         const colors = getStatusColors(status);
         expect(colors).toEqual({
           background: 'bg-error/10',
           text: 'text-error',
-          border: 'border-error'
+          border: 'border-error',
         });
       });
     });
 
     test('should return default colors for unknown statuses', () => {
       const unknownStatuses = ['unknown', 'draft', 'new', 'custom'];
-      
-      unknownStatuses.forEach(status => {
+
+      unknownStatuses.forEach((status) => {
         const colors = getStatusColors(status);
         expect(colors).toEqual({
           background: 'bg-primary/10',
           text: 'text-primary',
-          border: 'border-primary'
+          border: 'border-primary',
         });
       });
     });
@@ -299,7 +334,7 @@ describe('UI Utilities', () => {
       const upperColors = getStatusColors('APPROVED');
       const lowerColors = getStatusColors('approved');
       const mixedColors = getStatusColors('Approved');
-      
+
       expect(upperColors).toEqual(lowerColors);
       expect(lowerColors).toEqual(mixedColors);
     });
@@ -309,18 +344,28 @@ describe('UI Utilities', () => {
       expect(colors).toEqual({
         background: 'bg-primary/10',
         text: 'text-primary',
-        border: 'border-primary'
+        border: 'border-primary',
       });
     });
   });
 
   describe('getCardGradient', () => {
     test('should return correct gradient for each card type', () => {
-      expect(getCardGradient('primary')).toBe('bg-gradient-to-br from-primary/5 to-primary/10');
-      expect(getCardGradient('secondary')).toBe('bg-gradient-to-br from-secondary/5 to-secondary/10');
-      expect(getCardGradient('success')).toBe('bg-gradient-to-br from-secondary/5 to-secondary/10');
-      expect(getCardGradient('warning')).toBe('bg-gradient-to-br from-warning/5 to-warning/10');
-      expect(getCardGradient('error')).toBe('bg-gradient-to-br from-error/5 to-error/10');
+      expect(getCardGradient('primary')).toBe(
+        'bg-gradient-to-br from-primary/5 to-primary/10',
+      );
+      expect(getCardGradient('secondary')).toBe(
+        'bg-gradient-to-br from-secondary/5 to-secondary/10',
+      );
+      expect(getCardGradient('success')).toBe(
+        'bg-gradient-to-br from-secondary/5 to-secondary/10',
+      );
+      expect(getCardGradient('warning')).toBe(
+        'bg-gradient-to-br from-warning/5 to-warning/10',
+      );
+      expect(getCardGradient('error')).toBe(
+        'bg-gradient-to-br from-error/5 to-error/10',
+      );
     });
 
     test('should return default surface for invalid type', () => {
@@ -350,8 +395,8 @@ describe('UI Utilities', () => {
 
     test('should return numbers for all valid inputs', () => {
       const sizes: Array<'sm' | 'md' | 'lg' | 'xl'> = ['sm', 'md', 'lg', 'xl'];
-      
-      sizes.forEach(size => {
+
+      sizes.forEach((size) => {
         const result = getIconSize(size);
         expect(typeof result).toBe('number');
         expect(result).toBeGreaterThan(0);
@@ -392,14 +437,15 @@ describe('UI Utilities', () => {
     });
 
     test('should handle all haptic types', () => {
-      const hapticTypes: Array<'light' | 'medium' | 'heavy' | 'success' | 'warning' | 'error'> = 
-        ['light', 'medium', 'heavy', 'success', 'warning', 'error'];
-      
-      hapticTypes.forEach(type => {
+      const hapticTypes: Array<
+        'light' | 'medium' | 'heavy' | 'success' | 'warning' | 'error'
+      > = ['light', 'medium', 'heavy', 'success', 'warning', 'error'];
+
+      hapticTypes.forEach((type) => {
         triggerHaptic(type);
         expect(mockConsoleLog).toHaveBeenCalledWith(`Haptic feedback: ${type}`);
       });
-      
+
       expect(mockConsoleLog).toHaveBeenCalledTimes(hapticTypes.length);
     });
 
@@ -436,15 +482,21 @@ describe('UI Utilities', () => {
 
     test('should handle complex descriptions', () => {
       const label = getAccessibilityLabel(
-        'text input', 
-        'Enter your phone number', 
-        'required, focused'
+        'text input',
+        'Enter your phone number',
+        'required, focused',
       );
-      expect(label).toBe('text input, Enter your phone number, required, focused');
+      expect(label).toBe(
+        'text input, Enter your phone number, required, focused',
+      );
     });
 
     test('should handle special characters', () => {
-      const label = getAccessibilityLabel('button', 'Delete "My Document"', 'destructive');
+      const label = getAccessibilityLabel(
+        'button',
+        'Delete "My Document"',
+        'destructive',
+      );
       expect(label).toBe('button, Delete "My Document", destructive');
     });
   });
@@ -458,7 +510,7 @@ describe('UI Utilities', () => {
     test('should consistently return boolean', () => {
       const result1 = isDarkMode();
       const result2 = isDarkMode();
-      
+
       expect(typeof result1).toBe('boolean');
       expect(typeof result2).toBe('boolean');
       expect(result1).toBe(result2);
@@ -498,23 +550,23 @@ describe('UI Utilities', () => {
     test('should handle platform-specific behavior consistently', () => {
       Platform.OS = 'android';
       const androidSafeArea = getSafeAreaTop();
-      
+
       Platform.OS = 'ios';
       const iosSafeArea = getSafeAreaTop();
-      
+
       expect(typeof androidSafeArea).toBe('number');
       expect(typeof iosSafeArea).toBe('number');
     });
 
     test('should maintain consistent avatar colors across multiple calls', () => {
       const testNames = ['Alice', 'Bob', 'Charlie', 'Diana'];
-      
+
       // Get colors first time
-      const firstRun = testNames.map(name => getAvatarColor(name));
-      
+      const firstRun = testNames.map((name) => getAvatarColor(name));
+
       // Get colors second time
-      const secondRun = testNames.map(name => getAvatarColor(name));
-      
+      const secondRun = testNames.map((name) => getAvatarColor(name));
+
       expect(firstRun).toEqual(secondRun);
     });
 
@@ -524,17 +576,17 @@ describe('UI Utilities', () => {
         if (dim === 'window') return { width: 200, height: 400 };
         return { width: 200, height: 400, scale: 1, fontScale: 1 };
       });
-      
+
       let result = getDeviceDimensions();
       expect(result.isSmallDevice).toBe(true);
       expect(result.isTablet).toBe(false);
-      
+
       // Very large screen
       mockDimensions.get.mockImplementation((dim) => {
         if (dim === 'window') return { width: 1200, height: 1600 };
         return { width: 1200, height: 1600, scale: 1, fontScale: 1 };
       });
-      
+
       result = getDeviceDimensions();
       expect(result.isSmallDevice).toBe(false);
       expect(result.isTablet).toBe(true);

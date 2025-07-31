@@ -16,16 +16,24 @@ export interface AlertOptions {
 }
 
 // Global alert state management
-let globalShowAlert: ((config: Omit<AlertCardProps, 'visible' | 'onClose'>) => void) | null = null;
+let globalShowAlert:
+  | ((config: Omit<AlertCardProps, 'visible' | 'onClose'>) => void)
+  | null = null;
 
 export const setGlobalAlertHandler = (handler: typeof globalShowAlert) => {
   globalShowAlert = handler;
 };
 
 // Convenience functions that match the original Alert.alert API
-export const showAlert = (title: string, message?: string, options?: AlertOptions) => {
+export const showAlert = (
+  title: string,
+  message?: string,
+  options?: AlertOptions,
+) => {
   if (!globalShowAlert) {
-    console.warn('Global alert handler not set. Make sure to call setGlobalAlertHandler.');
+    console.warn(
+      'Global alert handler not set. Make sure to call setGlobalAlertHandler.',
+    );
     return;
   }
 
@@ -43,21 +51,33 @@ export const showAlert = (title: string, message?: string, options?: AlertOption
 };
 
 // Specific alert types for common use cases
-export const showSuccessAlert = (title: string, message?: string, onOk?: () => void) => {
+export const showSuccessAlert = (
+  title: string,
+  message?: string,
+  onOk?: () => void,
+) => {
   showAlert(title, message, {
     type: 'success',
     primaryAction: { label: 'OK', onPress: onOk || (() => {}) },
   });
 };
 
-export const showErrorAlert = (title: string, message?: string, onOk?: () => void) => {
+export const showErrorAlert = (
+  title: string,
+  message?: string,
+  onOk?: () => void,
+) => {
   showAlert(title, message, {
     type: 'error',
     primaryAction: { label: 'OK', onPress: onOk || (() => {}) },
   });
 };
 
-export const showWarningAlert = (title: string, message?: string, onOk?: () => void) => {
+export const showWarningAlert = (
+  title: string,
+  message?: string,
+  onOk?: () => void,
+) => {
   showAlert(title, message, {
     type: 'warning',
     primaryAction: { label: 'OK', onPress: onOk || (() => {}) },
@@ -65,13 +85,13 @@ export const showWarningAlert = (title: string, message?: string, onOk?: () => v
 };
 
 export const showConfirmAlert = (
-  title: string, 
-  message: string, 
+  title: string,
+  message: string,
   onConfirm: () => void | Promise<void>,
   onCancel?: () => void,
   confirmLabel: string = 'Confirm',
   cancelLabel: string = 'Cancel',
-  destructive: boolean = false
+  destructive: boolean = false,
 ) => {
   showAlert(title, message, {
     type: destructive ? 'error' : 'info',
@@ -92,7 +112,7 @@ export const showDeleteConfirmAlert = (
   title: string,
   message: string,
   onDelete: () => void | Promise<void>,
-  onCancel?: () => void
+  onCancel?: () => void,
 ) => {
   showConfirmAlert(
     title,
@@ -101,6 +121,6 @@ export const showDeleteConfirmAlert = (
     onCancel,
     'Delete',
     'Cancel',
-    true
+    true,
   );
 };

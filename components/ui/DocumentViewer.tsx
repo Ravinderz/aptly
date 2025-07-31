@@ -1,11 +1,30 @@
 import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, ScrollView, Alert, Linking } from 'react-native';
-import { FileText, Upload, Download, Trash2, Eye, Plus } from 'lucide-react-native';
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  ScrollView,
+  Alert,
+  Linking,
+} from 'react-native';
+import {
+  FileText,
+  Upload,
+  Download,
+  Trash2,
+  Eye,
+  Plus,
+} from 'lucide-react-native';
 import { Button } from './Button';
 import { Card } from './Card';
 import { Document } from '../../types/storage';
-import { DocumentStorage , formatFileSize } from '../../utils/storage';
-import { showAlert, showErrorAlert, showDeleteConfirmAlert, showSuccessAlert } from '../../utils/alert';
+import { DocumentStorage, formatFileSize } from '../../utils/storage';
+import {
+  showAlert,
+  showErrorAlert,
+  showDeleteConfirmAlert,
+  showSuccessAlert,
+} from '../../utils/alert';
 import * as DocumentPicker from 'expo-document-picker';
 import * as FileSystem from 'expo-file-system';
 import * as Sharing from 'expo-sharing';
@@ -23,23 +42,23 @@ const DOCUMENT_TYPES = {
   passport: { label: 'Passport', icon: '📘', color: '#4CAF50' },
   driving_license: { label: 'Driving License', icon: '🚗', color: '#FF5722' },
   property_papers: { label: 'Property Papers', icon: '🏠', color: '#9C27B0' },
-  other: { label: 'Other Document', icon: '📄', color: '#757575' }
+  other: { label: 'Other Document', icon: '📄', color: '#757575' },
 };
 
-const DocumentUploadForm = ({ 
-  visible, 
-  onSubmit, 
-  onCancel 
-}: { 
-  visible: boolean; 
-  onSubmit: (data: any) => void; 
-  onCancel: () => void; 
+const DocumentUploadForm = ({
+  visible,
+  onSubmit,
+  onCancel,
+}: {
+  visible: boolean;
+  onSubmit: (data: any) => void;
+  onCancel: () => void;
 }) => {
   const [formData, setFormData] = useState({
     name: '',
     type: 'other' as keyof typeof DOCUMENT_TYPES,
     description: '',
-    selectedFile: null as any
+    selectedFile: null as any,
   });
 
   const handleFileSelection = async () => {
@@ -51,10 +70,10 @@ const DocumentUploadForm = ({
 
       if (!result.canceled && result.assets[0]) {
         const file = result.assets[0];
-        setFormData(prev => ({
+        setFormData((prev) => ({
           ...prev,
           selectedFile: file,
-          name: prev.name || file.name.split('.')[0] // Auto-populate name if empty
+          name: prev.name || file.name.split('.')[0], // Auto-populate name if empty
         }));
         showSuccessAlert('File Selected', `Selected: ${file.name}`);
       }
@@ -78,31 +97,34 @@ const DocumentUploadForm = ({
       // Copy file to app's document directory
       const fileName = `${Date.now()}_${formData.selectedFile.name}`;
       const destPath = `${FileSystem.documentDirectory}documents/${fileName}`;
-      
+
       // Ensure documents directory exists
-      await FileSystem.makeDirectoryAsync(`${FileSystem.documentDirectory}documents/`, { intermediates: true });
-      
+      await FileSystem.makeDirectoryAsync(
+        `${FileSystem.documentDirectory}documents/`,
+        { intermediates: true },
+      );
+
       // Copy file
       await FileSystem.copyAsync({
         from: formData.selectedFile.uri,
-        to: destPath
+        to: destPath,
       });
 
       const documentData = {
         ...formData,
         fileUri: destPath,
         mimeType: formData.selectedFile.mimeType,
-        size: formData.selectedFile.size
+        size: formData.selectedFile.size,
       };
 
       onSubmit(documentData);
-      
+
       // Reset form
       setFormData({
         name: '',
         type: 'other',
         description: '',
-        selectedFile: null
+        selectedFile: null,
       });
     } catch (error) {
       showErrorAlert('Error', 'Failed to upload document');
@@ -113,11 +135,15 @@ const DocumentUploadForm = ({
 
   return (
     <Card className="mb-6">
-      <Text className="text-lg font-semibold text-text-primary mb-4">Upload Document</Text>
-      
+      <Text className="text-lg font-semibold text-text-primary mb-4">
+        Upload Document
+      </Text>
+
       {/* Document Name */}
       <View className="mb-4">
-        <Text className="text-text-primary font-medium mb-2">Document Name</Text>
+        <Text className="text-text-primary font-medium mb-2">
+          Document Name
+        </Text>
         <View className="bg-background border border-divider rounded-lg px-4 py-3">
           <Text
             className="text-text-primary"
@@ -129,14 +155,14 @@ const DocumentUploadForm = ({
                   { text: 'Cancel', style: 'cancel' },
                   {
                     text: 'OK',
-                    onPress: (text) => setFormData(prev => ({ ...prev, name: text || '' }))
-                  }
+                    onPress: (text) =>
+                      setFormData((prev) => ({ ...prev, name: text || '' })),
+                  },
                 ],
                 'plain-text',
-                formData.name
+                formData.name,
               );
-            }}
-          >
+            }}>
             {formData.name || 'Tap to enter name'}
           </Text>
         </View>
@@ -144,26 +170,33 @@ const DocumentUploadForm = ({
 
       {/* Document Type */}
       <View className="mb-4">
-        <Text className="text-text-primary font-medium mb-2">Document Type</Text>
+        <Text className="text-text-primary font-medium mb-2">
+          Document Type
+        </Text>
         <ScrollView horizontal showsHorizontalScrollIndicator={false}>
           <View className="flex-row gap-2">
             {Object.entries(DOCUMENT_TYPES).map(([key, type]) => (
               <TouchableOpacity
                 key={key}
-                onPress={() => setFormData(prev => ({ ...prev, type: key as keyof typeof DOCUMENT_TYPES }))}
+                onPress={() =>
+                  setFormData((prev) => ({
+                    ...prev,
+                    type: key as keyof typeof DOCUMENT_TYPES,
+                  }))
+                }
                 className={`px-4 py-3 rounded-lg border ${
                   formData.type === key
                     ? 'bg-primary/10 border-primary'
                     : 'bg-background border-divider'
-                }`}
-              >
+                }`}>
                 <View className="items-center">
                   <Text className="text-lg mb-1">{type.icon}</Text>
                   <Text
                     className={`text-xs font-medium ${
-                      formData.type === key ? 'text-primary' : 'text-text-secondary'
-                    }`}
-                  >
+                      formData.type === key
+                        ? 'text-primary'
+                        : 'text-text-secondary'
+                    }`}>
                     {type.label}
                   </Text>
                 </View>
@@ -176,9 +209,10 @@ const DocumentUploadForm = ({
       {/* Description (Optional) */}
       <View className="mb-4">
         <Text className="text-text-primary font-medium mb-2">
-          Description <Text className="text-text-secondary text-sm">(Optional)</Text>
+          Description{' '}
+          <Text className="text-text-secondary text-sm">(Optional)</Text>
         </Text>
-        <TouchableOpacity 
+        <TouchableOpacity
           onPress={() => {
             Alert.prompt(
               'Document Description',
@@ -187,16 +221,22 @@ const DocumentUploadForm = ({
                 { text: 'Cancel', style: 'cancel' },
                 {
                   text: 'OK',
-                  onPress: (text) => setFormData(prev => ({ ...prev, description: text || '' }))
-                }
+                  onPress: (text) =>
+                    setFormData((prev) => ({
+                      ...prev,
+                      description: text || '',
+                    })),
+                },
               ],
               'plain-text',
-              formData.description
+              formData.description,
             );
           }}
-          className="bg-background border border-divider rounded-lg px-4 py-3 min-h-[80px] justify-start"
-        >
-          <Text className={formData.description ? 'text-text-primary' : 'text-text-secondary'}>
+          className="bg-background border border-divider rounded-lg px-4 py-3 min-h-[80px] justify-start">
+          <Text
+            className={
+              formData.description ? 'text-text-primary' : 'text-text-secondary'
+            }>
             {formData.description || 'Tap to add description'}
           </Text>
         </TouchableOpacity>
@@ -206,22 +246,24 @@ const DocumentUploadForm = ({
       <TouchableOpacity
         onPress={handleFileSelection}
         className={`border-2 border-dashed rounded-lg p-6 items-center justify-center mb-4 ${
-          formData.selectedFile 
-            ? 'bg-success/10 border-success/30' 
+          formData.selectedFile
+            ? 'bg-success/10 border-success/30'
             : 'bg-primary/10 border-primary/30'
-        }`}
-      >
-        <Upload size={32} color={formData.selectedFile ? "#4CAF50" : "#6366f1"} />
-        <Text className={`font-semibold mt-2 ${
-          formData.selectedFile ? 'text-success' : 'text-primary'
         }`}>
+        <Upload
+          size={32}
+          color={formData.selectedFile ? '#4CAF50' : '#6366f1'}
+        />
+        <Text
+          className={`font-semibold mt-2 ${
+            formData.selectedFile ? 'text-success' : 'text-primary'
+          }`}>
           {formData.selectedFile ? 'File Selected' : 'Select Document'}
         </Text>
         <Text className="text-text-secondary text-sm">
-          {formData.selectedFile 
+          {formData.selectedFile
             ? `${formData.selectedFile.name} (${formatFileSize(formData.selectedFile.size)})`
-            : 'PDF, JPG, PNG (Max 10MB)'
-          }
+            : 'PDF, JPG, PNG (Max 10MB)'}
         </Text>
       </TouchableOpacity>
 
@@ -230,11 +272,10 @@ const DocumentUploadForm = ({
         <Button variant="outline" className="flex-1" onPress={onCancel}>
           Cancel
         </Button>
-        <Button 
-          className="flex-1" 
+        <Button
+          className="flex-1"
           onPress={handleUpload}
-          disabled={!formData.selectedFile || !formData.name.trim()}
-        >
+          disabled={!formData.selectedFile || !formData.name.trim()}>
           Upload Document
         </Button>
       </View>
@@ -242,11 +283,11 @@ const DocumentUploadForm = ({
   );
 };
 
-export default function DocumentViewer({ 
-  documents, 
-  onDocumentAdded, 
-  onDocumentDeleted, 
-  onRefresh 
+export default function DocumentViewer({
+  documents,
+  onDocumentAdded,
+  onDocumentDeleted,
+  onRefresh,
 }: DocumentViewerProps) {
   const [showUploadForm, setShowUploadForm] = useState(false);
 
@@ -255,7 +296,7 @@ export default function DocumentViewer({
       const newDocument = await DocumentStorage.saveDocument(documentData);
       showAlert('Success', 'Document uploaded successfully');
       setShowUploadForm(false);
-      
+
       if (onDocumentAdded) {
         onDocumentAdded(newDocument);
       }
@@ -273,24 +314,39 @@ export default function DocumentViewer({
       // Check if file exists
       const fileInfo = await FileSystem.getInfoAsync(document.fileUri);
       if (!fileInfo.exists) {
-        showErrorAlert('File Not Found', 'The document file could not be found. It may have been moved or deleted.');
+        showErrorAlert(
+          'File Not Found',
+          'The document file could not be found. It may have been moved or deleted.',
+        );
         return;
       }
 
       // For PDFs and images, we can try to open with the system viewer
-      if (document.mimeType === 'application/pdf' || document.mimeType?.startsWith('image/')) {
+      if (
+        document.mimeType === 'application/pdf' ||
+        document.mimeType?.startsWith('image/')
+      ) {
         const isAvailable = await Sharing.isAvailableAsync();
         if (isAvailable) {
           await Sharing.shareAsync(document.fileUri, {
             mimeType: document.mimeType,
             dialogTitle: `View ${document.name}`,
-            UTI: document.mimeType === 'application/pdf' ? 'com.adobe.pdf' : 'public.image'
+            UTI:
+              document.mimeType === 'application/pdf'
+                ? 'com.adobe.pdf'
+                : 'public.image',
           });
         } else {
-          showAlert('View Document', 'Document viewer is not available on this device');
+          showAlert(
+            'View Document',
+            'Document viewer is not available on this device',
+          );
         }
       } else {
-        showAlert('View Document', `${document.name}\n\nFile type: ${document.mimeType}\nSize: ${formatFileSize(document.size)}`);
+        showAlert(
+          'View Document',
+          `${document.name}\n\nFile type: ${document.mimeType}\nSize: ${formatFileSize(document.size)}`,
+        );
       }
     } catch (error) {
       showErrorAlert('Error', 'Failed to open document');
@@ -302,7 +358,10 @@ export default function DocumentViewer({
       // Check if file exists
       const fileInfo = await FileSystem.getInfoAsync(document.fileUri);
       if (!fileInfo.exists) {
-        showErrorAlert('File Not Found', 'The document file could not be found.');
+        showErrorAlert(
+          'File Not Found',
+          'The document file could not be found.',
+        );
         return;
       }
 
@@ -311,11 +370,17 @@ export default function DocumentViewer({
       if (isAvailable) {
         await Sharing.shareAsync(document.fileUri, {
           mimeType: document.mimeType,
-          dialogTitle: `Save ${document.name}`
+          dialogTitle: `Save ${document.name}`,
         });
-        showSuccessAlert('Download Started', 'Choose where to save the document');
+        showSuccessAlert(
+          'Download Started',
+          'Choose where to save the document',
+        );
       } else {
-        showAlert('Download Not Available', 'File sharing is not available on this device');
+        showAlert(
+          'Download Not Available',
+          'File sharing is not available on this device',
+        );
       }
     } catch (error) {
       showErrorAlert('Error', 'Failed to download document');
@@ -330,7 +395,7 @@ export default function DocumentViewer({
         try {
           await DocumentStorage.deleteDocument(document.id);
           showAlert('Success', 'Document deleted successfully');
-          
+
           if (onDocumentDeleted) {
             onDocumentDeleted(document.id);
           }
@@ -341,7 +406,7 @@ export default function DocumentViewer({
           console.error('Error deleting document:', error);
           showErrorAlert('Error', 'Failed to delete document');
         }
-      }
+      },
     );
   };
 
@@ -349,7 +414,7 @@ export default function DocumentViewer({
     return new Date(dateString).toLocaleDateString('en-IN', {
       day: 'numeric',
       month: 'short',
-      year: 'numeric'
+      year: 'numeric',
     });
   };
 
@@ -366,11 +431,14 @@ export default function DocumentViewer({
       {!showUploadForm && (
         <TouchableOpacity
           onPress={() => setShowUploadForm(true)}
-          className="border-2 border-dashed border-primary/30 rounded-xl p-6 items-center justify-center bg-primary/5 mb-6"
-        >
+          className="border-2 border-dashed border-primary/30 rounded-xl p-6 items-center justify-center bg-primary/5 mb-6">
           <Plus size={24} color="#6366f1" />
-          <Text className="text-primary font-semibold mt-2">Upload Document</Text>
-          <Text className="text-text-secondary text-sm">Add identity & property documents</Text>
+          <Text className="text-primary font-semibold mt-2">
+            Upload Document
+          </Text>
+          <Text className="text-text-secondary text-sm">
+            Add identity & property documents
+          </Text>
         </TouchableOpacity>
       )}
 
@@ -380,9 +448,12 @@ export default function DocumentViewer({
           <View className="w-20 h-20 rounded-full bg-primary/10 items-center justify-center mb-4">
             <FileText size={32} color="#6366f1" />
           </View>
-          <Text className="text-text-primary text-lg font-semibold mb-2">No Documents</Text>
+          <Text className="text-text-primary text-lg font-semibold mb-2">
+            No Documents
+          </Text>
           <Text className="text-text-secondary text-center mb-6">
-            Upload your important documents for easy access and sharing with society management.
+            Upload your important documents for easy access and sharing with
+            society management.
           </Text>
           {!showUploadForm && (
             <Button onPress={() => setShowUploadForm(true)}>
@@ -394,15 +465,14 @@ export default function DocumentViewer({
         <View className="space-y-4">
           {documents.map((document) => {
             const documentType = DOCUMENT_TYPES[document.type];
-            
+
             return (
               <Card key={document.id}>
                 <View className="flex-row items-start">
                   {/* Document Icon */}
-                  <View 
+                  <View
                     className="w-14 h-14 rounded-xl items-center justify-center mr-4"
-                    style={{ backgroundColor: `${documentType.color}15` }}
-                  >
+                    style={{ backgroundColor: `${documentType.color}15` }}>
                     <Text className="text-xl">{documentType.icon}</Text>
                   </View>
 
@@ -413,14 +483,14 @@ export default function DocumentViewer({
                         <Text className="text-text-primary font-semibold text-lg mb-1">
                           {document.name}
                         </Text>
-                        <View 
+                        <View
                           className="self-start px-2 py-1 rounded-full mb-2"
-                          style={{ backgroundColor: `${documentType.color}15` }}
-                        >
-                          <Text 
+                          style={{
+                            backgroundColor: `${documentType.color}15`,
+                          }}>
+                          <Text
                             className="text-xs font-medium"
-                            style={{ color: documentType.color }}
-                          >
+                            style={{ color: documentType.color }}>
                             {documentType.label}
                           </Text>
                         </View>
@@ -430,20 +500,17 @@ export default function DocumentViewer({
                       <View className="flex-row gap-2">
                         <TouchableOpacity
                           onPress={() => handleViewDocument(document)}
-                          className="p-2 rounded-full bg-primary/10"
-                        >
+                          className="p-2 rounded-full bg-primary/10">
                           <Eye size={14} color="#6366f1" />
                         </TouchableOpacity>
                         <TouchableOpacity
                           onPress={() => handleDownloadDocument(document)}
-                          className="p-2 rounded-full bg-success/10"
-                        >
+                          className="p-2 rounded-full bg-success/10">
                           <Download size={14} color="#4CAF50" />
                         </TouchableOpacity>
                         <TouchableOpacity
                           onPress={() => handleDeleteDocument(document)}
-                          className="p-2 rounded-full bg-error/10"
-                        >
+                          className="p-2 rounded-full bg-error/10">
                           <Trash2 size={14} color="#D32F2F" />
                         </TouchableOpacity>
                       </View>
@@ -456,7 +523,7 @@ export default function DocumentViewer({
                           {document.description}
                         </Text>
                       )}
-                      
+
                       <View className="flex-row items-center justify-between">
                         <Text className="text-text-secondary text-xs">
                           Size: {formatFileSize(document.size)}
@@ -465,7 +532,7 @@ export default function DocumentViewer({
                           Uploaded: {formatDate(document.createdAt)}
                         </Text>
                       </View>
-                      
+
                       <View className="bg-background rounded-lg p-2 mt-2">
                         <Text className="text-text-secondary text-xs">
                           File: {document.fileUri.split('/').pop()}
@@ -486,10 +553,9 @@ export default function DocumentViewer({
           📄 Document Security
         </Text>
         <Text className="text-text-secondary text-sm leading-5">
-          • All documents are stored securely on your device{'\n'}
-          • Only you have access to your uploaded documents{'\n'}
-          • Share documents only when required{'\n'}
-          • Keep your documents updated and valid
+          • All documents are stored securely on your device{'\n'}• Only you
+          have access to your uploaded documents{'\n'}• Share documents only
+          when required{'\n'}• Keep your documents updated and valid
         </Text>
       </Card>
     </ScrollView>

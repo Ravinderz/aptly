@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { 
-  SafeAreaView, 
-  ScrollView, 
-  View, 
-  Text, 
+import {
+  SafeAreaView,
+  ScrollView,
+  View,
+  Text,
   TouchableOpacity,
   Switch,
-  Alert
+  Alert,
 } from 'react-native';
 import { router } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -28,7 +28,7 @@ const defaultPreferences = {
   cacheSizeLimit: 100, // MB
   debugMode: false,
   analytics: true,
-  crashReporting: true
+  crashReporting: true,
 };
 
 const languages = [
@@ -36,13 +36,13 @@ const languages = [
   { code: 'hi', name: 'हिंदी', flag: '🇮🇳' },
   { code: 'ta', name: 'தமிழ்', flag: '🇮🇳' },
   { code: 'te', name: 'తెలుగు', flag: '🇮🇳' },
-  { code: 'kn', name: 'ಕನ್ನಡ', flag: '🇮🇳' }
+  { code: 'kn', name: 'ಕನ್ನಡ', flag: '🇮🇳' },
 ];
 
 const themes = [
   { id: 'light', name: 'Light', icon: 'sunny-outline' },
   { id: 'dark', name: 'Dark', icon: 'moon-outline' },
-  { id: 'system', name: 'System', icon: 'phone-portrait-outline' }
+  { id: 'system', name: 'System', icon: 'phone-portrait-outline' },
 ];
 
 export default function AppSettingsPage() {
@@ -79,8 +79,14 @@ export default function AppSettingsPage() {
   const handleSavePreferences = async () => {
     try {
       setIsSaving(true);
-      await AsyncStorage.setItem('app_preferences', JSON.stringify(preferences));
-      await AsyncStorage.setItem('app_settings_last_updated', new Date().toISOString());
+      await AsyncStorage.setItem(
+        'app_preferences',
+        JSON.stringify(preferences),
+      );
+      await AsyncStorage.setItem(
+        'app_settings_last_updated',
+        new Date().toISOString(),
+      );
       showSuccessAlert('Success', 'App settings updated successfully');
     } catch (error) {
       showErrorAlert('Error', 'Failed to update app settings');
@@ -102,13 +108,16 @@ export default function AppSettingsPage() {
             try {
               // In a real app, clear actual cache
               setStorageUsed(5); // Simulate cleared cache
-              showSuccessAlert('Cache Cleared', 'App cache has been cleared successfully');
+              showSuccessAlert(
+                'Cache Cleared',
+                'App cache has been cleared successfully',
+              );
             } catch (error) {
               showErrorAlert('Error', 'Failed to clear cache');
             }
-          }
-        }
-      ]
+          },
+        },
+      ],
     );
   };
 
@@ -123,10 +132,13 @@ export default function AppSettingsPage() {
           style: 'destructive',
           onPress: () => {
             setPreferences(defaultPreferences);
-            showSuccessAlert('Reset Complete', 'App settings have been reset to defaults');
-          }
-        }
-      ]
+            showSuccessAlert(
+              'Reset Complete',
+              'App settings have been reset to defaults',
+            );
+          },
+        },
+      ],
     );
   };
 
@@ -136,7 +148,7 @@ export default function AppSettingsPage() {
         <Text className="text-headline-small font-semibold text-text-primary mb-4">
           Language & Theme
         </Text>
-        
+
         <View className="space-y-4">
           {/* Language Selection */}
           <View>
@@ -147,17 +159,21 @@ export default function AppSettingsPage() {
               {languages.map((lang) => (
                 <TouchableOpacity
                   key={lang.code}
-                  onPress={() => setPreferences(prev => ({ ...prev, language: lang.code }))}
+                  onPress={() =>
+                    setPreferences((prev) => ({ ...prev, language: lang.code }))
+                  }
                   className={`flex-row items-center px-3 py-2 rounded-full border ${
                     preferences.language === lang.code
                       ? 'border-primary bg-primary/10'
                       : 'border-divider bg-background'
-                  }`}
-                >
-                  <Text className="mr-2">{lang.flag}</Text>
-                  <Text className={`text-body-small font-medium ${
-                    preferences.language === lang.code ? 'text-primary' : 'text-text-secondary'
                   }`}>
+                  <Text className="mr-2">{lang.flag}</Text>
+                  <Text
+                    className={`text-body-small font-medium ${
+                      preferences.language === lang.code
+                        ? 'text-primary'
+                        : 'text-text-secondary'
+                    }`}>
                     {lang.name}
                   </Text>
                 </TouchableOpacity>
@@ -174,21 +190,27 @@ export default function AppSettingsPage() {
               {themes.map((theme) => (
                 <TouchableOpacity
                   key={theme.id}
-                  onPress={() => setPreferences(prev => ({ ...prev, theme: theme.id }))}
+                  onPress={() =>
+                    setPreferences((prev) => ({ ...prev, theme: theme.id }))
+                  }
                   className={`flex-1 flex-row items-center justify-center px-3 py-3 rounded-lg border ${
                     preferences.theme === theme.id
                       ? 'border-primary bg-primary/10'
                       : 'border-divider bg-background'
-                  }`}
-                >
-                  <LucideIcons 
-                    name={theme.icon as any} 
-                    size={16} 
-                    color={preferences.theme === theme.id ? '#6366f1' : '#757575'} 
-                  />
-                  <Text className={`ml-2 text-body-small font-medium ${
-                    preferences.theme === theme.id ? 'text-primary' : 'text-text-secondary'
                   }`}>
+                  <LucideIcons
+                    name={theme.icon as any}
+                    size={16}
+                    color={
+                      preferences.theme === theme.id ? '#6366f1' : '#757575'
+                    }
+                  />
+                  <Text
+                    className={`ml-2 text-body-small font-medium ${
+                      preferences.theme === theme.id
+                        ? 'text-primary'
+                        : 'text-text-secondary'
+                    }`}>
                     {theme.name}
                   </Text>
                 </TouchableOpacity>
@@ -206,7 +228,7 @@ export default function AppSettingsPage() {
         <Text className="text-headline-small font-semibold text-text-primary mb-4">
           Data & Sync
         </Text>
-        
+
         <View className="space-y-4">
           {/* Auto Download Updates */}
           <View className="flex-row items-center justify-between">
@@ -220,9 +242,16 @@ export default function AppSettingsPage() {
             </View>
             <Switch
               value={preferences.autoDownloadUpdates}
-              onValueChange={(enabled) => setPreferences(prev => ({ ...prev, autoDownloadUpdates: enabled }))}
+              onValueChange={(enabled) =>
+                setPreferences((prev) => ({
+                  ...prev,
+                  autoDownloadUpdates: enabled,
+                }))
+              }
               trackColor={{ false: '#D1D5DB', true: '#6366f1' }}
-              thumbColor={preferences.autoDownloadUpdates ? '#FFFFFF' : '#757575'}
+              thumbColor={
+                preferences.autoDownloadUpdates ? '#FFFFFF' : '#757575'
+              }
             />
           </View>
 
@@ -238,7 +267,9 @@ export default function AppSettingsPage() {
             </View>
             <Switch
               value={preferences.offlineMode}
-              onValueChange={(enabled) => setPreferences(prev => ({ ...prev, offlineMode: enabled }))}
+              onValueChange={(enabled) =>
+                setPreferences((prev) => ({ ...prev, offlineMode: enabled }))
+              }
               trackColor={{ false: '#D1D5DB', true: '#6366f1' }}
               thumbColor={preferences.offlineMode ? '#FFFFFF' : '#757575'}
             />
@@ -254,7 +285,7 @@ export default function AppSettingsPage() {
         <Text className="text-headline-small font-semibold text-text-primary mb-4">
           Storage & Privacy
         </Text>
-        
+
         <View className="space-y-4">
           {/* Storage Usage */}
           <View>
@@ -267,22 +298,25 @@ export default function AppSettingsPage() {
               </Text>
             </View>
             <View className="bg-background rounded-full h-2">
-              <View 
-                className="bg-primary rounded-full h-2" 
-                style={{ width: `${Math.min((storageUsed / 100) * 100, 100)}%` }}
+              <View
+                className="bg-primary rounded-full h-2"
+                style={{
+                  width: `${Math.min((storageUsed / 100) * 100, 100)}%`,
+                }}
               />
             </View>
             <View className="flex-row justify-between mt-1">
               <Text className="text-body-small text-text-secondary">0 MB</Text>
-              <Text className="text-body-small text-text-secondary">100 MB limit</Text>
+              <Text className="text-body-small text-text-secondary">
+                100 MB limit
+              </Text>
             </View>
           </View>
 
           {/* Clear Cache Button */}
           <TouchableOpacity
             className="flex-row items-center justify-between py-2"
-            onPress={handleClearCache}
-          >
+            onPress={handleClearCache}>
             <View className="flex-1">
               <Text className="text-body-medium font-medium text-text-primary">
                 Clear Cache
@@ -306,7 +340,9 @@ export default function AppSettingsPage() {
             </View>
             <Switch
               value={preferences.analytics}
-              onValueChange={(enabled) => setPreferences(prev => ({ ...prev, analytics: enabled }))}
+              onValueChange={(enabled) =>
+                setPreferences((prev) => ({ ...prev, analytics: enabled }))
+              }
               trackColor={{ false: '#D1D5DB', true: '#6366f1' }}
               thumbColor={preferences.analytics ? '#FFFFFF' : '#757575'}
             />
@@ -324,7 +360,9 @@ export default function AppSettingsPage() {
             </View>
             <Switch
               value={preferences.crashReporting}
-              onValueChange={(enabled) => setPreferences(prev => ({ ...prev, crashReporting: enabled }))}
+              onValueChange={(enabled) =>
+                setPreferences((prev) => ({ ...prev, crashReporting: enabled }))
+              }
               trackColor={{ false: '#D1D5DB', true: '#6366f1' }}
               thumbColor={preferences.crashReporting ? '#FFFFFF' : '#757575'}
             />
@@ -340,7 +378,7 @@ export default function AppSettingsPage() {
         <Text className="text-headline-small font-semibold text-text-primary mb-4">
           Developer Options
         </Text>
-        
+
         <View className="space-y-4">
           <View className="flex-row items-center justify-between">
             <View className="flex-1 mr-4">
@@ -353,7 +391,9 @@ export default function AppSettingsPage() {
             </View>
             <Switch
               value={preferences.debugMode}
-              onValueChange={(enabled) => setPreferences(prev => ({ ...prev, debugMode: enabled }))}
+              onValueChange={(enabled) =>
+                setPreferences((prev) => ({ ...prev, debugMode: enabled }))
+              }
               trackColor={{ false: '#D1D5DB', true: '#6366f1' }}
               thumbColor={preferences.debugMode ? '#FFFFFF' : '#757575'}
             />
@@ -361,8 +401,9 @@ export default function AppSettingsPage() {
 
           <TouchableOpacity
             className="flex-row items-center justify-between py-2"
-            onPress={() => {/* Show app logs */}}
-          >
+            onPress={() => {
+              /* Show app logs */
+            }}>
             <View className="flex-1">
               <Text className="text-body-medium font-medium text-text-primary">
                 View Logs
@@ -371,7 +412,11 @@ export default function AppSettingsPage() {
                 View recent app activity and error logs
               </Text>
             </View>
-            <LucideIcons name="document-text-outline" size={20} color="#757575" />
+            <LucideIcons
+              name="document-text-outline"
+              size={20}
+              color="#757575"
+            />
           </TouchableOpacity>
         </View>
       </View>
@@ -380,16 +425,12 @@ export default function AppSettingsPage() {
 
   return (
     <SafeAreaView className="flex-1 bg-background">
-      <StackHeader
-        title="App Settings"
-        onBackPress={() => safeGoBack()}
-      />
+      <StackHeader title="App Settings" onBackPress={() => safeGoBack()} />
 
-      <ScrollView 
-        className="flex-1" 
+      <ScrollView
+        className="flex-1"
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ padding: 16, paddingBottom: 100 }}
-      >
+        contentContainerStyle={{ padding: 16, paddingBottom: 100 }}>
         {renderLanguageTheme()}
         {renderDataSync()}
         {renderStoragePrivacy()}
@@ -400,15 +441,11 @@ export default function AppSettingsPage() {
           <Button
             variant="primary"
             onPress={handleSavePreferences}
-            disabled={isSaving}
-          >
-            {isSaving ? "Saving..." : "Save App Settings"}
+            disabled={isSaving}>
+            {isSaving ? 'Saving...' : 'Save App Settings'}
           </Button>
-          
-          <Button
-            variant="destructive"
-            onPress={handleResetSettings}
-          >
+
+          <Button variant="destructive" onPress={handleResetSettings}>
             Reset to Defaults
           </Button>
         </View>

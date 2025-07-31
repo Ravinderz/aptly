@@ -16,7 +16,7 @@ describe('Button Component (Simplified)', () => {
 
   test('renders correctly with children', () => {
     const { getByText } = render(
-      React.createElement(Button, { onPress: mockOnPress }, 'Test Button')
+      React.createElement(Button, { onPress: mockOnPress }, 'Test Button'),
     );
 
     expect(getByText('Test Button')).toBeTruthy();
@@ -24,7 +24,7 @@ describe('Button Component (Simplified)', () => {
 
   test('calls onPress when pressed', () => {
     const { getByText } = render(
-      React.createElement(Button, { onPress: mockOnPress }, 'Test Button')
+      React.createElement(Button, { onPress: mockOnPress }, 'Test Button'),
     );
 
     fireEvent.press(getByText('Test Button'));
@@ -33,7 +33,11 @@ describe('Button Component (Simplified)', () => {
 
   test('does not call onPress when disabled', () => {
     const { getByText } = render(
-      React.createElement(Button, { onPress: mockOnPress, disabled: true }, 'Test Button')
+      React.createElement(
+        Button,
+        { onPress: mockOnPress, disabled: true },
+        'Test Button',
+      ),
     );
 
     fireEvent.press(getByText('Test Button'));
@@ -42,31 +46,43 @@ describe('Button Component (Simplified)', () => {
 
   test('renders with different variants', () => {
     const { rerender, getByTestId } = render(
-      React.createElement(Button, { 
-        onPress: mockOnPress, 
-        variant: 'primary', 
-        testID: 'button' 
-      }, 'Primary')
+      React.createElement(
+        Button,
+        {
+          onPress: mockOnPress,
+          variant: 'primary',
+          testID: 'button',
+        },
+        'Primary',
+      ),
     );
     expect(getByTestId('button')).toBeTruthy();
 
     rerender(
-      React.createElement(Button, { 
-        onPress: mockOnPress, 
-        variant: 'secondary', 
-        testID: 'button' 
-      }, 'Secondary')
+      React.createElement(
+        Button,
+        {
+          onPress: mockOnPress,
+          variant: 'secondary',
+          testID: 'button',
+        },
+        'Secondary',
+      ),
     );
     expect(getByTestId('button')).toBeTruthy();
   });
 
   test('renders loading state', () => {
     const { getByTestId } = render(
-      React.createElement(Button, { 
-        onPress: mockOnPress, 
-        loading: true, 
-        testID: 'button' 
-      }, 'Loading')
+      React.createElement(
+        Button,
+        {
+          onPress: mockOnPress,
+          loading: true,
+          testID: 'button',
+        },
+        'Loading',
+      ),
     );
 
     expect(getByTestId('button')).toBeTruthy();
@@ -74,11 +90,15 @@ describe('Button Component (Simplified)', () => {
 
   test('renders with fullWidth style', () => {
     const { getByTestId } = render(
-      React.createElement(Button, { 
-        onPress: mockOnPress, 
-        fullWidth: true, 
-        testID: 'button' 
-      }, 'Full Width')
+      React.createElement(
+        Button,
+        {
+          onPress: mockOnPress,
+          fullWidth: true,
+          testID: 'button',
+        },
+        'Full Width',
+      ),
     );
 
     expect(getByTestId('button')).toBeTruthy();

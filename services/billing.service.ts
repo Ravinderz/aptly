@@ -3,7 +3,14 @@ import { APIService } from './api.service';
 export interface Bill {
   id: string;
   billNumber: string;
-  billType: 'electricity' | 'gas' | 'broadband' | 'mobile' | 'dishtv' | 'water' | 'maintenance';
+  billType:
+    | 'electricity'
+    | 'gas'
+    | 'broadband'
+    | 'mobile'
+    | 'dishtv'
+    | 'water'
+    | 'maintenance';
   consumerNumber: string;
   billerName: string;
   billerCode: string;
@@ -80,14 +87,14 @@ const MOCK_BILLS: Bill[] = [
     consumerNumber: '1234567890',
     billerName: 'BESCOM',
     billerCode: 'BESCOM01',
-    amount: 2450.50,
+    amount: 2450.5,
     dueDate: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000), // 5 days from now
     issueDate: new Date(Date.now() - 25 * 24 * 60 * 60 * 1000), // 25 days ago
     status: 'pending',
     userId: 'user1',
     category: 'Utilities',
     paymentHistory: [],
-    autopayEnabled: false
+    autopayEnabled: false,
   },
   {
     id: 'bill2',
@@ -96,7 +103,7 @@ const MOCK_BILLS: Bill[] = [
     consumerNumber: '9876543210',
     billerName: 'Indane Gas',
     billerCode: 'INDANE01',
-    amount: 1200.00,
+    amount: 1200.0,
     dueDate: new Date(Date.now() + 10 * 24 * 60 * 60 * 1000), // 10 days from now
     issueDate: new Date(Date.now() - 20 * 24 * 60 * 60 * 1000), // 20 days ago
     status: 'pending',
@@ -104,8 +111,8 @@ const MOCK_BILLS: Bill[] = [
     category: 'Utilities',
     paymentHistory: [],
     autopayEnabled: true,
-    nextBillDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)
-  }
+    nextBillDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
+  },
 ];
 
 const MOCK_BILLERS: BillerInfo[] = [
@@ -119,7 +126,7 @@ const MOCK_BILLERS: BillerInfo[] = [
     isActive: true,
     supportedRegions: ['Karnataka'],
     minAmount: 100,
-    maxAmount: 50000
+    maxAmount: 50000,
   },
   {
     id: 'indane',
@@ -131,7 +138,7 @@ const MOCK_BILLERS: BillerInfo[] = [
     isActive: true,
     supportedRegions: ['All India'],
     minAmount: 500,
-    maxAmount: 5000
+    maxAmount: 5000,
   },
   {
     id: 'airtel',
@@ -143,11 +150,11 @@ const MOCK_BILLERS: BillerInfo[] = [
     isActive: true,
     supportedRegions: ['All India'],
     minAmount: 10,
-    maxAmount: 10000
-  }
+    maxAmount: 10000,
+  },
 ];
 
-const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 export class BillingService {
   private static instance: BillingService;
@@ -165,37 +172,40 @@ export class BillingService {
   }
 
   // Get user bills
-  async getBills(filters?: { 
-    status?: string; 
-    type?: string; 
-    dateRange?: { from: Date; to: Date } 
+  async getBills(filters?: {
+    status?: string;
+    type?: string;
+    dateRange?: { from: Date; to: Date };
   }): Promise<Bill[]> {
     await delay(500);
-    
+
     try {
       // In production, this would make an API call
       // const response = await this.apiService.getBills(filters);
       // return response;
-      
+
       // Mock implementation
       let bills = [...MOCK_BILLS];
-      
+
       if (filters?.status) {
-        bills = bills.filter(bill => bill.status === filters.status);
+        bills = bills.filter((bill) => bill.status === filters.status);
       }
-      
+
       if (filters?.type) {
-        bills = bills.filter(bill => bill.billType === filters.type);
+        bills = bills.filter((bill) => bill.billType === filters.type);
       }
-      
+
       if (filters?.dateRange) {
-        bills = bills.filter(bill => 
-          bill.issueDate >= filters.dateRange!.from && 
-          bill.issueDate <= filters.dateRange!.to
+        bills = bills.filter(
+          (bill) =>
+            bill.issueDate >= filters.dateRange!.from &&
+            bill.issueDate <= filters.dateRange!.to,
         );
       }
-      
-      return bills.sort((a, b) => b.issueDate.getTime() - a.issueDate.getTime());
+
+      return bills.sort(
+        (a, b) => b.issueDate.getTime() - a.issueDate.getTime(),
+      );
     } catch (error) {
       throw new Error('Failed to fetch bills');
     }
@@ -204,10 +214,10 @@ export class BillingService {
   // Get single bill
   async getBill(billId: string): Promise<Bill | null> {
     await delay(300);
-    
+
     try {
       // In production: const response = await this.apiService.getBill(billId);
-      return MOCK_BILLS.find(bill => bill.id === billId) || null;
+      return MOCK_BILLS.find((bill) => bill.id === billId) || null;
     } catch (error) {
       throw new Error('Failed to fetch bill details');
     }
@@ -216,7 +226,7 @@ export class BillingService {
   // Pay bill
   async payBill(request: BillPaymentRequest): Promise<PaymentRecord> {
     await delay(2000); // Simulate payment processing time
-    
+
     try {
       // In production, this would integrate with payment gateway
       const paymentRecord: PaymentRecord = {
@@ -230,16 +240,16 @@ export class BillingService {
         fee: request.amount * 0.02, // 2% fee
         gatewayResponse: {
           gateway: 'razorpay',
-          gatewayTransactionId: `rzp_${Date.now()}`
-        }
+          gatewayTransactionId: `rzp_${Date.now()}`,
+        },
       };
 
       // Update bill status
-      const bill = MOCK_BILLS.find(b => b.id === request.billId);
+      const bill = MOCK_BILLS.find((b) => b.id === request.billId);
       if (bill) {
         bill.status = 'paid';
         bill.paymentHistory.push(paymentRecord);
-        
+
         if (request.autopay) {
           bill.autopayEnabled = true;
         }
@@ -254,7 +264,7 @@ export class BillingService {
   // Mobile/DTH recharge
   async recharge(request: RechargeRequest): Promise<PaymentRecord> {
     await delay(1500);
-    
+
     try {
       // Mock recharge transaction
       const paymentRecord: PaymentRecord = {
@@ -269,8 +279,8 @@ export class BillingService {
         gatewayResponse: {
           operator: request.operator,
           number: request.number,
-          plan: request.plan
-        }
+          plan: request.plan,
+        },
       };
 
       return paymentRecord;
@@ -282,27 +292,30 @@ export class BillingService {
   // Get available billers
   async getBillers(type?: string): Promise<BillerInfo[]> {
     await delay(300);
-    
+
     try {
       let billers = [...MOCK_BILLERS];
-      
+
       if (type) {
-        billers = billers.filter(biller => biller.type === type);
+        billers = billers.filter((biller) => biller.type === type);
       }
-      
-      return billers.filter(biller => biller.isActive);
+
+      return billers.filter((biller) => biller.isActive);
     } catch (error) {
       throw new Error('Failed to fetch billers');
     }
   }
 
   // Calculate GST
-  async calculateGST(amount: number, gstRate: number = 18): Promise<GSTCalculation> {
+  async calculateGST(
+    amount: number,
+    gstRate: number = 18,
+  ): Promise<GSTCalculation> {
     await delay(100);
-    
+
     const gstAmount = (amount * gstRate) / 100;
     const totalAmount = amount + gstAmount;
-    
+
     return {
       baseAmount: amount,
       gstAmount: gstAmount,
@@ -311,26 +324,29 @@ export class BillingService {
       breakdown: {
         cgst: gstAmount / 2,
         sgst: gstAmount / 2,
-        igst: 0 // For interstate transactions
-      }
+        igst: 0, // For interstate transactions
+      },
     };
   }
 
   // Get payment history
-  async getPaymentHistory(userId: string, limit: number = 50): Promise<PaymentRecord[]> {
+  async getPaymentHistory(
+    userId: string,
+    limit: number = 50,
+  ): Promise<PaymentRecord[]> {
     await delay(400);
-    
+
     try {
       // In production: const response = await this.apiService.getPaymentHistory(userId, limit);
-      
+
       // Mock implementation - get all payments for user's bills
-      const userBills = MOCK_BILLS.filter(bill => bill.userId === userId);
+      const userBills = MOCK_BILLS.filter((bill) => bill.userId === userId);
       const allPayments: PaymentRecord[] = [];
-      
-      userBills.forEach(bill => {
+
+      userBills.forEach((bill) => {
         allPayments.push(...bill.paymentHistory);
       });
-      
+
       return allPayments
         .sort((a, b) => b.paymentDate.getTime() - a.paymentDate.getTime())
         .slice(0, limit);
@@ -342,9 +358,9 @@ export class BillingService {
   // Setup autopay
   async setupAutopay(billId: string, enabled: boolean): Promise<boolean> {
     await delay(500);
-    
+
     try {
-      const bill = MOCK_BILLS.find(b => b.id === billId);
+      const bill = MOCK_BILLS.find((b) => b.id === billId);
       if (bill) {
         bill.autopayEnabled = enabled;
         return true;
@@ -356,46 +372,54 @@ export class BillingService {
   }
 
   // Get billing analytics
-  async getBillingAnalytics(userId: string, period: 'month' | 'quarter' | 'year' = 'month'): Promise<{
+  async getBillingAnalytics(
+    userId: string,
+    period: 'month' | 'quarter' | 'year' = 'month',
+  ): Promise<{
     totalSpent: number;
     billCount: number;
     categoryBreakdown: { category: string; amount: number; count: number }[];
     monthlyTrend: { month: string; amount: number }[];
   }> {
     await delay(600);
-    
+
     try {
-      const userBills = MOCK_BILLS.filter(bill => bill.userId === userId);
+      const userBills = MOCK_BILLS.filter((bill) => bill.userId === userId);
       const totalSpent = userBills.reduce((sum, bill) => sum + bill.amount, 0);
-      
+
       // Category breakdown
       const categoryMap = new Map<string, { amount: number; count: number }>();
-      userBills.forEach(bill => {
-        const existing = categoryMap.get(bill.category) || { amount: 0, count: 0 };
+      userBills.forEach((bill) => {
+        const existing = categoryMap.get(bill.category) || {
+          amount: 0,
+          count: 0,
+        };
         categoryMap.set(bill.category, {
           amount: existing.amount + bill.amount,
-          count: existing.count + 1
+          count: existing.count + 1,
         });
       });
-      
-      const categoryBreakdown = Array.from(categoryMap.entries()).map(([category, data]) => ({
-        category,
-        ...data
-      }));
-      
+
+      const categoryBreakdown = Array.from(categoryMap.entries()).map(
+        ([category, data]) => ({
+          category,
+          ...data,
+        }),
+      );
+
       // Mock monthly trend
       const monthlyTrend = [
         { month: 'Jan', amount: 3200 },
         { month: 'Feb', amount: 2890 },
         { month: 'Mar', amount: 3650 },
-        { month: 'Apr', amount: totalSpent }
+        { month: 'Apr', amount: totalSpent },
       ];
-      
+
       return {
         totalSpent,
         billCount: userBills.length,
         categoryBreakdown,
-        monthlyTrend
+        monthlyTrend,
       };
     } catch (error) {
       throw new Error('Failed to fetch billing analytics');
@@ -403,7 +427,10 @@ export class BillingService {
   }
 
   // Validate bill details
-  async validateBillDetails(billerCode: string, consumerNumber: string): Promise<{
+  async validateBillDetails(
+    billerCode: string,
+    consumerNumber: string,
+  ): Promise<{
     isValid: boolean;
     billAmount?: number;
     dueDate?: Date;
@@ -411,21 +438,21 @@ export class BillingService {
     error?: string;
   }> {
     await delay(800);
-    
+
     try {
       // Mock validation
       if (consumerNumber.length < 8) {
         return {
           isValid: false,
-          error: 'Invalid consumer number'
+          error: 'Invalid consumer number',
         };
       }
-      
+
       return {
         isValid: true,
-        billAmount: 2450.50,
+        billAmount: 2450.5,
         dueDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
-        consumerName: 'John Doe'
+        consumerName: 'John Doe',
       };
     } catch (error) {
       throw new Error('Failed to validate bill details');

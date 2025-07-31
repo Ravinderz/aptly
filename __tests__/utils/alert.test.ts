@@ -6,15 +6,19 @@ import {
   showWarningAlert,
   showConfirmAlert,
   showDeleteConfirmAlert,
-  AlertOptions
+  AlertOptions,
 } from '../../utils/alert';
 import { AlertCardProps } from '../../components/ui/AlertCard';
 
 // Mock console.warn to test warning messages
-const mockConsoleWarn = jest.spyOn(console, 'warn').mockImplementation(() => {});
+const mockConsoleWarn = jest
+  .spyOn(console, 'warn')
+  .mockImplementation(() => {});
 
 describe('Alert Utilities', () => {
-  let mockHandler: jest.MockedFunction<(config: Omit<AlertCardProps, 'visible' | 'onClose'>) => void>;
+  let mockHandler: jest.MockedFunction<
+    (config: Omit<AlertCardProps, 'visible' | 'onClose'>) => void
+  >;
 
   beforeEach(() => {
     jest.clearAllMocks();
@@ -31,17 +35,17 @@ describe('Alert Utilities', () => {
     test('should set the global alert handler', () => {
       const newHandler = jest.fn();
       setGlobalAlertHandler(newHandler);
-      
+
       showAlert('Test', 'Message');
       expect(newHandler).toHaveBeenCalled();
     });
 
     test('should allow setting handler to null', () => {
       setGlobalAlertHandler(null);
-      
+
       showAlert('Test', 'Message');
       expect(mockConsoleWarn).toHaveBeenCalledWith(
-        'Global alert handler not set. Make sure to call setGlobalAlertHandler.'
+        'Global alert handler not set. Make sure to call setGlobalAlertHandler.',
       );
     });
   });
@@ -57,7 +61,7 @@ describe('Alert Utilities', () => {
         primaryAction: undefined,
         secondaryAction: undefined,
         persistent: false,
-        showCloseButton: true
+        showCloseButton: true,
       });
     });
 
@@ -71,7 +75,7 @@ describe('Alert Utilities', () => {
         primaryAction: undefined,
         secondaryAction: undefined,
         persistent: false,
-        showCloseButton: true
+        showCloseButton: true,
       });
     });
 
@@ -83,12 +87,12 @@ describe('Alert Utilities', () => {
         primaryAction: {
           label: 'Primary',
           onPress: jest.fn(),
-          variant: 'destructive'
+          variant: 'destructive',
         },
         secondaryAction: {
           label: 'Secondary',
-          onPress: jest.fn()
-        }
+          onPress: jest.fn(),
+        },
       };
 
       showAlert('Test', 'Message', options);
@@ -100,13 +104,13 @@ describe('Alert Utilities', () => {
         primaryAction: options.primaryAction,
         secondaryAction: options.secondaryAction,
         persistent: true,
-        showCloseButton: false
+        showCloseButton: false,
       });
     });
 
     test('should use default values for optional options', () => {
       const options: AlertOptions = {
-        type: 'success'
+        type: 'success',
         // Other options omitted to test defaults
       };
 
@@ -119,7 +123,7 @@ describe('Alert Utilities', () => {
         primaryAction: undefined,
         secondaryAction: undefined,
         persistent: false,
-        showCloseButton: true
+        showCloseButton: true,
       });
     });
 
@@ -133,17 +137,17 @@ describe('Alert Utilities', () => {
         primaryAction: undefined,
         secondaryAction: undefined,
         persistent: false,
-        showCloseButton: true
+        showCloseButton: true,
       });
     });
 
     test('should warn when no global handler is set', () => {
       setGlobalAlertHandler(null);
-      
+
       showAlert('Test', 'Message');
 
       expect(mockConsoleWarn).toHaveBeenCalledWith(
-        'Global alert handler not set. Make sure to call setGlobalAlertHandler.'
+        'Global alert handler not set. Make sure to call setGlobalAlertHandler.',
       );
       expect(mockHandler).not.toHaveBeenCalled();
     });
@@ -153,18 +157,23 @@ describe('Alert Utilities', () => {
 
       expect(mockHandler).toHaveBeenCalledWith(
         expect.objectContaining({
-          showCloseButton: false
-        })
+          showCloseButton: false,
+        }),
       );
     });
 
     test('should handle all alert types', () => {
-      const types: Array<'success' | 'error' | 'warning' | 'info'> = ['success', 'error', 'warning', 'info'];
-      
-      types.forEach(type => {
+      const types: Array<'success' | 'error' | 'warning' | 'info'> = [
+        'success',
+        'error',
+        'warning',
+        'info',
+      ];
+
+      types.forEach((type) => {
         showAlert('Test', 'Message', { type });
         expect(mockHandler).toHaveBeenCalledWith(
-          expect.objectContaining({ type })
+          expect.objectContaining({ type }),
         );
       });
     });
@@ -180,11 +189,11 @@ describe('Alert Utilities', () => {
         message: 'Success Message',
         primaryAction: {
           label: 'OK',
-          onPress: expect.any(Function)
+          onPress: expect.any(Function),
         },
         secondaryAction: undefined,
         persistent: false,
-        showCloseButton: true
+        showCloseButton: true,
       });
     });
 
@@ -204,8 +213,8 @@ describe('Alert Utilities', () => {
         expect.objectContaining({
           type: 'success',
           title: 'Success Only',
-          message: undefined
-        })
+          message: undefined,
+        }),
       );
     });
 
@@ -214,7 +223,7 @@ describe('Alert Utilities', () => {
 
       const config = mockHandler.mock.calls[0][0];
       expect(config.primaryAction?.onPress).toEqual(expect.any(Function));
-      
+
       // Test that the empty function doesn't throw
       expect(() => config.primaryAction?.onPress()).not.toThrow();
     });
@@ -228,8 +237,8 @@ describe('Alert Utilities', () => {
         expect.objectContaining({
           type: 'error',
           title: 'Error Title',
-          message: 'Error Message'
-        })
+          message: 'Error Message',
+        }),
       );
     });
 
@@ -257,8 +266,8 @@ describe('Alert Utilities', () => {
         expect.objectContaining({
           type: 'warning',
           title: 'Warning Title',
-          message: 'Warning Message'
-        })
+          message: 'Warning Message',
+        }),
       );
     });
 
@@ -290,28 +299,28 @@ describe('Alert Utilities', () => {
         primaryAction: {
           label: 'Confirm',
           onPress: onConfirm,
-          variant: 'primary'
+          variant: 'primary',
         },
         secondaryAction: {
           label: 'Cancel',
-          onPress: expect.any(Function)
+          onPress: expect.any(Function),
         },
         persistent: true,
-        showCloseButton: true
+        showCloseButton: true,
       });
     });
 
     test('should handle custom labels', () => {
       const onConfirm = jest.fn();
       const onCancel = jest.fn();
-      
+
       showConfirmAlert(
         'Custom Confirm',
         'Message',
         onConfirm,
         onCancel,
         'Yes',
-        'No'
+        'No',
       );
 
       const config = mockHandler.mock.calls[0][0];
@@ -322,7 +331,7 @@ describe('Alert Utilities', () => {
 
     test('should handle destructive confirmation', () => {
       const onConfirm = jest.fn();
-      
+
       showConfirmAlert(
         'Destructive',
         'Message',
@@ -330,7 +339,7 @@ describe('Alert Utilities', () => {
         undefined,
         'Delete',
         'Cancel',
-        true
+        true,
       );
 
       const config = mockHandler.mock.calls[0][0];
@@ -340,7 +349,7 @@ describe('Alert Utilities', () => {
 
     test('should handle non-destructive confirmation', () => {
       const onConfirm = jest.fn();
-      
+
       showConfirmAlert(
         'Non-destructive',
         'Message',
@@ -348,7 +357,7 @@ describe('Alert Utilities', () => {
         undefined,
         'Confirm',
         'Cancel',
-        false
+        false,
       );
 
       const config = mockHandler.mock.calls[0][0];
@@ -362,7 +371,7 @@ describe('Alert Utilities', () => {
 
       const config = mockHandler.mock.calls[0][0];
       expect(config.secondaryAction?.onPress).toEqual(expect.any(Function));
-      
+
       // Test that the empty function doesn't throw
       expect(() => config.secondaryAction?.onPress()).not.toThrow();
     });
@@ -381,7 +390,7 @@ describe('Alert Utilities', () => {
 
       const config = mockHandler.mock.calls[0][0];
       const result = config.primaryAction?.onPress();
-      
+
       expect(result).toBeInstanceOf(Promise);
       await result; // Ensure it resolves without error
       expect(onConfirm).toHaveBeenCalled();
@@ -400,21 +409,21 @@ describe('Alert Utilities', () => {
         primaryAction: {
           label: 'Delete',
           onPress: onDelete,
-          variant: 'destructive'
+          variant: 'destructive',
         },
         secondaryAction: {
           label: 'Cancel',
-          onPress: expect.any(Function)
+          onPress: expect.any(Function),
         },
         persistent: true,
-        showCloseButton: true
+        showCloseButton: true,
       });
     });
 
     test('should handle custom onCancel callback', () => {
       const onDelete = jest.fn();
       const onCancel = jest.fn();
-      
+
       showDeleteConfirmAlert('Delete', 'Message', onDelete, onCancel);
 
       const config = mockHandler.mock.calls[0][0];
@@ -446,7 +455,7 @@ describe('Alert Utilities', () => {
 
       const config = mockHandler.mock.calls[0][0];
       const result = config.primaryAction?.onPress();
-      
+
       expect(result).toBeInstanceOf(Promise);
       await result;
       expect(onDelete).toHaveBeenCalled();
@@ -460,9 +469,18 @@ describe('Alert Utilities', () => {
       showWarningAlert('Warning 1');
 
       expect(mockHandler).toHaveBeenCalledTimes(3);
-      expect(mockHandler).toHaveBeenNthCalledWith(1, expect.objectContaining({ type: 'success' }));
-      expect(mockHandler).toHaveBeenNthCalledWith(2, expect.objectContaining({ type: 'error' }));
-      expect(mockHandler).toHaveBeenNthCalledWith(3, expect.objectContaining({ type: 'warning' }));
+      expect(mockHandler).toHaveBeenNthCalledWith(
+        1,
+        expect.objectContaining({ type: 'success' }),
+      );
+      expect(mockHandler).toHaveBeenNthCalledWith(
+        2,
+        expect.objectContaining({ type: 'error' }),
+      );
+      expect(mockHandler).toHaveBeenNthCalledWith(
+        3,
+        expect.objectContaining({ type: 'warning' }),
+      );
     });
 
     test('should handle handler changes', () => {
@@ -486,8 +504,8 @@ describe('Alert Utilities', () => {
       expect(mockHandler).toHaveBeenCalledWith(
         expect.objectContaining({
           title: '',
-          message: ''
-        })
+          message: '',
+        }),
       );
     });
 
@@ -507,25 +525,25 @@ describe('Alert Utilities', () => {
       const onSuccess = jest.fn();
       const onError = jest.fn();
       const onConfirm = jest.fn();
-      
+
       // Show confirmation
       showConfirmAlert('Proceed?', 'This will delete data', onConfirm);
       expect(mockHandler).toHaveBeenLastCalledWith(
-        expect.objectContaining({ type: 'info', persistent: true })
+        expect.objectContaining({ type: 'info', persistent: true }),
       );
-      
+
       // Show success after confirmation
       showSuccessAlert('Done!', 'Data deleted', onSuccess);
       expect(mockHandler).toHaveBeenLastCalledWith(
-        expect.objectContaining({ type: 'success' })
+        expect.objectContaining({ type: 'success' }),
       );
-      
+
       // Show error if something goes wrong
       showErrorAlert('Failed!', 'Could not delete', onError);
       expect(mockHandler).toHaveBeenLastCalledWith(
-        expect.objectContaining({ type: 'error' })
+        expect.objectContaining({ type: 'error' }),
       );
-      
+
       expect(mockHandler).toHaveBeenCalledTimes(3);
     });
   });

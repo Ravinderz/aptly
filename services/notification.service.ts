@@ -5,7 +5,14 @@ export interface Notification {
   id: string;
   title: string;
   body: string;
-  type: 'bill' | 'maintenance' | 'community' | 'governance' | 'security' | 'announcement' | 'reminder';
+  type:
+    | 'bill'
+    | 'maintenance'
+    | 'community'
+    | 'governance'
+    | 'security'
+    | 'announcement'
+    | 'reminder';
   category: 'info' | 'warning' | 'success' | 'error' | 'urgent';
   isRead: boolean;
   data?: any; // Additional data for navigation or actions
@@ -79,13 +86,13 @@ let MOCK_NOTIFICATIONS: Notification[] = [
     type: 'bill',
     category: 'warning',
     isRead: false,
-    data: { billId: 'bill1', amount: 2450.50 },
+    data: { billId: 'bill1', amount: 2450.5 },
     actionUrl: '/services/billing/bill1',
     priority: 'high',
     createdAt: new Date(Date.now() - 2 * 60 * 60 * 1000), // 2 hours ago
     userId: 'user1',
     senderId: 'system',
-    senderName: 'Aptly System'
+    senderName: 'Aptly System',
   },
   {
     id: 'notif2',
@@ -100,7 +107,7 @@ let MOCK_NOTIFICATIONS: Notification[] = [
     createdAt: new Date(Date.now() - 4 * 60 * 60 * 1000), // 4 hours ago
     userId: 'user1',
     senderId: 'user4',
-    senderName: 'Neha Gupta'
+    senderName: 'Neha Gupta',
   },
   {
     id: 'notif3',
@@ -116,12 +123,12 @@ let MOCK_NOTIFICATIONS: Notification[] = [
     createdAt: new Date(Date.now() - 6 * 60 * 60 * 1000), // 6 hours ago
     userId: 'user1',
     senderId: 'user5',
-    senderName: 'Society Admin'
+    senderName: 'Society Admin',
   },
   {
     id: 'notif4',
     title: 'Voting Reminder',
-    body: 'Don\'t forget to vote on the Solar Panel installation proposal. Voting ends in 3 days.',
+    body: "Don't forget to vote on the Solar Panel installation proposal. Voting ends in 3 days.",
     type: 'governance',
     category: 'info',
     isRead: false,
@@ -131,7 +138,7 @@ let MOCK_NOTIFICATIONS: Notification[] = [
     createdAt: new Date(Date.now() - 12 * 60 * 60 * 1000), // 12 hours ago
     userId: 'user1',
     senderId: 'system',
-    senderName: 'Governance System'
+    senderName: 'Governance System',
   },
   {
     id: 'notif5',
@@ -147,8 +154,8 @@ let MOCK_NOTIFICATIONS: Notification[] = [
     createdAt: new Date(Date.now() - 24 * 60 * 60 * 1000), // 1 day ago
     userId: 'user1',
     senderId: 'system',
-    senderName: 'Maintenance Team'
-  }
+    senderName: 'Maintenance Team',
+  },
 ];
 
 const DEFAULT_PREFERENCES: NotificationPreferences = {
@@ -161,28 +168,28 @@ const DEFAULT_PREFERENCES: NotificationPreferences = {
     governance: true,
     security: true,
     announcements: true,
-    reminders: true
+    reminders: true,
   },
   channels: {
     push: true,
     email: true,
     sms: false,
-    inApp: true
+    inApp: true,
   },
   quietHours: {
     enabled: true,
     startTime: '22:00',
-    endTime: '07:00'
+    endTime: '07:00',
   },
   frequency: {
     immediate: true,
     digest: false,
-    digestTime: '08:00'
+    digestTime: '08:00',
   },
-  updatedAt: new Date()
+  updatedAt: new Date(),
 };
 
-const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 export class NotificationService {
   private static instance: NotificationService;
@@ -202,45 +209,51 @@ export class NotificationService {
 
   // Get all notifications for user
   async getNotifications(
-    userId: string, 
-    filters?: { 
-      type?: string; 
-      category?: string; 
-      isRead?: boolean; 
+    userId: string,
+    filters?: {
+      type?: string;
+      category?: string;
+      isRead?: boolean;
       limit?: number;
       offset?: number;
-    }
+    },
   ): Promise<Notification[]> {
     await delay(400);
-    
+
     try {
-      let notifications = MOCK_NOTIFICATIONS.filter(n => n.userId === userId);
-      
+      let notifications = MOCK_NOTIFICATIONS.filter((n) => n.userId === userId);
+
       // Apply filters
       if (filters?.type) {
-        notifications = notifications.filter(n => n.type === filters.type);
+        notifications = notifications.filter((n) => n.type === filters.type);
       }
-      
+
       if (filters?.category) {
-        notifications = notifications.filter(n => n.category === filters.category);
+        notifications = notifications.filter(
+          (n) => n.category === filters.category,
+        );
       }
-      
+
       if (filters?.isRead !== undefined) {
-        notifications = notifications.filter(n => n.isRead === filters.isRead);
+        notifications = notifications.filter(
+          (n) => n.isRead === filters.isRead,
+        );
       }
-      
+
       // Sort by creation date (newest first)
-      notifications.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
-      
+      notifications.sort(
+        (a, b) => b.createdAt.getTime() - a.createdAt.getTime(),
+      );
+
       // Apply pagination
       if (filters?.offset !== undefined) {
         notifications = notifications.slice(filters.offset);
       }
-      
+
       if (filters?.limit !== undefined) {
         notifications = notifications.slice(0, filters.limit);
       }
-      
+
       return notifications;
     } catch (error) {
       throw new Error('Failed to fetch notifications');
@@ -250,9 +263,11 @@ export class NotificationService {
   // Mark notification as read
   async markAsRead(notificationId: string): Promise<boolean> {
     await delay(200);
-    
+
     try {
-      const notification = MOCK_NOTIFICATIONS.find(n => n.id === notificationId);
+      const notification = MOCK_NOTIFICATIONS.find(
+        (n) => n.id === notificationId,
+      );
       if (notification) {
         notification.isRead = true;
         notification.readAt = new Date();
@@ -267,11 +282,11 @@ export class NotificationService {
   // Mark multiple notifications as read
   async markMultipleAsRead(notificationIds: string[]): Promise<number> {
     await delay(300);
-    
+
     try {
       let updatedCount = 0;
-      notificationIds.forEach(id => {
-        const notification = MOCK_NOTIFICATIONS.find(n => n.id === id);
+      notificationIds.forEach((id) => {
+        const notification = MOCK_NOTIFICATIONS.find((n) => n.id === id);
         if (notification && !notification.isRead) {
           notification.isRead = true;
           notification.readAt = new Date();
@@ -287,10 +302,10 @@ export class NotificationService {
   // Mark all notifications as read for user
   async markAllAsRead(userId: string): Promise<number> {
     await delay(500);
-    
+
     try {
       let updatedCount = 0;
-      MOCK_NOTIFICATIONS.forEach(notification => {
+      MOCK_NOTIFICATIONS.forEach((notification) => {
         if (notification.userId === userId && !notification.isRead) {
           notification.isRead = true;
           notification.readAt = new Date();
@@ -306,9 +321,11 @@ export class NotificationService {
   // Delete notification
   async deleteNotification(notificationId: string): Promise<boolean> {
     await delay(250);
-    
+
     try {
-      const index = MOCK_NOTIFICATIONS.findIndex(n => n.id === notificationId);
+      const index = MOCK_NOTIFICATIONS.findIndex(
+        (n) => n.id === notificationId,
+      );
       if (index !== -1) {
         MOCK_NOTIFICATIONS.splice(index, 1);
         return true;
@@ -322,44 +339,46 @@ export class NotificationService {
   // Get notification statistics
   async getNotificationStats(userId: string): Promise<NotificationStats> {
     await delay(300);
-    
+
     try {
-      const userNotifications = MOCK_NOTIFICATIONS.filter(n => n.userId === userId);
-      const unread = userNotifications.filter(n => !n.isRead);
-      
+      const userNotifications = MOCK_NOTIFICATIONS.filter(
+        (n) => n.userId === userId,
+      );
+      const unread = userNotifications.filter((n) => !n.isRead);
+
       // Count by type
       const byType: Record<string, number> = {};
-      userNotifications.forEach(n => {
+      userNotifications.forEach((n) => {
         byType[n.type] = (byType[n.type] || 0) + 1;
       });
-      
+
       // Count by category
       const byCategory: Record<string, number> = {};
-      userNotifications.forEach(n => {
+      userNotifications.forEach((n) => {
         byCategory[n.category] = (byCategory[n.category] || 0) + 1;
       });
-      
+
       // Last 7 days data
       const last7Days: { date: string; count: number }[] = [];
       for (let i = 6; i >= 0; i--) {
         const date = new Date();
         date.setDate(date.getDate() - i);
         const dateStr = date.toISOString().split('T')[0];
-        
-        const count = userNotifications.filter(n => {
+
+        const count = userNotifications.filter((n) => {
           const nDate = n.createdAt.toISOString().split('T')[0];
           return nDate === dateStr;
         }).length;
-        
+
         last7Days.push({ date: dateStr, count });
       }
-      
+
       return {
         total: userNotifications.length,
         unread: unread.length,
         byType,
         byCategory,
-        last7Days
+        last7Days,
       };
     } catch (error) {
       throw new Error('Failed to fetch notification statistics');
@@ -367,28 +386,32 @@ export class NotificationService {
   }
 
   // Send notification (for admin/system use)
-  async sendNotification(notificationData: Omit<Notification, 'id' | 'createdAt' | 'isRead'>): Promise<Notification> {
+  async sendNotification(
+    notificationData: Omit<Notification, 'id' | 'createdAt' | 'isRead'>,
+  ): Promise<Notification> {
     await delay(600);
-    
+
     try {
       const newNotification: Notification = {
         ...notificationData,
         id: `notif_${Date.now()}`,
         createdAt: new Date(),
-        isRead: false
+        isRead: false,
       };
-      
+
       // Check user preferences
-      const preferences = await this.getUserPreferences(notificationData.userId);
+      const preferences = await this.getUserPreferences(
+        notificationData.userId,
+      );
       if (!this.shouldSendNotification(newNotification, preferences)) {
         throw new Error('Notification blocked by user preferences');
       }
-      
+
       MOCK_NOTIFICATIONS.unshift(newNotification);
-      
+
       // In production, this would trigger push notification, email, etc.
       this.triggerPushNotification(newNotification);
-      
+
       return newNotification;
     } catch (error) {
       throw new Error('Failed to send notification');
@@ -400,17 +423,19 @@ export class NotificationService {
     if (this.preferences && this.preferences.userId === userId) {
       return this.preferences;
     }
-    
+
     await delay(200);
-    
+
     try {
       // In production, fetch from API or local storage
-      const stored = await AsyncStorage.getItem(`notification_preferences_${userId}`);
+      const stored = await AsyncStorage.getItem(
+        `notification_preferences_${userId}`,
+      );
       if (stored) {
         this.preferences = JSON.parse(stored);
         return this.preferences!;
       }
-      
+
       // Return default preferences
       this.preferences = { ...DEFAULT_PREFERENCES, userId };
       return this.preferences;
@@ -420,29 +445,32 @@ export class NotificationService {
   }
 
   // Update user notification preferences
-  async updateUserPreferences(userId: string, preferences: Partial<NotificationPreferences>): Promise<NotificationPreferences> {
+  async updateUserPreferences(
+    userId: string,
+    preferences: Partial<NotificationPreferences>,
+  ): Promise<NotificationPreferences> {
     await delay(400);
-    
+
     try {
       const currentPreferences = await this.getUserPreferences(userId);
       const updatedPreferences = {
         ...currentPreferences,
         ...preferences,
         userId,
-        updatedAt: new Date()
+        updatedAt: new Date(),
       };
-      
+
       // Store locally
       await AsyncStorage.setItem(
-        `notification_preferences_${userId}`, 
-        JSON.stringify(updatedPreferences)
+        `notification_preferences_${userId}`,
+        JSON.stringify(updatedPreferences),
       );
-      
+
       this.preferences = updatedPreferences;
-      
+
       // In production, sync with backend
       // await this.apiService.updateNotificationPreferences(updatedPreferences);
-      
+
       return updatedPreferences;
     } catch (error) {
       throw new Error('Failed to update notification preferences');
@@ -450,18 +478,23 @@ export class NotificationService {
   }
 
   // Register push token
-  async registerPushToken(tokenInfo: Omit<PushTokenInfo, 'lastUpdated'>): Promise<boolean> {
+  async registerPushToken(
+    tokenInfo: Omit<PushTokenInfo, 'lastUpdated'>,
+  ): Promise<boolean> {
     await delay(300);
-    
+
     try {
       // In production, this would register the token with the backend
       const tokenData = {
         ...tokenInfo,
-        lastUpdated: new Date()
+        lastUpdated: new Date(),
       };
-      
-      await AsyncStorage.setItem(`push_token_${tokenInfo.userId}`, JSON.stringify(tokenData));
-      
+
+      await AsyncStorage.setItem(
+        `push_token_${tokenInfo.userId}`,
+        JSON.stringify(tokenData),
+      );
+
       return true;
     } catch (error) {
       throw new Error('Failed to register push token');
@@ -471,21 +504,21 @@ export class NotificationService {
   // Schedule notification
   async scheduleNotification(
     notificationData: Omit<Notification, 'id' | 'createdAt' | 'isRead'>,
-    scheduleTime: Date
+    scheduleTime: Date,
   ): Promise<string> {
     await delay(300);
-    
+
     try {
       const scheduledNotification: Notification = {
         ...notificationData,
         id: `scheduled_${Date.now()}`,
         createdAt: new Date(),
         isRead: false,
-        scheduledFor: scheduleTime
+        scheduledFor: scheduleTime,
       };
-      
+
       // In production, this would use a job queue or scheduling service
-      
+
       return scheduledNotification.id;
     } catch (error) {
       throw new Error('Failed to schedule notification');
@@ -494,52 +527,64 @@ export class NotificationService {
 
   // Test notification (for debugging)
   async testNotification(userId: string): Promise<Notification> {
-    const testNotification: Omit<Notification, 'id' | 'createdAt' | 'isRead'> = {
-      title: 'Test Notification',
-      body: 'This is a test notification from the Aptly app.',
-      type: 'announcement',
-      category: 'info',
-      priority: 'normal',
-      userId,
-      senderId: 'system',
-      senderName: 'Test System'
-    };
-    
+    const testNotification: Omit<Notification, 'id' | 'createdAt' | 'isRead'> =
+      {
+        title: 'Test Notification',
+        body: 'This is a test notification from the Aptly app.',
+        type: 'announcement',
+        category: 'info',
+        priority: 'normal',
+        userId,
+        senderId: 'system',
+        senderName: 'Test System',
+      };
+
     return this.sendNotification(testNotification);
   }
 
   // Private helper methods
-  private shouldSendNotification(notification: Notification, preferences: NotificationPreferences): boolean {
+  private shouldSendNotification(
+    notification: Notification,
+    preferences: NotificationPreferences,
+  ): boolean {
     if (!preferences.enabled) return false;
-    
+
     // Check category preferences
-    const categoryKey = notification.type as keyof typeof preferences.categories;
+    const categoryKey =
+      notification.type as keyof typeof preferences.categories;
     if (!preferences.categories[categoryKey]) return false;
-    
+
     // Check quiet hours
     if (preferences.quietHours.enabled) {
       const now = new Date();
       const currentTime = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
-      
-      if (currentTime >= preferences.quietHours.startTime && currentTime <= preferences.quietHours.endTime) {
+
+      if (
+        currentTime >= preferences.quietHours.startTime &&
+        currentTime <= preferences.quietHours.endTime
+      ) {
         // Only send urgent notifications during quiet hours
-        return notification.priority === 'high' && notification.category === 'urgent';
+        return (
+          notification.priority === 'high' && notification.category === 'urgent'
+        );
       }
     }
-    
+
     return true;
   }
 
-  private async triggerPushNotification(notification: Notification): Promise<void> {
-    // In production, this would integrate with Firebase Cloud Messaging, 
+  private async triggerPushNotification(
+    notification: Notification,
+  ): Promise<void> {
+    // In production, this would integrate with Firebase Cloud Messaging,
     // Apple Push Notification Service, etc.
-    
+
     // TODO: Implement actual push notification service
     if (__DEV__) {
       console.log('Push notification triggered:', {
         title: notification.title,
         body: notification.body,
-        data: notification.data
+        data: notification.data,
       });
     }
   }
@@ -547,12 +592,12 @@ export class NotificationService {
   // Get unread count for badges
   async getUnreadCount(userId: string): Promise<number> {
     await delay(100);
-    
+
     try {
-      const unreadCount = MOCK_NOTIFICATIONS.filter(n => 
-        n.userId === userId && !n.isRead
+      const unreadCount = MOCK_NOTIFICATIONS.filter(
+        (n) => n.userId === userId && !n.isRead,
       ).length;
-      
+
       return unreadCount;
     } catch (error) {
       throw new Error('Failed to get unread count');
@@ -562,12 +607,14 @@ export class NotificationService {
   // Clear all notifications for user
   async clearAllNotifications(userId: string): Promise<number> {
     await delay(400);
-    
+
     try {
       const initialLength = MOCK_NOTIFICATIONS.length;
-      MOCK_NOTIFICATIONS = MOCK_NOTIFICATIONS.filter(n => n.userId !== userId);
+      MOCK_NOTIFICATIONS = MOCK_NOTIFICATIONS.filter(
+        (n) => n.userId !== userId,
+      );
       const deletedCount = initialLength - MOCK_NOTIFICATIONS.length;
-      
+
       return deletedCount;
     } catch (error) {
       throw new Error('Failed to clear notifications');

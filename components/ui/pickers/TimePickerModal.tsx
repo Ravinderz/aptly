@@ -1,7 +1,7 @@
-import { TimePickerModalProps, TimePreset } from "@/types/pickers";
-import { formatTimeToDisplay, parseTime } from "@/utils/dateUtils";
-import { Moon, Sun, Sunset, X } from "lucide-react-native";
-import React, { useEffect, useRef, useState } from "react";
+import { TimePickerModalProps, TimePreset } from '@/types/pickers';
+import { formatTimeToDisplay, parseTime } from '@/utils/dateUtils';
+import { Moon, Sun, Sunset, X } from 'lucide-react-native';
+import React, { useEffect, useRef, useState } from 'react';
 import {
   Animated,
   Dimensions,
@@ -10,9 +10,9 @@ import {
   Text,
   TouchableOpacity,
   View,
-} from "react-native";
+} from 'react-native';
 
-const { height: SCREEN_HEIGHT } = Dimensions.get("window");
+const { height: SCREEN_HEIGHT } = Dimensions.get('window');
 
 export default function TimePickerModal({
   visible,
@@ -22,15 +22,15 @@ export default function TimePickerModal({
   minTime,
   maxTime,
   timeInterval = 15,
-  format = "12",
+  format = '12',
   restrictedHours,
   showPresets = true,
-  title = "Select Time",
+  title = 'Select Time',
 }: TimePickerModalProps) {
-  const [currentTime, setCurrentTime] = useState(selectedTime || "09:00 AM");
+  const [currentTime, setCurrentTime] = useState(selectedTime || '09:00 AM');
   const [selectedHour, setSelectedHour] = useState(9);
   const [selectedMinute, setSelectedMinute] = useState(0);
-  const [selectedPeriod, setSelectedPeriod] = useState<"AM" | "PM">("AM");
+  const [selectedPeriod, setSelectedPeriod] = useState<'AM' | 'PM'>('AM');
 
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const slideAnim = useRef(new Animated.Value(SCREEN_HEIGHT)).current;
@@ -38,19 +38,19 @@ export default function TimePickerModal({
   // Default presets
   const defaultPresets: TimePreset[] = [
     {
-      label: "Morning",
-      value: "09:00 AM",
-      period: "morning",
+      label: 'Morning',
+      value: '09:00 AM',
+      period: 'morning',
     },
     {
-      label: "Afternoon",
-      value: "02:00 PM",
-      period: "afternoon",
+      label: 'Afternoon',
+      value: '02:00 PM',
+      period: 'afternoon',
     },
     {
-      label: "Evening",
-      value: "06:00 PM",
-      period: "evening",
+      label: 'Evening',
+      value: '06:00 PM',
+      period: 'evening',
     },
   ];
 
@@ -99,7 +99,7 @@ export default function TimePickerModal({
     const formattedTime = formatTimeToDisplay(
       selectedHour,
       selectedMinute,
-      selectedPeriod
+      selectedPeriod,
     );
     setCurrentTime(formattedTime);
   }, [selectedHour, selectedMinute, selectedPeriod]);
@@ -122,16 +122,16 @@ export default function TimePickerModal({
   // Generate minute options based on interval
   const minuteOptions = Array.from(
     { length: Math.floor(60 / timeInterval) },
-    (_, i) => i * timeInterval
+    (_, i) => i * timeInterval,
   );
 
   const getPresetIcon = (period: string) => {
     switch (period) {
-      case "morning":
+      case 'morning':
         return <Sun size={16} className="text-warning" />;
-      case "afternoon":
+      case 'afternoon':
         return <Sunset size={16} className="text-secondary" />;
-      case "evening":
+      case 'evening':
         return <Moon size={16} className="text-primary" />;
       default:
         return null;
@@ -143,12 +143,10 @@ export default function TimePickerModal({
       visible={visible}
       transparent={true}
       animationType="none"
-      onRequestClose={onClose}
-    >
+      onRequestClose={onClose}>
       <Animated.View
         style={{ opacity: fadeAnim }}
-        className="flex-1 bg-black/50 justify-end"
-      >
+        className="flex-1 bg-black/50 justify-end">
         <TouchableOpacity
           className="flex-1"
           activeOpacity={1}
@@ -159,8 +157,7 @@ export default function TimePickerModal({
           style={{
             transform: [{ translateY: slideAnim }],
           }}
-          className="bg-surface rounded-t-3xl shadow-xl shadow-black/10"
-        >
+          className="bg-surface rounded-t-3xl shadow-xl shadow-black/10">
           {/* Header */}
           <View className="flex-row items-center justify-between p-6 border-b border-divider">
             <Text className="text-headline-large font-semibold text-text-primary">
@@ -168,16 +165,14 @@ export default function TimePickerModal({
             </Text>
             <TouchableOpacity
               onPress={onClose}
-              className="w-10 h-10 rounded-full bg-background items-center justify-center"
-            >
+              className="w-10 h-10 rounded-full bg-background items-center justify-center">
               <X size={20} className="text-text-primary" />
             </TouchableOpacity>
           </View>
 
           <ScrollView
             className="max-h-128"
-            showsVerticalScrollIndicator={false}
-          >
+            showsVerticalScrollIndicator={false}>
             {/* Quick Presets */}
             {showPresets && (
               <View className="p-6 border-b border-divider">
@@ -191,18 +186,16 @@ export default function TimePickerModal({
                       onPress={() => handlePresetSelect(preset)}
                       className={`flex-row items-center px-4 py-2 rounded-xl border ${
                         currentTime === preset.value
-                          ? "bg-primary border-primary"
-                          : "bg-background border-divider"
-                      }`}
-                    >
+                          ? 'bg-primary border-primary'
+                          : 'bg-background border-divider'
+                      }`}>
                       {getPresetIcon(preset.period)}
                       <Text
                         className={`ml-2 text-label-large font-medium ${
                           currentTime === preset.value
-                            ? "text-white"
-                            : "text-text-primary"
-                        }`}
-                      >
+                            ? 'text-white'
+                            : 'text-text-primary'
+                        }`}>
                         {preset.label}
                       </Text>
                     </TouchableOpacity>
@@ -235,24 +228,21 @@ export default function TimePickerModal({
                   </Text>
                   <ScrollView
                     className="max-h-32 w-16"
-                    showsVerticalScrollIndicator={false}
-                  >
+                    showsVerticalScrollIndicator={false}>
                     {hourOptions.map((hour) => (
                       <TouchableOpacity
                         key={hour}
                         onPress={() => setSelectedHour(hour)}
                         className={`py-2 px-3 my-1 rounded-lg items-center ${
-                          selectedHour === hour ? "bg-primary" : "bg-background"
-                        }`}
-                      >
+                          selectedHour === hour ? 'bg-primary' : 'bg-background'
+                        }`}>
                         <Text
                           className={`text-body-large font-medium ${
                             selectedHour === hour
-                              ? "text-white"
-                              : "text-text-primary"
-                          }`}
-                        >
-                          {hour.toString().padStart(2, "0")}
+                              ? 'text-white'
+                              : 'text-text-primary'
+                          }`}>
+                          {hour.toString().padStart(2, '0')}
                         </Text>
                       </TouchableOpacity>
                     ))}
@@ -271,26 +261,23 @@ export default function TimePickerModal({
                   </Text>
                   <ScrollView
                     className="max-h-32 w-16"
-                    showsVerticalScrollIndicator={false}
-                  >
+                    showsVerticalScrollIndicator={false}>
                     {minuteOptions.map((minute) => (
                       <TouchableOpacity
                         key={minute}
                         onPress={() => setSelectedMinute(minute)}
                         className={`py-2 px-3 my-1 rounded-lg items-center ${
                           selectedMinute === minute
-                            ? "bg-primary"
-                            : "bg-background"
-                        }`}
-                      >
+                            ? 'bg-primary'
+                            : 'bg-background'
+                        }`}>
                         <Text
                           className={`text-body-large font-medium ${
                             selectedMinute === minute
-                              ? "text-white"
-                              : "text-text-primary"
-                          }`}
-                        >
-                          {minute.toString().padStart(2, "0")}
+                              ? 'text-white'
+                              : 'text-text-primary'
+                          }`}>
+                          {minute.toString().padStart(2, '0')}
                         </Text>
                       </TouchableOpacity>
                     ))}
@@ -298,29 +285,27 @@ export default function TimePickerModal({
                 </View>
 
                 {/* Period Picker (AM/PM) */}
-                {format === "12" && (
+                {format === '12' && (
                   <View className="items-center">
                     <Text className="text-label-medium font-medium text-text-secondary mb-2">
                       Period
                     </Text>
                     <View className="gap-2">
-                      {(["AM", "PM"] as const).map((period) => (
+                      {(['AM', 'PM'] as const).map((period) => (
                         <TouchableOpacity
                           key={period}
                           onPress={() => setSelectedPeriod(period)}
                           className={`py-2 px-3 rounded-lg items-center ${
                             selectedPeriod === period
-                              ? "bg-primary"
-                              : "bg-background"
-                          }`}
-                        >
+                              ? 'bg-primary'
+                              : 'bg-background'
+                          }`}>
                           <Text
                             className={`text-body-large font-medium ${
                               selectedPeriod === period
-                                ? "text-white"
-                                : "text-text-primary"
-                            }`}
-                          >
+                                ? 'text-white'
+                                : 'text-text-primary'
+                            }`}>
                             {period}
                           </Text>
                         </TouchableOpacity>
@@ -336,15 +321,13 @@ export default function TimePickerModal({
           <View className="flex-row gap-3 p-6 pt-4 border-t border-divider">
             <TouchableOpacity
               onPress={onClose}
-              className="flex-1 py-3 rounded-xl border border-divider items-center"
-            >
+              className="flex-1 py-3 rounded-xl border border-divider items-center">
               <Text className="text-text-primary font-medium">Cancel</Text>
             </TouchableOpacity>
 
             <TouchableOpacity
               onPress={handleConfirm}
-              className="flex-1 py-3 rounded-xl bg-primary items-center"
-            >
+              className="flex-1 py-3 rounded-xl bg-primary items-center">
               <Text className="text-white font-medium">Confirm</Text>
             </TouchableOpacity>
           </View>

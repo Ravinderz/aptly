@@ -1,16 +1,22 @@
 import React from 'react';
-import { View, Text, ScrollView, TouchableOpacity, Dimensions } from 'react-native';
-import { 
-  Users, 
-  DollarSign, 
-  Shield, 
-  Wrench, 
-  Bell, 
+import {
+  View,
+  Text,
+  ScrollView,
+  TouchableOpacity,
+  Dimensions,
+} from 'react-native';
+import {
+  Users,
+  DollarSign,
+  Shield,
+  Wrench,
+  Bell,
   AlertTriangle,
   TrendingUp,
   Clock,
   CheckCircle,
-  XCircle
+  XCircle,
 } from 'lucide-react-native';
 import { useAdmin } from '@/contexts/AdminContext';
 import { adminTheme, adminStyles } from '@/utils/adminTheme';
@@ -44,12 +50,7 @@ interface QuickAction {
 }
 
 export const AdminDashboard: React.FC = () => {
-  const { 
-    adminUser, 
-    activeSociety, 
-    checkPermission,
-    currentMode 
-  } = useAdmin();
+  const { adminUser, activeSociety, checkPermission, currentMode } = useAdmin();
 
   // Mock dashboard stats - replace with actual API call
   const stats: DashboardStats = {
@@ -62,12 +63,12 @@ export const AdminDashboard: React.FC = () => {
     maintenanceRequests: {
       pending: 8,
       completed: 23,
-      overdue: 3
+      overdue: 3,
     },
     visitorApprovals: {
       pending: 15,
-      today: 42
-    }
+      today: 42,
+    },
   };
 
   const getQuickActions = (): QuickAction[] => {
@@ -80,11 +81,14 @@ export const AdminDashboard: React.FC = () => {
       icon: <Bell size={20} color={adminTheme.textOnPrimary} />,
       onPress: () => console.log('Navigate to send notice'),
       color: adminTheme.primary,
-      permission: 'communication'
+      permission: 'communication',
     });
 
     // Role-specific actions
-    if (adminUser?.role === 'community_manager' || adminUser?.role === 'super_admin') {
+    if (
+      adminUser?.role === 'community_manager' ||
+      adminUser?.role === 'super_admin'
+    ) {
       baseActions.push(
         {
           id: 'residents',
@@ -92,7 +96,7 @@ export const AdminDashboard: React.FC = () => {
           icon: <Users size={20} color={adminTheme.textOnPrimary} />,
           onPress: () => console.log('Navigate to resident management'),
           color: adminTheme.primary,
-          permission: 'residents'
+          permission: 'residents',
         },
         {
           id: 'emergency',
@@ -100,47 +104,60 @@ export const AdminDashboard: React.FC = () => {
           icon: <AlertTriangle size={20} color={adminTheme.textOnPrimary} />,
           onPress: () => console.log('Declare emergency'),
           color: adminTheme.error,
-          permission: 'emergency'
-        }
+          permission: 'emergency',
+        },
       );
     }
 
-    if (adminUser?.role === 'financial_manager' || adminUser?.role === 'community_manager' || adminUser?.role === 'super_admin') {
+    if (
+      adminUser?.role === 'financial_manager' ||
+      adminUser?.role === 'community_manager' ||
+      adminUser?.role === 'super_admin'
+    ) {
       baseActions.push({
         id: 'billing',
         title: 'Generate Bills',
         icon: <DollarSign size={20} color={adminTheme.textOnPrimary} />,
         onPress: () => console.log('Navigate to billing'),
         color: adminTheme.secondary,
-        permission: 'billing'
+        permission: 'billing',
       });
     }
 
-    if (adminUser?.role === 'security_admin' || adminUser?.role === 'community_manager' || adminUser?.role === 'super_admin') {
+    if (
+      adminUser?.role === 'security_admin' ||
+      adminUser?.role === 'community_manager' ||
+      adminUser?.role === 'super_admin'
+    ) {
       baseActions.push({
         id: 'visitors',
         title: 'Visitor Approvals',
         icon: <Shield size={20} color={adminTheme.textOnPrimary} />,
         onPress: () => console.log('Navigate to visitor approvals'),
         color: adminTheme.info,
-        permission: 'visitors'
+        permission: 'visitors',
       });
     }
 
-    if (adminUser?.role === 'maintenance_admin' || adminUser?.role === 'community_manager' || adminUser?.role === 'super_admin') {
+    if (
+      adminUser?.role === 'maintenance_admin' ||
+      adminUser?.role === 'community_manager' ||
+      adminUser?.role === 'super_admin'
+    ) {
       baseActions.push({
         id: 'maintenance',
         title: 'Maintenance',
         icon: <Wrench size={20} color={adminTheme.textOnPrimary} />,
         onPress: () => console.log('Navigate to maintenance'),
         color: adminTheme.warning,
-        permission: 'maintenance'
+        permission: 'maintenance',
       });
     }
 
     // Filter actions based on permissions
-    return baseActions.filter(action => 
-      !action.permission || checkPermission(action.permission, 'read')
+    return baseActions.filter(
+      (action) =>
+        !action.permission || checkPermission(action.permission, 'read'),
     );
   };
 
@@ -148,9 +165,9 @@ export const AdminDashboard: React.FC = () => {
     const roleNames = {
       super_admin: 'Super Administrator',
       community_manager: 'Community Manager',
-      financial_manager: 'Financial Manager', 
+      financial_manager: 'Financial Manager',
       security_admin: 'Security Administrator',
-      maintenance_admin: 'Maintenance Administrator'
+      maintenance_admin: 'Maintenance Administrator',
     };
     return roleNames[role] || role;
   };
@@ -162,30 +179,45 @@ export const AdminDashboard: React.FC = () => {
   return (
     <ScrollView style={adminStyles.container}>
       {/* Header Section */}
-      <View style={[adminStyles.adminCard, { marginTop: 8, marginHorizontal: 16 }]}>
-        <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+      <View
+        style={[adminStyles.adminCard, { marginTop: 8, marginHorizontal: 16 }]}>
+        <View
+          style={{
+            flexDirection: 'row',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+          }}>
           <View>
             <Text style={[adminStyles.adminHeading, { fontSize: 20 }]}>
               Welcome back, {adminUser?.name}
             </Text>
-            <Text style={[adminStyles.adminCaption, { color: adminTheme.secondary }]}>
+            <Text
+              style={[
+                adminStyles.adminCaption,
+                { color: adminTheme.secondary },
+              ]}>
               {getRoleDisplayName(adminUser?.role || 'community_manager')}
             </Text>
             <Text style={[adminStyles.adminCaption, { marginTop: 2 }]}>
               Managing {activeSociety?.name}
             </Text>
           </View>
-          <View style={{
-            backgroundColor: adminTheme.secondary,
-            paddingHorizontal: 12,
-            paddingVertical: 6,
-            borderRadius: 16,
-            alignItems: 'center'
-          }}>
-            <Text style={[adminStyles.adminCaption, { 
-              color: adminTheme.textOnSecondary,
-              fontWeight: '700'
-            }]}>
+          <View
+            style={{
+              backgroundColor: adminTheme.secondary,
+              paddingHorizontal: 12,
+              paddingVertical: 6,
+              borderRadius: 16,
+              alignItems: 'center',
+            }}>
+            <Text
+              style={[
+                adminStyles.adminCaption,
+                {
+                  color: adminTheme.textOnSecondary,
+                  fontWeight: '700',
+                },
+              ]}>
               ADMIN MODE
             </Text>
           </View>
@@ -205,10 +237,12 @@ export const AdminDashboard: React.FC = () => {
                 <Text style={[adminStyles.adminHeading, { fontSize: 20 }]}>
                   {stats.activeResidents}
                 </Text>
-                <Text style={adminStyles.adminCaption}>
-                  Active Residents
-                </Text>
-                <Text style={[adminStyles.adminCaption, { color: adminTheme.textTertiary }]}>
+                <Text style={adminStyles.adminCaption}>Active Residents</Text>
+                <Text
+                  style={[
+                    adminStyles.adminCaption,
+                    { color: adminTheme.textTertiary },
+                  ]}>
                   of {stats.totalResidents} total
                 </Text>
               </View>
@@ -222,10 +256,12 @@ export const AdminDashboard: React.FC = () => {
                 <Text style={[adminStyles.adminHeading, { fontSize: 20 }]}>
                   {stats.collectionRate}%
                 </Text>
-                <Text style={adminStyles.adminCaption}>
-                  Collection Rate
-                </Text>
-                <Text style={[adminStyles.adminCaption, { color: adminTheme.textTertiary }]}>
+                <Text style={adminStyles.adminCaption}>Collection Rate</Text>
+                <Text
+                  style={[
+                    adminStyles.adminCaption,
+                    { color: adminTheme.textTertiary },
+                  ]}>
                   ₹{(stats.monthlyCollection / 1000).toFixed(0)}k this month
                 </Text>
               </View>
@@ -239,10 +275,12 @@ export const AdminDashboard: React.FC = () => {
                 <Text style={[adminStyles.adminHeading, { fontSize: 20 }]}>
                   {stats.pendingRequests}
                 </Text>
-                <Text style={adminStyles.adminCaption}>
-                  Pending Tasks
-                </Text>
-                <Text style={[adminStyles.adminCaption, { color: adminTheme.textTertiary }]}>
+                <Text style={adminStyles.adminCaption}>Pending Tasks</Text>
+                <Text
+                  style={[
+                    adminStyles.adminCaption,
+                    { color: adminTheme.textTertiary },
+                  ]}>
                   Requires attention
                 </Text>
               </View>
@@ -251,20 +289,29 @@ export const AdminDashboard: React.FC = () => {
 
           <View style={[adminStyles.adminCard, { flex: 1, minWidth: '47%' }]}>
             <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-              <AlertTriangle 
-                size={24} 
-                color={stats.emergencyAlerts > 0 ? adminTheme.error : adminTheme.success} 
+              <AlertTriangle
+                size={24}
+                color={
+                  stats.emergencyAlerts > 0
+                    ? adminTheme.error
+                    : adminTheme.success
+                }
               />
               <View style={{ marginLeft: 12, flex: 1 }}>
                 <Text style={[adminStyles.adminHeading, { fontSize: 20 }]}>
                   {stats.emergencyAlerts}
                 </Text>
-                <Text style={adminStyles.adminCaption}>
-                  Emergency Alerts
-                </Text>
-                <Text style={[adminStyles.adminCaption, { 
-                  color: stats.emergencyAlerts > 0 ? adminTheme.error : adminTheme.success 
-                }]}>
+                <Text style={adminStyles.adminCaption}>Emergency Alerts</Text>
+                <Text
+                  style={[
+                    adminStyles.adminCaption,
+                    {
+                      color:
+                        stats.emergencyAlerts > 0
+                          ? adminTheme.error
+                          : adminTheme.success,
+                    },
+                  ]}>
                   {stats.emergencyAlerts > 0 ? 'Active alerts' : 'All clear'}
                 </Text>
               </View>
@@ -284,26 +331,26 @@ export const AdminDashboard: React.FC = () => {
               key={action.id}
               style={[
                 adminStyles.adminCard,
-                { 
-                  flex: 1, 
+                {
+                  flex: 1,
                   minWidth: '47%',
                   backgroundColor: action.color,
-                  paddingVertical: 20
-                }
+                  paddingVertical: 20,
+                },
               ]}
               onPress={action.onPress}
-              activeOpacity={0.8}
-            >
+              activeOpacity={0.8}>
               <View style={{ alignItems: 'center' }}>
                 {action.icon}
-                <Text style={[
-                  adminStyles.adminLabel,
-                  { 
-                    color: adminTheme.textOnPrimary,
-                    marginTop: 8,
-                    textAlign: 'center'
-                  }
-                ]}>
+                <Text
+                  style={[
+                    adminStyles.adminLabel,
+                    {
+                      color: adminTheme.textOnPrimary,
+                      marginTop: 8,
+                      textAlign: 'center',
+                    },
+                  ]}>
                   {action.title}
                 </Text>
               </View>
@@ -313,81 +360,126 @@ export const AdminDashboard: React.FC = () => {
       </View>
 
       {/* Maintenance Overview - visible to maintenance admins and CMs */}
-      {(adminUser?.role === 'maintenance_admin' || adminUser?.role === 'community_manager' || adminUser?.role === 'super_admin') && (
+      {(adminUser?.role === 'maintenance_admin' ||
+        adminUser?.role === 'community_manager' ||
+        adminUser?.role === 'super_admin') && (
         <View style={{ paddingHorizontal: 16, marginTop: 24 }}>
           <Text style={[adminStyles.adminSubheading, { marginBottom: 12 }]}>
             Maintenance Status
           </Text>
           <View style={adminStyles.adminCard}>
-            <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 16 }}>
+            <View
+              style={{
+                flexDirection: 'row',
+                justifyContent: 'space-between',
+                marginBottom: 16,
+              }}>
               <View style={{ alignItems: 'center', flex: 1 }}>
-                <Text style={[adminStyles.adminHeading, { color: adminTheme.warning, fontSize: 18 }]}>
+                <Text
+                  style={[
+                    adminStyles.adminHeading,
+                    { color: adminTheme.warning, fontSize: 18 },
+                  ]}>
                   {stats.maintenanceRequests.pending}
                 </Text>
-                <Text style={[adminStyles.adminCaption, { textAlign: 'center' }]}>
+                <Text
+                  style={[adminStyles.adminCaption, { textAlign: 'center' }]}>
                   Pending
                 </Text>
               </View>
               <View style={{ alignItems: 'center', flex: 1 }}>
-                <Text style={[adminStyles.adminHeading, { color: adminTheme.success, fontSize: 18 }]}>
+                <Text
+                  style={[
+                    adminStyles.adminHeading,
+                    { color: adminTheme.success, fontSize: 18 },
+                  ]}>
                   {stats.maintenanceRequests.completed}
                 </Text>
-                <Text style={[adminStyles.adminCaption, { textAlign: 'center' }]}>
+                <Text
+                  style={[adminStyles.adminCaption, { textAlign: 'center' }]}>
                   Completed
                 </Text>
               </View>
               <View style={{ alignItems: 'center', flex: 1 }}>
-                <Text style={[adminStyles.adminHeading, { color: adminTheme.error, fontSize: 18 }]}>
+                <Text
+                  style={[
+                    adminStyles.adminHeading,
+                    { color: adminTheme.error, fontSize: 18 },
+                  ]}>
                   {stats.maintenanceRequests.overdue}
                 </Text>
-                <Text style={[adminStyles.adminCaption, { textAlign: 'center' }]}>
+                <Text
+                  style={[adminStyles.adminCaption, { textAlign: 'center' }]}>
                   Overdue
                 </Text>
               </View>
             </View>
-            
+
             {/* Progress bar */}
-            <View style={{ 
-              backgroundColor: adminTheme.surfaceElevated,
-              height: 8,
-              borderRadius: 4,
-              overflow: 'hidden'
-            }}>
-              <View style={{
-                backgroundColor: adminTheme.success,
-                height: '100%',
-                width: `${(stats.maintenanceRequests.completed / (stats.maintenanceRequests.completed + stats.maintenanceRequests.pending + stats.maintenanceRequests.overdue)) * 100}%`
-              }} />
+            <View
+              style={{
+                backgroundColor: adminTheme.surfaceElevated,
+                height: 8,
+                borderRadius: 4,
+                overflow: 'hidden',
+              }}>
+              <View
+                style={{
+                  backgroundColor: adminTheme.success,
+                  height: '100%',
+                  width: `${(stats.maintenanceRequests.completed / (stats.maintenanceRequests.completed + stats.maintenanceRequests.pending + stats.maintenanceRequests.overdue)) * 100}%`,
+                }}
+              />
             </View>
           </View>
         </View>
       )}
 
       {/* Visitor Overview - visible to security admins and CMs */}
-      {(adminUser?.role === 'security_admin' || adminUser?.role === 'community_manager' || adminUser?.role === 'super_admin') && (
-        <View style={{ paddingHorizontal: 16, marginTop: 24, marginBottom: 24 }}>
+      {(adminUser?.role === 'security_admin' ||
+        adminUser?.role === 'community_manager' ||
+        adminUser?.role === 'super_admin') && (
+        <View
+          style={{ paddingHorizontal: 16, marginTop: 24, marginBottom: 24 }}>
           <Text style={[adminStyles.adminSubheading, { marginBottom: 12 }]}>
             Visitor Management
           </Text>
           <View style={adminStyles.adminCard}>
-            <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+            <View
+              style={{
+                flexDirection: 'row',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+              }}>
               <View>
-                <Text style={[adminStyles.adminHeading, { color: adminTheme.warning }]}>
+                <Text
+                  style={[
+                    adminStyles.adminHeading,
+                    { color: adminTheme.warning },
+                  ]}>
                   {stats.visitorApprovals.pending}
                 </Text>
-                <Text style={adminStyles.adminCaption}>
-                  Pending Approvals
-                </Text>
+                <Text style={adminStyles.adminCaption}>Pending Approvals</Text>
               </View>
               <View style={{ alignItems: 'center' }}>
-                <Text style={[adminStyles.adminBody, { color: adminTheme.textSecondary }]}>
+                <Text
+                  style={[
+                    adminStyles.adminBody,
+                    { color: adminTheme.textSecondary },
+                  ]}>
                   {stats.visitorApprovals.today} approved today
                 </Text>
                 <TouchableOpacity
-                  style={[adminStyles.adminSecondaryButton, { marginTop: 8, paddingHorizontal: 12, paddingVertical: 6 }]}
-                  onPress={() => console.log('Navigate to visitor approvals')}
-                >
-                  <Text style={[adminStyles.adminLabel, { color: adminTheme.primary }]}>
+                  style={[
+                    adminStyles.adminSecondaryButton,
+                    { marginTop: 8, paddingHorizontal: 12, paddingVertical: 6 },
+                  ]}
+                  onPress={() => console.log('Navigate to visitor approvals')}>
+                  <Text
+                    style={[
+                      adminStyles.adminLabel,
+                      { color: adminTheme.primary },
+                    ]}>
                     Review All
                   </Text>
                 </TouchableOpacity>

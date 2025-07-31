@@ -8,23 +8,36 @@ import {
   ActivityIndicator,
   RefreshControl,
   KeyboardAvoidingView,
-  Platform
+  Platform,
 } from 'react-native';
-import { useRouter, useLocalSearchParams } from 'expo-router';
-import { ArrowLeft, Heart, MessageSquareText, Trash2 } from 'lucide-react-native';
+import { useLocalSearchParams } from 'expo-router';
+import {
+  ArrowLeft,
+  Heart,
+  MessageSquareText,
+  Trash2,
+} from 'lucide-react-native';
 import UserAvatar from '@/components/ui/UserAvatar';
 import { Post, Comment } from '@/types/community';
 import { communityApi } from '@/services/communityApi';
-import { formatTimeAgo, getCategoryDisplay, getPostStats } from '@/utils/community';
+import {
+  formatTimeAgo,
+  getCategoryDisplay,
+  getPostStats,
+} from '@/utils/community';
 import CommentInput from '@/components/community/CommentInput';
 import CommentCard from '@/components/community/CommentCard';
-import { showErrorAlert, showSuccessAlert, showDeleteConfirmAlert } from '@/utils/alert';
+import {
+  showErrorAlert,
+  showSuccessAlert,
+  showDeleteConfirmAlert,
+} from '@/utils/alert';
 import { safeGoBack } from '@/utils/navigation';
 
 export default function PostDetail() {
   // const router = useRouter();
   const { postId } = useLocalSearchParams<{ postId: string }>();
-  
+
   const [post, setPost] = useState<Post | null>(null);
   const [comments, setComments] = useState<Comment[]>([]);
   const [loading, setLoading] = useState(true);
@@ -35,22 +48,22 @@ export default function PostDetail() {
     if (postId) {
       loadPostData();
     }
-  }, [postId]);
+  }, [postId, loadPostData]);
 
   const loadPostData = useCallback(async () => {
     try {
       setLoading(true);
       const [postsData, commentsData] = await Promise.all([
         communityApi.getPosts(),
-        communityApi.getComments(postId)
+        communityApi.getComments(postId),
       ]);
-      
-      const foundPost = postsData.find(p => p.id === postId);
+
+      const foundPost = postsData.find((p) => p.id === postId);
       if (!foundPost) {
         showErrorAlert('Error', 'Post not found', () => safeGoBack());
         return;
       }
-      
+
       setPost(foundPost);
       setComments(commentsData);
     } catch (error) {
@@ -78,11 +91,15 @@ export default function PostDetail() {
     try {
       setLiking(true);
       const result = await communityApi.toggleLike(post.id);
-      setPost(prev => prev ? {
-        ...prev,
-        isLikedByUser: result.liked,
-        likesCount: result.likesCount
-      } : null);
+      setPost((prev) =>
+        prev
+          ? {
+              ...prev,
+              isLikedByUser: result.liked,
+              likesCount: result.likesCount,
+            }
+          : null,
+      );
     } catch (error) {
       console.error('Error toggling like:', error);
       showErrorAlert('Error', 'Failed to update like. Please try again.');
@@ -100,12 +117,14 @@ export default function PostDetail() {
       async () => {
         try {
           await communityApi.deletePost(post.id);
-          showSuccessAlert('Success', 'Post deleted successfully.', () => safeGoBack());
+          showSuccessAlert('Success', 'Post deleted successfully.', () =>
+            safeGoBack(),
+          );
         } catch (error) {
           console.error('Error deleting post:', error);
           showErrorAlert('Error', 'Failed to delete post. Please try again.');
         }
-      }
+      },
     );
   };
 
@@ -115,14 +134,18 @@ export default function PostDetail() {
     try {
       const newComment = await communityApi.addComment({
         postId: post.id,
-        content
+        content,
       });
-      
-      setComments(prev => [...prev, newComment]);
-      setPost(prev => prev ? {
-        ...prev,
-        commentsCount: prev.commentsCount + 1
-      } : null);
+
+      setComments((prev) => [...prev, newComment]);
+      setPost((prev) =>
+        prev
+          ? {
+              ...prev,
+              commentsCount: prev.commentsCount + 1,
+            }
+          : null,
+      );
     } catch (error) {
       console.error('Error adding comment:', error);
       showErrorAlert('Error', 'Failed to add comment. Please try again.');
@@ -132,11 +155,15 @@ export default function PostDetail() {
   const handleDeleteComment = async (commentId: string) => {
     try {
       await communityApi.deleteComment(commentId);
-      setComments(prev => prev.filter(c => c.id !== commentId));
-      setPost(prev => prev ? {
-        ...prev,
-        commentsCount: Math.max(0, prev.commentsCount - 1)
-      } : null);
+      setComments((prev) => prev.filter((c) => c.id !== commentId));
+      setPost((prev) =>
+        prev
+          ? {
+              ...prev,
+              commentsCount: Math.max(0, prev.commentsCount - 1),
+            }
+          : null,
+      );
       showSuccessAlert('Success', 'Comment deleted successfully.');
     } catch (error) {
       console.error('Error deleting comment:', error);
@@ -151,7 +178,9 @@ export default function PostDetail() {
           <TouchableOpacity onPress={() => safeGoBack()} className="mr-4">
             <ArrowLeft size={24} color="#212121" />
           </TouchableOpacity>
-          <Text className="text-headline-large font-bold text-text-primary">Post</Text>
+          <Text className="text-headline-large font-bold text-text-primary">
+            Post
+          </Text>
         </View>
         <View className="flex-1 items-center justify-center">
           <ActivityIndicator size="large" color="#6366f1" />
@@ -168,10 +197,14 @@ export default function PostDetail() {
           <TouchableOpacity onPress={() => safeGoBack()} className="mr-4">
             <ArrowLeft size={24} color="#212121" />
           </TouchableOpacity>
-          <Text className="text-headline-large font-bold text-text-primary">Post</Text>
+          <Text className="text-headline-large font-bold text-text-primary">
+            Post
+          </Text>
         </View>
         <View className="flex-1 items-center justify-center px-8">
-          <Text className="text-headline-large font-semibold text-text-primary mb-2">Post Not Found</Text>
+          <Text className="text-headline-large font-semibold text-text-primary mb-2">
+            Post Not Found
+          </Text>
           <Text className="text-text-secondary text-center">
             This post may have been deleted or is no longer available.
           </Text>
@@ -185,17 +218,18 @@ export default function PostDetail() {
 
   return (
     <SafeAreaView className="flex-1 bg-background">
-      <KeyboardAvoidingView 
+      <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        className="flex-1"
-      >
+        className="flex-1">
         {/* Header */}
         <View className="flex-row items-center justify-between px-6 py-4 border-b border-divider">
           <View className="flex-row items-center">
             <TouchableOpacity onPress={() => safeGoBack()} className="mr-4">
               <ArrowLeft size={24} color="#212121" />
             </TouchableOpacity>
-            <Text className="text-headline-large font-bold text-text-primary">Post</Text>
+            <Text className="text-headline-large font-bold text-text-primary">
+              Post
+            </Text>
           </View>
           {post.canDelete && (
             <TouchableOpacity onPress={handleDeletePost} className="p-1">
@@ -214,8 +248,7 @@ export default function PostDetail() {
               colors={['#6366f1']}
               tintColor={'#6366f1'}
             />
-          }
-        >
+          }>
           {/* Post Content */}
           <View className="bg-surface mx-4 mt-4 rounded-2xl p-6 border border-divider">
             {/* Post Header */}
@@ -223,61 +256,76 @@ export default function PostDetail() {
               <View className="flex-row items-center flex-1">
                 <UserAvatar name={post.userName} />
                 <View className="ml-3 flex-1">
-                  <Text className="text-headline-medium font-semibold text-text-primary">{post.userName}</Text>
+                  <Text className="text-headline-medium font-semibold text-text-primary">
+                    {post.userName}
+                  </Text>
                   <View className="flex-row items-center gap-2 mt-1">
-                    <Text className="text-body-medium text-text-secondary">Flat {post.flatNumber}</Text>
+                    <Text className="text-body-medium text-text-secondary">
+                      Flat {post.flatNumber}
+                    </Text>
                     <View className="w-1 h-1 bg-text-secondary rounded-full" />
                     <View className="bg-primary/10 px-2 py-1 rounded-full flex-row items-center">
-                      <Text className="text-label-large mr-1">{categoryDisplay.icon}</Text>
-                      <Text className="text-primary text-label-large font-medium">{categoryDisplay.name}</Text>
+                      <Text className="text-label-large mr-1">
+                        {categoryDisplay.icon}
+                      </Text>
+                      <Text className="text-primary text-label-large font-medium">
+                        {categoryDisplay.name}
+                      </Text>
                     </View>
                   </View>
                 </View>
               </View>
-              <Text className="text-body-medium text-text-secondary">{formatTimeAgo(post.createdAt)}</Text>
+              <Text className="text-body-medium text-text-secondary">
+                {formatTimeAgo(post.createdAt)}
+              </Text>
             </View>
 
             {/* Post Content */}
-            <Text className="text-text-primary leading-6 mb-4">{post.content}</Text>
+            <Text className="text-text-primary leading-6 mb-4">
+              {post.content}
+            </Text>
 
             {/* Post Image */}
             {post.imageUrl && (
               <View className="rounded-xl overflow-hidden mb-4">
                 {/* In a real implementation, this would be an actual Image component */}
                 <View className="bg-primary/5 h-48 items-center justify-center">
-                  <Text className="text-text-secondary">Image: {post.imageUrl}</Text>
+                  <Text className="text-text-secondary">
+                    Image: {post.imageUrl}
+                  </Text>
                 </View>
               </View>
             )}
 
             {/* Post Actions */}
             <View className="flex-row items-center justify-between pt-4 border-t border-divider">
-              <TouchableOpacity 
+              <TouchableOpacity
                 className="flex-row items-center gap-2 py-2 flex-1"
-                activeOpacity={0.7}
-              >
+                activeOpacity={0.7}>
                 <MessageSquareText size={20} color="#757575" />
-                <Text className="text-text-secondary font-medium">{postStats.comments}</Text>
+                <Text className="text-text-secondary font-medium">
+                  {postStats.comments}
+                </Text>
               </TouchableOpacity>
 
-              <TouchableOpacity 
+              <TouchableOpacity
                 onPress={handleLike}
                 disabled={liking}
                 className="flex-row items-center gap-2 py-2 flex-1 justify-end"
-                activeOpacity={0.7}
-              >
+                activeOpacity={0.7}>
                 {liking ? (
                   <ActivityIndicator size="small" color="#D32F2F" />
                 ) : (
-                  <Heart 
-                    size={20} 
-                    color={post.isLikedByUser ? "#D32F2F" : "#757575"} 
-                    fill={post.isLikedByUser ? "#D32F2F" : "transparent"}
+                  <Heart
+                    size={20}
+                    color={post.isLikedByUser ? '#D32F2F' : '#757575'}
+                    fill={post.isLikedByUser ? '#D32F2F' : 'transparent'}
                   />
                 )}
-                <Text className={`font-medium ${
-                  post.isLikedByUser ? 'text-error' : 'text-text-secondary'
-                }`}>
+                <Text
+                  className={`font-medium ${
+                    post.isLikedByUser ? 'text-error' : 'text-text-secondary'
+                  }`}>
                   {postStats.likes}
                 </Text>
               </TouchableOpacity>
@@ -289,7 +337,7 @@ export default function PostDetail() {
             <Text className="text-headline-medium font-semibold text-text-primary mb-4">
               Comments ({comments.length})
             </Text>
-            
+
             {comments.length > 0 ? (
               comments.map((comment) => (
                 <CommentCard

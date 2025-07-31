@@ -1,6 +1,6 @@
-import { Search, X } from "lucide-react-native";
-import React from "react";
-import { TextInput, TouchableOpacity, View } from "react-native";
+import { Search, X } from 'lucide-react-native';
+import React from 'react';
+import { TextInput, TouchableOpacity, View } from 'react-native';
 
 interface SearchBarProps {
   placeholder: string;
@@ -10,12 +10,12 @@ interface SearchBarProps {
   onClear?: () => void;
 }
 
-const AptlySearchBar: React.FC<SearchBarProps> = ({ 
-  placeholder, 
-  value, 
-  onChangeText, 
+const AptlySearchBar: React.FC<SearchBarProps> = ({
+  placeholder,
+  value,
+  onChangeText,
   onSearch,
-  onClear 
+  onClear,
 }) => {
   const handleSearch = () => {
     onSearch?.();
@@ -30,7 +30,7 @@ const AptlySearchBar: React.FC<SearchBarProps> = ({
       <View className="flex-[11] relative">
         <TextInput
           placeholder={placeholder}
-          cursorColor={"#6366f1"}
+          cursorColor={'#6366f1'}
           className="w-full p-3 pr-10 border border-divider rounded-xl bg-surface text-text-primary"
           placeholderTextColor="#757575"
           value={value}
@@ -42,17 +42,15 @@ const AptlySearchBar: React.FC<SearchBarProps> = ({
           <TouchableOpacity
             onPress={handleClear}
             className="absolute right-3 top-1/2 -translate-y-2"
-            style={{ transform: [{ translateY: -10 }] }}
-          >
+            style={{ transform: [{ translateY: -10 }] }}>
             <X size={16} color="#757575" />
           </TouchableOpacity>
         )}
       </View>
-      <TouchableOpacity 
+      <TouchableOpacity
         onPress={handleSearch}
         className="bg-primary rounded-xl py-3 px-4 flex-[1] items-center justify-center"
-        activeOpacity={0.7}
-      >
+        activeOpacity={0.7}>
         <Search size={18} color="white" />
       </TouchableOpacity>
     </View>

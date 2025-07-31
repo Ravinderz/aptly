@@ -1,6 +1,6 @@
-import { StackHeader } from "@/components/ui/headers";
-import { Stack } from "expo-router";
-import React from "react";
+import { StackHeader } from '@/components/ui/headers';
+import { Stack } from 'expo-router';
+import React from 'react';
 
 const _layout = () => {
   return (
@@ -26,7 +26,7 @@ const _layout = () => {
           headerShown: true,
           header: (props: any) => (
             <StackHeader
-              title={(route.params as { title?: string })?.title || "View All"}
+              title={(route.params as { title?: string })?.title || 'View All'}
               subtitle="Manage visitor entries and approvals"
               showBackButton={true}
               contentSpacing={false}

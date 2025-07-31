@@ -2,7 +2,7 @@ import { AdminUser, AdminSession } from '../../types/admin';
 
 export class AdminAuthService {
   private static instance: AdminAuthService;
-  
+
   static getInstance(): AdminAuthService {
     if (!AdminAuthService.instance) {
       AdminAuthService.instance = new AdminAuthService();
@@ -10,7 +10,10 @@ export class AdminAuthService {
     return AdminAuthService.instance;
   }
 
-  async authenticate(email: string, password: string): Promise<AdminSession | null> {
+  async authenticate(
+    email: string,
+    password: string,
+  ): Promise<AdminSession | null> {
     // Mock implementation
     return null;
   }

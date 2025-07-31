@@ -1,7 +1,7 @@
-import { Colors } from "@/constants/Colors";
-import * as LocalAuthentication from "expo-local-authentication";
-import { useRouter } from "expo-router";
-import React from "react";
+import { Colors } from '@/constants/Colors';
+import * as LocalAuthentication from 'expo-local-authentication';
+import { useRouter } from 'expo-router';
+import React from 'react';
 import {
   Image,
   SafeAreaView,
@@ -9,27 +9,27 @@ import {
   Text,
   TouchableOpacity,
   View,
-} from "react-native";
-import Swiper from "react-native-swiper";
+} from 'react-native';
+import Swiper from 'react-native-swiper';
 
 const slides = [
   {
-    key: "slide1",
-    title: "Seamless access approval",
-    text: "approve visitors, house help, delivery persons with ease",
-    image: require("../assets/images/onboarding1.png"), // Ensure your image paths are correct
+    key: 'slide1',
+    title: 'Seamless access approval',
+    text: 'approve visitors, house help, delivery persons with ease',
+    image: require('../assets/images/onboarding1.png'), // Ensure your image paths are correct
   },
   {
-    key: "slide2",
-    title: "Get instant help",
-    text: "Need help with your apartment? Get instant help from our contact directory",
-    image: require("../assets/images/onboarding2.png"),
+    key: 'slide2',
+    title: 'Get instant help',
+    text: 'Need help with your apartment? Get instant help from our contact directory',
+    image: require('../assets/images/onboarding2.png'),
   },
   {
-    key: "slide3",
-    title: "Build a happy community",
-    text: "form connections, build friendships, and create a sense of belonging",
-    image: require("../assets/images/onboarding3.png"),
+    key: 'slide3',
+    title: 'Build a happy community',
+    text: 'form connections, build friendships, and create a sense of belonging',
+    image: require('../assets/images/onboarding3.png'),
   },
 ];
 
@@ -39,17 +39,17 @@ const initBiometricAuth = () => {
       LocalAuthentication.isEnrolledAsync().then(
         (isEnrolled) => {
           if (isEnrolled) {
-            console.log("Biometric Auth is supported and enrolled");
+            console.log('Biometric Auth is supported and enrolled');
           } else {
-            console.log("Biometric Auth is supported but not enrolled");
+            console.log('Biometric Auth is supported but not enrolled');
           }
         },
         (error) => {
-          console.log("Biometric Auth is not supported");
-        }
+          console.log('Biometric Auth is not supported');
+        },
       );
     } else {
-      console.log("Biometric Auth is not supported");
+      console.log('Biometric Auth is not supported');
     }
   });
 };
@@ -58,7 +58,7 @@ const Onboarding = () => {
   const router = useRouter();
 
   const handleButtonPress = () => {
-    router.replace("/welcome");
+    router.replace('/welcome');
   };
 
   return (
@@ -86,8 +86,7 @@ const Onboarding = () => {
           <View>
             <TouchableOpacity
               style={styles.startBtn}
-              onPress={() => handleButtonPress()}
-            >
+              onPress={() => handleButtonPress()}>
               <Text style={styles.startBtnText}>Start</Text>
             </TouchableOpacity>
           </View>
@@ -100,11 +99,11 @@ const Onboarding = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#FFF",
+    backgroundColor: '#FFF',
   },
   slide: {
-    justifyContent: "center",
-    alignItems: "center",
+    justifyContent: 'center',
+    alignItems: 'center',
     padding: 40,
   },
   image: {
@@ -116,29 +115,29 @@ const styles = StyleSheet.create({
     width: 300,
     height: 300,
     marginBottom: 60,
-    resizeMode: "contain",
+    resizeMode: 'contain',
   },
   title: {
     fontSize: 24,
-    fontWeight: "bold",
+    fontWeight: 'bold',
     color: Colors.primary,
-    textAlign: "center",
+    textAlign: 'center',
     marginBottom: 10,
   },
   text: {
     fontSize: 16,
-    color: "#333",
-    textAlign: "center",
+    color: '#333',
+    textAlign: 'center',
   },
   button: {
     marginTop: 20,
-    backgroundColor: "#007aff",
+    backgroundColor: '#007aff',
     paddingVertical: 10,
     paddingHorizontal: 20,
     borderRadius: 5,
   },
   buttonText: {
-    color: "#fff",
+    color: '#fff',
     fontSize: 16,
   },
   skipBtnText: {
@@ -146,9 +145,9 @@ const styles = StyleSheet.create({
     fontSize: 14,
     marginTop: 20,
     marginRight: 20,
-    fontWeight: "600",
-    display: "flex",
-    alignSelf: "flex-end",
+    fontWeight: '600',
+    display: 'flex',
+    alignSelf: 'flex-end',
   },
   startBtn: {
     marginTop: 80,
@@ -158,9 +157,9 @@ const styles = StyleSheet.create({
     borderRadius: 40,
   },
   startBtnText: {
-    color: "#fff",
+    color: '#fff',
     fontSize: 18,
-    fontWeight: "bold",
+    fontWeight: 'bold',
   },
 });
 

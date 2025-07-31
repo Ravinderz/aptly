@@ -1,6 +1,6 @@
-import { useRouter } from "expo-router";
-import { ArrowLeft, Building, Search, Users } from "lucide-react-native";
-import React, { useState } from "react";
+import { useRouter } from 'expo-router';
+import { ArrowLeft, Building, Search, Users } from 'lucide-react-native';
+import React, { useState } from 'react';
 import {
   SafeAreaView,
   ScrollView,
@@ -8,74 +8,74 @@ import {
   TextInput,
   TouchableOpacity,
   View,
-} from "react-native";
+} from 'react-native';
 
 export default function MaintenanceRequests() {
   const router = useRouter();
-  const [searchQuery, setSearchQuery] = useState("");
-  const [selectedFilter, setSelectedFilter] = useState("all");
+  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedFilter, setSelectedFilter] = useState('all');
 
   // Mock maintenance requests data (individual requests)
   const individualRequests = [
     {
-      id: "1",
-      title: "Plumbing Issue - Kitchen Sink",
+      id: '1',
+      title: 'Plumbing Issue - Kitchen Sink',
       description:
-        "Kitchen sink is leaking from the bottom. Water is dripping continuously.",
-      category: "Plumbing",
-      priority: "high",
-      status: "in_progress",
-      date: "2024-03-15",
-      assignedTo: "Rajesh Kumar",
-      estimatedCost: "₹2,500",
-      flatNumber: "A-201",
-      type: "individual",
+        'Kitchen sink is leaking from the bottom. Water is dripping continuously.',
+      category: 'Plumbing',
+      priority: 'high',
+      status: 'in_progress',
+      date: '2024-03-15',
+      assignedTo: 'Rajesh Kumar',
+      estimatedCost: '₹2,500',
+      flatNumber: 'A-201',
+      type: 'individual',
     },
     {
-      id: "2",
-      title: "Electrical Work - Hall Fan",
-      description: "Ceiling fan in the hall is making noise and running slow.",
-      category: "Electrical",
-      priority: "medium",
-      status: "completed",
-      date: "2024-03-12",
-      assignedTo: "Suresh Electricals",
-      actualCost: "₹1,200",
-      flatNumber: "A-201",
-      type: "individual",
+      id: '2',
+      title: 'Electrical Work - Hall Fan',
+      description: 'Ceiling fan in the hall is making noise and running slow.',
+      category: 'Electrical',
+      priority: 'medium',
+      status: 'completed',
+      date: '2024-03-12',
+      assignedTo: 'Suresh Electricals',
+      actualCost: '₹1,200',
+      flatNumber: 'A-201',
+      type: 'individual',
     },
   ];
 
   // Mock common area requests
   const commonAreaRequests = [
     {
-      id: "demo-request-id",
-      title: "Main Lobby Lighting Issue",
+      id: 'demo-request-id',
+      title: 'Main Lobby Lighting Issue',
       description:
-        "Several LED lights in the main lobby are flickering and two have completely stopped working.",
-      category: "Electrical",
-      priority: "high",
-      status: "in_progress",
-      date: "2024-01-15",
-      assignedTo: "PowerTech Electricians",
-      estimatedCost: "₹4,500",
-      submittedBy: "Priya Sharma",
+        'Several LED lights in the main lobby are flickering and two have completely stopped working.',
+      category: 'Electrical',
+      priority: 'high',
+      status: 'in_progress',
+      date: '2024-01-15',
+      assignedTo: 'PowerTech Electricians',
+      estimatedCost: '₹4,500',
+      submittedBy: 'Priya Sharma',
       affectedResidents: 25,
-      type: "common_area",
+      type: 'common_area',
     },
     {
-      id: "ca-2",
-      title: "Garden Irrigation System Repair",
+      id: 'ca-2',
+      title: 'Garden Irrigation System Repair',
       description:
-        "Sprinkler system in the main garden area is not working properly.",
-      category: "Plumbing",
-      priority: "medium",
-      status: "approved",
-      date: "2024-01-12",
-      estimatedCost: "₹3,200",
-      submittedBy: "Amit Kumar",
+        'Sprinkler system in the main garden area is not working properly.',
+      category: 'Plumbing',
+      priority: 'medium',
+      status: 'approved',
+      date: '2024-01-12',
+      estimatedCost: '₹3,200',
+      submittedBy: 'Amit Kumar',
       affectedResidents: 40,
-      type: "common_area",
+      type: 'common_area',
     },
   ];
 
@@ -83,71 +83,71 @@ export default function MaintenanceRequests() {
   const allRequests = [...commonAreaRequests, ...individualRequests];
 
   const filterOptions = [
-    { label: "All", value: "all" },
-    { label: "Common Area", value: "common_area" },
-    { label: "Individual", value: "individual" },
-    { label: "In Progress", value: "in_progress" },
-    { label: "Completed", value: "completed" },
-    { label: "Pending", value: "pending" },
+    { label: 'All', value: 'all' },
+    { label: 'Common Area', value: 'common_area' },
+    { label: 'Individual', value: 'individual' },
+    { label: 'In Progress', value: 'in_progress' },
+    { label: 'Completed', value: 'completed' },
+    { label: 'Pending', value: 'pending' },
   ];
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case "completed":
-        return "text-success";
-      case "in_progress":
-        return "text-warning";
-      case "pending":
-        return "text-primary";
-      case "approved":
-        return "text-secondary";
-      case "submitted":
-        return "text-text-secondary";
+      case 'completed':
+        return 'text-success';
+      case 'in_progress':
+        return 'text-warning';
+      case 'pending':
+        return 'text-primary';
+      case 'approved':
+        return 'text-secondary';
+      case 'submitted':
+        return 'text-text-secondary';
       default:
-        return "text-text-secondary";
+        return 'text-text-secondary';
     }
   };
 
   const getStatusBgColor = (status: string) => {
     switch (status) {
-      case "completed":
-        return "bg-success/20";
-      case "in_progress":
-        return "bg-warning/20";
-      case "pending":
-        return "bg-primary/20";
-      case "approved":
-        return "bg-secondary/20";
-      case "submitted":
-        return "bg-text-secondary/20";
+      case 'completed':
+        return 'bg-success/20';
+      case 'in_progress':
+        return 'bg-warning/20';
+      case 'pending':
+        return 'bg-primary/20';
+      case 'approved':
+        return 'bg-secondary/20';
+      case 'submitted':
+        return 'bg-text-secondary/20';
       default:
-        return "bg-text-secondary/20";
+        return 'bg-text-secondary/20';
     }
   };
 
   const getPriorityColor = (priority: string) => {
     switch (priority) {
-      case "high":
-        return "bg-error/20 text-error border-error/30";
-      case "medium":
-        return "bg-warning/20 text-warning border-warning/30";
-      case "low":
-        return "bg-success/20 text-success border-success/30";
+      case 'high':
+        return 'bg-error/20 text-error border-error/30';
+      case 'medium':
+        return 'bg-warning/20 text-warning border-warning/30';
+      case 'low':
+        return 'bg-success/20 text-success border-success/30';
       default:
-        return "bg-primary/20 text-primary border-primary/30";
+        return 'bg-primary/20 text-primary border-primary/30';
     }
   };
 
   const getCategoryIcon = (category: string) => {
     const categoryIcons: { [key: string]: string } = {
-      Plumbing: "🔧",
-      Electrical: "⚡",
-      Civil: "🏗️",
-      Appliance: "📱",
-      Painting: "🎨",
-      Cleaning: "🧹",
+      Plumbing: '🔧',
+      Electrical: '⚡',
+      Civil: '🏗️',
+      Appliance: '📱',
+      Painting: '🎨',
+      Cleaning: '🧹',
     };
-    return categoryIcons[category] || "🔧";
+    return categoryIcons[category] || '🔧';
   };
 
   const filteredRequests = allRequests.filter((request) => {
@@ -157,7 +157,7 @@ export default function MaintenanceRequests() {
       request.category.toLowerCase().includes(searchQuery.toLowerCase());
 
     const matchesFilter =
-      selectedFilter === "all" ||
+      selectedFilter === 'all' ||
       request.status === selectedFilter ||
       request.type === selectedFilter;
 
@@ -186,10 +186,9 @@ export default function MaintenanceRequests() {
         <View className="flex-row gap-4">
           <TouchableOpacity
             onPress={() =>
-              router.push("/(tabs)/services/maintenance/common-area/create")
+              router.push('/(tabs)/services/maintenance/common-area/create')
             }
-            className="flex-1 bg-primary rounded-xl p-5 flex-row items-center justify-center"
-          >
+            className="flex-1 bg-primary rounded-xl p-5 flex-row items-center justify-center">
             <Building size={20} color="white" />
             <Text className="text-white font-semibold ml-3">
               Common Area Request
@@ -221,17 +220,15 @@ export default function MaintenanceRequests() {
                 onPress={() => setSelectedFilter(filter.value)}
                 className={`px-4 py-3 rounded-full border ${
                   selectedFilter === filter.value
-                    ? "bg-primary border-primary"
-                    : "bg-background border-divider"
-                }`}
-              >
+                    ? 'bg-primary border-primary'
+                    : 'bg-background border-divider'
+                }`}>
                 <Text
                   className={`font-medium ${
                     selectedFilter === filter.value
-                      ? "text-white"
-                      : "text-text-secondary"
-                  }`}
-                >
+                      ? 'text-white'
+                      : 'text-text-secondary'
+                  }`}>
                   {filter.label}
                 </Text>
               </TouchableOpacity>
@@ -248,8 +245,7 @@ export default function MaintenanceRequests() {
           paddingVertical: 20,
           paddingBottom: 24,
         }}
-        showsVerticalScrollIndicator={false}
-      >
+        showsVerticalScrollIndicator={false}>
         {filteredRequests.length === 0 ? (
           <View className="flex-1 items-center justify-center py-16">
             <Text className="text-text-secondary text-lg mb-2">
@@ -257,8 +253,8 @@ export default function MaintenanceRequests() {
             </Text>
             <Text className="text-text-secondary text-center">
               {searchQuery
-                ? "Try adjusting your search"
-                : "Create your first maintenance request"}
+                ? 'Try adjusting your search'
+                : 'Create your first maintenance request'}
             </Text>
           </View>
         ) : (
@@ -268,15 +264,14 @@ export default function MaintenanceRequests() {
                 key={request.id}
                 className="bg-surface rounded-2xl p-6 border border-divider mb-4"
                 onPress={() => {
-                  if (request.type === "common_area") {
+                  if (request.type === 'common_area') {
                     router.push(
-                      `/(tabs)/services/maintenance/common-area/${request.id}`
+                      `/(tabs)/services/maintenance/common-area/${request.id}`,
                     );
                   } else {
                     router.push(`/(tabs)/services/maintenance/${request.id}`);
                   }
-                }}
-              >
+                }}>
                 {/* Header with Category and Priority */}
                 <View className="flex-row items-center justify-between mb-3">
                   <View className="flex-row items-center">
@@ -288,7 +283,7 @@ export default function MaintenanceRequests() {
                         <Text className="text-text-secondary text-sm">
                           {request.category}
                         </Text>
-                        {request.type === "common_area" && (
+                        {request.type === 'common_area' && (
                           <View className="bg-primary/10 rounded-full px-2 py-1 ml-2">
                             <Text className="text-primary text-xs font-medium">
                               Common Area
@@ -303,9 +298,8 @@ export default function MaintenanceRequests() {
                   </View>
                   <View
                     className={`px-3 py-1 rounded-full border ${getPriorityColor(
-                      request.priority
-                    )}`}
-                  >
+                      request.priority,
+                    )}`}>
                     <Text className="text-xs font-medium uppercase">
                       {request.priority}
                     </Text>
@@ -321,7 +315,7 @@ export default function MaintenanceRequests() {
                 </Text>
 
                 {/* Common Area specific info */}
-                {request.type === "common_area" && (
+                {request.type === 'common_area' && (
                   <View className="flex-row items-center mb-3">
                     <Users size={14} color="#757575" />
                     <Text className="text-text-secondary text-xs ml-1">
@@ -338,15 +332,13 @@ export default function MaintenanceRequests() {
                   <View className="flex-row items-center justify-between">
                     <View
                       className={`px-3 py-1 rounded-full ${getStatusBgColor(
-                        request.status
-                      )}`}
-                    >
+                        request.status,
+                      )}`}>
                       <Text
                         className={`text-xs font-medium capitalize ${getStatusColor(
-                          request.status
-                        )}`}
-                      >
-                        {request.status.replace("_", " ")}
+                          request.status,
+                        )}`}>
+                        {request.status.replace('_', ' ')}
                       </Text>
                     </View>
                     <View className="items-end">
@@ -363,8 +355,7 @@ export default function MaintenanceRequests() {
                   {request.assignedTo && (
                     <Text
                       className="text-text-secondary text-xs"
-                      numberOfLines={1}
-                    >
+                      numberOfLines={1}>
                       Assigned to: {request.assignedTo}
                     </Text>
                   )}

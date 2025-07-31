@@ -13,6 +13,8 @@
     "build:android-local": "expo run:android --variant debug",
     "build:android-preview": "eas build --platform android --profile preview --local",
     "lint": "expo lint",
+    "lint:fix": "expo lint --fix",
+    "format": "prettier --write .",
     "test": "jest",
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",
@@ -32,6 +34,7 @@
     "expo-av": "~15.1.7",
     "expo-blur": "~14.1.5",
     "expo-constants": "~17.1.6",
+    "expo-dev-client": "~5.2.4",
     "expo-document-picker": "~13.1.6",
     "expo-file-system": "~18.1.11",
     "expo-font": "~13.3.2",
@@ -62,8 +65,7 @@
     "react-native-swiper": "^1.6.0",
     "react-native-web": "~0.20.0",
     "react-native-webview": "13.13.5",
-    "tailwindcss": "^3.4.17",
-    "expo-dev-client": "~5.2.4"
+    "tailwindcss": "^3.4.17"
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",
@@ -74,8 +76,11 @@
     "@types/react": "~19.0.10",
     "eslint": "^9.25.0",
     "eslint-config-expo": "~9.2.0",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-prettier": "^5.5.3",
     "jest": "^29.7.0",
     "jest-expo": "~53.0.0",
+    "prettier": "^3.6.2",
     "react-native-testing-library": "^2.2.0",
     "react-test-renderer": "19.0.0",
     "typescript": "~5.8.3"

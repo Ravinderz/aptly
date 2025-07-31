@@ -1,6 +1,11 @@
 // Admin system comprehensive TypeScript definitions
 
-export type AdminRole = 'super_admin' | 'community_manager' | 'financial_manager' | 'security_admin' | 'maintenance_admin';
+export type AdminRole =
+  | 'super_admin'
+  | 'community_manager'
+  | 'financial_manager'
+  | 'security_admin'
+  | 'maintenance_admin';
 
 export type AppMode = 'resident' | 'admin';
 
@@ -39,12 +44,26 @@ export interface Permission {
   conditions?: PermissionCondition[];
 }
 
-export type PermissionAction = 
-  | 'create' | 'read' | 'update' | 'delete' 
-  | 'approve' | 'reject' | 'assign' | 'escalate'
-  | 'bulk_action' | 'bulk_approve' | 'export' | 'import'
-  | 'broadcast' | 'declare' | 'generate' | 'incidents'
-  | 'billing_notices' | 'security_alerts' | 'maintenance_updates'
+export type PermissionAction =
+  | 'create'
+  | 'read'
+  | 'update'
+  | 'delete'
+  | 'approve'
+  | 'reject'
+  | 'assign'
+  | 'escalate'
+  | 'bulk_action'
+  | 'bulk_approve'
+  | 'export'
+  | 'import'
+  | 'broadcast'
+  | 'declare'
+  | 'generate'
+  | 'incidents'
+  | 'billing_notices'
+  | 'security_alerts'
+  | 'maintenance_updates'
   | '*'; // wildcard for super admin
 
 export type PermissionScope = 'global' | 'society' | 'own' | 'assigned';
@@ -63,10 +82,19 @@ export interface SocietyPermission {
   limitations?: PermissionLimitation[];
 }
 
-export type AdminResource = 
-  | 'residents' | 'billing' | 'maintenance' | 'visitors' | 'notices'
-  | 'analytics' | 'settings' | 'team_management' | 'emergency'
-  | 'voting' | 'audit_logs' | 'reports';
+export type AdminResource =
+  | 'residents'
+  | 'billing'
+  | 'maintenance'
+  | 'visitors'
+  | 'notices'
+  | 'analytics'
+  | 'settings'
+  | 'team_management'
+  | 'emergency'
+  | 'voting'
+  | 'audit_logs'
+  | 'reports';
 
 export interface PermissionLimitation {
   type: 'amount_limit' | 'time_limit' | 'approval_required';
@@ -114,10 +142,16 @@ export interface DashboardWidget {
   refreshInterval?: number;
 }
 
-export type WidgetType = 
-  | 'pending_approvals' | 'financial_summary' | 'maintenance_overview'
-  | 'visitor_stats' | 'resident_activity' | 'emergency_alerts'
-  | 'society_selector' | 'quick_actions' | 'audit_activity';
+export type WidgetType =
+  | 'pending_approvals'
+  | 'financial_summary'
+  | 'maintenance_overview'
+  | 'visitor_stats'
+  | 'resident_activity'
+  | 'emergency_alerts'
+  | 'society_selector'
+  | 'quick_actions'
+  | 'audit_activity';
 
 export interface DashboardLayout {
   columns: number;
@@ -185,10 +219,15 @@ export interface AuditLog {
   retentionUntil: string; // 1 year retention
 }
 
-export type AuditCategory = 
-  | 'admin_actions' | 'billing_finance' | 'maintenance_management'
-  | 'security_management' | 'resident_management' | 'communication'
-  | 'voting_governance' | 'emergency_response';
+export type AuditCategory =
+  | 'admin_actions'
+  | 'billing_finance'
+  | 'maintenance_management'
+  | 'security_management'
+  | 'resident_management'
+  | 'communication'
+  | 'voting_governance'
+  | 'emergency_response';
 
 export interface AuditActor {
   userId: string;
@@ -234,12 +273,22 @@ export interface EmergencyIncident {
   escalationChain: EmergencyEscalation[];
 }
 
-export type EmergencyType = 
-  | 'security_breach' | 'fire' | 'medical' | 'maintenance_critical'
-  | 'natural_disaster' | 'power_outage' | 'water_shortage' | 'other';
+export type EmergencyType =
+  | 'security_breach'
+  | 'fire'
+  | 'medical'
+  | 'maintenance_critical'
+  | 'natural_disaster'
+  | 'power_outage'
+  | 'water_shortage'
+  | 'other';
 
-export type EmergencyStatus = 
-  | 'reported' | 'acknowledged' | 'in_progress' | 'escalated' | 'resolved';
+export type EmergencyStatus =
+  | 'reported'
+  | 'acknowledged'
+  | 'in_progress'
+  | 'escalated'
+  | 'resolved';
 
 export interface EmergencyResponder {
   userId: string;
@@ -290,12 +339,20 @@ export interface VotingCampaign {
   isAnonymous: boolean;
 }
 
-export type VotingType = 
-  | 'admin_promotion' | 'policy_change' | 'budget_approval' 
-  | 'cm_succession' | 'facility_upgrade' | 'vendor_selection';
+export type VotingType =
+  | 'admin_promotion'
+  | 'policy_change'
+  | 'budget_approval'
+  | 'cm_succession'
+  | 'facility_upgrade'
+  | 'vendor_selection';
 
-export type VotingStatus = 
-  | 'nomination' | 'voting' | 'counting' | 'completed' | 'cancelled';
+export type VotingStatus =
+  | 'nomination'
+  | 'voting'
+  | 'counting'
+  | 'completed'
+  | 'cancelled';
 
 export interface VotingCandidate {
   userId: string;
@@ -354,10 +411,15 @@ export interface AdminNotification {
   expiresAt?: string;
 }
 
-export type AdminNotificationType = 
-  | 'approval_request' | 'emergency_alert' | 'system_update'
-  | 'role_assignment' | 'voting_notification' | 'audit_alert'
-  | 'financial_alert' | 'maintenance_escalation';
+export type AdminNotificationType =
+  | 'approval_request'
+  | 'emergency_alert'
+  | 'system_update'
+  | 'role_assignment'
+  | 'voting_notification'
+  | 'audit_alert'
+  | 'financial_alert'
+  | 'maintenance_escalation';
 
 export interface NotificationRead {
   userId: string;

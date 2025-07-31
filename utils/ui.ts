@@ -11,7 +11,7 @@ import { Dimensions, Platform, StatusBar } from 'react-native';
 export const getDeviceDimensions = () => {
   const { width, height } = Dimensions.get('window');
   const screenData = Dimensions.get('screen');
-  
+
   return {
     window: { width, height },
     screen: screenData,
@@ -24,7 +24,7 @@ export const getDeviceDimensions = () => {
  * Get safe area top padding for Android
  */
 export const getSafeAreaTop = (): number => {
-  return Platform.OS === 'android' ? (StatusBar.currentHeight || 0) : 0;
+  return Platform.OS === 'android' ? StatusBar.currentHeight || 0 : 0;
 };
 
 /**
@@ -35,19 +35,19 @@ export const getSafeAreaTop = (): number => {
 export const getAvatarColor = (name: string): string => {
   const colors = [
     'bg-primary',
-    'bg-secondary', 
+    'bg-secondary',
     'bg-warning',
     'bg-error/80',
     'bg-primary/80',
-    'bg-secondary/80'
+    'bg-secondary/80',
   ];
-  
+
   if (!name) return colors[0];
-  
+
   const hash = name.split('').reduce((acc, char) => {
     return char.charCodeAt(0) + ((acc << 5) - acc);
   }, 0);
-  
+
   return colors[Math.abs(hash) % colors.length];
 };
 
@@ -56,28 +56,30 @@ export const getAvatarColor = (name: string): string => {
  * @param priority - Priority level
  * @returns Object with background and text color classes
  */
-export const getPriorityColors = (priority: 'low' | 'medium' | 'high' | 'emergency') => {
+export const getPriorityColors = (
+  priority: 'low' | 'medium' | 'high' | 'emergency',
+) => {
   switch (priority) {
     case 'emergency':
       return {
         background: 'bg-error',
         text: 'text-white',
         border: 'border-error',
-        icon: 'text-error'
+        icon: 'text-error',
       };
     case 'high':
       return {
         background: 'bg-warning',
         text: 'text-white',
-        border: 'border-warning', 
-        icon: 'text-warning'
+        border: 'border-warning',
+        icon: 'text-warning',
       };
     case 'medium':
       return {
         background: 'bg-primary',
         text: 'text-white',
         border: 'border-primary',
-        icon: 'text-primary'
+        icon: 'text-primary',
       };
     case 'low':
     default:
@@ -85,7 +87,7 @@ export const getPriorityColors = (priority: 'low' | 'medium' | 'high' | 'emergen
         background: 'bg-secondary',
         text: 'text-white',
         border: 'border-secondary',
-        icon: 'text-secondary'
+        icon: 'text-secondary',
       };
   }
 };
@@ -97,36 +99,44 @@ export const getPriorityColors = (priority: 'low' | 'medium' | 'high' | 'emergen
  */
 export const getStatusColors = (status: string) => {
   const normalizedStatus = status.toLowerCase();
-  
-  if (['approved', 'completed', 'success', 'active', 'paid'].includes(normalizedStatus)) {
+
+  if (
+    ['approved', 'completed', 'success', 'active', 'paid'].includes(
+      normalizedStatus,
+    )
+  ) {
     return {
       background: 'bg-secondary/10',
       text: 'text-secondary',
-      border: 'border-secondary'
+      border: 'border-secondary',
     };
   }
-  
+
   if (['pending', 'in-progress', 'processing'].includes(normalizedStatus)) {
     return {
       background: 'bg-warning/10',
       text: 'text-warning',
-      border: 'border-warning'
+      border: 'border-warning',
     };
   }
-  
-  if (['rejected', 'failed', 'error', 'cancelled', 'overdue'].includes(normalizedStatus)) {
+
+  if (
+    ['rejected', 'failed', 'error', 'cancelled', 'overdue'].includes(
+      normalizedStatus,
+    )
+  ) {
     return {
       background: 'bg-error/10',
       text: 'text-error',
-      border: 'border-error'
+      border: 'border-error',
     };
   }
-  
+
   // Default/neutral status
   return {
     background: 'bg-primary/10',
     text: 'text-primary',
-    border: 'border-primary'
+    border: 'border-primary',
   };
 };
 
@@ -135,7 +145,9 @@ export const getStatusColors = (status: string) => {
  * @param type - Card type
  * @returns Gradient background class
  */
-export const getCardGradient = (type: 'primary' | 'secondary' | 'success' | 'warning' | 'error'): string => {
+export const getCardGradient = (
+  type: 'primary' | 'secondary' | 'success' | 'warning' | 'error',
+): string => {
   switch (type) {
     case 'primary':
       return 'bg-gradient-to-br from-primary/5 to-primary/10';
@@ -185,7 +197,9 @@ export const getSpacing = (multiplier: number): number => {
  * Haptic feedback wrapper (placeholder for actual haptic implementation)
  * @param type - Type of haptic feedback
  */
-export const triggerHaptic = (type: 'light' | 'medium' | 'heavy' | 'success' | 'warning' | 'error') => {
+export const triggerHaptic = (
+  type: 'light' | 'medium' | 'heavy' | 'success' | 'warning' | 'error',
+) => {
   // In a real app, this would use Haptics from expo-haptics
   // For now, this is a placeholder for future implementation
   console.log(`Haptic feedback: ${type}`);
@@ -199,9 +213,9 @@ export const triggerHaptic = (type: 'light' | 'medium' | 'heavy' | 'success' | '
  * @returns Accessibility label
  */
 export const getAccessibilityLabel = (
-  element: string, 
-  content: string, 
-  state?: string
+  element: string,
+  content: string,
+  state?: string,
 ): string => {
   let label = `${element}, ${content}`;
   if (state) {

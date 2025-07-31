@@ -1,13 +1,13 @@
-import AppNavigator from "@/components/AppNavigator";
-import { useAlert } from "@/components/ui/AlertCard";
-import { AuthProvider } from "@/contexts/AuthContext";
-import { FeatureFlagProvider } from "@/contexts/FeatureFlagContext";
-import { setGlobalAlertHandler } from "@/utils/alert";
-import { Stack } from "expo-router";
-import * as SplashScreen from "expo-splash-screen";
-import { useEffect } from "react";
-import { SafeAreaView } from "react-native-safe-area-context";
-import "./globals.css";
+import AppNavigator from '@/components/AppNavigator';
+import { useAlert } from '@/components/ui/AlertCard';
+import { AuthProvider } from '@/contexts/AuthContext';
+import { FeatureFlagProvider } from '@/contexts/FeatureFlagContext';
+import { setGlobalAlertHandler } from '@/utils/alert';
+import { Stack } from 'expo-router';
+import * as SplashScreen from 'expo-splash-screen';
+import { useEffect } from 'react';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import './globals.css';
 
 // Keep the splash screen visible while we fetch resources
 SplashScreen.preventAutoHideAsync();
@@ -29,12 +29,12 @@ export default function RootLayout() {
               <Stack.Screen name="welcome" options={{ headerShown: false }} />
               <Stack.Screen name="auth" options={{ headerShown: false }} />
               <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-              <Stack.Screen 
-                name="notifications" 
-                options={{ 
+              <Stack.Screen
+                name="notifications"
+                options={{
                   headerShown: false,
-                  presentation: 'modal' // This makes it feel like a modal that can be dismissed
-                }} 
+                  presentation: 'modal', // This makes it feel like a modal that can be dismissed
+                }}
               />
             </Stack>
           </AppNavigator>

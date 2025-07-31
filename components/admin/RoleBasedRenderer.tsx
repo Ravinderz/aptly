@@ -30,21 +30,20 @@ export const RoleBasedRenderer: React.FC<RoleBasedRendererProps> = ({
   roles,
   mode = 'include',
   fallback,
-  showFallback = false
+  showFallback = false,
 }) => {
   const { adminUser, currentMode } = useAdmin();
 
   if (currentMode !== 'admin' || !adminUser) {
-    return showFallback ? (fallback || null) : null;
+    return showFallback ? fallback || null : null;
   }
 
   const userRole = adminUser.role;
-  const hasAccess = mode === 'include' 
-    ? roles.includes(userRole)
-    : !roles.includes(userRole);
+  const hasAccess =
+    mode === 'include' ? roles.includes(userRole) : !roles.includes(userRole);
 
   if (!hasAccess) {
-    return showFallback ? (fallback || null) : null;
+    return showFallback ? fallback || null : null;
   }
 
   return <>{children}</>;
@@ -73,7 +72,7 @@ export const RoleVariants: React.FC<RoleVariantProps> = (props) => {
 export const ConditionalRender: React.FC<ConditionalRenderProps> = ({
   children,
   condition,
-  fallback
+  fallback,
 }) => {
   const { adminUser, currentMode } = useAdmin();
 
@@ -82,16 +81,16 @@ export const ConditionalRender: React.FC<ConditionalRenderProps> = ({
   }
 
   const shouldRender = condition(adminUser.role);
-  return shouldRender ? <>{children}</> : (fallback ? <>{fallback}</> : null);
+  return shouldRender ? <>{children}</> : fallback ? <>{fallback}</> : null;
 };
 
 /**
  * SuperAdminOnly - Convenience component for super admin content
  */
-export const SuperAdminOnly: React.FC<{ children: ReactNode; fallback?: ReactNode }> = ({
-  children,
-  fallback
-}) => (
+export const SuperAdminOnly: React.FC<{
+  children: ReactNode;
+  fallback?: ReactNode;
+}> = ({ children, fallback }) => (
   <RoleBasedRenderer roles={['super_admin']} fallback={fallback}>
     {children}
   </RoleBasedRenderer>
@@ -100,11 +99,13 @@ export const SuperAdminOnly: React.FC<{ children: ReactNode; fallback?: ReactNod
 /**
  * CommunityManagerUp - Content for community manager and above
  */
-export const CommunityManagerUp: React.FC<{ children: ReactNode; fallback?: ReactNode }> = ({
-  children,
-  fallback
-}) => (
-  <RoleBasedRenderer roles={['community_manager', 'super_admin']} fallback={fallback}>
+export const CommunityManagerUp: React.FC<{
+  children: ReactNode;
+  fallback?: ReactNode;
+}> = ({ children, fallback }) => (
+  <RoleBasedRenderer
+    roles={['community_manager', 'super_admin']}
+    fallback={fallback}>
     {children}
   </RoleBasedRenderer>
 );
@@ -112,14 +113,13 @@ export const CommunityManagerUp: React.FC<{ children: ReactNode; fallback?: Reac
 /**
  * SubAdminOnly - Content for sub-admin roles only
  */
-export const SubAdminOnly: React.FC<{ children: ReactNode; fallback?: ReactNode }> = ({
-  children,
-  fallback
-}) => (
-  <RoleBasedRenderer 
-    roles={['financial_manager', 'security_admin', 'maintenance_admin']} 
-    fallback={fallback}
-  >
+export const SubAdminOnly: React.FC<{
+  children: ReactNode;
+  fallback?: ReactNode;
+}> = ({ children, fallback }) => (
+  <RoleBasedRenderer
+    roles={['financial_manager', 'security_admin', 'maintenance_admin']}
+    fallback={fallback}>
     {children}
   </RoleBasedRenderer>
 );
@@ -128,11 +128,11 @@ export const SubAdminOnly: React.FC<{ children: ReactNode; fallback?: ReactNode 
  * RoleAwareComponent - Higher-order component that provides role context
  */
 export const withRoleContext = <P extends object>(
-  Component: React.ComponentType<P & { userRole: AdminRole; isAdmin: boolean }>
+  Component: React.ComponentType<P & { userRole: AdminRole; isAdmin: boolean }>,
 ) => {
   return (props: P) => {
     const { adminUser, currentMode } = useAdmin();
-    
+
     return (
       <Component
         {...props}
@@ -163,7 +163,7 @@ export const PermissionButton: React.FC<PermissionButtonProps> = ({
   action,
   roles,
   className = '',
-  children
+  children,
 }) => {
   const { checkPermission, adminUser } = useAdmin();
 
@@ -181,12 +181,9 @@ export const PermissionButton: React.FC<PermissionButtonProps> = ({
     <TouchableOpacity
       onPress={onPress}
       className={`py-3 px-4 bg-primary rounded-lg ${className}`}
-      activeOpacity={0.8}
-    >
+      activeOpacity={0.8}>
       {children || (
-        <Text className="text-white font-medium text-center">
-          {title}
-        </Text>
+        <Text className="text-white font-medium text-center">{title}</Text>
       )}
     </TouchableOpacity>
   );
@@ -204,7 +201,7 @@ interface RoleBadgeProps {
 export const RoleBadge: React.FC<RoleBadgeProps> = ({
   role,
   size = 'md',
-  showIcon = true
+  showIcon = true,
 }) => {
   const { adminUser } = useAdmin();
   const displayRole = role || adminUser?.role;
@@ -217,54 +214,53 @@ export const RoleBadge: React.FC<RoleBadgeProps> = ({
         return {
           label: 'Super Admin',
           color: 'bg-red-100 text-red-600 border-red-200',
-          icon: '👑'
+          icon: '👑',
         };
       case 'community_manager':
         return {
           label: 'Community Manager',
           color: 'bg-blue-100 text-blue-600 border-blue-200',
-          icon: '🏢'
+          icon: '🏢',
         };
       case 'financial_manager':
         return {
           label: 'Financial Manager',
           color: 'bg-green-100 text-green-600 border-green-200',
-          icon: '💰'
+          icon: '💰',
         };
       case 'security_admin':
         return {
           label: 'Security Admin',
           color: 'bg-orange-100 text-orange-600 border-orange-200',
-          icon: '🛡️'
+          icon: '🛡️',
         };
       case 'maintenance_admin':
         return {
           label: 'Maintenance Admin',
           color: 'bg-purple-100 text-purple-600 border-purple-200',
-          icon: '🔧'
+          icon: '🔧',
         };
       default:
         return {
           label: 'Admin',
           color: 'bg-gray-100 text-gray-600 border-gray-200',
-          icon: '👤'
+          icon: '👤',
         };
     }
   };
 
   const config = getRoleConfig(displayRole);
-  
+
   const sizeClasses = {
     sm: 'px-2 py-1 text-xs',
     md: 'px-3 py-1.5 text-sm',
-    lg: 'px-4 py-2 text-base'
+    lg: 'px-4 py-2 text-base',
   };
 
   return (
-    <View className={`inline-flex flex-row items-center rounded-full border ${config.color} ${sizeClasses[size]}`}>
-      {showIcon && (
-        <Text className="mr-1">{config.icon}</Text>
-      )}
+    <View
+      className={`inline-flex flex-row items-center rounded-full border ${config.color} ${sizeClasses[size]}`}>
+      {showIcon && <Text className="mr-1">{config.icon}</Text>}
       <Text className={`font-medium ${config.color.split(' ')[1]}`}>
         {config.label}
       </Text>
@@ -282,15 +278,15 @@ interface EscalationPathProps {
 
 export const EscalationPath: React.FC<EscalationPathProps> = ({
   issue,
-  currentRole
+  currentRole,
 }) => {
   const { getEscalationPath, adminUser } = useAdmin();
   const role = currentRole || adminUser?.role;
-  
+
   if (!role) return null;
 
   const escalationRoles = getEscalationPath(issue);
-  
+
   if (escalationRoles.length === 0) {
     return (
       <View className="p-3 bg-green-50 rounded-lg border border-green-200">
@@ -328,15 +324,17 @@ interface MultiSocietyRoleProps {
 }
 
 export const MultiSocietyRole: React.FC<MultiSocietyRoleProps> = ({
-  societyId
+  societyId,
 }) => {
   const { adminUser, activeSociety } = useAdmin();
-  
+
   if (!adminUser) return null;
 
   const targetSocietyId = societyId || activeSociety?.id;
-  const societyAccess = adminUser.societies.find(s => s.societyId === targetSocietyId);
-  
+  const societyAccess = adminUser.societies.find(
+    (s) => s.societyId === targetSocietyId,
+  );
+
   if (!societyAccess) return null;
 
   return (

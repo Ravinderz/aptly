@@ -1,7 +1,22 @@
-import React, { useState, useEffect } from 'react';
-import { SafeAreaView, ScrollView, View, Text, TextInput, TouchableOpacity } from 'react-native';
+import React, { useState } from 'react';
+import {
+  SafeAreaView,
+  ScrollView,
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+} from 'react-native';
 import { useAlert } from '@/components/ui/AlertCard';
-import { ArrowLeft, Smartphone, User, Zap, AlertCircle, CreditCard, Gift } from 'lucide-react-native';
+import {
+  ArrowLeft,
+  Smartphone,
+  User,
+  Zap,
+  AlertCircle,
+  CreditCard,
+  Gift,
+} from 'lucide-react-native';
 import { router } from 'expo-router';
 import { Button } from '../../../../components/ui/Button';
 import { Card } from '../../../../components/ui/Card';
@@ -26,12 +41,16 @@ interface Operator {
 
 export default function MobileRecharge() {
   const [phoneNumber, setPhoneNumber] = useState('');
-  const [selectedOperator, setSelectedOperator] = useState<Operator | null>(null);
+  const [selectedOperator, setSelectedOperator] = useState<Operator | null>(
+    null,
+  );
   const [selectedPlan, setSelectedPlan] = useState<Plan | null>(null);
   const [customAmount, setCustomAmount] = useState('');
   const [isDetecting, setIsDetecting] = useState(false);
-  const [rechargeType, setRechargeType] = useState<'prepaid' | 'postpaid'>('prepaid');
-  
+  const [rechargeType, setRechargeType] = useState<'prepaid' | 'postpaid'>(
+    'prepaid',
+  );
+
   const { showAlert, AlertComponent } = useAlert();
 
   const operators: Operator[] = [
@@ -42,19 +61,71 @@ export default function MobileRecharge() {
   ];
 
   const prepaidPlans: Plan[] = [
-    { id: '1', amount: 199, validity: '28 days', data: '2GB/day', type: 'prepaid', description: 'Unlimited calls', popular: true },
-    { id: '2', amount: 399, validity: '56 days', data: '2.5GB/day', type: 'prepaid', description: 'Unlimited calls + 100 SMS/day' },
-    { id: '3', amount: 599, validity: '84 days', data: '2GB/day', type: 'prepaid', description: 'Unlimited calls + Disney+ Hotstar' },
-    { id: '4', amount: 719, validity: '84 days', data: '1.5GB/day', type: 'prepaid', description: 'Unlimited calls + Netflix' },
+    {
+      id: '1',
+      amount: 199,
+      validity: '28 days',
+      data: '2GB/day',
+      type: 'prepaid',
+      description: 'Unlimited calls',
+      popular: true,
+    },
+    {
+      id: '2',
+      amount: 399,
+      validity: '56 days',
+      data: '2.5GB/day',
+      type: 'prepaid',
+      description: 'Unlimited calls + 100 SMS/day',
+    },
+    {
+      id: '3',
+      amount: 599,
+      validity: '84 days',
+      data: '2GB/day',
+      type: 'prepaid',
+      description: 'Unlimited calls + Disney+ Hotstar',
+    },
+    {
+      id: '4',
+      amount: 719,
+      validity: '84 days',
+      data: '1.5GB/day',
+      type: 'prepaid',
+      description: 'Unlimited calls + Netflix',
+    },
   ];
 
   const postpaidPlans: Plan[] = [
-    { id: '5', amount: 399, validity: '30 days', data: '75GB', type: 'postpaid', description: 'Unlimited calls + family sharing' },
-    { id: '6', amount: 599, validity: '30 days', data: '125GB', type: 'postpaid', description: 'Unlimited calls + OTT apps', popular: true },
-    { id: '7', amount: 999, validity: '30 days', data: '210GB', type: 'postpaid', description: 'Premium plan with international roaming' },
+    {
+      id: '5',
+      amount: 399,
+      validity: '30 days',
+      data: '75GB',
+      type: 'postpaid',
+      description: 'Unlimited calls + family sharing',
+    },
+    {
+      id: '6',
+      amount: 599,
+      validity: '30 days',
+      data: '125GB',
+      type: 'postpaid',
+      description: 'Unlimited calls + OTT apps',
+      popular: true,
+    },
+    {
+      id: '7',
+      amount: 999,
+      validity: '30 days',
+      data: '210GB',
+      type: 'postpaid',
+      description: 'Premium plan with international roaming',
+    },
   ];
 
-  const currentPlans = rechargeType === 'prepaid' ? prepaidPlans : postpaidPlans;
+  const currentPlans =
+    rechargeType === 'prepaid' ? prepaidPlans : postpaidPlans;
 
   const detectOperator = async () => {
     if (phoneNumber.length !== 10) {
@@ -71,20 +142,23 @@ export default function MobileRecharge() {
     }
 
     setIsDetecting(true);
-    
+
     // Simulate operator detection
     setTimeout(() => {
       const firstDigit = phoneNumber[0];
       let detectedOperator;
-      
+
       if (['6', '7', '8', '9'].includes(firstDigit)) {
         // Simple logic for demo - in real app would use API
-        if (phoneNumber.startsWith('9')) detectedOperator = operators[0]; // Airtel
-        else if (phoneNumber.startsWith('8')) detectedOperator = operators[1]; // Jio
-        else if (phoneNumber.startsWith('7')) detectedOperator = operators[2]; // Vi
+        if (phoneNumber.startsWith('9'))
+          detectedOperator = operators[0]; // Airtel
+        else if (phoneNumber.startsWith('8'))
+          detectedOperator = operators[1]; // Jio
+        else if (phoneNumber.startsWith('7'))
+          detectedOperator = operators[2]; // Vi
         else detectedOperator = operators[3]; // BSNL
       }
-      
+
       setSelectedOperator(detectedOperator || operators[0]);
       setIsDetecting(false);
     }, 1500);
@@ -127,8 +201,8 @@ export default function MobileRecharge() {
         operator: selectedOperator.name,
         amount: amount.toString(),
         planDetails: selectedPlan ? JSON.stringify(selectedPlan) : '',
-        cashback: Math.round(amount * 0.02).toString() // 2% cashback
-      }
+        cashback: Math.round(amount * 0.02).toString(), // 2% cashback
+      },
     });
   };
 
@@ -143,9 +217,10 @@ export default function MobileRecharge() {
         <Button
           variant="ghost"
           size="sm"
-          onPress={() => router.canGoBack() ? router.back() : router.replace('/(tabs)')}
-          className="mr-2 p-2"
-        >
+          onPress={() =>
+            router.canGoBack() ? router.back() : router.replace('/(tabs)')
+          }
+          className="mr-2 p-2">
           <ArrowLeft size={20} color="#6366f1" />
         </Button>
         <Smartphone size={20} color="#6366f1" />
@@ -160,7 +235,7 @@ export default function MobileRecharge() {
           <Text className="text-text-primary text-headline-medium font-semibold mb-4">
             Enter Mobile Number
           </Text>
-          
+
           <View className="flex-row items-center bg-background rounded-xl px-4 py-4 border border-divider mb-4">
             <Text className="text-text-primary text-body-large mr-3">+91</Text>
             <TextInput
@@ -178,11 +253,10 @@ export default function MobileRecharge() {
           </View>
 
           {phoneNumber.length === 10 && !selectedOperator && (
-            <Button 
-              onPress={detectOperator} 
+            <Button
+              onPress={detectOperator}
               disabled={isDetecting}
-              className="mb-4"
-            >
+              className="mb-4">
               {isDetecting ? 'Detecting Operator...' : 'Detect Operator'}
             </Button>
           )}
@@ -194,15 +268,23 @@ export default function MobileRecharge() {
             <Text className="text-text-primary text-headline-medium font-semibold mb-4">
               Selected Operator
             </Text>
-            
+
             <View className="flex-row items-center p-4 bg-primary/5 rounded-xl border border-primary/20">
-              <Text className="text-display-small mr-3">{selectedOperator.logo}</Text>
+              <Text className="text-display-small mr-3">
+                {selectedOperator.logo}
+              </Text>
               <View className="flex-1">
-                <Text className="text-text-primary font-semibold">{selectedOperator.name}</Text>
-                <Text className="text-text-secondary text-body-medium">Operator detected</Text>
+                <Text className="text-text-primary font-semibold">
+                  {selectedOperator.name}
+                </Text>
+                <Text className="text-text-secondary text-body-medium">
+                  Operator detected
+                </Text>
               </View>
               <TouchableOpacity onPress={() => setSelectedOperator(null)}>
-                <Text className="text-primary text-body-medium font-medium">Change</Text>
+                <Text className="text-primary text-body-medium font-medium">
+                  Change
+                </Text>
               </TouchableOpacity>
             </View>
           </Card>
@@ -214,30 +296,34 @@ export default function MobileRecharge() {
             <Text className="text-text-primary text-headline-medium font-semibold mb-4">
               Recharge Type
             </Text>
-            
+
             <View className="flex-row bg-background rounded-xl p-1">
               <TouchableOpacity
                 onPress={() => setRechargeType('prepaid')}
                 className={`flex-1 py-3 rounded-lg ${
                   rechargeType === 'prepaid' ? 'bg-primary' : 'bg-transparent'
-                }`}
-              >
-                <Text className={`text-center font-medium ${
-                  rechargeType === 'prepaid' ? 'text-white' : 'text-text-secondary'
                 }`}>
+                <Text
+                  className={`text-center font-medium ${
+                    rechargeType === 'prepaid'
+                      ? 'text-white'
+                      : 'text-text-secondary'
+                  }`}>
                   Prepaid
                 </Text>
               </TouchableOpacity>
-              
+
               <TouchableOpacity
                 onPress={() => setRechargeType('postpaid')}
                 className={`flex-1 py-3 rounded-lg ${
                   rechargeType === 'postpaid' ? 'bg-primary' : 'bg-transparent'
-                }`}
-              >
-                <Text className={`text-center font-medium ${
-                  rechargeType === 'postpaid' ? 'text-white' : 'text-text-secondary'
                 }`}>
+                <Text
+                  className={`text-center font-medium ${
+                    rechargeType === 'postpaid'
+                      ? 'text-white'
+                      : 'text-text-secondary'
+                  }`}>
                   Postpaid
                 </Text>
               </TouchableOpacity>
@@ -249,26 +335,30 @@ export default function MobileRecharge() {
         {selectedOperator && (
           <View className="mx-6 mb-6">
             <Text className="text-text-primary text-headline-medium font-semibold mb-4">
-              Popular {rechargeType === 'prepaid' ? 'Prepaid' : 'Postpaid'} Plans
+              Popular {rechargeType === 'prepaid' ? 'Prepaid' : 'Postpaid'}{' '}
+              Plans
             </Text>
-            
+
             <View className="space-y-3">
               {currentPlans.map((plan) => (
                 <TouchableOpacity
                   key={plan.id}
                   onPress={() => setSelectedPlan(plan)}
                   className={`bg-surface rounded-xl p-4 border ${
-                    selectedPlan?.id === plan.id ? 'border-primary bg-primary/5' : 'border-divider'
-                  }`}
-                >
+                    selectedPlan?.id === plan.id
+                      ? 'border-primary bg-primary/5'
+                      : 'border-divider'
+                  }`}>
                   {plan.popular && (
                     <View className="absolute -top-2 left-4">
                       <View className="bg-success rounded-full px-3 py-1">
-                        <Text className="text-white text-label-large font-bold">POPULAR</Text>
+                        <Text className="text-white text-label-large font-bold">
+                          POPULAR
+                        </Text>
                       </View>
                     </View>
                   )}
-                  
+
                   <View className="flex-row items-center justify-between mb-3">
                     <View className="flex-row items-center">
                       <Zap size={16} color="#6366f1" />
@@ -277,15 +367,23 @@ export default function MobileRecharge() {
                       </Text>
                     </View>
                     <View className="items-end">
-                      <Text className="text-text-secondary text-label-large">Validity</Text>
-                      <Text className="text-text-primary font-medium text-body-medium">{plan.validity}</Text>
+                      <Text className="text-text-secondary text-label-large">
+                        Validity
+                      </Text>
+                      <Text className="text-text-primary font-medium text-body-medium">
+                        {plan.validity}
+                      </Text>
                     </View>
                   </View>
-                  
+
                   <View className="flex-row items-center justify-between">
                     <View>
-                      <Text className="text-text-primary font-semibold text-body-large">{plan.data}</Text>
-                      <Text className="text-text-secondary text-body-medium">{plan.description}</Text>
+                      <Text className="text-text-primary font-semibold text-body-large">
+                        {plan.data}
+                      </Text>
+                      <Text className="text-text-secondary text-body-medium">
+                        {plan.description}
+                      </Text>
                     </View>
                     {selectedPlan?.id === plan.id && (
                       <View className="bg-primary rounded-full w-6 h-6 items-center justify-center">
@@ -305,7 +403,7 @@ export default function MobileRecharge() {
             <Text className="text-text-primary text-headline-medium font-semibold mb-4">
               Or Enter Custom Amount
             </Text>
-            
+
             <View className="flex-row items-center bg-background rounded-xl px-4 py-4 border border-divider">
               <Text className="text-text-primary text-body-large mr-2">₹</Text>
               <TextInput
@@ -326,8 +424,7 @@ export default function MobileRecharge() {
             title="Cashback Offer"
             variant="success"
             size="sm"
-            className="mx-6 mb-6"
-          >
+            className="mx-6 mb-6">
             <View className="flex-row items-center">
               <Gift size={16} color="#4CAF50" />
               <Text className="text-text-secondary text-body-medium ml-2">
@@ -342,8 +439,7 @@ export default function MobileRecharge() {
           title="Important Information"
           variant="info"
           size="sm"
-          className="mx-6 mb-8"
-        >
+          className="mx-6 mb-8">
           <View className="space-y-2">
             <View className="flex-row items-start">
               <AlertCircle size={14} color="#6366f1" className="mt-0.5 mr-2" />
@@ -368,24 +464,33 @@ export default function MobileRecharge() {
       </ScrollView>
 
       {/* Pay Button */}
-      {selectedOperator && (phoneNumber.length === 10) && (
+      {selectedOperator && phoneNumber.length === 10 && (
         <View className="px-6 py-4 bg-surface border-t border-divider">
           <View className="flex-row items-center justify-between mb-4">
-            <Text className="text-text-secondary text-body-medium">Amount to Pay</Text>
+            <Text className="text-text-secondary text-body-medium">
+              Amount to Pay
+            </Text>
             <Text className="text-text-primary font-bold text-display-small">
-              {formatCurrency(selectedPlan?.amount || parseInt(customAmount) || 0)}
+              {formatCurrency(
+                selectedPlan?.amount || parseInt(customAmount) || 0,
+              )}
             </Text>
           </View>
-          
-          <Button onPress={handleRecharge} className="flex-row items-center justify-center">
+
+          <Button
+            onPress={handleRecharge}
+            className="flex-row items-center justify-center">
             <CreditCard size={16} color="white" />
             <Text className="text-white font-semibold ml-2 text-body-medium">
-              Pay {formatCurrency(selectedPlan?.amount || parseInt(customAmount) || 0)}
+              Pay{' '}
+              {formatCurrency(
+                selectedPlan?.amount || parseInt(customAmount) || 0,
+              )}
             </Text>
           </Button>
         </View>
       )}
-      
+
       {/* Custom Alert Component */}
       {AlertComponent}
     </SafeAreaView>

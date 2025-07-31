@@ -1,9 +1,9 @@
-import AptlySearchBar from "@/components/ui/AptlySearchBar";
-import Header from "@/components/ui/Header";
-import PillFilter from "@/components/ui/PillFilter";
-import PostCard from "@/components/ui/PostCard";
-import ImagePicker from "@/components/ui/ImagePicker";
-import MentionInput from "@/components/ui/MentionInput";
+import AptlySearchBar from '@/components/ui/AptlySearchBar';
+import Header from '@/components/ui/Header';
+import PillFilter from '@/components/ui/PillFilter';
+import PostCard from '@/components/ui/PostCard';
+import ImagePicker from '@/components/ui/ImagePicker';
+import MentionInput from '@/components/ui/MentionInput';
 import {
   ScrollView,
   Text,
@@ -14,13 +14,19 @@ import {
   KeyboardAvoidingView,
   Platform,
   FlatList,
-} from "react-native";
-import React, { useState, useEffect, useCallback } from "react";
-import { router, useFocusEffect } from "expo-router";
-import { Post, CategoryType, CATEGORY_FILTERS, MAX_POST_LENGTH, User } from "@/types/community";
-import { communityApi } from "@/services/communityApi";
-import { filterPosts, validatePostContent } from "@/utils/community";
-import { showErrorAlert, showSuccessAlert } from "@/utils/alert";
+} from 'react-native';
+import React, { useState, useEffect, useCallback } from 'react';
+import { router, useFocusEffect } from 'expo-router';
+import {
+  Post,
+  CategoryType,
+  CATEGORY_FILTERS,
+  MAX_POST_LENGTH,
+  User,
+} from '@/types/community';
+import { communityApi } from '@/services/communityApi';
+import { filterPosts, validatePostContent } from '@/utils/community';
+import { showErrorAlert, showSuccessAlert } from '@/utils/alert';
 
 export default function Community() {
   const [posts, setPosts] = useState<Post[]>([]);
@@ -43,7 +49,12 @@ export default function Community() {
 
   // Filter posts when dependencies change
   useEffect(() => {
-    const filtered = filterPosts(posts, selectedFilter, searchQuery, currentUser?.id);
+    const filtered = filterPosts(
+      posts,
+      selectedFilter,
+      searchQuery,
+      currentUser?.id,
+    );
     setFilteredPosts(filtered);
   }, [posts, selectedFilter, searchQuery, currentUser]);
 
@@ -53,7 +64,7 @@ export default function Community() {
       if (!loading) {
         refreshPosts();
       }
-    }, [loading])
+    }, [loading]),
   );
 
   const loadCommunityData = async () => {
@@ -61,20 +72,23 @@ export default function Community() {
       setLoading(true);
       const [user, postsData] = await Promise.all([
         communityApi.getCurrentUser(),
-        communityApi.getPosts()
+        communityApi.getPosts(),
       ]);
       setCurrentUser(user);
       setPosts(postsData);
-      
+
       // Load all users for mentions (you could also create a getAllUsers method in the API)
       const allUserIds = ['user1', 'user2', 'user3', 'user4', 'user5'];
       const allUsers = await Promise.all(
-        allUserIds.map(id => communityApi.getUser(id))
+        allUserIds.map((id) => communityApi.getUser(id)),
       );
-      setAllUsers(allUsers.filter(u => u !== null) as User[]);
+      setAllUsers(allUsers.filter((u) => u !== null) as User[]);
     } catch (error) {
       console.error('Error loading community data:', error);
-      showErrorAlert('Error', 'Failed to load community posts. Please try again.');
+      showErrorAlert(
+        'Error',
+        'Failed to load community posts. Please try again.',
+      );
     } finally {
       setLoading(false);
     }
@@ -106,13 +120,16 @@ export default function Community() {
       const newPost = await communityApi.createPost({
         content: postContent,
         category: 'feedback',
-        imageUrl: postImage
+        imageUrl: postImage,
       });
-      
-      setPosts(prev => [newPost, ...prev]);
+
+      setPosts((prev) => [newPost, ...prev]);
       setPostContent('');
       setPostImage(undefined);
-      showSuccessAlert('Success', 'Your post has been shared with the community!');
+      showSuccessAlert(
+        'Success',
+        'Your post has been shared with the community!',
+      );
     } catch (error) {
       console.error('Error creating post:', error);
       showErrorAlert('Error', 'Failed to create post. Please try again.');
@@ -122,11 +139,13 @@ export default function Community() {
   };
 
   const handleLike = (postId: string, liked: boolean, likesCount: number) => {
-    setPosts(prev => prev.map(post => 
-      post.id === postId 
-        ? { ...post, isLikedByUser: liked, likesCount }
-        : post
-    ));
+    setPosts((prev) =>
+      prev.map((post) =>
+        post.id === postId
+          ? { ...post, isLikedByUser: liked, likesCount }
+          : post,
+      ),
+    );
   };
 
   const handleComment = (postId: string) => {
@@ -134,7 +153,7 @@ export default function Community() {
   };
 
   const handleDelete = (postId: string) => {
-    setPosts(prev => prev.filter(post => post.id !== postId));
+    setPosts((prev) => prev.filter((post) => post.id !== postId));
     showSuccessAlert('Success', 'Post deleted successfully.');
   };
 
@@ -151,18 +170,25 @@ export default function Community() {
   };
 
   const getFilterCounts = () => {
-    const counts: Record<CategoryType, number> = {} as Record<CategoryType, number>;
-    
-    CATEGORY_FILTERS.forEach(filter => {
+    const counts: Record<CategoryType, number> = {} as Record<
+      CategoryType,
+      number
+    >;
+
+    CATEGORY_FILTERS.forEach((filter) => {
       if (filter.key === 'all') {
         counts[filter.key] = posts.length;
       } else if (filter.key === 'my_posts') {
-        counts[filter.key] = posts.filter(p => p.userId === currentUser?.id).length;
+        counts[filter.key] = posts.filter(
+          (p) => p.userId === currentUser?.id,
+        ).length;
       } else {
-        counts[filter.key] = posts.filter(p => p.category === filter.key).length;
+        counts[filter.key] = posts.filter(
+          (p) => p.category === filter.key,
+        ).length;
       }
     });
-    
+
     return counts;
   };
 
@@ -182,7 +208,9 @@ export default function Community() {
       <Header>
         <View className="flex-1 items-center justify-center py-20">
           <ActivityIndicator size="large" color="#6366f1" />
-          <Text className="text-text-secondary mt-4">Loading community posts...</Text>
+          <Text className="text-text-secondary mt-4">
+            Loading community posts...
+          </Text>
         </View>
       </Header>
     );
@@ -190,11 +218,10 @@ export default function Community() {
 
   return (
     <Header>
-      <KeyboardAvoidingView 
+      <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         className="flex-1"
-        keyboardVerticalOffset={Platform.OS === 'ios' ? 90 : 0}
-      >
+        keyboardVerticalOffset={Platform.OS === 'ios' ? 90 : 0}>
         <ScrollView
           className="flex-1"
           showsVerticalScrollIndicator={false}
@@ -210,8 +237,7 @@ export default function Community() {
           keyboardShouldPersistTaps="handled"
           scrollEventThrottle={16}
           overScrollMode="always"
-          nestedScrollEnabled={false}
-        >
+          nestedScrollEnabled={false}>
           {/* Post Creation Section */}
           <View className="mb-6">
             <View className="bg-surface border border-divider rounded-2xl p-5">
@@ -226,7 +252,7 @@ export default function Community() {
                 users={allUsers}
                 disabled={isSubmittingPost}
               />
-              
+
               {/* Image Upload */}
               <ImagePicker
                 onImageSelected={handleImageSelected}
@@ -234,30 +260,39 @@ export default function Community() {
                 selectedImage={postImage}
                 disabled={isSubmittingPost}
               />
-              
+
               {/* Character count */}
               <View className="flex-row justify-between items-center mt-3 pt-3 border-t border-divider">
-                <Text className={`text-sm ${isNearLimit ? 'text-warning' : 'text-text-secondary'}`}>
+                <Text
+                  className={`text-sm ${isNearLimit ? 'text-warning' : 'text-text-secondary'}`}>
                   {characterCount}/{MAX_POST_LENGTH}
                 </Text>
-                
-                <TouchableOpacity 
+
+                <TouchableOpacity
                   onPress={handleSubmitPost}
-                  disabled={(!postContent.trim() && !postImage) || isSubmittingPost || characterCount > MAX_POST_LENGTH}
+                  disabled={
+                    (!postContent.trim() && !postImage) ||
+                    isSubmittingPost ||
+                    characterCount > MAX_POST_LENGTH
+                  }
                   className={`px-6 py-2 rounded-xl flex-row items-center gap-2 ${
-                    (!postContent.trim() && !postImage) || isSubmittingPost || characterCount > MAX_POST_LENGTH
-                      ? 'bg-text-secondary/20' 
+                    (!postContent.trim() && !postImage) ||
+                    isSubmittingPost ||
+                    characterCount > MAX_POST_LENGTH
+                      ? 'bg-text-secondary/20'
                       : 'bg-primary'
-                  }`}
-                >
+                  }`}>
                   {isSubmittingPost ? (
                     <ActivityIndicator size="small" color="white" />
                   ) : null}
-                  <Text className={`font-semibold ${
-                    (!postContent.trim() && !postImage) || isSubmittingPost || characterCount > MAX_POST_LENGTH
-                      ? 'text-text-secondary' 
-                      : 'text-white'
-                  }`}>
+                  <Text
+                    className={`font-semibold ${
+                      (!postContent.trim() && !postImage) ||
+                      isSubmittingPost ||
+                      characterCount > MAX_POST_LENGTH
+                        ? 'text-text-secondary'
+                        : 'text-white'
+                    }`}>
                     {isSubmittingPost ? 'Posting...' : 'Share'}
                   </Text>
                 </TouchableOpacity>
@@ -267,22 +302,21 @@ export default function Community() {
 
           {/* Search and Filters */}
           <View className="mb-4">
-            <AptlySearchBar 
+            <AptlySearchBar
               placeholder="Search community posts..."
               value={searchQuery}
               onChangeText={setSearchQuery}
               onSearch={handleSearch}
               onClear={handleClearSearch}
             />
-            
+
             <ScrollView
               horizontal
               showsHorizontalScrollIndicator={false}
               className="mt-4"
               contentContainerStyle={{ paddingHorizontal: 4, gap: 8 }}
               nestedScrollEnabled={false}
-              scrollEventThrottle={1}
-            >
+              scrollEventThrottle={1}>
               {CATEGORY_FILTERS.map((filter) => (
                 <PillFilter
                   key={filter.key}
@@ -312,15 +346,18 @@ export default function Community() {
             ListEmptyComponent={
               <View className="flex-1 items-center justify-center py-16 min-h-[200px]">
                 <Text className="text-xl font-semibold text-text-primary mb-2">
-                  {searchQuery ? 'No posts found' : selectedFilter === 'my_posts' ? 'No posts yet' : 'No community posts'}
+                  {searchQuery
+                    ? 'No posts found'
+                    : selectedFilter === 'my_posts'
+                      ? 'No posts yet'
+                      : 'No community posts'}
                 </Text>
                 <Text className="text-text-secondary text-center leading-6 px-8">
-                  {searchQuery 
-                    ? 'Try adjusting your search terms or browse all posts.' 
+                  {searchQuery
+                    ? 'Try adjusting your search terms or browse all posts.'
                     : selectedFilter === 'my_posts'
                       ? 'Start sharing with your community by creating your first post above.'
-                      : 'Be the first to start a conversation in your community!'
-                  }
+                      : 'Be the first to start a conversation in your community!'}
                 </Text>
               </View>
             }

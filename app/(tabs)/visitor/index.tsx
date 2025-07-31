@@ -1,10 +1,25 @@
-import AptlySearchBar from "@/components/ui/AptlySearchBar";
-import Header from "@/components/ui/Header";
-import VisitorListItem from "@/components/ui/VisitorListItem";
-import VisitorQRModal from "@/components/ui/VisitorQRModal";
-import { router } from "expo-router";
-import { Calendar, Filter, Plus, Users, X, Clock, CalendarDays, Phone, MessageSquare } from "lucide-react-native";
-import React, { useEffect, useState, useCallback, startTransition } from "react";
+import AptlySearchBar from '@/components/ui/AptlySearchBar';
+import Header from '@/components/ui/Header';
+import VisitorListItem from '@/components/ui/VisitorListItem';
+import VisitorQRModal from '@/components/ui/VisitorQRModal';
+import { router } from 'expo-router';
+import {
+  Calendar,
+  Filter,
+  Plus,
+  Users,
+  X,
+  Clock,
+  CalendarDays,
+  Phone,
+  MessageSquare,
+} from 'lucide-react-native';
+import React, {
+  useEffect,
+  useState,
+  useCallback,
+  startTransition,
+} from 'react';
 import {
   RefreshControl,
   ScrollView,
@@ -12,57 +27,59 @@ import {
   TouchableOpacity,
   View,
   Modal,
-  TextInput
-} from "react-native";
-import { DatePickerModal, TimePickerModal } from "@/components/ui/pickers";
-import { formatDate } from "@/utils/dateUtils";
-import { useAlert } from "@/components/ui/AlertCard";
+  TextInput,
+} from 'react-native';
+import { DatePickerModal, TimePickerModal } from '@/components/ui/pickers';
+import { formatDate } from '@/utils/dateUtils';
+import { useAlert } from '@/components/ui/AlertCard';
 
 interface Visitor {
   id: string;
   name: string;
   date: string;
   time: string;
-  status: "Pending" | "Approved" | "Pre-approved" | "Rejected" | "Completed";
-  category: "Personal" | "Delivery" | "Service" | "Official";
+  status: 'Pending' | 'Approved' | 'Pre-approved' | 'Rejected' | 'Completed';
+  category: 'Personal' | 'Delivery' | 'Service' | 'Official';
   phone?: string;
   purpose?: string;
 }
 
 const FILTER_OPTIONS = [
-  { key: "all", label: "All Visitors" },
-  { key: "pending", label: "Pending" },
-  { key: "approved", label: "Approved" },
-  { key: "today", label: "Today" },
+  { key: 'all', label: 'All Visitors' },
+  { key: 'pending', label: 'Pending' },
+  { key: 'approved', label: 'Approved' },
+  { key: 'today', label: 'Today' },
 ];
 
 const CATEGORY_FILTERS = [
-  { key: "all", label: "All Categories", icon: Users },
-  { key: "Personal", label: "Personal", icon: Users },
-  { key: "Delivery", label: "Delivery", icon: Users },
-  { key: "Service", label: "Service", icon: Users },
-  { key: "Official", label: "Official", icon: Users },
+  { key: 'all', label: 'All Categories', icon: Users },
+  { key: 'Personal', label: 'Personal', icon: Users },
+  { key: 'Delivery', label: 'Delivery', icon: Users },
+  { key: 'Service', label: 'Service', icon: Users },
+  { key: 'Official', label: 'Official', icon: Users },
 ];
 
 export default function VisitorDashboard() {
   const [visitors, setVisitors] = useState<Visitor[]>([]);
   const [filteredVisitors, setFilteredVisitors] = useState<Visitor[]>([]);
-  const [selectedFilter, setSelectedFilter] = useState("all");
-  const [selectedCategory, setSelectedCategory] = useState("all");
-  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedFilter, setSelectedFilter] = useState('all');
+  const [selectedCategory, setSelectedCategory] = useState('all');
+  const [searchQuery, setSearchQuery] = useState('');
   const [refreshing, setRefreshing] = useState(false);
   const [loading, setLoading] = useState(true);
   const [selectedVisitor, setSelectedVisitor] = useState<Visitor | null>(null);
   const [showQRModal, setShowQRModal] = useState(false);
-  
+
   // Reschedule modal states
   const [showRescheduleModal, setShowRescheduleModal] = useState(false);
-  const [rescheduleVisitor, setRescheduleVisitor] = useState<Visitor | null>(null);
+  const [rescheduleVisitor, setRescheduleVisitor] = useState<Visitor | null>(
+    null,
+  );
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [showTimePicker, setShowTimePicker] = useState(false);
   const [rescheduleDate, setRescheduleDate] = useState<Date | null>(null);
-  const [rescheduleTime, setRescheduleTime] = useState("");
-  const [rescheduleReason, setRescheduleReason] = useState("");
+  const [rescheduleTime, setRescheduleTime] = useState('');
+  const [rescheduleReason, setRescheduleReason] = useState('');
 
   // Custom alert hook
   const { showAlert, AlertComponent } = useAlert();
@@ -80,70 +97,70 @@ export default function VisitorDashboard() {
       // Mock data - in production this would be an API call
       const mockVisitors: Visitor[] = [
         {
-          id: "1",
-          name: "Nishant Kumar",
-          date: "Today",
-          time: "10:00 AM",
-          status: "Pre-approved",
-          category: "Personal",
-          phone: "+91 9876543210",
-          purpose: "Family visit"
+          id: '1',
+          name: 'Nishant Kumar',
+          date: 'Today',
+          time: '10:00 AM',
+          status: 'Pre-approved',
+          category: 'Personal',
+          phone: '+91 9876543210',
+          purpose: 'Family visit',
         },
         {
-          id: "2",
-          name: "Amazon Delivery",
-          date: "Today",
-          time: "11:00 AM",
-          status: "Approved",
-          category: "Delivery",
-          phone: "+91 9876543211",
-          purpose: "Package delivery"
+          id: '2',
+          name: 'Amazon Delivery',
+          date: 'Today',
+          time: '11:00 AM',
+          status: 'Approved',
+          category: 'Delivery',
+          phone: '+91 9876543211',
+          purpose: 'Package delivery',
         },
         {
-          id: "3",
-          name: "Blinkit Delivery",
-          date: "Today",
-          time: "12:30 PM",
-          status: "Pending",
-          category: "Delivery",
-          phone: "+91 9876543212",
-          purpose: "Grocery delivery"
+          id: '3',
+          name: 'Blinkit Delivery',
+          date: 'Today',
+          time: '12:30 PM',
+          status: 'Pending',
+          category: 'Delivery',
+          phone: '+91 9876543212',
+          purpose: 'Grocery delivery',
         },
         {
-          id: "4",
-          name: "Plumber - Raj",
-          date: "Tomorrow",
-          time: "09:00 AM",
-          status: "Approved",
-          category: "Service",
-          phone: "+91 9876543213",
-          purpose: "Pipe repair"
+          id: '4',
+          name: 'Plumber - Raj',
+          date: 'Tomorrow',
+          time: '09:00 AM',
+          status: 'Approved',
+          category: 'Service',
+          phone: '+91 9876543213',
+          purpose: 'Pipe repair',
         },
         {
-          id: "5",
-          name: "Dr. Sharma",
-          date: "Yesterday",
-          time: "08:00 PM",
-          status: "Completed",
-          category: "Personal",
-          phone: "+91 9876543214",
-          purpose: "Home consultation"
+          id: '5',
+          name: 'Dr. Sharma',
+          date: 'Yesterday',
+          time: '08:00 PM',
+          status: 'Completed',
+          category: 'Personal',
+          phone: '+91 9876543214',
+          purpose: 'Home consultation',
         },
         {
-          id: "6",
-          name: "Unknown Visitor",
-          date: "Yesterday",
-          time: "02:00 PM", 
-          status: "Rejected",
-          category: "Personal",
-          phone: "+91 9876543215",
-          purpose: "Unscheduled visit"
-        }
+          id: '6',
+          name: 'Unknown Visitor',
+          date: 'Yesterday',
+          time: '02:00 PM',
+          status: 'Rejected',
+          category: 'Personal',
+          phone: '+91 9876543215',
+          purpose: 'Unscheduled visit',
+        },
       ];
-      
+
       setVisitors(mockVisitors);
     } catch (error) {
-      console.error("Error loading visitors:", error);
+      console.error('Error loading visitors:', error);
     } finally {
       setLoading(false);
     }
@@ -153,44 +170,56 @@ export default function VisitorDashboard() {
     let filtered = visitors;
 
     // Filter by status/time
-    if (selectedFilter !== "all") {
+    if (selectedFilter !== 'all') {
       switch (selectedFilter) {
-        case "pending":
-          filtered = filtered.filter(v => v.status === "Pending");
+        case 'pending':
+          filtered = filtered.filter((v) => v.status === 'Pending');
           break;
-        case "approved":
-          filtered = filtered.filter(v => v.status === "Approved" || v.status === "Pre-approved");
+        case 'approved':
+          filtered = filtered.filter(
+            (v) => v.status === 'Approved' || v.status === 'Pre-approved',
+          );
           break;
-        case "today":
-          filtered = filtered.filter(v => v.date === "Today");
+        case 'today':
+          filtered = filtered.filter((v) => v.date === 'Today');
           break;
       }
     }
 
     // Filter by category
-    if (selectedCategory !== "all") {
-      filtered = filtered.filter(v => v.category === selectedCategory);
+    if (selectedCategory !== 'all') {
+      filtered = filtered.filter((v) => v.category === selectedCategory);
     }
 
     // Filter by search query
     if (searchQuery.trim()) {
       const query = searchQuery.toLowerCase();
-      filtered = filtered.filter(v => 
-        v.name.toLowerCase().includes(query) ||
-        v.purpose?.toLowerCase().includes(query) ||
-        v.category.toLowerCase().includes(query)
+      filtered = filtered.filter(
+        (v) =>
+          v.name.toLowerCase().includes(query) ||
+          v.purpose?.toLowerCase().includes(query) ||
+          v.category.toLowerCase().includes(query),
       );
     }
 
     // Sort by date and status priority
     filtered.sort((a, b) => {
-      const statusOrder = { "Pending": 4, "Pre-approved": 3, "Approved": 2, "Completed": 1, "Rejected": 0 };
+      const statusOrder = {
+        Pending: 4,
+        'Pre-approved': 3,
+        Approved: 2,
+        Completed: 1,
+        Rejected: 0,
+      };
       const statusComparison = statusOrder[b.status] - statusOrder[a.status];
       if (statusComparison !== 0) return statusComparison;
-      
+
       // Then sort by date
-      const dateOrder = { "Today": 3, "Tomorrow": 2, "Yesterday": 1 };
-      return (dateOrder[b.date as keyof typeof dateOrder] || 0) - (dateOrder[a.date as keyof typeof dateOrder] || 0);
+      const dateOrder = { Today: 3, Tomorrow: 2, Yesterday: 1 };
+      return (
+        (dateOrder[b.date as keyof typeof dateOrder] || 0) -
+        (dateOrder[a.date as keyof typeof dateOrder] || 0)
+      );
     });
 
     setFilteredVisitors(filtered);
@@ -203,36 +232,32 @@ export default function VisitorDashboard() {
   };
 
   const handleAddVisitor = () => {
-    router.push("/(tabs)/visitor/addVisitor");
+    router.push('/(tabs)/visitor/addVisitor');
   };
 
   const handleVisitorAction = (visitor: Visitor, action: string) => {
     console.log(`${action} visitor:`, visitor.name);
-    
-    if (action === "approve") {
+
+    if (action === 'approve') {
       // Update visitor status to approved
-      setVisitors(prevVisitors => 
-        prevVisitors.map(v => 
-          v.id === visitor.id 
-            ? { ...v, status: "Approved" as const }
-            : v
-        )
+      setVisitors((prevVisitors) =>
+        prevVisitors.map((v) =>
+          v.id === visitor.id ? { ...v, status: 'Approved' as const } : v,
+        ),
       );
-    } else if (action === "reject") {
+    } else if (action === 'reject') {
       // Update visitor status to rejected
-      setVisitors(prevVisitors => 
-        prevVisitors.map(v => 
-          v.id === visitor.id 
-            ? { ...v, status: "Rejected" as const }
-            : v
-        )
+      setVisitors((prevVisitors) =>
+        prevVisitors.map((v) =>
+          v.id === visitor.id ? { ...v, status: 'Rejected' as const } : v,
+        ),
       );
-    } else if (action === "view") {
+    } else if (action === 'view') {
       // Handle reschedule action
       setRescheduleVisitor(visitor);
       setRescheduleDate(null);
-      setRescheduleTime("");
-      setRescheduleReason("");
+      setRescheduleTime('');
+      setRescheduleReason('');
       setShowRescheduleModal(true);
     }
   };
@@ -252,16 +277,16 @@ export default function VisitorDashboard() {
     }
 
     // Update visitor with new date and time
-    setVisitors(prevVisitors => 
-      prevVisitors.map(v => 
-        v.id === rescheduleVisitor.id 
-          ? { 
-              ...v, 
+    setVisitors((prevVisitors) =>
+      prevVisitors.map((v) =>
+        v.id === rescheduleVisitor.id
+          ? {
+              ...v,
               date: formatDate(rescheduleDate),
-              time: rescheduleTime
+              time: rescheduleTime,
             }
-          : v
-      )
+          : v,
+      ),
     );
 
     const visitorName = rescheduleVisitor.name;
@@ -270,8 +295,8 @@ export default function VisitorDashboard() {
     setShowRescheduleModal(false);
     setRescheduleVisitor(null);
     setRescheduleDate(null);
-    setRescheduleTime("");
-    setRescheduleReason("");
+    setRescheduleTime('');
+    setRescheduleReason('');
 
     showAlert({
       type: 'success',
@@ -288,8 +313,8 @@ export default function VisitorDashboard() {
     setShowRescheduleModal(false);
     setRescheduleVisitor(null);
     setRescheduleDate(null);
-    setRescheduleTime("");
-    setRescheduleReason("");
+    setRescheduleTime('');
+    setRescheduleReason('');
   };
 
   const handleViewQR = useCallback((visitor: Visitor) => {
@@ -307,8 +332,11 @@ export default function VisitorDashboard() {
     });
   }, []);
 
-  const getUpcomingCount = () => visitors.filter(v => v.status !== "Completed" && v.status !== "Rejected").length;
-  const getPendingCount = () => visitors.filter(v => v.status === "Pending").length;
+  const getUpcomingCount = () =>
+    visitors.filter((v) => v.status !== 'Completed' && v.status !== 'Rejected')
+      .length;
+  const getPendingCount = () =>
+    visitors.filter((v) => v.status === 'Pending').length;
 
   return (
     <Header>
@@ -320,8 +348,7 @@ export default function VisitorDashboard() {
           </Text>
           <TouchableOpacity
             onPress={handleAddVisitor}
-            className="bg-primary rounded-full w-12 h-12 items-center justify-center shadow-sm"
-          >
+            className="bg-primary rounded-full w-12 h-12 items-center justify-center shadow-sm">
             <Plus size={20} color="white" strokeWidth={2} />
           </TouchableOpacity>
         </View>
@@ -364,7 +391,7 @@ export default function VisitorDashboard() {
           <View className="flex-1 bg-success/10 border border-success/20 rounded-xl p-4">
             <View className="flex-row items-center justify-between mb-2">
               <Text className="text-display-small font-bold text-success">
-                {visitors.filter(v => v.date === "Today").length}
+                {visitors.filter((v) => v.date === 'Today').length}
               </Text>
               <View className="w-2 h-2 bg-success rounded-full" />
             </View>
@@ -384,7 +411,7 @@ export default function VisitorDashboard() {
           placeholder="Search visitors, purpose..."
           value={searchQuery}
           onChangeText={setSearchQuery}
-          onClear={() => setSearchQuery("")}
+          onClear={() => setSearchQuery('')}
         />
       </View>
 
@@ -393,26 +420,23 @@ export default function VisitorDashboard() {
         <ScrollView
           horizontal
           showsHorizontalScrollIndicator={false}
-          contentContainerStyle={{ paddingRight: 16 }}
-        >
+          contentContainerStyle={{ paddingRight: 16 }}>
           {FILTER_OPTIONS.map((filter) => (
             <TouchableOpacity
               key={filter.key}
               onPress={() => setSelectedFilter(filter.key)}
               className={`mr-3 px-4 py-2 rounded-full border ${
                 selectedFilter === filter.key
-                  ? "bg-primary border-primary"
-                  : "bg-surface border-divider"
+                  ? 'bg-primary border-primary'
+                  : 'bg-surface border-divider'
               }`}
-              activeOpacity={0.7}
-            >
+              activeOpacity={0.7}>
               <Text
                 className={`text-body-medium font-medium ${
                   selectedFilter === filter.key
-                    ? "text-white"
-                    : "text-text-primary"
-                }`}
-              >
+                    ? 'text-white'
+                    : 'text-text-primary'
+                }`}>
                 {filter.label}
               </Text>
             </TouchableOpacity>
@@ -425,31 +449,32 @@ export default function VisitorDashboard() {
         <ScrollView
           horizontal
           showsHorizontalScrollIndicator={false}
-          contentContainerStyle={{ paddingRight: 16 }}
-        >
+          contentContainerStyle={{ paddingRight: 16 }}>
           {CATEGORY_FILTERS.map((category) => (
             <TouchableOpacity
               key={category.key}
               onPress={() => setSelectedCategory(category.key)}
               className={`mr-3 px-3 py-2 rounded-full border flex-row items-center ${
                 selectedCategory === category.key
-                  ? "bg-secondary/10 border-secondary"
-                  : "bg-surface border-divider"
+                  ? 'bg-secondary/10 border-secondary'
+                  : 'bg-surface border-divider'
               }`}
-              activeOpacity={0.7}
-            >
-              <category.icon 
-                size={14} 
-                className={selectedCategory === category.key ? "text-secondary" : "text-text-secondary"}
+              activeOpacity={0.7}>
+              <category.icon
+                size={14}
+                className={
+                  selectedCategory === category.key
+                    ? 'text-secondary'
+                    : 'text-text-secondary'
+                }
                 strokeWidth={1.5}
               />
               <Text
                 className={`text-label-medium font-medium ml-1 ${
                   selectedCategory === category.key
-                    ? "text-secondary"
-                    : "text-text-primary"
-                }`}
-              >
+                    ? 'text-secondary'
+                    : 'text-text-primary'
+                }`}>
                 {category.label}
               </Text>
             </TouchableOpacity>
@@ -463,8 +488,7 @@ export default function VisitorDashboard() {
         refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }
-        showsVerticalScrollIndicator={false}
-      >
+        showsVerticalScrollIndicator={false}>
         {loading ? (
           <View className="flex-1 items-center justify-center py-12">
             <Text className="text-text-secondary">Loading visitors...</Text>
@@ -481,11 +505,16 @@ export default function VisitorDashboard() {
                 category={visitor.category}
                 purpose={visitor.purpose}
                 phone={visitor.phone}
-                type={visitor.status === "Completed" || visitor.status === "Rejected" ? "past" : "upcoming"}
+                type={
+                  visitor.status === 'Completed' ||
+                  visitor.status === 'Rejected'
+                    ? 'past'
+                    : 'upcoming'
+                }
                 onViewQR={() => handleViewQR(visitor)}
-                onApprove={() => handleVisitorAction(visitor, "approve")}
-                onReject={() => handleVisitorAction(visitor, "reject")}
-                handleClick={() => handleVisitorAction(visitor, "view")}
+                onApprove={() => handleVisitorAction(visitor, 'approve')}
+                onReject={() => handleVisitorAction(visitor, 'reject')}
+                handleClick={() => handleVisitorAction(visitor, 'view')}
               />
             ))}
           </>
@@ -495,43 +524,50 @@ export default function VisitorDashboard() {
             <View className="bg-primary/5 p-6 rounded-full mb-6">
               <Users size={48} className="text-primary" strokeWidth={1.5} />
             </View>
-            
+
             {/* Empty State Content */}
             <Text className="text-text-primary text-headline-medium font-bold mb-3 text-center">
-              {searchQuery.trim() || selectedFilter !== "all" || selectedCategory !== "all" 
-                ? "No Matching Visitors" 
-                : "No Visitors Yet"}
+              {searchQuery.trim() ||
+              selectedFilter !== 'all' ||
+              selectedCategory !== 'all'
+                ? 'No Matching Visitors'
+                : 'No Visitors Yet'}
             </Text>
-            
+
             <Text className="text-text-secondary text-center px-8 mb-8 leading-6">
-              {searchQuery.trim() || selectedFilter !== "all" || selectedCategory !== "all"
-                ? "Try clearing your search or adjusting the filters to see more visitors."
-                : "Start managing your visitors by adding your first entry. You can pre-approve guests, track deliveries, and generate QR codes for easy access."
-              }
+              {searchQuery.trim() ||
+              selectedFilter !== 'all' ||
+              selectedCategory !== 'all'
+                ? 'Try clearing your search or adjusting the filters to see more visitors.'
+                : 'Start managing your visitors by adding your first entry. You can pre-approve guests, track deliveries, and generate QR codes for easy access.'}
             </Text>
 
             {/* Action Buttons */}
             <View className="flex-row gap-4">
-              {(searchQuery.trim() || selectedFilter !== "all" || selectedCategory !== "all") ? (
+              {searchQuery.trim() ||
+              selectedFilter !== 'all' ||
+              selectedCategory !== 'all' ? (
                 <TouchableOpacity
                   onPress={() => {
-                    setSearchQuery("");
-                    setSelectedFilter("all");
-                    setSelectedCategory("all");
+                    setSearchQuery('');
+                    setSelectedFilter('all');
+                    setSelectedCategory('all');
                   }}
-                  className="bg-surface border border-divider px-6 py-3 rounded-xl flex-row items-center"
-                >
-                  <X size={16} className="text-text-secondary" strokeWidth={2} />
+                  className="bg-surface border border-divider px-6 py-3 rounded-xl flex-row items-center">
+                  <X
+                    size={16}
+                    className="text-text-secondary"
+                    strokeWidth={2}
+                  />
                   <Text className="text-text-secondary font-semibold ml-2">
                     Clear Filters
                   </Text>
                 </TouchableOpacity>
               ) : null}
-              
+
               <TouchableOpacity
                 onPress={handleAddVisitor}
-                className="bg-primary px-6 py-3 rounded-xl flex-row items-center"
-              >
+                className="bg-primary px-6 py-3 rounded-xl flex-row items-center">
                 <Plus size={16} color="white" strokeWidth={2} />
                 <Text className="text-white font-semibold ml-2">
                   Add Visitor
@@ -540,33 +576,35 @@ export default function VisitorDashboard() {
             </View>
 
             {/* Quick Tips */}
-            {!searchQuery.trim() && selectedFilter === "all" && selectedCategory === "all" && (
-              <View className="mt-8 bg-primary/5 border border-primary/10 rounded-xl p-4 mx-8">
-                <Text className="text-primary text-body-medium font-semibold mb-3">
-                  💡 Quick Tips
-                </Text>
-                <View className="space-y-2">
-                  <Text className="text-text-secondary text-label-large leading-5">
-                    • Pre-approve family and friends for faster entry
+            {!searchQuery.trim() &&
+              selectedFilter === 'all' &&
+              selectedCategory === 'all' && (
+                <View className="mt-8 bg-primary/5 border border-primary/10 rounded-xl p-4 mx-8">
+                  <Text className="text-primary text-body-medium font-semibold mb-3">
+                    💡 Quick Tips
                   </Text>
-                  <Text className="text-text-secondary text-label-large leading-5">
-                    • Track deliveries from Amazon, Flipkart, and food apps
-                  </Text>
-                  <Text className="text-text-secondary text-label-large leading-5">
-                    • Generate QR codes for contactless gate entry
-                  </Text>
+                  <View className="space-y-2">
+                    <Text className="text-text-secondary text-label-large leading-5">
+                      • Pre-approve family and friends for faster entry
+                    </Text>
+                    <Text className="text-text-secondary text-label-large leading-5">
+                      • Track deliveries from Amazon, Flipkart, and food apps
+                    </Text>
+                    <Text className="text-text-secondary text-label-large leading-5">
+                      • Generate QR codes for contactless gate entry
+                    </Text>
+                  </View>
                 </View>
-              </View>
-            )}
+              )}
           </View>
         )}
 
         <View className="h-6" />
       </ScrollView>
-      
+
       {/* Custom Alert Component */}
       {AlertComponent}
-      
+
       {/* QR Code Modal */}
       <VisitorQRModal
         visible={showQRModal}
@@ -579,8 +617,7 @@ export default function VisitorDashboard() {
         visible={showRescheduleModal}
         animationType="slide"
         presentationStyle="pageSheet"
-        onRequestClose={handleCancelReschedule}
-      >
+        onRequestClose={handleCancelReschedule}>
         <View className="flex-1 bg-background">
           {/* Modal Header */}
           <View className="flex-row items-center justify-between p-4 border-b border-divider bg-surface">
@@ -589,8 +626,7 @@ export default function VisitorDashboard() {
             </Text>
             <TouchableOpacity
               onPress={handleCancelReschedule}
-              className="w-8 h-8 rounded-full bg-divider/50 items-center justify-center"
-            >
+              className="w-8 h-8 rounded-full bg-divider/50 items-center justify-center">
               <X size={16} color="#757575" />
             </TouchableOpacity>
           </View>
@@ -600,16 +636,20 @@ export default function VisitorDashboard() {
               <>
                 {/* Visitor Info */}
                 <View className="bg-surface rounded-xl p-4 mb-6 border border-divider">
-                  <Text className="text-body-medium text-text-secondary mb-2">Rescheduling visit for:</Text>
+                  <Text className="text-body-medium text-text-secondary mb-2">
+                    Rescheduling visit for:
+                  </Text>
                   <Text className="text-headline-medium font-semibold text-text-primary mb-1">
                     {rescheduleVisitor.name}
                   </Text>
                   <Text className="text-body-medium text-text-secondary">
-                    {rescheduleVisitor.category} Visit • {rescheduleVisitor.purpose}
+                    {rescheduleVisitor.category} Visit •{' '}
+                    {rescheduleVisitor.purpose}
                   </Text>
                   <View className="bg-warning/10 rounded-lg p-3 mt-3">
                     <Text className="text-warning text-body-small font-medium">
-                      Current Schedule: {rescheduleVisitor.date} at {rescheduleVisitor.time}
+                      Current Schedule: {rescheduleVisitor.date} at{' '}
+                      {rescheduleVisitor.time}
                     </Text>
                   </View>
                 </View>
@@ -621,13 +661,17 @@ export default function VisitorDashboard() {
                   </Text>
                   <TouchableOpacity
                     onPress={() => setShowDatePicker(true)}
-                    className="bg-surface border border-divider rounded-xl p-4 flex-row items-center"
-                  >
+                    className="bg-surface border border-divider rounded-xl p-4 flex-row items-center">
                     <CalendarDays size={20} color="#6366f1" />
-                    <Text className={`ml-3 text-body-large ${
-                      rescheduleDate ? "text-text-primary" : "text-text-secondary"
-                    }`}>
-                      {rescheduleDate ? formatDate(rescheduleDate) : "Select new date"}
+                    <Text
+                      className={`ml-3 text-body-large ${
+                        rescheduleDate
+                          ? 'text-text-primary'
+                          : 'text-text-secondary'
+                      }`}>
+                      {rescheduleDate
+                        ? formatDate(rescheduleDate)
+                        : 'Select new date'}
                     </Text>
                   </TouchableOpacity>
                 </View>
@@ -639,13 +683,15 @@ export default function VisitorDashboard() {
                   </Text>
                   <TouchableOpacity
                     onPress={() => setShowTimePicker(true)}
-                    className="bg-surface border border-divider rounded-xl p-4 flex-row items-center"
-                  >
+                    className="bg-surface border border-divider rounded-xl p-4 flex-row items-center">
                     <Clock size={20} color="#6366f1" />
-                    <Text className={`ml-3 text-body-large ${
-                      rescheduleTime ? "text-text-primary" : "text-text-secondary"
-                    }`}>
-                      {rescheduleTime || "Select new time"}
+                    <Text
+                      className={`ml-3 text-body-large ${
+                        rescheduleTime
+                          ? 'text-text-primary'
+                          : 'text-text-secondary'
+                      }`}>
+                      {rescheduleTime || 'Select new time'}
                     </Text>
                   </TouchableOpacity>
                 </View>
@@ -653,7 +699,10 @@ export default function VisitorDashboard() {
                 {/* Reason (Optional) */}
                 <View className="mb-6">
                   <Text className="text-body-large font-semibold text-text-primary mb-3">
-                    Reason for Rescheduling <Text className="text-text-secondary font-normal">(Optional)</Text>
+                    Reason for Rescheduling{' '}
+                    <Text className="text-text-secondary font-normal">
+                      (Optional)
+                    </Text>
                   </Text>
                   <TextInput
                     className="bg-surface border border-divider rounded-xl p-4 text-text-primary text-body-large"
@@ -671,8 +720,7 @@ export default function VisitorDashboard() {
                 <View className="flex-row gap-3 mb-6">
                   <TouchableOpacity
                     onPress={handleCancelReschedule}
-                    className="flex-1 bg-surface border border-divider rounded-xl py-4"
-                  >
+                    className="flex-1 bg-surface border border-divider rounded-xl py-4">
                     <Text className="text-text-secondary text-center font-semibold text-body-large">
                       Cancel
                     </Text>
@@ -680,8 +728,7 @@ export default function VisitorDashboard() {
                   <TouchableOpacity
                     onPress={handleRescheduleSubmit}
                     className="flex-1 bg-primary rounded-xl py-4"
-                    disabled={!rescheduleDate || !rescheduleTime}
-                  >
+                    disabled={!rescheduleDate || !rescheduleTime}>
                     <Text className="text-white text-center font-semibold text-body-large">
                       Reschedule Visit
                     </Text>
@@ -694,7 +741,9 @@ export default function VisitorDashboard() {
                     📱 Automatic Notifications
                   </Text>
                   <Text className="text-text-secondary text-body-small leading-5">
-                    The visitor will be automatically notified about the schedule change via SMS and will receive an updated QR code for the new time slot.
+                    The visitor will be automatically notified about the
+                    schedule change via SMS and will receive an updated QR code
+                    for the new time slot.
                   </Text>
                 </View>
               </>
@@ -730,8 +779,8 @@ export default function VisitorDashboard() {
         format="12"
         timeInterval={15}
         restrictedHours={{
-          start: "06:00 AM",
-          end: "10:00 PM",
+          start: '06:00 AM',
+          end: '10:00 PM',
         }}
         showPresets={true}
         title="Select New Visit Time"

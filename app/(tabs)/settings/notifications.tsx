@@ -20,7 +20,9 @@ interface NotificationSetting {
 }
 
 export default function NotificationPreferences() {
-  const [notificationSettings, setNotificationSettings] = useState<NotificationSetting[]>([
+  const [notificationSettings, setNotificationSettings] = useState<
+    NotificationSetting[]
+  >([
     {
       id: 'maintenance',
       category: 'Maintenance',
@@ -31,7 +33,11 @@ export default function NotificationPreferences() {
         { id: 'maintenance_created', name: 'Request created', enabled: true },
         { id: 'maintenance_assigned', name: 'Vendor assigned', enabled: true },
         { id: 'maintenance_completed', name: 'Work completed', enabled: true },
-        { id: 'maintenance_feedback', name: 'Feedback requested', enabled: false },
+        {
+          id: 'maintenance_feedback',
+          name: 'Feedback requested',
+          enabled: false,
+        },
       ],
     },
     {
@@ -66,8 +72,16 @@ export default function NotificationPreferences() {
       icon: <Bell size={20} color="#6366f1" />,
       enabled: true,
       subcategories: [
-        { id: 'visitor_approval', name: 'Visitor approval requests', enabled: true },
-        { id: 'visitor_arrived', name: 'Visitor arrival notifications', enabled: true },
+        {
+          id: 'visitor_approval',
+          name: 'Visitor approval requests',
+          enabled: true,
+        },
+        {
+          id: 'visitor_arrived',
+          name: 'Visitor arrival notifications',
+          enabled: true,
+        },
         { id: 'security_alerts', name: 'Security alerts', enabled: true },
       ],
     },
@@ -80,7 +94,11 @@ export default function NotificationPreferences() {
       subcategories: [
         { id: 'meeting_scheduled', name: 'Meeting scheduled', enabled: false },
         { id: 'voting_open', name: 'Voting open', enabled: false },
-        { id: 'decisions_announced', name: 'Decisions announced', enabled: false },
+        {
+          id: 'decisions_announced',
+          name: 'Decisions announced',
+          enabled: false,
+        },
       ],
     },
     {
@@ -111,43 +129,45 @@ export default function NotificationPreferences() {
   });
 
   const toggleMainCategory = (categoryId: string) => {
-    setNotificationSettings(prev => 
-      prev.map(setting => 
-        setting.id === categoryId 
-          ? { 
-              ...setting, 
+    setNotificationSettings((prev) =>
+      prev.map((setting) =>
+        setting.id === categoryId
+          ? {
+              ...setting,
               enabled: !setting.enabled,
-              subcategories: setting.subcategories?.map(sub => ({
+              subcategories: setting.subcategories?.map((sub) => ({
                 ...sub,
-                enabled: !setting.enabled
-              }))
+                enabled: !setting.enabled,
+              })),
             }
-          : setting
-      )
+          : setting,
+      ),
     );
   };
 
   const toggleSubcategory = (categoryId: string, subcategoryId: string) => {
-    setNotificationSettings(prev => 
-      prev.map(setting => 
-        setting.id === categoryId 
+    setNotificationSettings((prev) =>
+      prev.map((setting) =>
+        setting.id === categoryId
           ? {
               ...setting,
-              subcategories: setting.subcategories?.map(sub =>
-                sub.id === subcategoryId ? { ...sub, enabled: !sub.enabled } : sub
-              )
+              subcategories: setting.subcategories?.map((sub) =>
+                sub.id === subcategoryId
+                  ? { ...sub, enabled: !sub.enabled }
+                  : sub,
+              ),
             }
-          : setting
-      )
+          : setting,
+      ),
     );
   };
 
   const toggleDoNotDisturb = () => {
-    setDoNotDisturbSettings(prev => ({ ...prev, enabled: !prev.enabled }));
+    setDoNotDisturbSettings((prev) => ({ ...prev, enabled: !prev.enabled }));
   };
 
   const toggleDeliveryChannel = (channel: 'push' | 'email' | 'sms') => {
-    setDeliveryChannels(prev => ({ ...prev, [channel]: !prev[channel] }));
+    setDeliveryChannels((prev) => ({ ...prev, [channel]: !prev[channel] }));
   };
 
   return (
@@ -158,8 +178,7 @@ export default function NotificationPreferences() {
           variant="ghost"
           size="sm"
           onPress={() => router.back()}
-          className="mr-2 p-2"
-        >
+          className="mr-2 p-2">
           <ArrowLeft size={20} color="#6366f1" />
         </Button>
         <Text className="text-text-primary text-headline-large font-semibold">
@@ -167,11 +186,10 @@ export default function NotificationPreferences() {
         </Text>
       </View>
 
-      <ScrollView 
-        className="flex-1" 
+      <ScrollView
+        className="flex-1"
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ paddingBottom: 20 }}
-      >
+        contentContainerStyle={{ paddingBottom: 20 }}>
         {/* Do Not Disturb */}
         <View className="p-4">
           <Card>
@@ -185,10 +203,9 @@ export default function NotificationPreferences() {
                     Do Not Disturb
                   </Text>
                   <Text className="text-text-secondary text-sm">
-                    {doNotDisturbSettings.enabled 
+                    {doNotDisturbSettings.enabled
                       ? `${doNotDisturbSettings.startTime} - ${doNotDisturbSettings.endTime}`
-                      : 'Disabled'
-                    }
+                      : 'Disabled'}
                   </Text>
                 </View>
               </View>
@@ -203,12 +220,14 @@ export default function NotificationPreferences() {
             {doNotDisturbSettings.enabled && (
               <View className="bg-background rounded-lg p-3">
                 <Text className="text-text-secondary text-sm mb-2">
-                  During these hours, only emergency notifications will be shown.
+                  During these hours, only emergency notifications will be
+                  shown.
                 </Text>
                 <View className="flex-row items-center">
                   <Clock size={14} color="#757575" />
                   <Text className="text-text-secondary text-sm ml-1">
-                    {doNotDisturbSettings.startTime} to {doNotDisturbSettings.endTime}
+                    {doNotDisturbSettings.startTime} to{' '}
+                    {doNotDisturbSettings.endTime}
                   </Text>
                 </View>
               </View>
@@ -258,10 +277,14 @@ export default function NotificationPreferences() {
                         </Text>
                         <Switch
                           value={subcategory.enabled}
-                          onValueChange={() => toggleSubcategory(setting.id, subcategory.id)}
+                          onValueChange={() =>
+                            toggleSubcategory(setting.id, subcategory.id)
+                          }
                           trackColor={{ false: '#E0E0E0', true: '#6366f1' }}
                           thumbColor="#FFFFFF"
-                          style={{ transform: [{ scaleX: 0.8 }, { scaleY: 0.8 }] }}
+                          style={{
+                            transform: [{ scaleX: 0.8 }, { scaleY: 0.8 }],
+                          }}
                         />
                       </View>
                       {index < (setting.subcategories?.length || 0) - 1 && (
@@ -299,7 +322,9 @@ export default function NotificationPreferences() {
 
             <View className="space-y-3">
               <View className="flex-row items-center justify-between">
-                <Text className="text-text-primary text-body-large">Push Notifications</Text>
+                <Text className="text-text-primary text-body-large">
+                  Push Notifications
+                </Text>
                 <Switch
                   value={deliveryChannels.push}
                   onValueChange={() => toggleDeliveryChannel('push')}
@@ -342,10 +367,10 @@ export default function NotificationPreferences() {
               🔔 Notification Tips
             </Text>
             <Text className="text-text-secondary text-sm leading-5">
-              • Emergency notifications override Do Not Disturb{'\n'}
-              • You can customize preferences for each category{'\n'}
-              • Push notifications require app permissions{'\n'}
-              • Email/SMS may have additional charges
+              • Emergency notifications override Do Not Disturb{'\n'}• You can
+              customize preferences for each category{'\n'}• Push notifications
+              require app permissions{'\n'}• Email/SMS may have additional
+              charges
             </Text>
           </Card>
         </View>

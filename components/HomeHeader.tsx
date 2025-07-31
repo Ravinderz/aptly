@@ -1,6 +1,6 @@
-import { BellRing, MapPinHouse, MessageSquareMore } from "lucide-react-native";
-import React from "react";
-import { Text, TouchableOpacity, View } from "react-native";
+import { BellRing, MapPinHouse, MessageSquareMore } from 'lucide-react-native';
+import React from 'react';
+import { Text, TouchableOpacity, View } from 'react-native';
 
 const HomeHeader = () => {
   return (

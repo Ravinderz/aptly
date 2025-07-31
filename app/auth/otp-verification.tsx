@@ -1,10 +1,16 @@
-import { useRouter, useLocalSearchParams } from "expo-router";
-import { ArrowLeft, Shield, RefreshCw } from "lucide-react-native";
-import React, { useState, useEffect, useRef } from "react";
-import { SafeAreaView, Text, TextInput, TouchableOpacity, View } from "react-native";
-import { Button } from "@/components/ui/Button";
-import AuthService from "@/services/auth.service";
-import { showErrorAlert, showSuccessAlert } from "@/utils/alert";
+import { useRouter, useLocalSearchParams } from 'expo-router';
+import { ArrowLeft, Shield, RefreshCw } from 'lucide-react-native';
+import React, { useState, useEffect, useRef } from 'react';
+import {
+  SafeAreaView,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from 'react-native';
+import { Button } from '@/components/ui/Button';
+import AuthService from '@/services/auth.service';
+import { showErrorAlert, showSuccessAlert } from '@/utils/alert';
 
 export default function OTPVerification() {
   const router = useRouter();
@@ -12,14 +18,14 @@ export default function OTPVerification() {
     phoneNumber: string;
     societyCode: string;
   }>();
-  
-  const [otp, setOTP] = useState(["", "", "", "", "", ""]);
+
+  const [otp, setOTP] = useState(['', '', '', '', '', '']);
   const [isLoading, setIsLoading] = useState(false);
   const [isResending, setIsResending] = useState(false);
   const [timeLeft, setTimeLeft] = useState(30);
   const [canResend, setCanResend] = useState(false);
-  const [error, setError] = useState("");
-  
+  const [error, setError] = useState('');
+
   const inputRefs = useRef<(TextInput | null)[]>([]);
 
   useEffect(() => {
@@ -33,68 +39,74 @@ export default function OTPVerification() {
 
   const handleOTPChange = (value: string, index: number) => {
     // Only allow numbers
-    const numericValue = value.replace(/[^0-9]/g, "");
-    
+    const numericValue = value.replace(/[^0-9]/g, '');
+
     if (numericValue.length <= 1) {
       const newOTP = [...otp];
       newOTP[index] = numericValue;
       setOTP(newOTP);
-      
+
       // Clear error when user starts typing
-      if (error) setError("");
-      
+      if (error) setError('');
+
       // Auto-focus next input
       if (numericValue && index < 5) {
         inputRefs.current[index + 1]?.focus();
       }
-      
+
       // Auto-submit if all fields are filled
-      if (index === 5 && numericValue && newOTP.every(digit => digit !== "")) {
-        handleVerifyOTP(newOTP.join(""));
+      if (
+        index === 5 &&
+        numericValue &&
+        newOTP.every((digit) => digit !== '')
+      ) {
+        handleVerifyOTP(newOTP.join(''));
       }
     }
   };
 
   const handleKeyPress = (key: string, index: number) => {
-    if (key === "Backspace" && !otp[index] && index > 0) {
+    if (key === 'Backspace' && !otp[index] && index > 0) {
       // Move to previous input if current is empty and backspace is pressed
       inputRefs.current[index - 1]?.focus();
     }
   };
 
   const handleVerifyOTP = async (otpCode?: string) => {
-    const otpToVerify = otpCode || otp.join("");
-    
+    const otpToVerify = otpCode || otp.join('');
+
     if (otpToVerify.length !== 6) {
-      setError("Please enter complete 6-digit OTP");
+      setError('Please enter complete 6-digit OTP');
       return;
     }
-    
+
     setIsLoading(true);
-    setError("");
-    
+    setError('');
+
     try {
-      const result = await AuthService.verifyOTP(phoneNumber || '', otpToVerify);
-      
+      const result = await AuthService.verifyOTP(
+        phoneNumber || '',
+        otpToVerify,
+      );
+
       if (result.success) {
         // Navigate to society verification/profile setup
         router.push({
-          pathname: "/auth/society-verification",
+          pathname: '/auth/society-verification',
           params: {
             phoneNumber,
-            societyCode
-          }
+            societyCode,
+          },
         });
       } else {
-        setError(result.error || "Invalid OTP. Please try again.");
+        setError(result.error || 'Invalid OTP. Please try again.');
         // Clear OTP inputs
-        setOTP(["", "", "", "", "", ""]);
+        setOTP(['', '', '', '', '', '']);
         inputRefs.current[0]?.focus();
       }
-      
     } catch (error) {
       console.error('OTP verification error:', error);
-      setError("Verification failed. Please try again.");
+      setError('Verification failed. Please try again.');
     } finally {
       setIsLoading(false);
     }
@@ -102,31 +114,39 @@ export default function OTPVerification() {
 
   const handleResendOTP = async () => {
     setIsResending(true);
-    
+
     try {
-      const result = await AuthService.registerPhone(phoneNumber || '', societyCode || '');
-      
+      const result = await AuthService.registerPhone(
+        phoneNumber || '',
+        societyCode || '',
+      );
+
       if (result.success) {
         // Reset timer
         setTimeLeft(30);
         setCanResend(false);
-        setError("");
-        
-        showSuccessAlert("OTP Sent", "A new OTP has been sent to your mobile number.");
+        setError('');
+
+        showSuccessAlert(
+          'OTP Sent',
+          'A new OTP has been sent to your mobile number.',
+        );
       } else {
-        showErrorAlert("Error", result.error || "Failed to resend OTP. Please try again.");
+        showErrorAlert(
+          'Error',
+          result.error || 'Failed to resend OTP. Please try again.',
+        );
       }
-      
     } catch (error) {
       console.error('Resend OTP error:', error);
-      showErrorAlert("Error", "Failed to resend OTP. Please try again.");
+      showErrorAlert('Error', 'Failed to resend OTP. Please try again.');
     } finally {
       setIsResending(false);
     }
   };
 
   const formatPhoneNumber = (phone: string) => {
-    if (phone.startsWith("+91")) {
+    if (phone.startsWith('+91')) {
       const number = phone.substring(3);
       return `+91 ${number.substring(0, 3)} ${number.substring(3, 6)} ${number.substring(6)}`;
     }
@@ -156,7 +176,7 @@ export default function OTPVerification() {
             We've sent a 6-digit verification code to
           </Text>
           <Text className="text-text-primary font-semibold">
-            {formatPhoneNumber(phoneNumber || "")}
+            {formatPhoneNumber(phoneNumber || '')}
           </Text>
         </View>
 
@@ -171,18 +191,20 @@ export default function OTPVerification() {
                 key={index}
                 ref={(ref) => (inputRefs.current[index] = ref)}
                 className={`w-12 h-14 text-center text-xl font-bold bg-surface rounded-xl border ${
-                  error ? "border-error" : "border-divider"
+                  error ? 'border-error' : 'border-divider'
                 } text-text-primary`}
                 value={digit}
                 onChangeText={(value) => handleOTPChange(value, index)}
-                onKeyPress={({ nativeEvent }) => handleKeyPress(nativeEvent.key, index)}
+                onKeyPress={({ nativeEvent }) =>
+                  handleKeyPress(nativeEvent.key, index)
+                }
                 keyboardType="number-pad"
                 maxLength={1}
                 selectTextOnFocus={true}
               />
             ))}
           </View>
-          
+
           {error && (
             <Text className="text-error text-sm text-center mb-4">{error}</Text>
           )}
@@ -192,9 +214,8 @@ export default function OTPVerification() {
         <Button
           onPress={() => handleVerifyOTP()}
           loading={isLoading}
-          disabled={isLoading || otp.some(digit => !digit)}
-          className="mb-6"
-        >
+          disabled={isLoading || otp.some((digit) => !digit)}
+          className="mb-6">
           Verify OTP
         </Button>
 
@@ -203,20 +224,19 @@ export default function OTPVerification() {
           <Text className="text-text-secondary mb-4">
             Didn't receive the code?
           </Text>
-          
+
           {canResend ? (
             <TouchableOpacity
               onPress={handleResendOTP}
               disabled={isResending}
-              className="flex-row items-center"
-            >
-              <RefreshCw 
-                size={16} 
-                color="#6366f1" 
-                className={isResending ? "animate-spin mr-2" : "mr-2"}
+              className="flex-row items-center">
+              <RefreshCw
+                size={16}
+                color="#6366f1"
+                className={isResending ? 'animate-spin mr-2' : 'mr-2'}
               />
               <Text className="text-primary font-semibold">
-                {isResending ? "Resending..." : "Resend OTP"}
+                {isResending ? 'Resending...' : 'Resend OTP'}
               </Text>
             </TouchableOpacity>
           ) : (
@@ -230,7 +250,8 @@ export default function OTPVerification() {
         <View className="mt-8 bg-warning/5 rounded-xl p-4">
           <Text className="text-warning font-semibold mb-2">Demo Mode</Text>
           <Text className="text-text-secondary text-sm leading-5">
-            For demonstration purposes, use OTP: <Text className="font-mono font-bold">123456</Text>
+            For demonstration purposes, use OTP:{' '}
+            <Text className="font-mono font-bold">123456</Text>
           </Text>
         </View>
       </View>

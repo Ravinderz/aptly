@@ -23,18 +23,19 @@ export const ProfileHeader: React.FC<ProfileHeaderProps> = ({
   onChangePhoto,
 }) => {
   return (
-    <View className={cn(
-      "bg-primary rounded-2xl p-6 mx-4 mt-4 mb-6",
-      "shadow-lg shadow-black/20"
-    )}>
+    <View
+      className={cn(
+        'bg-primary rounded-2xl p-6 mx-4 mt-4 mb-6',
+        'shadow-lg shadow-black/20',
+      )}>
       <View className="flex-row items-center justify-between">
         <View className="flex-row items-center flex-1">
           {/* Profile Image */}
           <View className="relative">
             <View className="w-20 h-20 rounded-full border-3 border-white overflow-hidden bg-white/20">
               {profileImageUrl ? (
-                <Image 
-                  source={{ uri: profileImageUrl }} 
+                <Image
+                  source={{ uri: profileImageUrl }}
                   className="w-full h-full"
                   resizeMode="cover"
                 />
@@ -46,13 +47,12 @@ export const ProfileHeader: React.FC<ProfileHeaderProps> = ({
                 </View>
               )}
             </View>
-            
+
             {/* Camera Icon for Photo Change */}
             <TouchableOpacity
               onPress={onChangePhoto}
               className="absolute -bottom-1 -right-1 bg-white rounded-full p-2 shadow-sm"
-              activeOpacity={0.8}
-            >
+              activeOpacity={0.8}>
               <Camera size={14} color="#6366f1" />
             </TouchableOpacity>
           </View>
@@ -75,8 +75,7 @@ export const ProfileHeader: React.FC<ProfileHeaderProps> = ({
         <TouchableOpacity
           onPress={onEditProfile}
           className="bg-white/20 rounded-full p-3"
-          activeOpacity={0.8}
-        >
+          activeOpacity={0.8}>
           <Edit3 size={18} color="white" />
         </TouchableOpacity>
       </View>

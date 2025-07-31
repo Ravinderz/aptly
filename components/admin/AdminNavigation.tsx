@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, ScrollView } from 'react-native';
-import { 
+import {
   Home,
   Users,
   DollarSign,
@@ -16,7 +16,7 @@ import {
   Calendar,
   MessageSquare,
   Eye,
-  ChevronRight
+  ChevronRight,
 } from 'lucide-react-native';
 import { useAdmin } from '@/contexts/AdminContext';
 import { adminTheme, adminStyles } from '@/utils/adminTheme';
@@ -42,11 +42,7 @@ interface NavigationSection {
 export const AdminNavigation: React.FC<{
   onNavigate?: (screen: string) => void;
 }> = ({ onNavigate }) => {
-  const { 
-    adminUser, 
-    checkPermission,
-    currentMode 
-  } = useAdmin();
+  const { adminUser, checkPermission, currentMode } = useAdmin();
 
   if (currentMode !== 'admin') {
     return null;
@@ -70,7 +66,7 @@ export const AdminNavigation: React.FC<{
             title: 'Admin Dashboard',
             subtitle: 'Overview and quick actions',
             icon: <Home size={20} color={adminTheme.primary} />,
-            onPress: () => handleNavigate('admin-dashboard')
+            onPress: () => handleNavigate('admin-dashboard'),
           },
           {
             id: 'analytics',
@@ -78,14 +74,17 @@ export const AdminNavigation: React.FC<{
             subtitle: 'Reports and insights',
             icon: <BarChart3 size={20} color={adminTheme.info} />,
             onPress: () => handleNavigate('admin-analytics'),
-            permission: 'analytics'
-          }
-        ]
-      }
+            permission: 'analytics',
+          },
+        ],
+      },
     ];
 
     // Resident Management (CM, Super Admin)
-    if (adminUser?.role === 'community_manager' || adminUser?.role === 'super_admin') {
+    if (
+      adminUser?.role === 'community_manager' ||
+      adminUser?.role === 'super_admin'
+    ) {
       sections.push({
         title: 'Resident Management',
         items: [
@@ -95,7 +94,7 @@ export const AdminNavigation: React.FC<{
             subtitle: 'Manage resident profiles',
             icon: <Users size={20} color={adminTheme.primary} />,
             onPress: () => handleNavigate('residents'),
-            permission: 'residents'
+            permission: 'residents',
           },
           {
             id: 'add-resident',
@@ -103,7 +102,7 @@ export const AdminNavigation: React.FC<{
             subtitle: 'Onboard new residents',
             icon: <UserPlus size={20} color={adminTheme.success} />,
             onPress: () => handleNavigate('add-resident'),
-            permission: 'residents'
+            permission: 'residents',
           },
           {
             id: 'flat-management',
@@ -111,14 +110,18 @@ export const AdminNavigation: React.FC<{
             subtitle: 'Manage flat assignments',
             icon: <Building size={20} color={adminTheme.secondary} />,
             onPress: () => handleNavigate('flat-management'),
-            permission: 'residents'
-          }
-        ]
+            permission: 'residents',
+          },
+        ],
       });
     }
 
     // Financial Management
-    if (adminUser?.role === 'financial_manager' || adminUser?.role === 'community_manager' || adminUser?.role === 'super_admin') {
+    if (
+      adminUser?.role === 'financial_manager' ||
+      adminUser?.role === 'community_manager' ||
+      adminUser?.role === 'super_admin'
+    ) {
       sections.push({
         title: 'Financial Management',
         items: [
@@ -129,7 +132,7 @@ export const AdminNavigation: React.FC<{
             icon: <DollarSign size={20} color={adminTheme.secondary} />,
             onPress: () => handleNavigate('admin-billing'),
             permission: 'billing',
-            badge: 5
+            badge: 5,
           },
           {
             id: 'payments',
@@ -137,7 +140,7 @@ export const AdminNavigation: React.FC<{
             subtitle: 'Monitor collections',
             icon: <FileText size={20} color={adminTheme.success} />,
             onPress: () => handleNavigate('payment-tracking'),
-            permission: 'billing'
+            permission: 'billing',
           },
           {
             id: 'financial-reports',
@@ -145,14 +148,18 @@ export const AdminNavigation: React.FC<{
             subtitle: 'Monthly and annual reports',
             icon: <BarChart3 size={20} color={adminTheme.info} />,
             onPress: () => handleNavigate('financial-reports'),
-            permission: 'billing'
-          }
-        ]
+            permission: 'billing',
+          },
+        ],
       });
     }
 
     // Security & Visitor Management
-    if (adminUser?.role === 'security_admin' || adminUser?.role === 'community_manager' || adminUser?.role === 'super_admin') {
+    if (
+      adminUser?.role === 'security_admin' ||
+      adminUser?.role === 'community_manager' ||
+      adminUser?.role === 'super_admin'
+    ) {
       sections.push({
         title: 'Security Management',
         items: [
@@ -163,7 +170,7 @@ export const AdminNavigation: React.FC<{
             icon: <Shield size={20} color={adminTheme.info} />,
             onPress: () => handleNavigate('visitor-approvals'),
             permission: 'visitors',
-            badge: 12
+            badge: 12,
           },
           {
             id: 'security-logs',
@@ -171,7 +178,7 @@ export const AdminNavigation: React.FC<{
             subtitle: 'Access and incident logs',
             icon: <Eye size={20} color={adminTheme.slate} />,
             onPress: () => handleNavigate('security-logs'),
-            permission: 'security'
+            permission: 'security',
           },
           {
             id: 'emergency-management',
@@ -179,14 +186,18 @@ export const AdminNavigation: React.FC<{
             subtitle: 'Handle emergencies',
             icon: <AlertTriangle size={20} color={adminTheme.error} />,
             onPress: () => handleNavigate('emergency-management'),
-            permission: 'emergency'
-          }
-        ]
+            permission: 'emergency',
+          },
+        ],
       });
     }
 
     // Maintenance Management
-    if (adminUser?.role === 'maintenance_admin' || adminUser?.role === 'community_manager' || adminUser?.role === 'super_admin') {
+    if (
+      adminUser?.role === 'maintenance_admin' ||
+      adminUser?.role === 'community_manager' ||
+      adminUser?.role === 'super_admin'
+    ) {
       sections.push({
         title: 'Maintenance Management',
         items: [
@@ -197,7 +208,7 @@ export const AdminNavigation: React.FC<{
             icon: <Wrench size={20} color={adminTheme.warning} />,
             onPress: () => handleNavigate('maintenance-requests'),
             permission: 'maintenance',
-            badge: 8
+            badge: 8,
           },
           {
             id: 'vendor-management',
@@ -205,7 +216,7 @@ export const AdminNavigation: React.FC<{
             subtitle: 'Manage service providers',
             icon: <Users size={20} color={adminTheme.secondary} />,
             onPress: () => handleNavigate('vendor-management'),
-            permission: 'vendors'
+            permission: 'vendors',
           },
           {
             id: 'maintenance-schedule',
@@ -213,9 +224,9 @@ export const AdminNavigation: React.FC<{
             subtitle: 'Plan routine maintenance',
             icon: <Calendar size={20} color={adminTheme.info} />,
             onPress: () => handleNavigate('maintenance-schedule'),
-            permission: 'maintenance'
-          }
-        ]
+            permission: 'maintenance',
+          },
+        ],
       });
     }
 
@@ -229,7 +240,7 @@ export const AdminNavigation: React.FC<{
           subtitle: 'Create and manage notices',
           icon: <Bell size={20} color={adminTheme.primary} />,
           onPress: () => handleNavigate('admin-notices'),
-          permission: 'communication'
+          permission: 'communication',
         },
         {
           id: 'broadcasts',
@@ -237,9 +248,9 @@ export const AdminNavigation: React.FC<{
           subtitle: 'Send mass notifications',
           icon: <MessageSquare size={20} color={adminTheme.info} />,
           onPress: () => handleNavigate('broadcast-messages'),
-          permission: 'communication'
-        }
-      ]
+          permission: 'communication',
+        },
+      ],
     });
 
     // Super Admin Only
@@ -252,23 +263,23 @@ export const AdminNavigation: React.FC<{
             title: 'Society Management',
             subtitle: 'Manage all societies',
             icon: <Building size={20} color={adminTheme.primary} />,
-            onPress: () => handleNavigate('society-management')
+            onPress: () => handleNavigate('society-management'),
           },
           {
             id: 'admin-management',
             title: 'Admin Management',
             subtitle: 'Assign and revoke roles',
             icon: <Users size={20} color={adminTheme.secondary} />,
-            onPress: () => handleNavigate('admin-management')
+            onPress: () => handleNavigate('admin-management'),
           },
           {
             id: 'platform-analytics',
             title: 'Platform Analytics',
             subtitle: 'Cross-society insights',
             icon: <BarChart3 size={20} color={adminTheme.success} />,
-            onPress: () => handleNavigate('platform-analytics')
-          }
-        ]
+            onPress: () => handleNavigate('platform-analytics'),
+          },
+        ],
       });
     }
 
@@ -281,7 +292,7 @@ export const AdminNavigation: React.FC<{
           title: 'Admin Settings',
           subtitle: 'Configure admin preferences',
           icon: <Settings size={20} color={adminTheme.slate} />,
-          onPress: () => handleNavigate('admin-settings')
+          onPress: () => handleNavigate('admin-settings'),
         },
         {
           id: 'audit-logs',
@@ -289,38 +300,40 @@ export const AdminNavigation: React.FC<{
           subtitle: 'View activity history',
           icon: <FileText size={20} color={adminTheme.slate} />,
           onPress: () => handleNavigate('audit-logs'),
-          permission: 'audit'
-        }
-      ]
+          permission: 'audit',
+        },
+      ],
     });
 
     // Filter items based on permissions
-    return sections.map(section => ({
-      ...section,
-      items: section.items.filter(item => 
-        !item.permission || checkPermission(item.permission, 'read')
-      )
-    })).filter(section => section.items.length > 0);
+    return sections
+      .map((section) => ({
+        ...section,
+        items: section.items.filter(
+          (item) =>
+            !item.permission || checkPermission(item.permission, 'read'),
+        ),
+      }))
+      .filter((section) => section.items.length > 0);
   };
 
-  const NavigationItemComponent: React.FC<{ item: NavigationItem }> = ({ item }) => (
+  const NavigationItemComponent: React.FC<{ item: NavigationItem }> = ({
+    item,
+  }) => (
     <TouchableOpacity
       style={[
         adminStyles.adminCard,
-        { 
+        {
           marginBottom: 8,
           flexDirection: 'row',
           alignItems: 'center',
-          paddingVertical: 16
-        }
+          paddingVertical: 16,
+        },
       ]}
       onPress={item.onPress}
-      activeOpacity={0.8}
-    >
-      <View style={{ marginRight: 12 }}>
-        {item.icon}
-      </View>
-      
+      activeOpacity={0.8}>
+      <View style={{ marginRight: 12 }}>{item.icon}</View>
+
       <View style={{ flex: 1 }}>
         <Text style={[adminStyles.adminLabel, { fontSize: 15 }]}>
           {item.title}
@@ -334,26 +347,31 @@ export const AdminNavigation: React.FC<{
 
       <View style={{ flexDirection: 'row', alignItems: 'center' }}>
         {item.badge !== undefined && item.badge > 0 && (
-          <View style={{
-            backgroundColor: adminTheme.error,
-            borderRadius: 10,
-            minWidth: 20,
-            height: 20,
-            justifyContent: 'center',
-            alignItems: 'center',
-            marginRight: 8,
-            paddingHorizontal: 6
-          }}>
-            <Text style={[adminStyles.adminCaption, { 
-              color: adminTheme.textInverse,
-              fontWeight: '700',
-              fontSize: 11
-            }]}>
+          <View
+            style={{
+              backgroundColor: adminTheme.error,
+              borderRadius: 10,
+              minWidth: 20,
+              height: 20,
+              justifyContent: 'center',
+              alignItems: 'center',
+              marginRight: 8,
+              paddingHorizontal: 6,
+            }}>
+            <Text
+              style={[
+                adminStyles.adminCaption,
+                {
+                  color: adminTheme.textInverse,
+                  fontWeight: '700',
+                  fontSize: 11,
+                },
+              ]}>
               {item.badge > 99 ? '99+' : item.badge}
             </Text>
           </View>
         )}
-        
+
         <ChevronRight size={16} color={adminTheme.textTertiary} />
       </View>
     </TouchableOpacity>
@@ -362,22 +380,27 @@ export const AdminNavigation: React.FC<{
   const sections = getNavigationSections();
 
   return (
-    <ScrollView style={adminStyles.container} showsVerticalScrollIndicator={false}>
+    <ScrollView
+      style={adminStyles.container}
+      showsVerticalScrollIndicator={false}>
       <View style={{ padding: 16 }}>
         {sections.map((section, index) => (
-          <View key={section.title} style={{ marginBottom: index < sections.length - 1 ? 24 : 8 }}>
-            <Text style={[
-              adminStyles.adminSubheading, 
-              { 
-                marginBottom: 12,
-                color: adminTheme.textSecondary,
-                fontSize: 16
-              }
-            ]}>
+          <View
+            key={section.title}
+            style={{ marginBottom: index < sections.length - 1 ? 24 : 8 }}>
+            <Text
+              style={[
+                adminStyles.adminSubheading,
+                {
+                  marginBottom: 12,
+                  color: adminTheme.textSecondary,
+                  fontSize: 16,
+                },
+              ]}>
               {section.title}
             </Text>
-            
-            {section.items.map(item => (
+
+            {section.items.map((item) => (
               <NavigationItemComponent key={item.id} item={item} />
             ))}
           </View>
@@ -410,15 +433,15 @@ export const QuickAdminNav: React.FC<{
       {
         id: 'dashboard',
         icon: <Home size={20} color={adminTheme.textInverse} />,
-        onPress: () => handleNavigate('admin-dashboard')
-      }
+        onPress: () => handleNavigate('admin-dashboard'),
+      },
     ];
 
     if (checkPermission('residents', 'read')) {
       items.push({
         id: 'residents',
         icon: <Users size={20} color={adminTheme.textInverse} />,
-        onPress: () => handleNavigate('residents')
+        onPress: () => handleNavigate('residents'),
       });
     }
 
@@ -426,7 +449,7 @@ export const QuickAdminNav: React.FC<{
       items.push({
         id: 'billing',
         icon: <DollarSign size={20} color={adminTheme.textInverse} />,
-        onPress: () => handleNavigate('admin-billing')
+        onPress: () => handleNavigate('admin-billing'),
       });
     }
 
@@ -434,7 +457,7 @@ export const QuickAdminNav: React.FC<{
       items.push({
         id: 'visitors',
         icon: <Shield size={20} color={adminTheme.textInverse} />,
-        onPress: () => handleNavigate('visitor-approvals')
+        onPress: () => handleNavigate('visitor-approvals'),
       });
     }
 
@@ -442,7 +465,7 @@ export const QuickAdminNav: React.FC<{
       items.push({
         id: 'maintenance',
         icon: <Wrench size={20} color={adminTheme.textInverse} />,
-        onPress: () => handleNavigate('maintenance-requests')
+        onPress: () => handleNavigate('maintenance-requests'),
       });
     }
 
@@ -452,21 +475,21 @@ export const QuickAdminNav: React.FC<{
   const quickNavItems = getQuickNavItems();
 
   return (
-    <View style={[
-      adminStyles.adminTabBar,
-      { 
-        flexDirection: 'row',
-        justifyContent: 'space-around',
-        paddingVertical: 12
-      }
-    ]}>
-      {quickNavItems.map(item => (
+    <View
+      style={[
+        adminStyles.adminTabBar,
+        {
+          flexDirection: 'row',
+          justifyContent: 'space-around',
+          paddingVertical: 12,
+        },
+      ]}>
+      {quickNavItems.map((item) => (
         <TouchableOpacity
           key={item.id}
           style={adminStyles.adminTabItem}
           onPress={item.onPress}
-          activeOpacity={0.7}
-        >
+          activeOpacity={0.7}>
           {item.icon}
         </TouchableOpacity>
       ))}

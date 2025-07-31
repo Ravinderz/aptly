@@ -7,12 +7,12 @@ import SectionHeading from './ui/SectionHeading';
 export const SocietyOverview: React.FC = () => {
   // Mock data for resident-focused information
   const societyInfo = {
-    name: "Green Valley Apartments",
+    name: 'Green Valley Apartments',
     totalFlats: 120,
-    nextEvent: "Society Meeting",
-    eventDate: "Jan 25, 2025",
-    maintenanceWindow: "10 AM - 2 PM",
-    emergencyContact: "+91 98765 43210"
+    nextEvent: 'Society Meeting',
+    eventDate: 'Jan 25, 2025',
+    maintenanceWindow: '10 AM - 2 PM',
+    emergencyContact: '+91 98765 43210',
   };
 
   return (
@@ -21,7 +21,7 @@ export const SocietyOverview: React.FC = () => {
         heading="Society Info"
         handleViewAll={() => console.log('View society details')}
       />
-      
+
       <Card>
         {/* Society Basic Info */}
         <View className="mb-4">
@@ -35,9 +35,9 @@ export const SocietyOverview: React.FC = () => {
             </Text>
           </View>
         </View>
-        
+
         <View className="h-px bg-divider mb-4" />
-        
+
         {/* Next Event */}
         <View className="flex-row items-center justify-between mb-4">
           <View className="flex-row items-center flex-1">
@@ -54,9 +54,9 @@ export const SocietyOverview: React.FC = () => {
             </View>
           </View>
         </View>
-        
+
         <View className="h-px bg-divider mb-4" />
-        
+
         {/* Maintenance Hours */}
         <View className="flex-row items-center justify-between mb-4">
           <View className="flex-row items-center flex-1">
@@ -73,9 +73,9 @@ export const SocietyOverview: React.FC = () => {
             </View>
           </View>
         </View>
-        
+
         <View className="h-px bg-divider mb-4" />
-        
+
         {/* Emergency Contact */}
         <View className="flex-row items-center justify-between">
           <View className="flex-row items-center flex-1">

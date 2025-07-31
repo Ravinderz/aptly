@@ -1,5 +1,5 @@
-import { Stack } from "expo-router";
-import React from "react";
+import { Stack } from 'expo-router';
+import React from 'react';
 
 const _layout = () => {
   return (
@@ -9,8 +9,14 @@ const _layout = () => {
       <Stack.Screen name="analytics" options={{ headerShown: false }} />
       <Stack.Screen name="mobile-recharge" options={{ headerShown: false }} />
       <Stack.Screen name="gas-recharge" options={{ headerShown: false }} />
-      <Stack.Screen name="electricity-recharge" options={{ headerShown: false }} />
-      <Stack.Screen name="broadband-recharge" options={{ headerShown: false }} />
+      <Stack.Screen
+        name="electricity-recharge"
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="broadband-recharge"
+        options={{ headerShown: false }}
+      />
       <Stack.Screen name="payment" options={{ headerShown: false }} />
       <Stack.Screen name="payment-success" options={{ headerShown: false }} />
       <Stack.Screen name="settings" options={{ headerShown: false }} />

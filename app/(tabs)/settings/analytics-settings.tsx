@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { 
-  SafeAreaView, 
-  ScrollView, 
-  View, 
-  Text, 
+import {
+  SafeAreaView,
+  ScrollView,
+  View,
+  Text,
   TouchableOpacity,
   Switch,
-  Slider
+  Slider,
 } from 'react-native';
 import { router } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -27,15 +27,15 @@ const defaultPreferences = {
   alertThresholds: {
     performance: 500,
     errors: 5,
-    usage: 80
-  }
+    usage: 80,
+  },
 };
 
 // Default state
 const defaultState = {
   userRole: 'resident' as 'resident' | 'committee_member' | 'admin',
   preferences: defaultPreferences,
-  lastUpdated: null as string | null
+  lastUpdated: null as string | null,
 };
 
 // Helper function to check user access permissions
@@ -52,10 +52,18 @@ const canUserManageNotifications = (userRole: string): boolean => {
 };
 
 // Helper function to update preferences
-const updateAnalyticsPreferences = async (newPreferences: typeof defaultPreferences): Promise<void> => {
+const updateAnalyticsPreferences = async (
+  newPreferences: typeof defaultPreferences,
+): Promise<void> => {
   try {
-    await AsyncStorage.setItem('analytics_preferences', JSON.stringify(newPreferences));
-    await AsyncStorage.setItem('analytics_last_updated', new Date().toISOString());
+    await AsyncStorage.setItem(
+      'analytics_preferences',
+      JSON.stringify(newPreferences),
+    );
+    await AsyncStorage.setItem(
+      'analytics_last_updated',
+      new Date().toISOString(),
+    );
   } catch (error) {
     throw new Error('Failed to save preferences');
   }
@@ -65,13 +73,13 @@ const updateAnalyticsPreferences = async (newPreferences: typeof defaultPreferen
 const loadAnalyticsPreferences = async () => {
   try {
     const prefsString = await AsyncStorage.getItem('analytics_preferences');
-    const roleString = await AsyncStorage.getItem('user_role') || 'resident';
+    const roleString = (await AsyncStorage.getItem('user_role')) || 'resident';
     const lastUpdated = await AsyncStorage.getItem('analytics_last_updated');
-    
+
     return {
       userRole: roleString as 'resident' | 'committee_member' | 'admin',
       preferences: prefsString ? JSON.parse(prefsString) : defaultPreferences,
-      lastUpdated
+      lastUpdated,
     };
   } catch (error) {
     return defaultState;
@@ -85,7 +93,7 @@ export default function AnalyticsSettingsPage() {
 
   useEffect(() => {
     // Load preferences on component mount
-    loadAnalyticsPreferences().then(loadedState => {
+    loadAnalyticsPreferences().then((loadedState) => {
       setState(loadedState);
       setPreferences(loadedState.preferences);
     });
@@ -95,7 +103,11 @@ export default function AnalyticsSettingsPage() {
     try {
       setIsSaving(true);
       await updateAnalyticsPreferences(preferences);
-      setState(prev => ({ ...prev, preferences, lastUpdated: new Date().toISOString() }));
+      setState((prev) => ({
+        ...prev,
+        preferences,
+        lastUpdated: new Date().toISOString(),
+      }));
       showSuccessAlert('Success', 'Analytics preferences updated successfully');
     } catch (error) {
       showErrorAlert('Error', 'Failed to update preferences');
@@ -105,24 +117,27 @@ export default function AnalyticsSettingsPage() {
   };
 
   const handleToggleAutoRefresh = (enabled: boolean) => {
-    setPreferences(prev => ({ ...prev, autoRefresh: enabled }));
+    setPreferences((prev) => ({ ...prev, autoRefresh: enabled }));
   };
 
   const handleChangeReportFormat = (format: 'json' | 'csv' | 'pdf') => {
-    setPreferences(prev => ({ ...prev, reportFormat: format }));
+    setPreferences((prev) => ({ ...prev, reportFormat: format }));
   };
 
   const handleChangeDataRetention = (days: number) => {
-    setPreferences(prev => ({ ...prev, dataRetention: days }));
+    setPreferences((prev) => ({ ...prev, dataRetention: days }));
   };
 
-  const handleChangeAlertThreshold = (type: 'performance' | 'errors' | 'usage', value: number) => {
-    setPreferences(prev => ({
+  const handleChangeAlertThreshold = (
+    type: 'performance' | 'errors' | 'usage',
+    value: number,
+  ) => {
+    setPreferences((prev) => ({
       ...prev,
       alertThresholds: {
         ...prev.alertThresholds,
-        [type]: value
-      }
+        [type]: value,
+      },
     }));
   };
 
@@ -132,7 +147,7 @@ export default function AnalyticsSettingsPage() {
         <Text className="text-headline-small font-semibold text-text-primary mb-4">
           Data Management
         </Text>
-        
+
         <View className="space-y-4">
           {/* Auto Refresh */}
           <View className="flex-row items-center justify-between">
@@ -172,8 +187,12 @@ export default function AnalyticsSettingsPage() {
               thumbStyle={{ backgroundColor: '#6366f1' }}
             />
             <View className="flex-row justify-between mt-1">
-              <Text className="text-body-small text-text-secondary">30 days</Text>
-              <Text className="text-body-small text-text-secondary">2 years</Text>
+              <Text className="text-body-small text-text-secondary">
+                30 days
+              </Text>
+              <Text className="text-body-small text-text-secondary">
+                2 years
+              </Text>
             </View>
           </View>
 
@@ -191,13 +210,13 @@ export default function AnalyticsSettingsPage() {
                     preferences.reportFormat === format
                       ? 'border-primary bg-primary/10'
                       : 'border-border-primary bg-surface-secondary'
-                  }`}
-                >
-                  <Text className={`text-center text-body-small font-medium uppercase ${
-                    preferences.reportFormat === format
-                      ? 'text-primary'
-                      : 'text-text-secondary'
                   }`}>
+                  <Text
+                    className={`text-center text-body-small font-medium uppercase ${
+                      preferences.reportFormat === format
+                        ? 'text-primary'
+                        : 'text-text-secondary'
+                    }`}>
                     {format}
                   </Text>
                 </TouchableOpacity>
@@ -218,7 +237,7 @@ export default function AnalyticsSettingsPage() {
         <Text className="text-body-small text-text-secondary mb-4">
           Configure when to receive alerts based on system metrics
         </Text>
-        
+
         <View className="space-y-6">
           {/* Performance Threshold */}
           <View>
@@ -226,7 +245,8 @@ export default function AnalyticsSettingsPage() {
               Performance Alert Threshold
             </Text>
             <Text className="text-body-small text-text-secondary mb-3">
-              Alert when response time exceeds {preferences.alertThresholds.performance}ms
+              Alert when response time exceeds{' '}
+              {preferences.alertThresholds.performance}ms
             </Text>
             <Slider
               style={{ width: '100%', height: 40 }}
@@ -234,14 +254,18 @@ export default function AnalyticsSettingsPage() {
               maximumValue={2000}
               step={50}
               value={preferences.alertThresholds.performance}
-              onValueChange={(value) => handleChangeAlertThreshold('performance', value)}
+              onValueChange={(value) =>
+                handleChangeAlertThreshold('performance', value)
+              }
               minimumTrackTintColor="#6366f1"
               maximumTrackTintColor="#D1D5DB"
               thumbStyle={{ backgroundColor: '#6366f1' }}
             />
             <View className="flex-row justify-between mt-1">
               <Text className="text-body-small text-text-secondary">100ms</Text>
-              <Text className="text-body-small text-text-secondary">2000ms</Text>
+              <Text className="text-body-small text-text-secondary">
+                2000ms
+              </Text>
             </View>
           </View>
 
@@ -251,7 +275,8 @@ export default function AnalyticsSettingsPage() {
               Error Rate Alert Threshold
             </Text>
             <Text className="text-body-small text-text-secondary mb-3">
-              Alert when error rate exceeds {preferences.alertThresholds.errors}%
+              Alert when error rate exceeds {preferences.alertThresholds.errors}
+              %
             </Text>
             <Slider
               style={{ width: '100%', height: 40 }}
@@ -259,7 +284,9 @@ export default function AnalyticsSettingsPage() {
               maximumValue={20}
               step={1}
               value={preferences.alertThresholds.errors}
-              onValueChange={(value) => handleChangeAlertThreshold('errors', value)}
+              onValueChange={(value) =>
+                handleChangeAlertThreshold('errors', value)
+              }
               minimumTrackTintColor="#6366f1"
               maximumTrackTintColor="#D1D5DB"
               thumbStyle={{ backgroundColor: '#6366f1' }}
@@ -276,7 +303,8 @@ export default function AnalyticsSettingsPage() {
               Resource Usage Alert Threshold
             </Text>
             <Text className="text-body-small text-text-secondary mb-3">
-              Alert when resource usage exceeds {preferences.alertThresholds.usage}%
+              Alert when resource usage exceeds{' '}
+              {preferences.alertThresholds.usage}%
             </Text>
             <Slider
               style={{ width: '100%', height: 40 }}
@@ -284,7 +312,9 @@ export default function AnalyticsSettingsPage() {
               maximumValue={95}
               step={5}
               value={preferences.alertThresholds.usage}
-              onValueChange={(value) => handleChangeAlertThreshold('usage', value)}
+              onValueChange={(value) =>
+                handleChangeAlertThreshold('usage', value)
+              }
               minimumTrackTintColor="#6366f1"
               maximumTrackTintColor="#D1D5DB"
               thumbStyle={{ backgroundColor: '#6366f1' }}
@@ -305,42 +335,61 @@ export default function AnalyticsSettingsPage() {
         <Text className="text-headline-small font-semibold text-text-primary mb-4">
           Access Permissions
         </Text>
-        
+
         <View className="bg-surface-secondary p-3 rounded-lg mb-4">
           <View className="flex-row items-center mb-2">
-            <View className={`w-3 h-3 rounded-full mr-2 ${
-              state.userRole === 'admin' ? 'bg-error' :
-              state.userRole === 'committee_member' ? 'bg-warning' : 'bg-success'
-            }`} />
+            <View
+              className={`w-3 h-3 rounded-full mr-2 ${
+                state.userRole === 'admin'
+                  ? 'bg-error'
+                  : state.userRole === 'committee_member'
+                    ? 'bg-warning'
+                    : 'bg-success'
+              }`}
+            />
             <Text className="text-body-medium font-semibold text-text-primary capitalize">
               {state.userRole.replace('_', ' ')}
             </Text>
           </View>
           <Text className="text-body-small text-text-secondary">
-            {state.userRole === 'admin' ? 'Full access to all analytics features' :
-             state.userRole === 'committee_member' ? 'Can view analytics and manage notifications' :
-             'Limited access to basic metrics only'
-            }
+            {state.userRole === 'admin'
+              ? 'Full access to all analytics features'
+              : state.userRole === 'committee_member'
+                ? 'Can view analytics and manage notifications'
+                : 'Limited access to basic metrics only'}
           </Text>
         </View>
 
         <View className="space-y-2">
           {[
-            { check: canUserAccessAnalytics(state.userRole), label: 'View detailed analytics' },
-            { check: canUserExportData(state.userRole), label: 'Export analytics data' },
-            { check: canUserManageNotifications(state.userRole), label: 'Manage notification campaigns' },
-            { check: state.userRole === 'admin', label: 'Apply system optimizations' },
-            { check: state.userRole === 'admin', label: 'View audit logs' }
+            {
+              check: canUserAccessAnalytics(state.userRole),
+              label: 'View detailed analytics',
+            },
+            {
+              check: canUserExportData(state.userRole),
+              label: 'Export analytics data',
+            },
+            {
+              check: canUserManageNotifications(state.userRole),
+              label: 'Manage notification campaigns',
+            },
+            {
+              check: state.userRole === 'admin',
+              label: 'Apply system optimizations',
+            },
+            { check: state.userRole === 'admin', label: 'View audit logs' },
           ].map((permission, index) => (
             <View key={index} className="flex-row items-center">
-              <LucideIcons 
-                name={permission.check ? "checkmark-circle" : "close-circle"} 
-                size={16} 
-                color={permission.check ? "#4CAF50" : "#D32F2F"} 
+              <LucideIcons
+                name={permission.check ? 'checkmark-circle' : 'close-circle'}
+                size={16}
+                color={permission.check ? '#4CAF50' : '#D32F2F'}
               />
-              <Text className={`text-body-small ml-2 ${
-                permission.check ? 'text-text-primary' : 'text-text-secondary'
-              }`}>
+              <Text
+                className={`text-body-small ml-2 ${
+                  permission.check ? 'text-text-primary' : 'text-text-secondary'
+                }`}>
                 {permission.label}
               </Text>
             </View>
@@ -356,19 +405,21 @@ export default function AnalyticsSettingsPage() {
         <Text className="text-headline-small font-semibold text-text-primary mb-4">
           Data Actions
         </Text>
-        
+
         <View className="space-y-4">
           {canUserExportData(state.userRole) && (
             <TouchableOpacity
               className="flex-row items-center justify-between py-2"
-              onPress={() => {/* Trigger data export */}}
-            >
+              onPress={() => {
+                /* Trigger data export */
+              }}>
               <View className="flex-1">
                 <Text className="text-body-medium font-medium text-text-primary">
                   Export Analytics Data
                 </Text>
                 <Text className="text-body-small text-text-secondary">
-                  Download complete analytics report in {preferences.reportFormat.toUpperCase()} format
+                  Download complete analytics report in{' '}
+                  {preferences.reportFormat.toUpperCase()} format
                 </Text>
               </View>
               <LucideIcons name="download-outline" size={20} color="#757575" />
@@ -377,8 +428,9 @@ export default function AnalyticsSettingsPage() {
 
           <TouchableOpacity
             className="flex-row items-center justify-between py-2"
-            onPress={() => {/* Clear cached data */}}
-          >
+            onPress={() => {
+              /* Clear cached data */
+            }}>
             <View className="flex-1">
               <Text className="text-body-medium font-medium text-text-primary">
                 Clear Cache
@@ -393,8 +445,7 @@ export default function AnalyticsSettingsPage() {
           {canUserAccessAnalytics(state.userRole) && (
             <TouchableOpacity
               className="flex-row items-center justify-between py-2"
-              onPress={() => router.push('/(tabs)/services/analytics')}
-            >
+              onPress={() => router.push('/(tabs)/services/analytics')}>
               <View className="flex-1">
                 <Text className="text-body-medium font-medium text-text-primary">
                   Analytics Dashboard
@@ -418,21 +469,19 @@ export default function AnalyticsSettingsPage() {
           title="Analytics Settings"
           onBackPress={() => safeGoBack()}
         />
-        
+
         <View className="flex-1 items-center justify-center p-4">
           <LucideIcons name="analytics-outline" size={64} color="#757575" />
           <Text className="text-headline-small text-text-secondary mt-4 mb-2">
             Access Restricted
           </Text>
           <Text className="text-body-medium text-text-secondary text-center mb-8">
-            Analytics settings are only available to committee members and administrators.
+            Analytics settings are only available to committee members and
+            administrators.
           </Text>
-          
+
           {/* Back Button under content */}
-          <Button
-            variant="secondary"
-            onPress={() => safeGoBack()}
-          >
+          <Button variant="secondary" onPress={() => safeGoBack()}>
             Go Back
           </Button>
         </View>
@@ -458,9 +507,11 @@ export default function AnalyticsSettingsPage() {
           <Button
             variant="primary"
             onPress={handleSavePreferences}
-            disabled={isSaving || JSON.stringify(preferences) === JSON.stringify(state.preferences)}
-          >
-            {isSaving ? "Saving..." : "Save Preferences"}
+            disabled={
+              isSaving ||
+              JSON.stringify(preferences) === JSON.stringify(state.preferences)
+            }>
+            {isSaving ? 'Saving...' : 'Save Preferences'}
           </Button>
         </View>
 

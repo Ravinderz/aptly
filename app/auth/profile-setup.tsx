@@ -1,10 +1,10 @@
-import { Button } from "@/components/ui/Button";
-import { useAuth } from "@/contexts/AuthContext";
-import { UserProfile } from "@/services/auth.service";
-import { showErrorAlert, showSuccessAlert } from "@/utils/alert";
-import { useLocalSearchParams, useRouter } from "expo-router";
-import { ArrowLeft, User } from "lucide-react-native";
-import React, { useState } from "react";
+import { Button } from '@/components/ui/Button';
+import { useAuth } from '@/contexts/AuthContext';
+import { UserProfile } from '@/services/auth.service';
+import { showErrorAlert, showSuccessAlert } from '@/utils/alert';
+import { useLocalSearchParams, useRouter } from 'expo-router';
+import { ArrowLeft, User } from 'lucide-react-native';
+import React, { useState } from 'react';
 import {
   SafeAreaView,
   ScrollView,
@@ -12,15 +12,15 @@ import {
   TextInput,
   TouchableOpacity,
   View,
-} from "react-native";
+} from 'react-native';
 
 interface ProfileData {
   fullName: string;
   flatNumber: string;
-  ownershipType: "owner" | "tenant";
+  ownershipType: 'owner' | 'tenant';
   familySize: string;
   emergencyContact: string;
-  role: "resident" | "committee_member" | "society_admin";
+  role: 'resident' | 'committee_member' | 'society_admin';
 }
 
 export default function ProfileSetup() {
@@ -35,12 +35,12 @@ export default function ProfileSetup() {
     }>();
 
   const [profileData, setProfileData] = useState<ProfileData>({
-    fullName: "",
-    flatNumber: "",
-    ownershipType: "owner",
-    familySize: "",
-    emergencyContact: "",
-    role: "resident",
+    fullName: '',
+    flatNumber: '',
+    ownershipType: 'owner',
+    familySize: '',
+    emergencyContact: '',
+    role: 'resident',
   });
 
   const [errors, setErrors] = useState<Partial<ProfileData>>({});
@@ -48,37 +48,37 @@ export default function ProfileSetup() {
 
   const ownershipTypes = [
     {
-      value: "owner",
-      label: "Owner",
-      icon: "🏠",
-      description: "I own this flat",
+      value: 'owner',
+      label: 'Owner',
+      icon: '🏠',
+      description: 'I own this flat',
     },
     {
-      value: "tenant",
-      label: "Tenant",
-      icon: "🔑",
-      description: "I am renting this flat",
+      value: 'tenant',
+      label: 'Tenant',
+      icon: '🔑',
+      description: 'I am renting this flat',
     },
   ];
 
   const roles = [
     {
-      value: "resident",
-      label: "Resident",
-      icon: "👤",
-      description: "Regular society member",
+      value: 'resident',
+      label: 'Resident',
+      icon: '👤',
+      description: 'Regular society member',
     },
     {
-      value: "committee_member",
-      label: "Committee Member",
-      icon: "👥",
-      description: "Part of society committee",
+      value: 'committee_member',
+      label: 'Committee Member',
+      icon: '👥',
+      description: 'Part of society committee',
     },
     {
-      value: "society_admin",
-      label: "Society Admin",
-      icon: "⚡",
-      description: "Full administrative access",
+      value: 'society_admin',
+      label: 'Society Admin',
+      icon: '⚡',
+      description: 'Full administrative access',
     },
   ];
 
@@ -86,43 +86,43 @@ export default function ProfileSetup() {
     const newErrors: Partial<ProfileData> = {};
 
     if (!profileData.fullName.trim()) {
-      newErrors.fullName = "Full name is required";
+      newErrors.fullName = 'Full name is required';
     } else if (profileData.fullName.trim().length < 2) {
-      newErrors.fullName = "Name must be at least 2 characters";
+      newErrors.fullName = 'Name must be at least 2 characters';
     }
 
     if (!profileData.flatNumber.trim()) {
-      newErrors.flatNumber = "Flat number is required";
+      newErrors.flatNumber = 'Flat number is required';
     } else if (!/^[A-Z0-9\-\/]+$/i.test(profileData.flatNumber.trim())) {
-      newErrors.flatNumber = "Invalid flat number format";
+      newErrors.flatNumber = 'Invalid flat number format';
     }
 
     if (!profileData.familySize.trim()) {
-      newErrors.familySize = "Family size is required";
+      newErrors.familySize = 'Family size is required';
     } else if (
       isNaN(Number(profileData.familySize)) ||
       Number(profileData.familySize) < 1 ||
       Number(profileData.familySize) > 20
     ) {
-      newErrors.familySize = "Family size must be between 1-20";
+      newErrors.familySize = 'Family size must be between 1-20';
     }
 
     if (!profileData.emergencyContact.trim()) {
-      newErrors.emergencyContact = "Emergency contact is required";
+      newErrors.emergencyContact = 'Emergency contact is required';
     } else {
       const cleanContact = profileData.emergencyContact.replace(
         /[\s\-\(\)]/g,
-        ""
+        '',
       );
       const indianMobileRegex = /^[6-9]\d{9}$/;
       if (
         !indianMobileRegex.test(cleanContact) &&
         !(
-          cleanContact.startsWith("91") &&
+          cleanContact.startsWith('91') &&
           indianMobileRegex.test(cleanContact.substring(2))
         )
       ) {
-        newErrors.emergencyContact = "Invalid Indian mobile number";
+        newErrors.emergencyContact = 'Invalid Indian mobile number';
       }
     }
 
@@ -148,15 +148,15 @@ export default function ProfileSetup() {
       // Create profile data
       const completeProfileData = {
         id: `user_${Date.now()}`, // Generate temp ID for demo
-        phoneNumber: phoneNumber || "",
+        phoneNumber: phoneNumber || '',
         fullName: profileData.fullName,
         flatNumber: profileData.flatNumber,
         ownershipType: profileData.ownershipType,
         familySize: parseInt(profileData.familySize),
         emergencyContact: profileData.emergencyContact,
         role: profileData.role,
-        societyId: societyId || "",
-        societyCode: societyCode || "",
+        societyId: societyId || '',
+        societyCode: societyCode || '',
         isVerified: true,
         createdAt: new Date().toISOString(),
       } as UserProfile;
@@ -169,16 +169,16 @@ export default function ProfileSetup() {
       login(completeProfileData);
 
       showSuccessAlert(
-        "Profile Created!",
-        "Your profile has been set up successfully. Welcome to Aptly!",
+        'Profile Created!',
+        'Your profile has been set up successfully. Welcome to Aptly!',
         () => {
           // The auth context will handle navigation
-          router.replace("/auth/biometric-setup");
-        }
+          router.replace('/auth/biometric-setup');
+        },
       );
     } catch (error) {
-      console.error("Profile creation error:", error);
-      showErrorAlert("Error", "Failed to create profile. Please try again.");
+      console.error('Profile creation error:', error);
+      showErrorAlert('Error', 'Failed to create profile. Please try again.');
     } finally {
       setIsLoading(false);
     }
@@ -224,7 +224,7 @@ export default function ProfileSetup() {
               placeholder="Enter your full name"
               placeholderTextColor="#757575"
               value={profileData.fullName}
-              onChangeText={(value) => handleInputChange("fullName", value)}
+              onChangeText={(value) => handleInputChange('fullName', value)}
               autoCapitalize="words"
             />
             {errors.fullName && (
@@ -243,7 +243,7 @@ export default function ProfileSetup() {
               placeholderTextColor="#757575"
               value={profileData.flatNumber}
               onChangeText={(value) =>
-                handleInputChange("flatNumber", value.toUpperCase())
+                handleInputChange('flatNumber', value.toUpperCase())
               }
               autoCapitalize="characters"
             />
@@ -266,24 +266,22 @@ export default function ProfileSetup() {
                   onPress={() =>
                     setProfileData((prev) => ({
                       ...prev,
-                      ownershipType: type.value as "owner" | "tenant",
+                      ownershipType: type.value as 'owner' | 'tenant',
                     }))
                   }
                   className={`flex-row items-center p-4 rounded-xl border ${
                     profileData.ownershipType === type.value
-                      ? "border-primary bg-primary/5"
-                      : "border-divider bg-surface"
-                  }`}
-                >
+                      ? 'border-primary bg-primary/5'
+                      : 'border-divider bg-surface'
+                  }`}>
                   <Text className="text-2xl mr-4">{type.icon}</Text>
                   <View className="flex-1">
                     <Text
                       className={`font-semibold ${
                         profileData.ownershipType === type.value
-                          ? "text-primary"
-                          : "text-text-primary"
-                      }`}
-                    >
+                          ? 'text-primary'
+                          : 'text-text-primary'
+                      }`}>
                       {type.label}
                     </Text>
                     <Text className="text-text-secondary text-sm">
@@ -310,7 +308,7 @@ export default function ProfileSetup() {
               placeholder="Number of family members"
               placeholderTextColor="#757575"
               value={profileData.familySize}
-              onChangeText={(value) => handleInputChange("familySize", value)}
+              onChangeText={(value) => handleInputChange('familySize', value)}
               keyboardType="number-pad"
               maxLength={2}
             />
@@ -332,7 +330,7 @@ export default function ProfileSetup() {
               placeholderTextColor="#757575"
               value={profileData.emergencyContact}
               onChangeText={(value) =>
-                handleInputChange("emergencyContact", value)
+                handleInputChange('emergencyContact', value)
               }
               keyboardType="phone-pad"
             />
@@ -363,19 +361,17 @@ export default function ProfileSetup() {
                   }
                   className={`flex-row items-center p-4 rounded-xl border ${
                     profileData.role === role.value
-                      ? "border-primary bg-primary/5"
-                      : "border-divider bg-surface"
-                  }`}
-                >
+                      ? 'border-primary bg-primary/5'
+                      : 'border-divider bg-surface'
+                  }`}>
                   <Text className="text-2xl mr-4">{role.icon}</Text>
                   <View className="flex-1">
                     <Text
                       className={`font-semibold ${
                         profileData.role === role.value
-                          ? "text-primary"
-                          : "text-text-primary"
-                      }`}
-                    >
+                          ? 'text-primary'
+                          : 'text-text-primary'
+                      }`}>
                       {role.label}
                     </Text>
                     <Text className="text-text-secondary text-sm">
@@ -397,8 +393,7 @@ export default function ProfileSetup() {
             onPress={handleSubmit}
             loading={isLoading}
             disabled={isLoading}
-            className="mb-6"
-          >
+            className="mb-6">
             Create Profile
           </Button>
 

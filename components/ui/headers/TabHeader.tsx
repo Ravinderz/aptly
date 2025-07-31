@@ -1,10 +1,10 @@
-import { useAuth } from "@/contexts/AuthContext";
-import { ArrowLeft, Bell, HelpCircle, MapPin } from "lucide-react-native";
-import React, { useEffect, useRef, useState } from "react";
-import { Animated, Text, View } from "react-native";
-import { router } from "expo-router";
-import { navigateWithReset } from "@/utils/navigation";
-import HeaderAction from "./HeaderAction";
+import { useAuth } from '@/contexts/AuthContext';
+import { ArrowLeft, Bell, HelpCircle, MapPin } from 'lucide-react-native';
+import React, { useEffect, useRef, useState } from 'react';
+import { Animated, Text, View } from 'react-native';
+import { router } from 'expo-router';
+import { navigateWithReset } from '@/utils/navigation';
+import HeaderAction from './HeaderAction';
 
 interface TabHeaderProps {
   onNotificationPress?: () => void;
@@ -29,7 +29,7 @@ export default function TabHeader({
 }: TabHeaderProps) {
   const { user } = useAuth();
   const [mounted, setMounted] = useState(false);
-  
+
   // Animations
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const slideAnim = useRef(new Animated.Value(-20)).current;
@@ -93,8 +93,7 @@ export default function TabHeader({
         opacity: fadeAnim,
         transform: [{ translateY: slideAnim }],
       }}
-      className="bg-surface border-b border-divider shadow-sm shadow-primary/5"
-    >
+      className="bg-surface border-b border-divider shadow-sm shadow-primary/5">
       <View className="flex-row items-center justify-between px-6 py-4 pt-6">
         {/* Back Button */}
         {showBackButton && (
@@ -105,7 +104,7 @@ export default function TabHeader({
             className="mr-3"
           />
         )}
-        
+
         {/* Content Section */}
         <View className="flex-1 pr-4">
           {title ? (
@@ -124,15 +123,19 @@ export default function TabHeader({
             <>
               {/* User Context */}
               <Text className="text-headline-medium font-semibold text-text-primary mb-1">
-                {user?.name || "Welcome"}
+                {user?.name || 'Welcome'}
               </Text>
-              
+
               {/* Location Info */}
               <View className="flex-row items-center">
-                <MapPin size={14} className="text-text-secondary mr-1" strokeWidth={1.5} />
+                <MapPin
+                  size={14}
+                  className="text-text-secondary mr-1"
+                  strokeWidth={1.5}
+                />
                 <Text className="text-body-medium text-text-secondary">
-                  {user?.flatNumber ? `${user.flatNumber} • ` : ""}
-                  {user?.societyName || "Green Valley Apartments"}
+                  {user?.flatNumber ? `${user.flatNumber} • ` : ''}
+                  {user?.societyName || 'Green Valley Apartments'}
                 </Text>
               </View>
             </>
@@ -142,12 +145,8 @@ export default function TabHeader({
         {/* Action Buttons */}
         <View className="flex-row items-center gap-3">
           {/* Help Action */}
-          <HeaderAction
-            icon={HelpCircle}
-            onPress={handleHelpPress}
-            size={20}
-          />
-          
+          <HeaderAction icon={HelpCircle} onPress={handleHelpPress} size={20} />
+
           {/* Notification Action */}
           <HeaderAction
             icon={Bell}

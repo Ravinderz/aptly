@@ -15,7 +15,7 @@ export const formatTime = (time: string): string => {
   const hour24 = parseInt(hours);
   const hour12 = hour24 === 0 ? 12 : hour24 > 12 ? hour24 - 12 : hour24;
   const period = hour24 >= 12 ? 'PM' : 'AM';
-  
+
   return `${hour12}:${minutes} ${period}`;
 };
 
@@ -55,7 +55,11 @@ export const isPastDate = (date: Date): boolean => {
   return compareDate < today;
 };
 
-export const isDateInRange = (date: Date, minDate?: Date, maxDate?: Date): boolean => {
+export const isDateInRange = (
+  date: Date,
+  minDate?: Date,
+  maxDate?: Date,
+): boolean => {
   if (minDate && date < minDate) return false;
   if (maxDate && date > maxDate) return false;
   return true;
@@ -64,36 +68,42 @@ export const isDateInRange = (date: Date, minDate?: Date, maxDate?: Date): boole
 export const generateTimeSlots = (
   startTime = '06:00',
   endTime = '22:00',
-  intervalMinutes = 15
+  intervalMinutes = 15,
 ): string[] => {
   const slots: string[] = [];
   const start = new Date(`1970-01-01T${startTime}:00`);
   const end = new Date(`1970-01-01T${endTime}:00`);
-  
+
   const current = new Date(start);
-  
+
   while (current <= end) {
     const hours = current.getHours().toString().padStart(2, '0');
     const minutes = current.getMinutes().toString().padStart(2, '0');
     slots.push(`${hours}:${minutes}`);
     current.setMinutes(current.getMinutes() + intervalMinutes);
   }
-  
+
   return slots;
 };
 
-export const parseTime = (timeString: string): { hours: number; minutes: number; period: 'AM' | 'PM' } => {
+export const parseTime = (
+  timeString: string,
+): { hours: number; minutes: number; period: 'AM' | 'PM' } => {
   const [time, period] = timeString.split(' ');
   const [hours, minutes] = time.split(':').map(Number);
-  
+
   return {
     hours,
     minutes,
-    period: period as 'AM' | 'PM'
+    period: period as 'AM' | 'PM',
   };
 };
 
-export const formatTimeToDisplay = (hours: number, minutes: number, period: 'AM' | 'PM'): string => {
+export const formatTimeToDisplay = (
+  hours: number,
+  minutes: number,
+  period: 'AM' | 'PM',
+): string => {
   const displayHours = hours.toString().padStart(2, '0');
   const displayMinutes = minutes.toString().padStart(2, '0');
   return `${displayHours}:${displayMinutes} ${period}`;

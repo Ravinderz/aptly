@@ -23,14 +23,14 @@ describe('AuthService', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
-    
+
     // Reset AsyncStorage mock
     mockAsyncStorage.getItem.mockResolvedValue(null);
     mockAsyncStorage.setItem.mockResolvedValue();
     mockAsyncStorage.removeItem.mockResolvedValue();
-    
+
     authService = AuthService.getInstance();
-    
+
     // Get the mocked API service
     const { APIService } = require('../../services/api.service');
     mockApiService = APIService.getInstance();
@@ -51,7 +51,7 @@ describe('AuthService', () => {
         sessionId: 'session-123',
         expiresIn: 300,
       };
-      
+
       mockApiService.post.mockResolvedValue(mockResponse);
 
       const result = await authService.sendOTP('9876543210');
@@ -89,7 +89,7 @@ describe('AuthService', () => {
         message: 'Invalid phone number',
         statusCode: 400,
       };
-      
+
       mockApiService.post.mockRejectedValue(mockError);
 
       await expect(authService.sendOTP('invalid')).rejects.toEqual(mockError);
@@ -110,7 +110,7 @@ describe('AuthService', () => {
           email: 'test@example.com',
         },
       };
-      
+
       mockApiService.post.mockResolvedValue(mockResponse);
 
       const result = await authService.verifyOTP('session-123', '123456');
@@ -128,10 +128,12 @@ describe('AuthService', () => {
         message: 'Invalid OTP',
         statusCode: 400,
       };
-      
+
       mockApiService.post.mockRejectedValue(mockError);
 
-      await expect(authService.verifyOTP('session-123', '000000')).rejects.toEqual(mockError);
+      await expect(
+        authService.verifyOTP('session-123', '000000'),
+      ).rejects.toEqual(mockError);
     });
 
     test('should handle expired OTP', async () => {
@@ -140,10 +142,12 @@ describe('AuthService', () => {
         message: 'OTP has expired',
         statusCode: 400,
       };
-      
+
       mockApiService.post.mockRejectedValue(mockError);
 
-      await expect(authService.verifyOTP('session-123', '123456')).rejects.toEqual(mockError);
+      await expect(
+        authService.verifyOTP('session-123', '123456'),
+      ).rejects.toEqual(mockError);
     });
   });
 
@@ -164,12 +168,15 @@ describe('AuthService', () => {
           phoneNumber: '+919876543210',
         },
       };
-      
+
       mockApiService.post.mockResolvedValue(mockResponse);
 
       const result = await authService.completeProfile(profileData);
 
-      expect(mockApiService.post).toHaveBeenCalledWith('/auth/complete-profile', profileData);
+      expect(mockApiService.post).toHaveBeenCalledWith(
+        '/auth/complete-profile',
+        profileData,
+      );
       expect(result).toEqual(mockResponse);
     });
 
@@ -187,12 +194,15 @@ describe('AuthService', () => {
           phoneNumber: '+919876543210',
         },
       };
-      
+
       mockApiService.put.mockResolvedValue(mockResponse);
 
       const result = await authService.updateProfile(updateData);
 
-      expect(mockApiService.put).toHaveBeenCalledWith('/auth/profile', updateData);
+      expect(mockApiService.put).toHaveBeenCalledWith(
+        '/auth/profile',
+        updateData,
+      );
       expect(result).toEqual(mockResponse);
     });
 
@@ -205,7 +215,7 @@ describe('AuthService', () => {
         societyCode: 'SOC123',
         flatNumber: 'A-101',
       };
-      
+
       mockApiService.get.mockResolvedValue(mockUser);
 
       const result = await authService.getCurrentUser();
@@ -221,11 +231,11 @@ describe('AuthService', () => {
 
       expect(mockAsyncStorage.setItem).toHaveBeenCalledWith(
         'accessToken',
-        'access-token'
+        'access-token',
       );
       expect(mockAsyncStorage.setItem).toHaveBeenCalledWith(
         'refreshToken',
-        'refresh-token'
+        'refresh-token',
       );
     });
 
@@ -248,12 +258,12 @@ describe('AuthService', () => {
 
     test('should refresh access token', async () => {
       mockAsyncStorage.getItem.mockResolvedValue('refresh-token-123');
-      
+
       const mockResponse = {
         accessToken: 'new-access-token',
         refreshToken: 'new-refresh-token',
       };
-      
+
       mockApiService.post.mockResolvedValue(mockResponse);
 
       const result = await authService.refreshToken();
@@ -266,13 +276,13 @@ describe('AuthService', () => {
 
     test('should handle refresh token failure', async () => {
       mockAsyncStorage.getItem.mockResolvedValue('invalid-refresh-token');
-      
+
       const mockError = {
         code: 'INVALID_REFRESH_TOKEN',
         message: 'Invalid refresh token',
         statusCode: 401,
       };
-      
+
       mockApiService.post.mockRejectedValue(mockError);
 
       await expect(authService.refreshToken()).rejects.toEqual(mockError);
@@ -306,10 +316,13 @@ describe('AuthService', () => {
     test('should check if user is authenticated', async () => {
       mockAsyncStorage.getItem.mockImplementation((key) => {
         if (key === 'accessToken') return Promise.resolve('valid-token');
-        if (key === 'userProfile') return Promise.resolve(JSON.stringify({
-          id: 'user-123',
-          fullName: 'Test User',
-        }));
+        if (key === 'userProfile')
+          return Promise.resolve(
+            JSON.stringify({
+              id: 'user-123',
+              fullName: 'Test User',
+            }),
+          );
         return Promise.resolve(null);
       });
 
@@ -349,19 +362,19 @@ describe('AuthService', () => {
         '6555444333',
       ];
 
-      validNumbers.forEach(number => {
+      validNumbers.forEach((number) => {
         expect(() => authService.sendOTP(number)).not.toThrow();
       });
     });
 
     test('should reject invalid phone numbers', async () => {
       const invalidNumbers = [
-        '123456789',    // Too short
-        '12345678901',  // Too long
-        '5876543210',   // Doesn't start with 6-9
-        '1876543210',   // Doesn't start with 6-9
-        'abcd123456',   // Contains letters
-        '',             // Empty
+        '123456789', // Too short
+        '12345678901', // Too long
+        '5876543210', // Doesn't start with 6-9
+        '1876543210', // Doesn't start with 6-9
+        'abcd123456', // Contains letters
+        '', // Empty
       ];
 
       for (const number of invalidNumbers) {

@@ -45,85 +45,96 @@ export class AuthService {
   }
 
   // Phone Registration
-  async registerPhone(phoneNumber: string, societyCode: string): Promise<AuthResult> {
+  async registerPhone(
+    phoneNumber: string,
+    societyCode: string,
+  ): Promise<AuthResult> {
     try {
       // For demo purposes, simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+
       // Validate Indian phone number
       const cleanNumber = phoneNumber.replace(/[\s\-\(\)\+]/g, '');
       const indianMobileRegex = /^(?:\+91|91)?[6-9]\d{9}$/;
-      
+
       if (!indianMobileRegex.test(cleanNumber)) {
         return {
           success: false,
-          error: 'Please enter a valid Indian mobile number'
+          error: 'Please enter a valid Indian mobile number',
         };
       }
-      
+
       // Validate society code
       if (!societyCode || societyCode.length < 4) {
         return {
           success: false,
-          error: 'Please enter a valid society code'
+          error: 'Please enter a valid society code',
         };
       }
-      
+
       return {
         success: true,
         data: { message: 'OTP sent successfully' },
         requiresOTP: true,
-        sessionId: `session_${Date.now()}`
+        sessionId: `session_${Date.now()}`,
       };
     } catch (error) {
       return {
         success: false,
-        error: 'Network error. Please check your connection.'
+        error: 'Network error. Please check your connection.',
       };
     }
   }
 
   // OTP Verification
-  async verifyOTP(phoneNumber: string, otp: string, sessionId?: string): Promise<AuthResult> {
+  async verifyOTP(
+    phoneNumber: string,
+    otp: string,
+    sessionId?: string,
+  ): Promise<AuthResult> {
     try {
       // For demo purposes, simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+
       // Accept demo OTP: 123456
       if (otp !== '123456') {
         return {
           success: false,
-          error: 'Invalid OTP. Use 123456 for demo.'
+          error: 'Invalid OTP. Use 123456 for demo.',
         };
       }
-      
+
       // Generate demo tokens
       const tokens = {
         accessToken: `demo_access_token_${Date.now()}`,
         refreshToken: `demo_refresh_token_${Date.now()}`,
-        expiresAt: Date.now() + (24 * 60 * 60 * 1000) // 24 hours
+        expiresAt: Date.now() + 24 * 60 * 60 * 1000, // 24 hours
       };
-      
+
       // Store tokens securely
       await this.storeTokens(tokens);
-      
+
       return {
         success: true,
         data: {
           message: 'OTP verified successfully',
-          user: null // Profile will be created in next step
-        }
+          user: null, // Profile will be created in next step
+        },
       };
     } catch (error) {
       return {
         success: false,
-        error: 'Network error. Please check your connection.'
+        error: 'Network error. Please check your connection.',
       };
     }
   }
 
   // Society Association
-  async associateWithSociety(userId: string, societyId: string, flatNumber: string): Promise<AuthResult> {
+  async associateWithSociety(
+    userId: string,
+    societyId: string,
+    flatNumber: string,
+  ): Promise<AuthResult> {
     try {
       const token = await this.getAccessToken();
       if (!token) {
@@ -134,12 +145,12 @@ export class AuthService {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
+          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
           userId,
           societyId,
-          flatNumber
+          flatNumber,
         }),
       });
 
@@ -148,18 +159,18 @@ export class AuthService {
       if (response.ok) {
         return {
           success: true,
-          data: data
+          data: data,
         };
       } else {
         return {
           success: false,
-          error: data.message || 'Failed to associate with society'
+          error: data.message || 'Failed to associate with society',
         };
       }
     } catch (error) {
       return {
         success: false,
-        error: 'Network error. Please check your connection.'
+        error: 'Network error. Please check your connection.',
       };
     }
   }
@@ -168,13 +179,13 @@ export class AuthService {
   async createProfile(profileData: Partial<UserProfile>): Promise<AuthResult> {
     try {
       // For demo purposes, simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+
       const token = await this.getAccessToken();
       if (!token) {
         return { success: false, error: 'Authentication required' };
       }
-      
+
       // Create complete user profile
       const completeProfile: UserProfile = {
         id: profileData.id || `user_${Date.now()}`,
@@ -190,18 +201,21 @@ export class AuthService {
         isVerified: true,
         createdAt: new Date().toISOString(),
       };
-      
+
       this.currentUser = completeProfile;
-      await AsyncStorage.setItem('userProfile', JSON.stringify(completeProfile));
-      
+      await AsyncStorage.setItem(
+        'userProfile',
+        JSON.stringify(completeProfile),
+      );
+
       return {
         success: true,
-        data: completeProfile
+        data: completeProfile,
       };
     } catch (error) {
       return {
         success: false,
-        error: 'Network error. Please check your connection.'
+        error: 'Network error. Please check your connection.',
       };
     }
   }
@@ -218,8 +232,8 @@ export class AuthService {
 
       const response = await fetch(`${this.baseURL}/auth/me`, {
         headers: {
-          'Authorization': `Bearer ${token}`
-        }
+          Authorization: `Bearer ${token}`,
+        },
       });
 
       if (response.ok) {
@@ -254,9 +268,9 @@ export class AuthService {
         const tokens: TokenPair = {
           accessToken: data.accessToken,
           refreshToken: data.refreshToken,
-          expiresAt: data.expiresAt
+          expiresAt: data.expiresAt,
         };
-        
+
         await this.storeTokens(tokens);
         return tokens;
       }
@@ -275,8 +289,8 @@ export class AuthService {
         await fetch(`${this.baseURL}/auth/logout`, {
           method: 'POST',
           headers: {
-            'Authorization': `Bearer ${token}`
-          }
+            Authorization: `Bearer ${token}`,
+          },
         });
       }
     } catch (error) {
@@ -300,16 +314,16 @@ export class AuthService {
     try {
       const token = await SecureStore.getItemAsync('accessToken');
       const expiresAt = await AsyncStorage.getItem('tokenExpiresAt');
-      
+
       if (!token || !expiresAt) return null;
-      
+
       // Check if token is expired
       if (Date.now() >= parseInt(expiresAt)) {
         // Try to refresh token
         const newTokens = await this.refreshToken();
         return newTokens?.accessToken || null;
       }
-      
+
       return token;
     } catch (error) {
       console.error('Failed to get access token:', error);

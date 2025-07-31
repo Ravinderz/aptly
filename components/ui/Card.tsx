@@ -35,10 +35,9 @@ export const Card: React.FC<CardProps> = ({
         'rounded-xl',
         cardVariants[variant],
         cardPadding[padding],
-        className
+        className,
       )}
-      {...props}
-    >
+      {...props}>
       {children}
     </View>
   );

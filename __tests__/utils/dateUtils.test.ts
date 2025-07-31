@@ -10,7 +10,7 @@ import {
   isDateInRange,
   generateTimeSlots,
   parseTime,
-  formatTimeToDisplay
+  formatTimeToDisplay,
 } from '../../utils/dateUtils';
 
 describe('Date Utilities', () => {
@@ -100,7 +100,9 @@ describe('Date Utilities', () => {
     test('should return a date within the next 7 days', () => {
       const today = new Date();
       const weekend = getNextWeekend();
-      const daysDiff = Math.floor((weekend.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
+      const daysDiff = Math.floor(
+        (weekend.getTime() - today.getTime()) / (1000 * 60 * 60 * 24),
+      );
       expect(daysDiff).toBeLessThanOrEqual(7);
       expect(daysDiff).toBeGreaterThanOrEqual(0);
     });
@@ -199,13 +201,13 @@ describe('Date Utilities', () => {
       expect(parseTime('2:30 PM')).toEqual({
         hours: 2,
         minutes: 30,
-        period: 'PM'
+        period: 'PM',
       });
 
       expect(parseTime('11:45 AM')).toEqual({
         hours: 11,
         minutes: 45,
-        period: 'AM'
+        period: 'AM',
       });
     });
 
@@ -213,7 +215,7 @@ describe('Date Utilities', () => {
       expect(parseTime('9:15 AM')).toEqual({
         hours: 9,
         minutes: 15,
-        period: 'AM'
+        period: 'AM',
       });
     });
   });

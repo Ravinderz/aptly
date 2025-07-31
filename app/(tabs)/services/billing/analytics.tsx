@@ -1,4 +1,4 @@
-import { useRouter } from "expo-router";
+import { useRouter } from 'expo-router';
 import {
   AlertCircle,
   ArrowLeft,
@@ -11,15 +11,15 @@ import {
   Share,
   TrendingDown,
   TrendingUp,
-} from "lucide-react-native";
-import React, { useState } from "react";
+} from 'lucide-react-native';
+import React, { useState } from 'react';
 import {
   SafeAreaView,
   ScrollView,
   Text,
   TouchableOpacity,
   View,
-} from "react-native";
+} from 'react-native';
 
 // Mock analytics data
 const analyticsData = {
@@ -37,58 +37,58 @@ const analyticsData = {
     },
   },
   yearlyTrend: [
-    { month: "Jan", paid: 6195, pending: 0 },
-    { month: "Feb", paid: 6997, pending: 0 },
-    { month: "Mar", paid: 0, pending: 7080 },
-    { month: "Apr", paid: 0, pending: 9499 },
+    { month: 'Jan', paid: 6195, pending: 0 },
+    { month: 'Feb', paid: 6997, pending: 0 },
+    { month: 'Mar', paid: 0, pending: 7080 },
+    { month: 'Apr', paid: 0, pending: 9499 },
   ],
   categoryBreakdown: [
     {
-      category: "Maintenance",
+      category: 'Maintenance',
       amount: 21000,
       percentage: 55,
-      color: "#6366f1",
+      color: '#6366f1',
     },
-    { category: "Water", amount: 3400, percentage: 18, color: "#3B82F6" },
-    { category: "Security", amount: 8000, percentage: 21, color: "#4CAF50" },
-    { category: "Common Area", amount: 3304, percentage: 6, color: "#FF9800" },
+    { category: 'Water', amount: 3400, percentage: 18, color: '#3B82F6' },
+    { category: 'Security', amount: 8000, percentage: 21, color: '#4CAF50' },
+    { category: 'Common Area', amount: 3304, percentage: 6, color: '#FF9800' },
   ],
   paymentHistory: [
     {
-      id: "1",
-      date: "2024-03-02",
-      description: "Water Bill - February 2024",
+      id: '1',
+      date: '2024-03-02',
+      description: 'Water Bill - February 2024',
       amount: 802,
-      method: "UPI",
-      status: "success",
-      transactionId: "TXN123456789",
+      method: 'UPI',
+      status: 'success',
+      transactionId: 'TXN123456789',
     },
     {
-      id: "2",
-      date: "2024-02-25",
-      description: "Maintenance Bill - February 2024",
+      id: '2',
+      date: '2024-02-25',
+      description: 'Maintenance Bill - February 2024',
       amount: 6195,
-      method: "Net Banking",
-      status: "success",
-      transactionId: "TXN123456788",
+      method: 'Net Banking',
+      status: 'success',
+      transactionId: 'TXN123456788',
     },
     {
-      id: "3",
-      date: "2024-01-28",
-      description: "Water Bill - January 2024",
+      id: '3',
+      date: '2024-01-28',
+      description: 'Water Bill - January 2024',
       amount: 755,
-      method: "UPI",
-      status: "success",
-      transactionId: "TXN123456787",
+      method: 'UPI',
+      status: 'success',
+      transactionId: 'TXN123456787',
     },
     {
-      id: "4",
-      date: "2024-01-25",
-      description: "Maintenance Bill - January 2024",
+      id: '4',
+      date: '2024-01-25',
+      description: 'Maintenance Bill - January 2024',
       amount: 6195,
-      method: "Credit Card",
-      status: "success",
-      transactionId: "TXN123456786",
+      method: 'Credit Card',
+      status: 'success',
+      transactionId: 'TXN123456786',
     },
   ],
 };
@@ -97,7 +97,7 @@ interface StatCardProps {
   title: string;
   value: string;
   change?: string;
-  changeType?: "increase" | "decrease";
+  changeType?: 'increase' | 'decrease';
   icon: React.ReactNode;
   color?: string;
 }
@@ -108,7 +108,7 @@ const StatCard: React.FC<StatCardProps> = ({
   change,
   changeType,
   icon,
-  color = "bg-primary/10",
+  color = 'bg-primary/10',
 }) => (
   <View className={`${color} rounded-xl p-4 border border-divider`}>
     <View className="flex-row items-center justify-between mb-2">
@@ -118,19 +118,17 @@ const StatCard: React.FC<StatCardProps> = ({
       {change && (
         <View
           className={`flex-row items-center ${
-            changeType === "increase" ? "text-secondary" : "text-error"
-          }`}
-        >
-          {changeType === "increase" ? (
+            changeType === 'increase' ? 'text-secondary' : 'text-error'
+          }`}>
+          {changeType === 'increase' ? (
             <TrendingUp size={14} color="#4CAF50" />
           ) : (
             <TrendingDown size={14} color="#D32F2F" />
           )}
           <Text
             className={`text-xs ml-1 ${
-              changeType === "increase" ? "text-secondary" : "text-error"
-            }`}
-          >
+              changeType === 'increase' ? 'text-secondary' : 'text-error'
+            }`}>
             {change}
           </Text>
         </View>
@@ -152,9 +150,9 @@ const CategoryBar: React.FC<CategoryBarProps> = ({ category }) => (
         {category.category}
       </Text>
       <Text className="text-body-large font-semibold text-text-primary">
-        {new Intl.NumberFormat("en-IN", {
-          style: "currency",
-          currency: "INR",
+        {new Intl.NumberFormat('en-IN', {
+          style: 'currency',
+          currency: 'INR',
         }).format(category.amount)}
       </Text>
     </View>
@@ -175,35 +173,35 @@ const CategoryBar: React.FC<CategoryBarProps> = ({ category }) => (
 
 export default function BillingAnalytics() {
   const router = useRouter();
-  const [selectedPeriod, setSelectedPeriod] = useState("monthly");
+  const [selectedPeriod, setSelectedPeriod] = useState('monthly');
 
   const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat("en-IN", {
-      style: "currency",
-      currency: "INR",
+    return new Intl.NumberFormat('en-IN', {
+      style: 'currency',
+      currency: 'INR',
     }).format(amount);
   };
 
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString("en-IN", {
-      day: "numeric",
-      month: "short",
-      year: "numeric",
+    return new Date(dateString).toLocaleDateString('en-IN', {
+      day: 'numeric',
+      month: 'short',
+      year: 'numeric',
     });
   };
 
   const getPaymentMethodIcon = (method: string) => {
     switch (method.toLowerCase()) {
-      case "upi":
-        return "📱";
-      case "credit card":
-        return "💳";
-      case "net banking":
-        return "🏦";
-      case "cash":
-        return "💵";
+      case 'upi':
+        return '📱';
+      case 'credit card':
+        return '💳';
+      case 'net banking':
+        return '🏦';
+      case 'cash':
+        return '💵';
       default:
-        return "💳";
+        return '💳';
     }
   };
 
@@ -233,26 +231,23 @@ export default function BillingAnalytics() {
       <ScrollView
         className="flex-1"
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ paddingBottom: 20 }}
-      >
+        contentContainerStyle={{ paddingBottom: 20 }}>
         <View className="px-6 py-6 space-y-6">
           {/* Period Selector */}
           <View className="flex-row bg-surface rounded-xl p-1 border border-divider mb-4">
-            {["monthly", "quarterly", "yearly"].map((period) => (
+            {['monthly', 'quarterly', 'yearly'].map((period) => (
               <TouchableOpacity
                 key={period}
                 onPress={() => setSelectedPeriod(period)}
                 className={`flex-1 py-3 rounded-lg ${
-                  selectedPeriod === period ? "bg-primary" : "bg-transparent"
-                }`}
-              >
+                  selectedPeriod === period ? 'bg-primary' : 'bg-transparent'
+                }`}>
                 <Text
                   className={`text-center font-medium capitalize ${
                     selectedPeriod === period
-                      ? "text-white"
-                      : "text-text-secondary"
-                  }`}
-                >
+                      ? 'text-white'
+                      : 'text-text-secondary'
+                  }`}>
                   {period}
                 </Text>
               </TouchableOpacity>
@@ -327,8 +322,7 @@ export default function BillingAnalytics() {
                 ([method, percentage]) => (
                   <View
                     key={method}
-                    className="flex-row items-center justify-between"
-                  >
+                    className="flex-row items-center justify-between">
                     <View className="flex-row items-center">
                       <Text className="text-lg mr-3">
                         {getPaymentMethodIcon(method)}
@@ -349,7 +343,7 @@ export default function BillingAnalytics() {
                       </View>
                     </View>
                   </View>
-                )
+                ),
               )}
             </View>
           </View>
@@ -363,8 +357,7 @@ export default function BillingAnalytics() {
               {analyticsData.yearlyTrend.map((month, index) => (
                 <View
                   key={index}
-                  className="flex-row items-center justify-between"
-                >
+                  className="flex-row items-center justify-between">
                   <Text className="text-body-large font-medium text-text-primary w-12">
                     {month.month}
                   </Text>
@@ -413,8 +406,7 @@ export default function BillingAnalytics() {
               {analyticsData.paymentHistory.map((payment) => (
                 <View
                   key={payment.id}
-                  className="flex-row items-center justify-between py-3 border-b border-divider last:border-b-0"
-                >
+                  className="flex-row items-center justify-between py-3 border-b border-divider last:border-b-0">
                   <View className="flex-1">
                     <Text className="text-body-large font-medium text-text-primary mb-1">
                       {payment.description}

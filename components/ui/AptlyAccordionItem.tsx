@@ -1,11 +1,11 @@
-import React from "react";
-import { View } from "react-native";
+import React from 'react';
+import { View } from 'react-native';
 import Animated, {
   useAnimatedStyle,
   useDerivedValue,
   useSharedValue,
   withTiming,
-} from "react-native-reanimated";
+} from 'react-native-reanimated';
 
 const AptlyAccordionItem = ({
   isExpanded,
@@ -25,7 +25,7 @@ const AptlyAccordionItem = ({
   const derivedHeight = useDerivedValue(() =>
     withTiming(height.value * Number(isExpanded.value), {
       duration,
-    })
+    }),
   );
   const bodyStyle = useAnimatedStyle(() => ({
     height: derivedHeight.value,
@@ -34,14 +34,12 @@ const AptlyAccordionItem = ({
   return (
     <Animated.View
       key={`accordionItem_${viewKey}`}
-      style={[styles.animatedView, bodyStyle, style]}
-    >
+      style={[styles.animatedView, bodyStyle, style]}>
       <View
         onLayout={(e) => {
           height.value = e.nativeEvent.layout.height;
         }}
-        style={styles.wrapper}
-      >
+        style={styles.wrapper}>
         {children}
       </View>
     </Animated.View>

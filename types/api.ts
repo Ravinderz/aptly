@@ -136,7 +136,13 @@ export interface Visitor {
   name: string;
   phoneNumber: string;
   purpose: string;
-  status: 'pending' | 'approved' | 'rejected' | 'checked_in' | 'checked_out' | 'expired';
+  status:
+    | 'pending'
+    | 'approved'
+    | 'rejected'
+    | 'checked_in'
+    | 'checked_out'
+    | 'expired';
   hostFlatNumber: string;
   hostName: string;
   expectedDuration: number;
@@ -192,7 +198,14 @@ export interface CommentInteractionRequest {
 export interface MaintenanceRequestCreateRequest {
   title: string;
   description: string;
-  category: 'plumbing' | 'electrical' | 'civil' | 'appliance' | 'painting' | 'cleaning' | 'other';
+  category:
+    | 'plumbing'
+    | 'electrical'
+    | 'civil'
+    | 'appliance'
+    | 'painting'
+    | 'cleaning'
+    | 'other';
   priority: 'low' | 'medium' | 'high';
   type: 'individual' | 'common_area';
   flatNumber?: string;
@@ -269,7 +282,12 @@ export interface BillPaymentRequest {
 // File upload types
 export interface FileUploadRequest {
   file: File | Blob;
-  type: 'avatar' | 'document' | 'post_image' | 'maintenance_image' | 'notice_attachment';
+  type:
+    | 'avatar'
+    | 'document'
+    | 'post_image'
+    | 'maintenance_image'
+    | 'notice_attachment';
   metadata?: {
     originalName?: string;
     description?: string;
@@ -380,7 +398,12 @@ export interface PushNotificationToken {
 
 // WebSocket types
 export interface WebSocketMessage {
-  type: 'notification' | 'visitor_update' | 'post_update' | 'maintenance_update' | 'bill_update';
+  type:
+    | 'notification'
+    | 'visitor_update'
+    | 'post_update'
+    | 'maintenance_update'
+    | 'bill_update';
   payload: any;
   timestamp: string;
   userId?: string;

@@ -17,7 +17,7 @@ interface PermissionGateProps {
 
 /**
  * PermissionGate component that conditionally renders children based on user permissions
- * 
+ *
  * Features:
  * - Resource-action based permission checking
  * - Role-based access control
@@ -33,28 +33,46 @@ const PermissionGate: React.FC<PermissionGateProps> = ({
   role,
   fallback,
   showFallback = true,
-  renderEmpty = false
+  renderEmpty = false,
 }) => {
   const { checkPermission, adminUser, currentMode } = useAdmin();
 
   // Check if user is in admin mode
   if (currentMode !== 'admin') {
-    return renderEmpty ? null : (showFallback ? (fallback || <DefaultFallback type="mode" />) : null);
+    return renderEmpty
+      ? null
+      : showFallback
+        ? fallback || <DefaultFallback type="mode" />
+        : null;
   }
 
   // Check role-based access first
   if (role && adminUser) {
     const hasRole = role.includes(adminUser.role);
     if (!hasRole) {
-      return renderEmpty ? null : (showFallback ? (fallback || <DefaultFallback type="role" requiredRoles={role} />) : null);
+      return renderEmpty
+        ? null
+        : showFallback
+          ? fallback || <DefaultFallback type="role" requiredRoles={role} />
+          : null;
     }
   }
 
   // Check permission-based access
   const hasPermission = checkPermission(resource, action, societyId);
-  
+
   if (!hasPermission) {
-    return renderEmpty ? null : (showFallback ? (fallback || <DefaultFallback type="permission" resource={resource} action={action} />) : null);
+    return renderEmpty
+      ? null
+      : showFallback
+        ? fallback || (
+            <DefaultFallback
+              type="permission"
+              resource={resource}
+              action={action}
+            />
+          )
+        : null;
   }
 
   return <>{children}</>;
@@ -67,11 +85,11 @@ interface DefaultFallbackProps {
   requiredRoles?: AdminRole[];
 }
 
-const DefaultFallback: React.FC<DefaultFallbackProps> = ({ 
-  type, 
-  resource, 
-  action, 
-  requiredRoles 
+const DefaultFallback: React.FC<DefaultFallbackProps> = ({
+  type,
+  resource,
+  action,
+  requiredRoles,
 }) => {
   const getMessage = () => {
     switch (type) {

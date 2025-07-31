@@ -1,5 +1,11 @@
 import React, { useState } from 'react';
-import { ScrollView, SafeAreaView, View, Text, TouchableOpacity } from 'react-native';
+import {
+  ScrollView,
+  SafeAreaView,
+  View,
+  Text,
+  TouchableOpacity,
+} from 'react-native';
 import { ArrowLeft, Plus, Edit3, Trash2, User } from 'lucide-react-native';
 import { router } from 'expo-router';
 import { Button } from '../../../components/ui/Button';
@@ -57,22 +63,22 @@ export default function FamilyMembers() {
       'Remove Family Member',
       `Are you sure you want to remove ${member.name} from your family list?`,
       () => {
-        setFamilyMembers(prev => prev.filter(m => m.id !== member.id));
-      }
+        setFamilyMembers((prev) => prev.filter((m) => m.id !== member.id));
+      },
     );
   };
 
   const getRelationshipColor = (relationship: string) => {
     const colors = {
-      'Wife': '#4CAF50',
-      'Husband': '#4CAF50',
-      'Son': '#2196F3',
-      'Daughter': '#E91E63',
-      'Father': '#FF9800',
-      'Mother': '#9C27B0',
-      'Brother': '#00BCD4',
-      'Sister': '#FF5722',
-      'Other': '#757575',
+      Wife: '#4CAF50',
+      Husband: '#4CAF50',
+      Son: '#2196F3',
+      Daughter: '#E91E63',
+      Father: '#FF9800',
+      Mother: '#9C27B0',
+      Brother: '#00BCD4',
+      Sister: '#FF5722',
+      Other: '#757575',
     };
     return colors[relationship as keyof typeof colors] || colors.Other;
   };
@@ -86,25 +92,23 @@ export default function FamilyMembers() {
             variant="ghost"
             size="sm"
             onPress={() => router.back()}
-            className="mr-2 p-2"
-          >
+            className="mr-2 p-2">
             <ArrowLeft size={20} color="#6366f1" />
           </Button>
           <Text className="text-text-primary text-headline-large font-semibold">
             Family Members
           </Text>
         </View>
-        
+
         <Button size="sm" onPress={handleAddMember}>
           <Plus size={16} color="white" />
         </Button>
       </View>
 
-      <ScrollView 
-        className="flex-1 p-4" 
+      <ScrollView
+        className="flex-1 p-4"
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ paddingBottom: 20 }}
-      >
+        contentContainerStyle={{ paddingBottom: 20 }}>
         {/* Family Members List */}
         {familyMembers.map((member, index) => (
           <Card key={member.id} className="mb-4">
@@ -124,29 +128,29 @@ export default function FamilyMembers() {
                     <TouchableOpacity
                       onPress={() => handleEditMember(member)}
                       className="p-2 rounded-full bg-primary/10"
-                      activeOpacity={0.7}
-                    >
+                      activeOpacity={0.7}>
                       <Edit3 size={14} color="#6366f1" />
                     </TouchableOpacity>
                     <TouchableOpacity
                       onPress={() => handleDeleteMember(member)}
                       className="p-2 rounded-full bg-error/10"
-                      activeOpacity={0.7}
-                    >
+                      activeOpacity={0.7}>
                       <Trash2 size={14} color="#D32F2F" />
                     </TouchableOpacity>
                   </View>
                 </View>
 
                 {/* Relationship Badge */}
-                <View 
+                <View
                   className="self-start px-3 py-1 rounded-full mb-2"
-                  style={{ backgroundColor: `${getRelationshipColor(member.relationship)}15` }}
-                >
-                  <Text 
+                  style={{
+                    backgroundColor: `${getRelationshipColor(member.relationship)}15`,
+                  }}>
+                  <Text
                     className="text-label-large font-medium"
-                    style={{ color: getRelationshipColor(member.relationship) }}
-                  >
+                    style={{
+                      color: getRelationshipColor(member.relationship),
+                    }}>
                     {member.relationship}
                   </Text>
                 </View>
@@ -156,19 +160,19 @@ export default function FamilyMembers() {
                   <Text className="text-text-secondary text-body-medium">
                     Age: {member.age} years
                   </Text>
-                  
+
                   {member.phoneNumber && (
                     <Text className="text-text-secondary text-body-medium">
                       Phone: {member.phoneNumber}
                     </Text>
                   )}
-                  
+
                   {member.occupation && (
                     <Text className="text-text-secondary text-body-medium">
                       Occupation: {member.occupation}
                     </Text>
                   )}
-                  
+
                   {member.aadharNumber && (
                     <Text className="text-text-secondary text-body-medium">
                       Aadhar: {member.aadharNumber}
@@ -190,11 +194,10 @@ export default function FamilyMembers() {
               No Family Members Added
             </Text>
             <Text className="text-text-secondary text-center mb-6 px-4">
-              Add your family members to help with visitor management and emergency contacts.
+              Add your family members to help with visitor management and
+              emergency contacts.
             </Text>
-            <Button onPress={handleAddMember}>
-              Add Family Member
-            </Button>
+            <Button onPress={handleAddMember}>Add Family Member</Button>
           </View>
         )}
 
@@ -203,12 +206,11 @@ export default function FamilyMembers() {
           <TouchableOpacity
             onPress={handleAddMember}
             className={cn(
-              "border-2 border-dashed border-primary/30 rounded-xl p-6",
-              "items-center justify-center bg-primary/5",
-              "active:bg-primary/10"
+              'border-2 border-dashed border-primary/30 rounded-xl p-6',
+              'items-center justify-center bg-primary/5',
+              'active:bg-primary/10',
             )}
-            activeOpacity={0.8}
-          >
+            activeOpacity={0.8}>
             <Plus size={24} color="#6366f1" />
             <Text className="text-primary text-body-large font-medium mt-2">
               Add Family Member
@@ -222,10 +224,9 @@ export default function FamilyMembers() {
             💡 Family Member Benefits
           </Text>
           <Text className="text-text-secondary text-body-medium leading-5">
-            • Pre-approve visitors for family members{'\n'}
-            • Emergency contact management{'\n'}
-            • Society directory access{'\n'}
-            • Event and notification preferences
+            • Pre-approve visitors for family members{'\n'}• Emergency contact
+            management{'\n'}• Society directory access{'\n'}• Event and
+            notification preferences
           </Text>
         </Card>
       </ScrollView>

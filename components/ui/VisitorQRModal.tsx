@@ -1,22 +1,16 @@
-import { Image } from "expo-image";
-import { Download, Share2, X } from "lucide-react-native";
-import React from "react";
-import {
-  Modal,
-  Share,
-  Text,
-  TouchableOpacity,
-  View,
-} from "react-native";
-import { useAlert } from "./AlertCard";
+import { Image } from 'expo-image';
+import { Download, Share2, X } from 'lucide-react-native';
+import React from 'react';
+import { Modal, Share, Text, TouchableOpacity, View } from 'react-native';
+import { useAlert } from './AlertCard';
 
 interface Visitor {
   id: string;
   name: string;
   date: string;
   time: string;
-  status: "Pending" | "Approved" | "Pre-approved" | "Rejected" | "Completed";
-  category: "Personal" | "Delivery" | "Service" | "Official";
+  status: 'Pending' | 'Approved' | 'Pre-approved' | 'Rejected' | 'Completed';
+  category: 'Personal' | 'Delivery' | 'Service' | 'Official';
   phone?: string;
   purpose?: string;
 }
@@ -27,13 +21,17 @@ interface VisitorQRModalProps {
   onClose: () => void;
 }
 
-export default function VisitorQRModal({ visible, visitor, onClose }: VisitorQRModalProps) {
+export default function VisitorQRModal({
+  visible,
+  visitor,
+  onClose,
+}: VisitorQRModalProps) {
   const { showAlert, AlertComponent } = useAlert();
-  
+
   if (!visitor) return null;
 
   const getLetters = (str: string) => {
-    const parts = str ? str.split(" ") : ["A", "A"];
+    const parts = str ? str.split(' ') : ['A', 'A'];
     if (parts?.length > 1) {
       return `${parts[0].charAt(0)}${parts[1].charAt(0)}`.toUpperCase();
     }
@@ -47,7 +45,7 @@ export default function VisitorQRModal({ visible, visitor, onClose }: VisitorQRM
         title: `Visitor QR - ${visitor.name}`,
       });
     } catch (error) {
-      console.error("Error sharing QR code:", error);
+      console.error('Error sharing QR code:', error);
       showAlert({
         type: 'error',
         title: 'Share Failed',
@@ -64,7 +62,8 @@ export default function VisitorQRModal({ visible, visitor, onClose }: VisitorQRM
     showAlert({
       type: 'info',
       title: 'Coming Soon',
-      message: 'QR code download functionality will be available in the next update!',
+      message:
+        'QR code download functionality will be available in the next update!',
       primaryAction: {
         label: 'OK',
         onPress: () => {},
@@ -74,15 +73,15 @@ export default function VisitorQRModal({ visible, visitor, onClose }: VisitorQRM
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case "Pre-approved":
-      case "Approved":
-        return "bg-success/10 text-success";
-      case "Pending":
-        return "bg-warning/10 text-warning";
-      case "Rejected":
-        return "bg-error/10 text-error";
+      case 'Pre-approved':
+      case 'Approved':
+        return 'bg-success/10 text-success';
+      case 'Pending':
+        return 'bg-warning/10 text-warning';
+      case 'Rejected':
+        return 'bg-error/10 text-error';
       default:
-        return "bg-primary/10 text-primary";
+        return 'bg-primary/10 text-primary';
     }
   };
 
@@ -91,8 +90,7 @@ export default function VisitorQRModal({ visible, visitor, onClose }: VisitorQRM
       visible={visible}
       transparent={true}
       animationType="fade"
-      statusBarTranslucent={true}
-    >
+      statusBarTranslucent={true}>
       <View className="flex-1 bg-black/60 justify-center items-center p-4">
         <View className="bg-surface rounded-3xl w-full max-w-sm">
           {/* Header */}
@@ -113,8 +111,10 @@ export default function VisitorQRModal({ visible, visitor, onClose }: VisitorQRM
                       {visitor.category} Visit
                     </Text>
                   )}
-                  <View className={`px-2 py-1 rounded-full ${getStatusColor(visitor.status)}`}>
-                    <Text className={`text-label-small font-medium ${getStatusColor(visitor.status).split(' ')[1]}`}>
+                  <View
+                    className={`px-2 py-1 rounded-full ${getStatusColor(visitor.status)}`}>
+                    <Text
+                      className={`text-label-small font-medium ${getStatusColor(visitor.status).split(' ')[1]}`}>
                       {visitor.status}
                     </Text>
                   </View>
@@ -124,8 +124,7 @@ export default function VisitorQRModal({ visible, visitor, onClose }: VisitorQRM
             <TouchableOpacity
               onPress={onClose}
               className="absolute top-4 right-4 p-2 bg-surface/80 rounded-full"
-              activeOpacity={0.7}
-            >
+              activeOpacity={0.7}>
               <X size={20} className="text-text-secondary" strokeWidth={2} />
             </TouchableOpacity>
           </View>
@@ -135,11 +134,11 @@ export default function VisitorQRModal({ visible, visitor, onClose }: VisitorQRM
             <View className="bg-white p-6 rounded-2xl mb-6">
               <Image
                 style={{ width: 200, height: 200 }}
-                source={require("../../assets/images/QR_Code.png")}
+                source={require('../../assets/images/QR_Code.png')}
                 contentFit="cover"
               />
             </View>
-            
+
             {/* Visit Details */}
             <View className="items-center">
               <View className="bg-primary/5 px-4 py-2 rounded-full mb-3">
@@ -147,7 +146,7 @@ export default function VisitorQRModal({ visible, visitor, onClose }: VisitorQRM
                   {visitor.date} • {visitor.time}
                 </Text>
               </View>
-              
+
               {visitor.purpose && (
                 <Text className="text-text-secondary text-center px-4 text-body-medium">
                   {visitor.purpose}
@@ -162,19 +161,21 @@ export default function VisitorQRModal({ visible, visitor, onClose }: VisitorQRM
               <TouchableOpacity
                 onPress={handleShareQR}
                 className="flex-1 bg-primary py-4 px-4 rounded-2xl flex-row items-center justify-center"
-                activeOpacity={0.8}
-              >
+                activeOpacity={0.8}>
                 <Share2 size={18} color="white" strokeWidth={2} />
-                <Text className="text-white font-bold ml-2 text-body-medium">Share QR</Text>
+                <Text className="text-white font-bold ml-2 text-body-medium">
+                  Share QR
+                </Text>
               </TouchableOpacity>
-              
+
               <TouchableOpacity
                 onPress={handleDownloadQR}
                 className="flex-1 bg-surface border-2 border-primary/20 py-4 px-4 rounded-2xl flex-row items-center justify-center"
-                activeOpacity={0.8}
-              >
+                activeOpacity={0.8}>
                 <Download size={18} className="text-primary" strokeWidth={2} />
-                <Text className="text-primary font-bold ml-2 text-body-medium">Save</Text>
+                <Text className="text-primary font-bold ml-2 text-body-medium">
+                  Save
+                </Text>
               </TouchableOpacity>
             </View>
 
@@ -189,7 +190,8 @@ export default function VisitorQRModal({ visible, visitor, onClose }: VisitorQRM
                     Gate Entry Instructions
                   </Text>
                   <Text className="text-text-secondary text-label-large leading-5">
-                    Show this QR code to the security guard for quick verification and contactless entry.
+                    Show this QR code to the security guard for quick
+                    verification and contactless entry.
                   </Text>
                 </View>
               </View>
@@ -197,7 +199,7 @@ export default function VisitorQRModal({ visible, visitor, onClose }: VisitorQRM
           </View>
         </View>
       </View>
-      
+
       {/* Custom Alert Component */}
       {AlertComponent}
     </Modal>

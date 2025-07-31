@@ -1,6 +1,6 @@
 /**
  * Feature Flag Utilities
- * 
+ *
  * Provides utility functions and configurations for feature flag management
  */
 
@@ -18,7 +18,10 @@ export interface FeatureFlagMetadata {
 }
 
 // Complete feature flag metadata
-export const FEATURE_FLAG_METADATA: Record<keyof FeatureFlags, FeatureFlagMetadata> = {
+export const FEATURE_FLAG_METADATA: Record<
+  keyof FeatureFlags,
+  FeatureFlagMetadata
+> = {
   // Analytics and Reporting
   analytics_dashboard: {
     name: 'Analytics Dashboard',
@@ -311,12 +314,12 @@ export const FEATURE_FLAG_METADATA: Record<keyof FeatureFlags, FeatureFlagMetada
  */
 export const areFeatureDependenciesMet = (
   feature: keyof FeatureFlags,
-  currentFlags: FeatureFlags
+  currentFlags: FeatureFlags,
 ): boolean => {
   const metadata = FEATURE_FLAG_METADATA[feature];
   if (!metadata.dependencies) return true;
-  
-  return metadata.dependencies.every(dep => currentFlags[dep]);
+
+  return metadata.dependencies.every((dep) => currentFlags[dep]);
 };
 
 /**
@@ -324,13 +327,13 @@ export const areFeatureDependenciesMet = (
  */
 export const hasRequiredPermissions = (
   feature: keyof FeatureFlags,
-  userPermissions: string[] = []
+  userPermissions: string[] = [],
 ): boolean => {
   const metadata = FEATURE_FLAG_METADATA[feature];
   if (!metadata.requiredPermissions) return true;
-  
-  return metadata.requiredPermissions.every(permission => 
-    userPermissions.includes(permission)
+
+  return metadata.requiredPermissions.every((permission) =>
+    userPermissions.includes(permission),
   );
 };
 
@@ -339,20 +342,22 @@ export const hasRequiredPermissions = (
  */
 export const isFeatureEnabledForEnvironment = (
   feature: keyof FeatureFlags,
-  environment: 'development' | 'staging' | 'production'
+  environment: 'development' | 'staging' | 'production',
 ): boolean => {
   const metadata = FEATURE_FLAG_METADATA[feature];
   if (!metadata.environments) return true;
-  
+
   return metadata.environments.includes(environment);
 };
 
 /**
  * Get all features for a specific group
  */
-export const getFeaturesByGroup = (group: FeatureGroup): (keyof FeatureFlags)[] => {
+export const getFeaturesByGroup = (
+  group: FeatureGroup,
+): (keyof FeatureFlags)[] => {
   return Object.keys(FEATURE_FLAG_METADATA).filter(
-    key => FEATURE_FLAG_METADATA[key as keyof FeatureFlags].group === group
+    (key) => FEATURE_FLAG_METADATA[key as keyof FeatureFlags].group === group,
   ) as (keyof FeatureFlags)[];
 };
 
@@ -383,7 +388,7 @@ export const FEATURE_FLAG_PRESETS = {
     indian_payment_methods: true,
     regional_holidays: true,
   },
-  
+
   admin: {
     // All admin features enabled
     analytics_dashboard: true,
@@ -418,7 +423,7 @@ export const FEATURE_FLAG_PRESETS = {
     indian_payment_methods: true,
     regional_holidays: true,
   },
-  
+
   developer: {
     // All features enabled for development
     analytics_dashboard: true,
@@ -466,14 +471,14 @@ export const FEATURE_FLAG_PRESETS = {
     indian_payment_methods: true,
     local_language_support: true,
     regional_holidays: true,
-  }
+  },
 };
 
 /**
  * Apply a feature flag preset
  */
 export const applyFeatureFlagPreset = (
-  preset: keyof typeof FEATURE_FLAG_PRESETS
+  preset: keyof typeof FEATURE_FLAG_PRESETS,
 ): Partial<FeatureFlags> => {
   return FEATURE_FLAG_PRESETS[preset];
 };

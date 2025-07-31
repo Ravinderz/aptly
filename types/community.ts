@@ -1,7 +1,7 @@
-export type CategoryType = 
+export type CategoryType =
   | 'all'
   | 'my_posts'
-  | 'announcement' 
+  | 'announcement'
   | 'buy_sell'
   | 'events'
   | 'lost_found'

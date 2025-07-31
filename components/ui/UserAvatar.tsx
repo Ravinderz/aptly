@@ -1,5 +1,5 @@
-import React from "react";
-import { Text, View } from "react-native";
+import React from 'react';
+import { Text, View } from 'react-native';
 
 interface UserAvatarProps {
   name: string;
@@ -8,7 +8,7 @@ interface UserAvatarProps {
 
 const UserAvatar: React.FC<UserAvatarProps> = ({ name, size = 'md' }) => {
   const getLetters = (name: string) => {
-    const names = name.split(" ");
+    const names = name.split(' ');
     if (names.length > 1) {
       return names[0][0] + names[1][0];
     }
@@ -18,16 +18,15 @@ const UserAvatar: React.FC<UserAvatarProps> = ({ name, size = 'md' }) => {
   const sizeClasses = {
     sm: 'w-8 h-8 text-xs',
     md: 'w-12 h-12 text-sm',
-    lg: 'w-16 h-16 text-lg'
+    lg: 'w-16 h-16 text-lg',
   };
 
   // Handle numeric size
   if (typeof size === 'number') {
     return (
-      <View 
+      <View
         className="bg-primary/10 rounded-full items-center justify-center"
-        style={{ width: size, height: size }}
-      >
+        style={{ width: size, height: size }}>
         <Text className="text-primary font-bold text-body-medium">
           {getLetters(name)}
         </Text>
@@ -36,10 +35,9 @@ const UserAvatar: React.FC<UserAvatarProps> = ({ name, size = 'md' }) => {
   }
 
   return (
-    <View className={`bg-primary/10 rounded-full items-center justify-center ${sizeClasses[size as keyof typeof sizeClasses]}`}>
-      <Text className="text-primary font-bold">
-        {getLetters(name)}
-      </Text>
+    <View
+      className={`bg-primary/10 rounded-full items-center justify-center ${sizeClasses[size as keyof typeof sizeClasses]}`}>
+      <Text className="text-primary font-bold">{getLetters(name)}</Text>
     </View>
   );
 };

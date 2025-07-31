@@ -5,10 +5,10 @@ import LucideIcons from '../ui/LucideIcons';
 import { router } from 'expo-router';
 
 // Types
-import type { 
-  VotingCampaign, 
+import type {
+  VotingCampaign,
   VotingAnalytics,
-  UserVote 
+  UserVote,
 } from '../../types/governance';
 
 // UI Components
@@ -20,7 +20,11 @@ import { AlertCard } from '../ui/AlertCard';
 interface VotingSystemProps {
   campaigns: VotingCampaign[];
   analytics?: VotingAnalytics[];
-  onCastVote: (campaignId: string, candidateId?: string, optionId?: string) => Promise<void>;
+  onCastVote: (
+    campaignId: string,
+    candidateId?: string,
+    optionId?: string,
+  ) => Promise<void>;
   onCreateCampaign: (campaignData: any) => Promise<void>;
   currentUserId: string;
   userRole: 'resident' | 'committee_member' | 'admin';
@@ -32,30 +36,42 @@ export const VotingSystem: React.FC<VotingSystemProps> = ({
   onCastVote,
   onCreateCampaign,
   currentUserId,
-  userRole
+  userRole,
 }) => {
-  const [activeTab, setActiveTab] = useState<'active' | 'completed' | 'create'>('active');
-  const [selectedCampaign, setSelectedCampaign] = useState<VotingCampaign | null>(null);
-  const [selectedCandidate, setSelectedCandidate] = useState<string | null>(null);
+  const [activeTab, setActiveTab] = useState<'active' | 'completed' | 'create'>(
+    'active',
+  );
+  const [selectedCampaign, setSelectedCampaign] =
+    useState<VotingCampaign | null>(null);
+  const [selectedCandidate, setSelectedCandidate] = useState<string | null>(
+    null,
+  );
   const [selectedOption, setSelectedOption] = useState<string | null>(null);
   const [isVoting, setIsVoting] = useState(false);
   const [userVotes, setUserVotes] = useState<Record<string, UserVote>>({});
 
-  const activeCampaigns = campaigns.filter(c => c.status === 'active');
-  const completedCampaigns = campaigns.filter(c => c.status === 'completed');
-  
+  const activeCampaigns = campaigns.filter((c) => c.status === 'active');
+  const completedCampaigns = campaigns.filter((c) => c.status === 'completed');
+
   const handleVote = async (campaignId: string) => {
     if (!selectedCandidate && !selectedOption) {
-      showErrorAlert('Selection Required', 'Please select a candidate or option before voting.');
+      showErrorAlert(
+        'Selection Required',
+        'Please select a candidate or option before voting.',
+      );
       return;
     }
 
     try {
       setIsVoting(true);
-      await onCastVote(campaignId, selectedCandidate || undefined, selectedOption || undefined);
-      
+      await onCastVote(
+        campaignId,
+        selectedCandidate || undefined,
+        selectedOption || undefined,
+      );
+
       // Record user vote locally
-      setUserVotes(prev => ({
+      setUserVotes((prev) => ({
         ...prev,
         [campaignId]: {
           id: Date.now().toString(),
@@ -65,16 +81,22 @@ export const VotingSystem: React.FC<VotingSystemProps> = ({
           optionId: selectedOption || undefined,
           isAnonymous: selectedCampaign?.isAnonymous || false,
           castedAt: new Date().toISOString(),
-          isValid: true
-        }
+          isValid: true,
+        },
       }));
 
-      showSuccessAlert('Vote Cast', 'Your vote has been recorded successfully!');
+      showSuccessAlert(
+        'Vote Cast',
+        'Your vote has been recorded successfully!',
+      );
       setSelectedCampaign(null);
       setSelectedCandidate(null);
       setSelectedOption(null);
     } catch {
-      showErrorAlert('Voting Error', 'Failed to cast your vote. Please try again.');
+      showErrorAlert(
+        'Voting Error',
+        'Failed to cast your vote. Please try again.',
+      );
     } finally {
       setIsVoting(false);
     }
@@ -84,7 +106,8 @@ export const VotingSystem: React.FC<VotingSystemProps> = ({
     const userHasVoted = userVotes[campaign.id];
     const isEligible = campaign.eligibleVoters.includes(currentUserId);
     const timeRemaining = getTimeRemaining(campaign.endDate);
-    const participationRate = (campaign.totalVotes / campaign.eligibleVoters.length) * 100;
+    const participationRate =
+      (campaign.totalVotes / campaign.eligibleVoters.length) * 100;
 
     return (
       <Card key={campaign.id} className="mb-4">
@@ -98,28 +121,34 @@ export const VotingSystem: React.FC<VotingSystemProps> = ({
               <Text className="text-body-medium text-text-secondary mb-2">
                 {campaign.description}
               </Text>
-              
+
               {/* Campaign Type Badge */}
               <View className="self-start">
-                <View className={`px-2 py-1 rounded-full ${getCampaignTypeStyle(campaign.type).bg}`}>
-                  <Text className={`text-label-small font-medium ${getCampaignTypeStyle(campaign.type).text}`}>
+                <View
+                  className={`px-2 py-1 rounded-full ${getCampaignTypeStyle(campaign.type).bg}`}>
+                  <Text
+                    className={`text-label-small font-medium ${getCampaignTypeStyle(campaign.type).text}`}>
                     {formatCampaignType(campaign.type)}
                   </Text>
                 </View>
               </View>
             </View>
-            
+
             {/* Status Indicator */}
             <View className="items-end">
-              <View className={`px-2 py-1 rounded-full mb-1 ${getStatusStyle(campaign.status).bg}`}>
-                <Text className={`text-label-small font-medium ${getStatusStyle(campaign.status).text}`}>
+              <View
+                className={`px-2 py-1 rounded-full mb-1 ${getStatusStyle(campaign.status).bg}`}>
+                <Text
+                  className={`text-label-small font-medium ${getStatusStyle(campaign.status).text}`}>
                   {campaign.status.toUpperCase()}
                 </Text>
               </View>
               {campaign.isAnonymous && (
                 <View className="flex-row items-center">
                   <LucideIcons name="shield-check" size={12} color="#4CAF50" />
-                  <Text className="text-label-small text-success ml-1">Anonymous</Text>
+                  <Text className="text-label-small text-success ml-1">
+                    Anonymous
+                  </Text>
                 </View>
               )}
             </View>
@@ -129,15 +158,16 @@ export const VotingSystem: React.FC<VotingSystemProps> = ({
           <View className="mb-3">
             <View className="flex-row items-center justify-between mb-2">
               <Text className="text-body-medium text-text-secondary">
-                Participation: {campaign.totalVotes}/{campaign.eligibleVoters.length} voters
+                Participation: {campaign.totalVotes}/
+                {campaign.eligibleVoters.length} voters
               </Text>
               <Text className="text-body-medium font-medium text-text-primary">
                 {participationRate.toFixed(1)}%
               </Text>
             </View>
             <View className="h-2 bg-surface-secondary rounded-full">
-              <View 
-                className="h-full bg-primary rounded-full" 
+              <View
+                className="h-full bg-primary rounded-full"
                 style={{ width: `${Math.min(participationRate, 100)}%` }}
               />
             </View>
@@ -163,12 +193,14 @@ export const VotingSystem: React.FC<VotingSystemProps> = ({
                 <View className="flex-row gap-3">
                   {campaign.candidates.slice(0, 3).map((candidate) => (
                     <View key={candidate.id} className="items-center">
-                      <UserAvatar 
+                      <UserAvatar
                         name={candidate.name}
                         imageUrl={candidate.profileImage}
                         size={32}
                       />
-                      <Text className="text-label-small text-text-secondary mt-1 max-w-[60px] text-center" numberOfLines={1}>
+                      <Text
+                        className="text-label-small text-text-secondary mt-1 max-w-[60px] text-center"
+                        numberOfLines={1}>
                         {candidate.name}
                       </Text>
                     </View>
@@ -176,7 +208,9 @@ export const VotingSystem: React.FC<VotingSystemProps> = ({
                   {campaign.candidates.length > 3 && (
                     <View className="items-center justify-center">
                       <View className="w-8 h-8 bg-surface-secondary rounded-full items-center justify-center">
-                        <Text className="text-label-small text-text-secondary">+{campaign.candidates.length - 3}</Text>
+                        <Text className="text-label-small text-text-secondary">
+                          +{campaign.candidates.length - 3}
+                        </Text>
                       </View>
                     </View>
                   )}
@@ -220,7 +254,7 @@ export const VotingSystem: React.FC<VotingSystemProps> = ({
                 className="flex-1"
               />
             )}
-            
+
             <Button
               title="Details"
               variant="ghost"
@@ -238,7 +272,9 @@ export const VotingSystem: React.FC<VotingSystemProps> = ({
     if (!selectedCampaign) return null;
 
     return (
-      <View className="absolute inset-0 bg-black/50 items-center justify-center p-4" style={{ zIndex: 1000 }}>
+      <View
+        className="absolute inset-0 bg-black/50 items-center justify-center p-4"
+        style={{ zIndex: 1000 }}>
         <View className="bg-surface-primary rounded-2xl max-h-[80%] w-full max-w-md">
           {/* Header */}
           <View className="p-4 border-b border-border-primary">
@@ -267,83 +303,93 @@ export const VotingSystem: React.FC<VotingSystemProps> = ({
             )}
 
             {/* Candidates */}
-            {selectedCampaign.candidates && selectedCampaign.candidates.length > 0 && (
-              <View className="mb-4">
-                <Text className="text-body-large font-medium text-text-primary mb-3">
-                  Select a Candidate
-                </Text>
-                {selectedCampaign.candidates.map((candidate) => (
-                  <TouchableOpacity
-                    key={candidate.id}
-                    onPress={() => {
-                      setSelectedCandidate(candidate.id);
-                      setSelectedOption(null);
-                    }}
-                    className={`flex-row items-center p-3 mb-2 border rounded-lg ${
-                      selectedCandidate === candidate.id
-                        ? 'border-primary bg-primary/5'
-                        : 'border-border-primary bg-surface-secondary'
-                    }`}
-                  >
-                    <UserAvatar
-                      name={candidate.name}
-                      imageUrl={candidate.profileImage}
-                      size={40}
-                    />
-                    <View className="flex-1 ml-3">
-                      <Text className="text-body-medium font-medium text-text-primary">
-                        {candidate.name}
-                      </Text>
-                      {candidate.bio && (
-                        <Text className="text-body-small text-text-secondary mt-1" numberOfLines={2}>
-                          {candidate.bio}
+            {selectedCampaign.candidates &&
+              selectedCampaign.candidates.length > 0 && (
+                <View className="mb-4">
+                  <Text className="text-body-large font-medium text-text-primary mb-3">
+                    Select a Candidate
+                  </Text>
+                  {selectedCampaign.candidates.map((candidate) => (
+                    <TouchableOpacity
+                      key={candidate.id}
+                      onPress={() => {
+                        setSelectedCandidate(candidate.id);
+                        setSelectedOption(null);
+                      }}
+                      className={`flex-row items-center p-3 mb-2 border rounded-lg ${
+                        selectedCandidate === candidate.id
+                          ? 'border-primary bg-primary/5'
+                          : 'border-border-primary bg-surface-secondary'
+                      }`}>
+                      <UserAvatar
+                        name={candidate.name}
+                        imageUrl={candidate.profileImage}
+                        size={40}
+                      />
+                      <View className="flex-1 ml-3">
+                        <Text className="text-body-medium font-medium text-text-primary">
+                          {candidate.name}
                         </Text>
+                        {candidate.bio && (
+                          <Text
+                            className="text-body-small text-text-secondary mt-1"
+                            numberOfLines={2}>
+                            {candidate.bio}
+                          </Text>
+                        )}
+                      </View>
+                      {selectedCandidate === candidate.id && (
+                        <LucideIcons
+                          name="check-circle"
+                          size={24}
+                          color="#6366f1"
+                        />
                       )}
-                    </View>
-                    {selectedCandidate === candidate.id && (
-                      <LucideIcons name="check-circle" size={24} color="#6366f1" />
-                    )}
-                  </TouchableOpacity>
-                ))}
-              </View>
-            )}
+                    </TouchableOpacity>
+                  ))}
+                </View>
+              )}
 
             {/* Options */}
-            {selectedCampaign.options && selectedCampaign.options.length > 0 && (
-              <View className="mb-4">
-                <Text className="text-body-large font-medium text-text-primary mb-3">
-                  Select an Option
-                </Text>
-                {selectedCampaign.options.map((option) => (
-                  <TouchableOpacity
-                    key={option.id}
-                    onPress={() => {
-                      setSelectedOption(option.id);
-                      setSelectedCandidate(null);
-                    }}
-                    className={`p-3 mb-2 border rounded-lg ${
-                      selectedOption === option.id
-                        ? 'border-primary bg-primary/5'
-                        : 'border-border-primary bg-surface-secondary'
-                    }`}
-                  >
-                    <View className="flex-row items-center justify-between">
-                      <View className="flex-1 mr-3">
-                        <Text className="text-body-medium font-medium text-text-primary mb-1">
-                          {option.title}
-                        </Text>
-                        <Text className="text-body-small text-text-secondary">
-                          {option.description}
-                        </Text>
+            {selectedCampaign.options &&
+              selectedCampaign.options.length > 0 && (
+                <View className="mb-4">
+                  <Text className="text-body-large font-medium text-text-primary mb-3">
+                    Select an Option
+                  </Text>
+                  {selectedCampaign.options.map((option) => (
+                    <TouchableOpacity
+                      key={option.id}
+                      onPress={() => {
+                        setSelectedOption(option.id);
+                        setSelectedCandidate(null);
+                      }}
+                      className={`p-3 mb-2 border rounded-lg ${
+                        selectedOption === option.id
+                          ? 'border-primary bg-primary/5'
+                          : 'border-border-primary bg-surface-secondary'
+                      }`}>
+                      <View className="flex-row items-center justify-between">
+                        <View className="flex-1 mr-3">
+                          <Text className="text-body-medium font-medium text-text-primary mb-1">
+                            {option.title}
+                          </Text>
+                          <Text className="text-body-small text-text-secondary">
+                            {option.description}
+                          </Text>
+                        </View>
+                        {selectedOption === option.id && (
+                          <LucideIcons
+                            name="check-circle"
+                            size={24}
+                            color="#6366f1"
+                          />
+                        )}
                       </View>
-                      {selectedOption === option.id && (
-                        <LucideIcons name="check-circle" size={24} color="#6366f1" />
-                      )}
-                    </View>
-                  </TouchableOpacity>
-                ))}
-              </View>
-            )}
+                    </TouchableOpacity>
+                  ))}
+                </View>
+              )}
           </ScrollView>
 
           {/* Footer */}
@@ -357,7 +403,7 @@ export const VotingSystem: React.FC<VotingSystemProps> = ({
                 className="flex-1"
               />
               <Button
-                title={isVoting ? "Submitting..." : "Submit Vote"}
+                title={isVoting ? 'Submitting...' : 'Submit Vote'}
                 variant="primary"
                 size="md"
                 onPress={() => handleVote(selectedCampaign.id)}
@@ -376,10 +422,9 @@ export const VotingSystem: React.FC<VotingSystemProps> = ({
 
     return (
       <Card className="mb-4">
-        <TouchableOpacity 
+        <TouchableOpacity
           onPress={() => router.push('/governance/voting/create')}
-          className="p-4 items-center"
-        >
+          className="p-4 items-center">
           <View className="w-16 h-16 bg-primary/10 rounded-full items-center justify-center mb-3">
             <LucideIcons name="plus-circle" size={32} color="#6366f1" />
           </View>
@@ -409,26 +454,38 @@ export const VotingSystem: React.FC<VotingSystemProps> = ({
       {/* Tab Navigation */}
       <View className="flex-row bg-surface-primary border-b border-border-primary">
         {[
-          { key: 'active', label: 'Active Campaigns', count: activeCampaigns.length },
-          { key: 'completed', label: 'Completed', count: completedCampaigns.length },
-          ...(userRole !== 'resident' ? [{ key: 'create', label: 'Create', count: 0 }] : [])
+          {
+            key: 'active',
+            label: 'Active Campaigns',
+            count: activeCampaigns.length,
+          },
+          {
+            key: 'completed',
+            label: 'Completed',
+            count: completedCampaigns.length,
+          },
+          ...(userRole !== 'resident'
+            ? [{ key: 'create', label: 'Create', count: 0 }]
+            : []),
         ].map((tab) => (
           <TouchableOpacity
             key={tab.key}
             onPress={() => setActiveTab(tab.key as any)}
             className={`flex-1 p-4 border-b-2 ${
               activeTab === tab.key ? 'border-primary' : 'border-transparent'
-            }`}
-          >
+            }`}>
             <View className="items-center">
-              <Text className={`text-body-medium font-medium ${
-                activeTab === tab.key ? 'text-primary' : 'text-text-secondary'
-              }`}>
+              <Text
+                className={`text-body-medium font-medium ${
+                  activeTab === tab.key ? 'text-primary' : 'text-text-secondary'
+                }`}>
                 {tab.label}
               </Text>
               {tab.count > 0 && (
                 <View className="bg-primary rounded-full px-2 py-1 mt-1">
-                  <Text className="text-label-small text-white">{tab.count}</Text>
+                  <Text className="text-label-small text-white">
+                    {tab.count}
+                  </Text>
                 </View>
               )}
             </View>
@@ -451,7 +508,8 @@ export const VotingSystem: React.FC<VotingSystemProps> = ({
                   </Text>
                   <Text className="text-body-medium text-text-secondary text-center">
                     There are currently no voting campaigns running.
-                    {userRole !== 'resident' && '\nCreate a new campaign to engage the community.'}
+                    {userRole !== 'resident' &&
+                      '\nCreate a new campaign to engage the community.'}
                   </Text>
                 </View>
               )}
@@ -476,11 +534,7 @@ export const VotingSystem: React.FC<VotingSystemProps> = ({
             </View>
           )}
 
-          {activeTab === 'create' && (
-            <View>
-              {renderCreateCampaignCard()}
-            </View>
-          )}
+          {activeTab === 'create' && <View>{renderCreateCampaignCard()}</View>}
         </View>
       </ScrollView>
 
@@ -498,7 +552,7 @@ const getCampaignTypeStyle = (type: string) => {
     budget_approval: { bg: 'bg-green-50', text: 'text-green-700' },
     committee_election: { bg: 'bg-orange-50', text: 'text-orange-700' },
     emergency_decision: { bg: 'bg-red-50', text: 'text-red-700' },
-    general_poll: { bg: 'bg-gray-50', text: 'text-gray-700' }
+    general_poll: { bg: 'bg-gray-50', text: 'text-gray-700' },
   };
   return styles[type as keyof typeof styles] || styles.general_poll;
 };
@@ -509,28 +563,28 @@ const getStatusStyle = (status: string) => {
     completed: { bg: 'bg-blue-50', text: 'text-blue-700' },
     scheduled: { bg: 'bg-yellow-50', text: 'text-yellow-700' },
     cancelled: { bg: 'bg-red-50', text: 'text-red-700' },
-    suspended: { bg: 'bg-gray-50', text: 'text-gray-700' }
+    suspended: { bg: 'bg-gray-50', text: 'text-gray-700' },
   };
   return styles[status as keyof typeof styles] || styles.scheduled;
 };
 
 const formatCampaignType = (type: string) => {
-  return type.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+  return type.replace(/_/g, ' ').replace(/\b\w/g, (l) => l.toUpperCase());
 };
 
 const getTimeRemaining = (endDate: string): string => {
   const now = new Date();
   const end = new Date(endDate);
   const diff = end.getTime() - now.getTime();
-  
+
   if (diff <= 0) return 'Voting ended';
-  
+
   const days = Math.floor(diff / (1000 * 60 * 60 * 24));
   const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-  
+
   if (days > 0) return `${days}d ${hours}h remaining`;
   if (hours > 0) return `${hours}h remaining`;
-  
+
   const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
   return `${minutes}m remaining`;
 };

@@ -2,7 +2,7 @@ import { AdminRole, AdminUser, Permission } from '../../types/admin';
 
 export class RoleManager {
   private static instance: RoleManager;
-  
+
   static getInstance(): RoleManager {
     if (!RoleManager.instance) {
       RoleManager.instance = new RoleManager();
@@ -23,7 +23,10 @@ export class RoleManager {
     };
   }
 
-  async updateRole(roleId: string, updates: Partial<AdminRole>): Promise<AdminRole | null> {
+  async updateRole(
+    roleId: string,
+    updates: Partial<AdminRole>,
+  ): Promise<AdminRole | null> {
     // Mock implementation
     return null;
   }

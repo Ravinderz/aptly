@@ -1,17 +1,25 @@
 import React, { useState, useMemo } from 'react';
-import { SafeAreaView, ScrollView, Text, TouchableOpacity, View, TextInput, Linking } from 'react-native';
+import {
+  SafeAreaView,
+  ScrollView,
+  Text,
+  TouchableOpacity,
+  View,
+  TextInput,
+  Linking,
+} from 'react-native';
 import { useRouter, useLocalSearchParams } from 'expo-router';
-import { 
-  ArrowLeft, 
-  Search, 
-  Star, 
-  Phone, 
-  MessageCircle, 
+import {
+  ArrowLeft,
+  Search,
+  Star,
+  Phone,
+  MessageCircle,
   MapPin,
   Clock,
   Shield,
   Filter,
-  SortAsc
+  SortAsc,
 } from 'lucide-react-native';
 
 // Mock vendor data - in production this would come from Supabase
@@ -31,10 +39,11 @@ const mockVendors = {
       image: null,
       experience: '8 years',
       responseTime: '< 30 min',
-      description: 'Expert in bathroom renovations and water system repairs. Available for emergency services.',
+      description:
+        'Expert in bathroom renovations and water system repairs. Available for emergency services.',
     },
     {
-      id: '2', 
+      id: '2',
       name: 'Modern Plumbers Co.',
       rating: 4.5,
       reviewCount: 89,
@@ -47,7 +56,8 @@ const mockVendors = {
       image: null,
       experience: '12 years',
       responseTime: '< 1 hour',
-      description: 'Professional plumbing services with modern equipment and techniques.',
+      description:
+        'Professional plumbing services with modern equipment and techniques.',
     },
     {
       id: '3',
@@ -55,7 +65,11 @@ const mockVendors = {
       rating: 4.2,
       reviewCount: 67,
       phone: '+91 96543 21098',
-      specializations: ['Emergency Repairs', 'Leak Detection', 'Pipe Installation'],
+      specializations: [
+        'Emergency Repairs',
+        'Leak Detection',
+        'Pipe Installation',
+      ],
       priceRange: '₹180-350/hour',
       distance: '2.1 km',
       availability: 'Available',
@@ -63,8 +77,9 @@ const mockVendors = {
       image: null,
       experience: '5 years',
       responseTime: '< 45 min',
-      description: 'Fast and reliable plumbing solutions for residential properties.',
-    }
+      description:
+        'Fast and reliable plumbing solutions for residential properties.',
+    },
   ],
   electrical: [
     {
@@ -81,7 +96,8 @@ const mockVendors = {
       image: null,
       experience: '15 years',
       responseTime: '< 20 min',
-      description: 'Licensed electricians specializing in residential and commercial electrical work.',
+      description:
+        'Licensed electricians specializing in residential and commercial electrical work.',
     },
     {
       id: '5',
@@ -97,8 +113,9 @@ const mockVendors = {
       image: null,
       experience: '10 years',
       responseTime: '< 40 min',
-      description: 'Expert electrical services with safety-first approach and quality materials.',
-    }
+      description:
+        'Expert electrical services with safety-first approach and quality materials.',
+    },
   ],
   // Add more categories as needed
 };
@@ -125,7 +142,9 @@ const VendorCard: React.FC<VendorCardProps> = ({ vendor, onPress }) => {
   };
 
   const handleWhatsApp = () => {
-    Linking.openURL(`whatsapp://send?phone=${vendor.phone.replace(/\s/g, '')}&text=Hi, I found your contact through Aptly app. I need help with plumbing services.`);
+    Linking.openURL(
+      `whatsapp://send?phone=${vendor.phone.replace(/\s/g, '')}&text=Hi, I found your contact through Aptly app. I need help with plumbing services.`,
+    );
   };
 
   const getAvailabilityColor = (status: string) => {
@@ -145,8 +164,7 @@ const VendorCard: React.FC<VendorCardProps> = ({ vendor, onPress }) => {
     <TouchableOpacity
       onPress={onPress}
       className="bg-surface rounded-xl p-4 mb-4 border border-divider shadow-sm shadow-black/5"
-      activeOpacity={0.7}
-    >
+      activeOpacity={0.7}>
       {/* Vendor Header */}
       <View className="flex-row items-start justify-between mb-3">
         <View className="flex-1">
@@ -154,11 +172,9 @@ const VendorCard: React.FC<VendorCardProps> = ({ vendor, onPress }) => {
             <Text className="text-headline-medium font-semibold text-text-primary mr-2">
               {vendor.name}
             </Text>
-            {vendor.verified && (
-              <Shield size={16} color="#4CAF50" />
-            )}
+            {vendor.verified && <Shield size={16} color="#4CAF50" />}
           </View>
-          
+
           <View className="flex-row items-center mb-2">
             <View className="flex-row items-center mr-4">
               <Star size={14} color="#FF9800" fill="#FF9800" />
@@ -177,7 +193,8 @@ const VendorCard: React.FC<VendorCardProps> = ({ vendor, onPress }) => {
             </View>
           </View>
 
-          <Text className={`text-body-medium font-medium ${getAvailabilityColor(vendor.availability)}`}>
+          <Text
+            className={`text-body-medium font-medium ${getAvailabilityColor(vendor.availability)}`}>
             ● {vendor.availability}
           </Text>
         </View>
@@ -186,14 +203,12 @@ const VendorCard: React.FC<VendorCardProps> = ({ vendor, onPress }) => {
           <TouchableOpacity
             onPress={handleCall}
             className="bg-primary rounded-full w-10 h-10 items-center justify-center"
-            style={{ marginRight: 4 }}
-          >
+            style={{ marginRight: 4 }}>
             <Phone size={16} color="white" />
           </TouchableOpacity>
           <TouchableOpacity
             onPress={handleWhatsApp}
-            className="bg-secondary rounded-full w-10 h-10 items-center justify-center"
-          >
+            className="bg-secondary rounded-full w-10 h-10 items-center justify-center">
             <MessageCircle size={16} color="white" />
           </TouchableOpacity>
         </View>
@@ -201,13 +216,13 @@ const VendorCard: React.FC<VendorCardProps> = ({ vendor, onPress }) => {
 
       {/* Specializations */}
       <View className="flex-row flex-wrap gap-2 mb-3">
-        {vendor.specializations.slice(0, 3).map((spec: string, index: number) => (
-          <View key={index} className="bg-primary/10 rounded-full px-3 py-1">
-            <Text className="text-label-large text-primary">
-              {spec}
-            </Text>
-          </View>
-        ))}
+        {vendor.specializations
+          .slice(0, 3)
+          .map((spec: string, index: number) => (
+            <View key={index} className="bg-primary/10 rounded-full px-3 py-1">
+              <Text className="text-label-large text-primary">{spec}</Text>
+            </View>
+          ))}
       </View>
 
       {/* Details Row */}
@@ -238,29 +253,35 @@ export default function VendorCategory() {
   const router = useRouter();
   const { category } = useLocalSearchParams<{ category: string }>();
   const [searchQuery, setSearchQuery] = useState('');
-  const [sortBy, setSortBy] = useState<'rating' | 'distance' | 'price'>('rating');
+  const [sortBy, setSortBy] = useState<'rating' | 'distance' | 'price'>(
+    'rating',
+  );
   const [filterAvailable, setFilterAvailable] = useState(false);
 
-  // Get vendors for this category
-  const categoryVendors = mockVendors[category as keyof typeof mockVendors] || [];
-  
   // Filter and sort vendors
   const filteredVendors = useMemo(() => {
+    // Get vendors for this category
+    const categoryVendors =
+      mockVendors[category as keyof typeof mockVendors] || [];
+
     let filtered = categoryVendors;
 
     // Search filter
     if (searchQuery) {
-      filtered = filtered.filter(vendor => 
-        vendor.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        vendor.specializations.some(spec => 
-          spec.toLowerCase().includes(searchQuery.toLowerCase())
-        )
+      filtered = filtered.filter(
+        (vendor) =>
+          vendor.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          vendor.specializations.some((spec) =>
+            spec.toLowerCase().includes(searchQuery.toLowerCase()),
+          ),
       );
     }
 
     // Availability filter
     if (filterAvailable) {
-      filtered = filtered.filter(vendor => vendor.availability === 'Available');
+      filtered = filtered.filter(
+        (vendor) => vendor.availability === 'Available',
+      );
     }
 
     // Sort
@@ -286,7 +307,8 @@ export default function VendorCategory() {
     router.push(`/services/vendors/${category}/${vendorId}`);
   };
 
-  const categoryTitle = categoryTitles[category as keyof typeof categoryTitles] || 'Services';
+  const categoryTitle =
+    categoryTitles[category as keyof typeof categoryTitles] || 'Services';
 
   return (
     <SafeAreaView className="flex-1 bg-background">
@@ -305,11 +327,10 @@ export default function VendorCategory() {
         </View>
       </View>
 
-      <ScrollView 
-        className="flex-1" 
+      <ScrollView
+        className="flex-1"
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ paddingBottom: 20 }}
-      >
+        contentContainerStyle={{ paddingBottom: 20 }}>
         {/* Search and Filters */}
         <View className="px-4 py-4">
           {/* Search Bar */}
@@ -329,25 +350,37 @@ export default function VendorCategory() {
             <TouchableOpacity
               onPress={() => setFilterAvailable(!filterAvailable)}
               className={`flex-row items-center px-4 py-2 rounded-lg border ${
-                filterAvailable 
-                  ? 'bg-primary/10 border-primary' 
+                filterAvailable
+                  ? 'bg-primary/10 border-primary'
                   : 'bg-surface border-divider'
-              }`}
-            >
-              <Filter size={16} color={filterAvailable ? "#6366f1" : "#757575"} />
-              <Text className={`ml-2 text-body-medium font-medium ${
-                filterAvailable ? 'text-primary' : 'text-text-secondary'
               }`}>
+              <Filter
+                size={16}
+                color={filterAvailable ? '#6366f1' : '#757575'}
+              />
+              <Text
+                className={`ml-2 text-body-medium font-medium ${
+                  filterAvailable ? 'text-primary' : 'text-text-secondary'
+                }`}>
                 Available Only
               </Text>
             </TouchableOpacity>
 
             <View className="flex-row items-center gap-2">
-              <Text className="text-body-medium text-text-secondary">Sort by:</Text>
+              <Text className="text-body-medium text-text-secondary">
+                Sort by:
+              </Text>
               <TouchableOpacity
-                onPress={() => setSortBy(sortBy === 'rating' ? 'distance' : sortBy === 'distance' ? 'price' : 'rating')}
-                className="flex-row items-center px-3 py-2 rounded-lg bg-surface border border-divider"
-              >
+                onPress={() =>
+                  setSortBy(
+                    sortBy === 'rating'
+                      ? 'distance'
+                      : sortBy === 'distance'
+                        ? 'price'
+                        : 'rating',
+                  )
+                }
+                className="flex-row items-center px-3 py-2 rounded-lg bg-surface border border-divider">
                 <SortAsc size={16} color="#757575" />
                 <Text className="ml-2 text-body-medium text-text-primary capitalize">
                   {sortBy}

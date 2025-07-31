@@ -5,7 +5,9 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useRouter, useSegments } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 
-const AppNavigator: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+const AppNavigator: React.FC<{ children: React.ReactNode }> = ({
+  children,
+}) => {
   const [isFirstLaunch, setIsFirstLaunch] = useState<boolean | null>(null);
   const [isCheckingFirstLaunch, setIsCheckingFirstLaunch] = useState(true);
   const { isAuthenticated, isLoading } = useAuth();
@@ -16,8 +18,9 @@ const AppNavigator: React.FC<{ children: React.ReactNode }> = ({ children }) => 
   useEffect(() => {
     const checkFirstLaunch = async () => {
       try {
-        const hasLaunchedBefore = await AsyncStorage.getItem('hasLaunchedBefore');
-        
+        const hasLaunchedBefore =
+          await AsyncStorage.getItem('hasLaunchedBefore');
+
         if (hasLaunchedBefore === null) {
           // First launch
           setIsFirstLaunch(true);
@@ -74,7 +77,13 @@ const AppNavigator: React.FC<{ children: React.ReactNode }> = ({ children }) => 
       router.replace('/welcome');
       return;
     }
-  }, [isAuthenticated, isLoading, isFirstLaunch, isCheckingFirstLaunch, segments]);
+  }, [
+    isAuthenticated,
+    isLoading,
+    isFirstLaunch,
+    isCheckingFirstLaunch,
+    segments,
+  ]);
 
   // Show loading spinner while checking auth or first launch
   if (isCheckingFirstLaunch || isLoading) {

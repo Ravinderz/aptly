@@ -8,7 +8,7 @@ import {
   generateInitials,
   formatPostContent,
   canEditPost,
-  getPostStats
+  getPostStats,
 } from '../../utils/community';
 import { CategoryType, Post, User } from '../../types/community';
 
@@ -24,7 +24,7 @@ const mockPost: Post = {
   likesCount: 5,
   commentsCount: 3,
   liked: false,
-  comments: []
+  comments: [],
 };
 
 const mockUser: User = {
@@ -32,7 +32,7 @@ const mockUser: User = {
   name: 'John Doe',
   email: 'john@example.com',
   role: 'resident',
-  avatar: 'avatar-url'
+  avatar: 'avatar-url',
 };
 
 describe('Community Utilities', () => {
@@ -47,7 +47,7 @@ describe('Community Utilities', () => {
       const now = new Date();
       const fiveMinutesAgo = new Date(now.getTime() - 5 * 60 * 1000);
       const thirtyMinutesAgo = new Date(now.getTime() - 30 * 60 * 1000);
-      
+
       expect(formatTimeAgo(fiveMinutesAgo)).toBe('5m ago');
       expect(formatTimeAgo(thirtyMinutesAgo)).toBe('30m ago');
     });
@@ -56,7 +56,7 @@ describe('Community Utilities', () => {
       const now = new Date();
       const twoHoursAgo = new Date(now.getTime() - 2 * 60 * 60 * 1000);
       const twelveHoursAgo = new Date(now.getTime() - 12 * 60 * 60 * 1000);
-      
+
       expect(formatTimeAgo(twoHoursAgo)).toBe('2h ago');
       expect(formatTimeAgo(twelveHoursAgo)).toBe('12h ago');
     });
@@ -65,7 +65,7 @@ describe('Community Utilities', () => {
       const now = new Date();
       const threeDaysAgo = new Date(now.getTime() - 3 * 24 * 60 * 60 * 1000);
       const sixDaysAgo = new Date(now.getTime() - 6 * 24 * 60 * 60 * 1000);
-      
+
       expect(formatTimeAgo(threeDaysAgo)).toBe('3d ago');
       expect(formatTimeAgo(sixDaysAgo)).toBe('6d ago');
     });
@@ -74,7 +74,7 @@ describe('Community Utilities', () => {
       const now = new Date();
       const weekOld = new Date(now.getTime() - 8 * 24 * 60 * 60 * 1000);
       const result = formatTimeAgo(weekOld);
-      
+
       expect(result).not.toContain('ago');
       expect(result).toMatch(/\d{1,2}\s\w{3}/); // Format like "15 Jan"
     });
@@ -83,17 +83,38 @@ describe('Community Utilities', () => {
   describe('getCategoryDisplay', () => {
     test('should return correct display for all categories', () => {
       expect(getCategoryDisplay('all')).toEqual({ name: 'All', icon: '📋' });
-      expect(getCategoryDisplay('my_posts')).toEqual({ name: 'My Posts', icon: '👤' });
-      expect(getCategoryDisplay('announcement')).toEqual({ name: 'Announcement', icon: '📢' });
-      expect(getCategoryDisplay('buy_sell')).toEqual({ name: 'Buy/Sell', icon: '🛒' });
-      expect(getCategoryDisplay('events')).toEqual({ name: 'Events', icon: '🎉' });
-      expect(getCategoryDisplay('lost_found')).toEqual({ name: 'Lost/Found', icon: '🔍' });
+      expect(getCategoryDisplay('my_posts')).toEqual({
+        name: 'My Posts',
+        icon: '👤',
+      });
+      expect(getCategoryDisplay('announcement')).toEqual({
+        name: 'Announcement',
+        icon: '📢',
+      });
+      expect(getCategoryDisplay('buy_sell')).toEqual({
+        name: 'Buy/Sell',
+        icon: '🛒',
+      });
+      expect(getCategoryDisplay('events')).toEqual({
+        name: 'Events',
+        icon: '🎉',
+      });
+      expect(getCategoryDisplay('lost_found')).toEqual({
+        name: 'Lost/Found',
+        icon: '🔍',
+      });
       expect(getCategoryDisplay('help')).toEqual({ name: 'Help', icon: '🙋‍♂️' });
-      expect(getCategoryDisplay('feedback')).toEqual({ name: 'Feedback', icon: '💬' });
+      expect(getCategoryDisplay('feedback')).toEqual({
+        name: 'Feedback',
+        icon: '💬',
+      });
     });
 
     test('should return default for unknown categories', () => {
-      expect(getCategoryDisplay('unknown' as CategoryType)).toEqual({ name: 'General', icon: '📝' });
+      expect(getCategoryDisplay('unknown' as CategoryType)).toEqual({
+        name: 'General',
+        icon: '📝',
+      });
     });
   });
 
@@ -108,11 +129,17 @@ describe('Community Utilities', () => {
     });
 
     test('should allow all roles to create posts in other categories', () => {
-      const categories: CategoryType[] = ['buy_sell', 'events', 'lost_found', 'help', 'feedback'];
+      const categories: CategoryType[] = [
+        'buy_sell',
+        'events',
+        'lost_found',
+        'help',
+        'feedback',
+      ];
       const roles: User['role'][] = ['resident', 'committee', 'admin'];
 
-      categories.forEach(category => {
-        roles.forEach(role => {
+      categories.forEach((category) => {
+        roles.forEach((role) => {
           expect(canCreatePostInCategory(category, role)).toBe(true);
         });
       });
@@ -146,7 +173,7 @@ describe('Community Utilities', () => {
         userName: 'John Doe',
         content: 'Buy/sell post content',
         category: 'buy_sell',
-        createdAt: new Date('2024-01-15T10:00:00Z')
+        createdAt: new Date('2024-01-15T10:00:00Z'),
       },
       {
         ...mockPost,
@@ -155,7 +182,7 @@ describe('Community Utilities', () => {
         userName: 'Jane Smith',
         content: 'Event announcement',
         category: 'events',
-        createdAt: new Date('2024-01-14T10:00:00Z')
+        createdAt: new Date('2024-01-14T10:00:00Z'),
       },
       {
         ...mockPost,
@@ -164,14 +191,14 @@ describe('Community Utilities', () => {
         userName: 'John Doe',
         content: 'General discussion',
         category: 'general',
-        createdAt: new Date('2024-01-16T10:00:00Z')
-      }
+        createdAt: new Date('2024-01-16T10:00:00Z'),
+      },
     ];
 
     test('should filter by "my_posts" category', () => {
       const filtered = filterPosts(mockPosts, 'my_posts', '', 'user-1');
       expect(filtered).toHaveLength(2);
-      expect(filtered.every(post => post.userId === 'user-1')).toBe(true);
+      expect(filtered.every((post) => post.userId === 'user-1')).toBe(true);
     });
 
     test('should filter by specific category', () => {
@@ -212,7 +239,9 @@ describe('Community Utilities', () => {
 
   describe('validatePostContent', () => {
     test('should validate correct post content', () => {
-      const result = validatePostContent('This is a valid post with enough content');
+      const result = validatePostContent(
+        'This is a valid post with enough content',
+      );
       expect(result.isValid).toBe(true);
       expect(result.error).toBeUndefined();
     });
@@ -252,7 +281,7 @@ describe('Community Utilities', () => {
     test('should validate content at boundaries', () => {
       const minLengthContent = 'a'.repeat(10);
       const maxLengthContent = 'a'.repeat(500);
-      
+
       expect(validatePostContent(minLengthContent).isValid).toBe(true);
       expect(validatePostContent(maxLengthContent).isValid).toBe(true);
     });
@@ -301,7 +330,7 @@ describe('Community Utilities', () => {
     test('should handle mixed whitespace formatting', () => {
       const content = '  Line 1\n\n\n\nLine    2   ';
       // Step 1: trim -> 'Line 1\n\n\n\nLine    2'
-      // Step 2: replace \n{3,} -> 'Line 1\n\nLine    2' 
+      // Step 2: replace \n{3,} -> 'Line 1\n\nLine    2'
       // Step 3: replace \s{2,} -> 'Line 1 Line 2' (all multi-whitespace becomes single space)
       expect(formatPostContent(content)).toBe('Line 1 Line 2');
     });
@@ -317,9 +346,9 @@ describe('Community Utilities', () => {
       const recentPost = {
         ...mockPost,
         userId: 'user-1',
-        createdAt: new Date(Date.now() - 15 * 60 * 1000) // 15 minutes ago
+        createdAt: new Date(Date.now() - 15 * 60 * 1000), // 15 minutes ago
       };
-      
+
       expect(canEditPost(recentPost, 'user-1', 30)).toBe(true);
     });
 
@@ -327,9 +356,9 @@ describe('Community Utilities', () => {
       const oldPost = {
         ...mockPost,
         userId: 'user-1',
-        createdAt: new Date(Date.now() - 45 * 60 * 1000) // 45 minutes ago
+        createdAt: new Date(Date.now() - 45 * 60 * 1000), // 45 minutes ago
       };
-      
+
       expect(canEditPost(oldPost, 'user-1', 30)).toBe(false);
     });
 
@@ -337,9 +366,9 @@ describe('Community Utilities', () => {
       const recentPost = {
         ...mockPost,
         userId: 'user-1',
-        createdAt: new Date(Date.now() - 15 * 60 * 1000)
+        createdAt: new Date(Date.now() - 15 * 60 * 1000),
       };
-      
+
       expect(canEditPost(recentPost, 'user-2', 30)).toBe(false);
     });
 
@@ -347,20 +376,20 @@ describe('Community Utilities', () => {
       const post = {
         ...mockPost,
         userId: 'user-1',
-        createdAt: new Date(Date.now() - 10 * 60 * 1000) // 10 minutes ago
+        createdAt: new Date(Date.now() - 10 * 60 * 1000), // 10 minutes ago
       };
-      
-      expect(canEditPost(post, 'user-1', 5)).toBe(false);  // 5-minute limit
-      expect(canEditPost(post, 'user-1', 15)).toBe(true);  // 15-minute limit
+
+      expect(canEditPost(post, 'user-1', 5)).toBe(false); // 5-minute limit
+      expect(canEditPost(post, 'user-1', 15)).toBe(true); // 15-minute limit
     });
 
     test('should handle edge case at exact time limit', () => {
       const post = {
         ...mockPost,
         userId: 'user-1',
-        createdAt: new Date(Date.now() - 30 * 60 * 1000) // Exactly 30 minutes ago
+        createdAt: new Date(Date.now() - 30 * 60 * 1000), // Exactly 30 minutes ago
       };
-      
+
       expect(canEditPost(post, 'user-1', 30)).toBe(true);
     });
   });

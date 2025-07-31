@@ -1,6 +1,14 @@
-import { AdminUser, AdminRole, Permission, Society, AdminSession } from '../../types/admin';
+import {
+  AdminUser,
+  AdminRole,
+  Permission,
+  Society,
+  AdminSession,
+} from '../../types/admin';
 
-export const createMockAdminUser = (overrides?: Partial<AdminUser>): AdminUser => ({
+export const createMockAdminUser = (
+  overrides?: Partial<AdminUser>,
+): AdminUser => ({
   id: 'admin-123',
   email: 'admin@test.com',
   fullName: 'Test Admin',
@@ -27,7 +35,9 @@ export const createMockSociety = (overrides?: Partial<Society>): Society => ({
   ...overrides,
 });
 
-export const createMockSession = (overrides?: Partial<AdminSession>): AdminSession => ({
+export const createMockSession = (
+  overrides?: Partial<AdminSession>,
+): AdminSession => ({
   id: 'session-123',
   adminId: 'admin-123',
   societyId: 'society-1',
@@ -38,7 +48,9 @@ export const createMockSession = (overrides?: Partial<AdminSession>): AdminSessi
   ...overrides,
 });
 
-export const createMockAdminRole = (overrides?: Partial<AdminRole>): AdminRole => ({
+export const createMockAdminRole = (
+  overrides?: Partial<AdminRole>,
+): AdminRole => ({
   id: 'role-1',
   name: 'Test Role',
   description: 'Test role description',
@@ -49,7 +61,9 @@ export const createMockAdminRole = (overrides?: Partial<AdminRole>): AdminRole =
   ...overrides,
 });
 
-export const createMockPermission = (overrides?: Partial<Permission>): Permission => ({
+export const createMockPermission = (
+  overrides?: Partial<Permission>,
+): Permission => ({
   id: 'permission-1',
   name: 'test_permission',
   description: 'Test permission',

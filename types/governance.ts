@@ -9,35 +9,35 @@ export interface VotingCampaign {
   status: VotingStatus;
   createdBy: string;
   society_id: string;
-  
+
   // Voting configuration
   startDate: string;
   endDate: string;
   isAnonymous: boolean;
   requiresQuorum: boolean;
   minimumParticipation: number; // percentage
-  
+
   // Candidate/option management
   candidates?: VotingCandidate[];
   options?: VotingOption[];
-  
+
   // Eligibility criteria
   eligibleVoters: string[]; // user IDs
   eligibilityRules: EligibilityRules;
-  
+
   // Results and transparency
   totalVotes: number;
   results?: VotingResults;
   isResultsPublished: boolean;
-  
+
   // Audit trail
   auditLog: VotingAuditEntry[];
-  
+
   createdAt: string;
   updatedAt: string;
 }
 
-export type VotingType = 
+export type VotingType =
   | 'resident_promotion'
   | 'policy_change'
   | 'budget_approval'
@@ -45,7 +45,7 @@ export type VotingType =
   | 'emergency_decision'
   | 'general_poll';
 
-export type VotingStatus = 
+export type VotingStatus =
   | 'draft'
   | 'scheduled'
   | 'active'
@@ -108,7 +108,7 @@ export interface VotingAuditEntry {
   ipAddress?: string;
 }
 
-export type VotingAuditAction = 
+export type VotingAuditAction =
   | 'campaign_created'
   | 'campaign_started'
   | 'vote_cast'
@@ -139,45 +139,45 @@ export interface EmergencyAlert {
   type: EmergencyType;
   status: EmergencyStatus;
   society_id: string;
-  
+
   // Alert details
   location?: string;
   affectedAreas: string[];
   contactPerson: string;
   contactNumber: string;
-  
+
   // Escalation chain
   declaredBy: string;
   escalationLevel: number;
   escalationChain: EscalationStep[];
   currentResponder?: string;
-  
+
   // Notification tracking
   notifications: EmergencyNotification[];
   acknowledgments: EmergencyAcknowledgment[];
-  
+
   // Resolution
   resolvedBy?: string;
   resolvedAt?: string;
   resolutionNotes?: string;
   postIncidentReport?: string;
-  
+
   // Super Admin overrides
   overriddenBy?: string;
   overrideReason?: string;
-  
+
   createdAt: string;
   updatedAt: string;
 }
 
-export type EmergencySeverity = 
+export type EmergencySeverity =
   | 'low'
   | 'medium'
   | 'high'
   | 'critical'
   | 'disaster';
 
-export type EmergencyType = 
+export type EmergencyType =
   | 'fire'
   | 'medical'
   | 'security'
@@ -189,7 +189,7 @@ export type EmergencyType =
   | 'elevator'
   | 'other';
 
-export type EmergencyStatus = 
+export type EmergencyStatus =
   | 'active'
   | 'escalated'
   | 'responding'
@@ -208,12 +208,7 @@ export interface EscalationStep {
   acknowledgedAt?: string;
 }
 
-export type ContactMethod = 
-  | 'push'
-  | 'sms'
-  | 'call'
-  | 'email'
-  | 'whatsapp';
+export type ContactMethod = 'push' | 'sms' | 'call' | 'email' | 'whatsapp';
 
 export interface EmergencyNotification {
   id: string;
@@ -237,7 +232,7 @@ export interface EmergencyAcknowledgment {
   notes?: string;
 }
 
-export type EmergencyResponse = 
+export type EmergencyResponse =
   | 'acknowledged'
   | 'responding'
   | 'on_site'
@@ -261,7 +256,7 @@ export interface EmergencyContact {
   isActive: boolean;
 }
 
-export type EmergencyContactCategory = 
+export type EmergencyContactCategory =
   | 'police'
   | 'fire'
   | 'medical'
@@ -280,40 +275,40 @@ export interface SuccessionPlan {
   society_id: string;
   currentCM: string;
   status: SuccessionStatus;
-  
+
   // Succession triggers
   triggers: SuccessionTrigger[];
   isAutomatic: boolean;
   manualTriggerBy?: string;
-  
+
   // Deputy and succession order
   deputies: DeputyAssignment[];
   successionOrder: string[]; // user IDs in order
-  
+
   // Activation details
   activatedAt?: string;
   activatedBy?: string;
   activationReason?: string;
-  
+
   // Transition period
   transitionStartDate?: string;
   transitionEndDate?: string;
   handoverTasks: HandoverTask[];
-  
+
   // Voting process
   requiresVoting: boolean;
   votingCampaignId?: string;
-  
+
   // Audit and approval
   approvedBy?: string;
   approvalDate?: string;
   auditLog: SuccessionAuditEntry[];
-  
+
   createdAt: string;
   updatedAt: string;
 }
 
-export type SuccessionStatus = 
+export type SuccessionStatus =
   | 'active'
   | 'triggered'
   | 'in_transition'
@@ -327,7 +322,7 @@ export interface SuccessionTrigger {
   lastChecked?: string;
 }
 
-export type TriggerType = 
+export type TriggerType =
   | 'resignation'
   | 'inactivity'
   | 'no_confidence_vote'
@@ -345,7 +340,7 @@ export interface DeputyAssignment {
   performanceRating?: number;
 }
 
-export type DeputyRole = 
+export type DeputyRole =
   | 'primary_deputy'
   | 'secondary_deputy'
   | 'emergency_deputy'
@@ -366,7 +361,7 @@ export interface HandoverTask {
   notes?: string;
 }
 
-export type HandoverCategory = 
+export type HandoverCategory =
   | 'financial'
   | 'legal'
   | 'operational'
@@ -374,13 +369,9 @@ export type HandoverCategory =
   | 'technical'
   | 'relationships';
 
-export type TaskPriority = 
-  | 'critical'
-  | 'high'
-  | 'medium'
-  | 'low';
+export type TaskPriority = 'critical' | 'high' | 'medium' | 'low';
 
-export type TaskStatus = 
+export type TaskStatus =
   | 'pending'
   | 'in_progress'
   | 'completed'
@@ -395,7 +386,7 @@ export interface SuccessionAuditEntry {
   details: Record<string, any>;
 }
 
-export type SuccessionAuditAction = 
+export type SuccessionAuditAction =
   | 'plan_created'
   | 'plan_updated'
   | 'deputy_assigned'
@@ -413,43 +404,43 @@ export interface PolicyProposal {
   category: PolicyCategory;
   proposedBy: string;
   society_id: string;
-  
+
   // Policy details
   currentPolicy?: string;
   proposedChanges: PolicyChange[];
   impact: PolicyImpact;
   implementationPlan: string;
   effectiveDate: string;
-  
+
   // Approval workflow
   status: PolicyStatus;
   reviewers: PolicyReviewer[];
   approvals: PolicyApproval[];
   requiredApprovals: number;
-  
+
   // Voting process
   requiresVoting: boolean;
   votingCampaignId?: string;
   votingThreshold: number; // percentage
-  
+
   // Discussion and feedback
   comments: PolicyComment[];
   publicFeedback: boolean;
   feedbackDeadline?: string;
-  
+
   // Implementation tracking
   implementedAt?: string;
   implementedBy?: string;
   rollbackPlan?: string;
-  
+
   // Audit trail
   auditLog: PolicyAuditEntry[];
-  
+
   createdAt: string;
   updatedAt: string;
 }
 
-export type PolicyCategory = 
+export type PolicyCategory =
   | 'bylaws'
   | 'financial'
   | 'maintenance'
@@ -479,7 +470,7 @@ export interface PolicyImpact {
   benefits: string[];
 }
 
-export type PolicyStatus = 
+export type PolicyStatus =
   | 'draft'
   | 'submitted'
   | 'under_review'
@@ -525,7 +516,7 @@ export interface PolicyAuditEntry {
   details: Record<string, any>;
 }
 
-export type PolicyAuditAction = 
+export type PolicyAuditAction =
   | 'proposal_created'
   | 'proposal_submitted'
   | 'review_assigned'
@@ -546,30 +537,30 @@ export interface CommunityEngagement {
   description: string;
   society_id: string;
   organizer: string;
-  
+
   // Event details
   startDate: string;
   endDate?: string;
   location?: string;
   maxParticipants?: number;
   registrationRequired: boolean;
-  
+
   // Participation tracking
   participants: EngagementParticipant[];
   feedback: EngagementFeedback[];
   attendance: AttendanceRecord[];
-  
+
   // Outcomes
   outcomes: string[];
   followUpActions: FollowUpAction[];
   successMetrics: SuccessMetric[];
-  
+
   status: EngagementStatus;
   createdAt: string;
   updatedAt: string;
 }
 
-export type EngagementType = 
+export type EngagementType =
   | 'town_hall'
   | 'feedback_session'
   | 'workshop'
@@ -617,7 +608,7 @@ export interface SuccessMetric {
   achieved: boolean;
 }
 
-export type EngagementStatus = 
+export type EngagementStatus =
   | 'planned'
   | 'registration_open'
   | 'in_progress'
@@ -732,7 +723,7 @@ export interface VotingAnalytics {
     byAge: Record<string, number>;
   };
   votingPattern: {
-    hourlyVotes: Array<{hour: number; votes: number}>;
+    hourlyVotes: Array<{ hour: number; votes: number }>;
     peakVotingTime: string;
     methodology: 'anonymous' | 'recorded';
   };
@@ -749,7 +740,7 @@ export interface EmergencyAnalytics {
   incidentBreakdown: {
     byType: Record<EmergencyType, number>;
     bySeverity: Record<EmergencySeverity, number>;
-    byMonth: Array<{month: string; incidents: number}>;
+    byMonth: Array<{ month: string; incidents: number }>;
   };
   preparedness: {
     contactsUpdated: number;

@@ -6,11 +6,7 @@ export type { APIError, UploadResult, NetworkState } from './api.service';
 
 // Authentication service
 export { AuthService } from './auth.service';
-export type { 
-  AuthResult, 
-  TokenPair, 
-  UserProfile 
-} from './auth.service';
+export type { AuthResult, TokenPair, UserProfile } from './auth.service';
 
 // Community service
 export { communityApi } from './communityApi';
@@ -19,7 +15,7 @@ export type {
   Comment,
   CreatePostRequest,
   CreateCommentRequest,
-  User
+  User,
 } from '@/types/community';
 
 // Billing service
@@ -30,7 +26,7 @@ export type {
   BillPaymentRequest,
   RechargeRequest,
   BillerInfo,
-  GSTCalculation
+  GSTCalculation,
 } from './billing.service';
 
 // Governance service
@@ -45,7 +41,7 @@ export type {
   Committee,
   CommitteeMember,
   Announcement,
-  Complaint
+  Complaint,
 } from './governance.service';
 
 // Notification service
@@ -54,7 +50,7 @@ export type {
   Notification,
   NotificationPreferences,
   NotificationStats,
-  PushTokenInfo
+  PushTokenInfo,
 } from './notification.service';
 
 // Maintenance service
@@ -65,7 +61,7 @@ export type {
   Vendor,
   MaintenanceAnalytics,
   ScheduledMaintenance,
-  ChecklistItem
+  ChecklistItem,
 } from './maintenance.service';
 
 // Biometric service (existing)
@@ -92,7 +88,7 @@ export const services = {
   billing: BillingService,
   governance: GovernanceService,
   notification: NotificationService,
-  maintenance: MaintenanceService
+  maintenance: MaintenanceService,
 } as const;
 
 // Default export for convenience
@@ -102,7 +98,7 @@ export default services;
 export const ServiceStatus = {
   async checkAllServices(): Promise<Record<string, boolean>> {
     const results: Record<string, boolean> = {};
-    
+
     try {
       // Test each service with a lightweight operation
       results.auth = await AuthService.isAuthenticated();
@@ -115,13 +111,13 @@ export const ServiceStatus = {
     } catch (error) {
       console.error('Service health check failed:', error);
       // Set failed services to false
-      Object.keys(results).forEach(key => {
+      Object.keys(results).forEach((key) => {
         if (results[key] === undefined) {
           results[key] = false;
         }
       });
     }
-    
+
     return results;
   },
 
@@ -136,11 +132,11 @@ export const ServiceStatus = {
         billing: { status: 'active', mode: 'mock' },
         governance: { status: 'active', mode: 'mock' },
         notification: { status: 'active', mode: 'mock' },
-        maintenance: { status: 'active', mode: 'mock' }
+        maintenance: { status: 'active', mode: 'mock' },
       },
-      lastHealthCheck: new Date().toISOString()
+      lastHealthCheck: new Date().toISOString(),
     };
-  }
+  },
 };
 
 // Utility functions for common operations
@@ -150,12 +146,12 @@ export const ServiceHelpers = {
     try {
       // Initialize auth service
       const isAuthenticated = await AuthService.isAuthenticated();
-      
+
       if (isAuthenticated && userId) {
         // Load user preferences
         await NotificationService.getUserPreferences(userId);
       }
-      
+
       return true;
     } catch (error) {
       console.error('Failed to initialize services:', error);
@@ -181,17 +177,17 @@ export const ServiceHelpers = {
       const [notifications, communityPosts] = await Promise.all([
         NotificationService.getUnreadCount(userId),
         // Add other unread count services here
-        Promise.resolve(0) // Placeholder for community unread count
+        Promise.resolve(0), // Placeholder for community unread count
       ]);
 
       return {
         notifications,
         community: communityPosts,
-        total: notifications + communityPosts
+        total: notifications + communityPosts,
       };
     } catch (error) {
       console.error('Failed to get unread counts:', error);
       return { notifications: 0, community: 0, total: 0 };
     }
-  }
+  },
 };

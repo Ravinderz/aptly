@@ -21,5 +21,5 @@ export type {
   PolicyChange,
   GovernanceDashboard as GovernanceDashboardData,
   VotingAnalytics,
-  EmergencyAnalytics
+  EmergencyAnalytics,
 } from '../../types/governance';

@@ -1,12 +1,12 @@
-import AuthService, { UserProfile } from "@/services/auth.service";
-import BiometricService from "@/services/biometric.service";
+import AuthService, { UserProfile } from '@/services/auth.service';
+import BiometricService from '@/services/biometric.service';
 import React, {
   createContext,
   ReactNode,
   useContext,
   useEffect,
   useState,
-} from "react";
+} from 'react';
 
 interface AuthContextType {
   isAuthenticated: boolean;
@@ -24,7 +24,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (context === undefined) {
-    throw new Error("useAuth must be used within an AuthProvider");
+    throw new Error('useAuth must be used within an AuthProvider');
   }
   return context;
 };
@@ -67,7 +67,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         setUser(null);
       }
     } catch (error) {
-      console.error("Auth check failed:", error);
+      console.error('Auth check failed:', error);
       setIsAuthenticated(false);
       setUser(null);
     } finally {
@@ -87,7 +87,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       setUser(null);
       setIsAuthenticated(false);
     } catch (error) {
-      console.error("Logout failed:", error);
+      console.error('Logout failed:', error);
       // Still clear local state even if API call fails
       setUser(null);
       setIsAuthenticated(false);
@@ -96,8 +96,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const authenticateWithBiometrics = async (): Promise<boolean> => {
     try {
-      const biometricResult = await BiometricService.authenticateWithBiometrics();
-      
+      const biometricResult =
+        await BiometricService.authenticateWithBiometrics();
+
       if (biometricResult.success) {
         const userId = await BiometricService.getBiometricUserId();
         if (userId) {
@@ -115,7 +116,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       }
       return false;
     } catch (error) {
-      console.error("Biometric authentication failed:", error);
+      console.error('Biometric authentication failed:', error);
       return false;
     }
   };

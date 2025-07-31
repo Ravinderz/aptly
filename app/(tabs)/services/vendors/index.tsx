@@ -1,18 +1,24 @@
 import React, { useState } from 'react';
-import { SafeAreaView, ScrollView, Text, TouchableOpacity, View, Linking } from 'react-native';
+import {
+  ScrollView,
+  Text,
+  TouchableOpacity,
+  View,
+  Linking,
+} from 'react-native';
 import { useRouter } from 'expo-router';
-import { 
-  Wrench, 
-  Zap, 
-  Home, 
-  Snowflake, 
-  Truck, 
-  Shield, 
-  TreePine, 
+import {
+  Wrench,
+  Zap,
+  Home,
+  Snowflake,
+  Truck,
+  Shield,
+  TreePine,
   Car,
   Phone,
   MessageCircle,
-  AlertTriangle
+  AlertTriangle,
 } from 'lucide-react-native';
 import HighlightCard from '@/components/ui/HighlightCard';
 import { StackHeader } from '@/components/ui/headers';
@@ -96,7 +102,7 @@ const emergencyContacts = [
   },
   {
     title: 'Society Plumber',
-    name: 'Suresh Sharma', 
+    name: 'Suresh Sharma',
     phone: '+91 97654 32109',
     status: 'Available',
     specialization: 'Water Systems & Leakage',
@@ -118,16 +124,18 @@ const emergencyContacts = [
 ];
 
 interface ServiceCategoryCardProps {
-  category: typeof serviceCategories[0];
+  category: (typeof serviceCategories)[0];
   onPress: () => void;
 }
 
-const ServiceCategoryCard: React.FC<ServiceCategoryCardProps> = ({ category, onPress }) => (
+const ServiceCategoryCard: React.FC<ServiceCategoryCardProps> = ({
+  category,
+  onPress,
+}) => (
   <TouchableOpacity
     onPress={onPress}
     className="bg-surface rounded-xl p-5 mb-4 border border-divider shadow-sm shadow-black/5"
-    activeOpacity={0.7}
-  >
+    activeOpacity={0.7}>
     <View className="flex-row items-center justify-between">
       <View className="flex-row items-center flex-1">
         <View className="bg-primary/10 rounded-full w-16 h-16 items-center justify-center mr-4">
@@ -163,16 +171,20 @@ const ServiceCategoryCard: React.FC<ServiceCategoryCardProps> = ({ category, onP
 );
 
 interface EmergencyContactCardProps {
-  contact: typeof emergencyContacts[0];
+  contact: (typeof emergencyContacts)[0];
 }
 
-const EmergencyContactCard: React.FC<EmergencyContactCardProps> = ({ contact }) => {
+const EmergencyContactCard: React.FC<EmergencyContactCardProps> = ({
+  contact,
+}) => {
   const handleCall = () => {
     Linking.openURL(`tel:${contact.phone}`);
   };
 
   const handleWhatsApp = () => {
-    Linking.openURL(`whatsapp://send?phone=${contact.phone.replace(/\s/g, '')}`);
+    Linking.openURL(
+      `whatsapp://send?phone=${contact.phone.replace(/\s/g, '')}`,
+    );
   };
 
   const getStatusColor = (status: string) => {
@@ -197,21 +209,20 @@ const EmergencyContactCard: React.FC<EmergencyContactCardProps> = ({ contact }) 
           <Text className="text-body-medium text-text-secondary mb-1">
             {contact.name}
           </Text>
-          <Text className={`text-body-medium font-medium ${getStatusColor(contact.status)}`}>
+          <Text
+            className={`text-body-medium font-medium ${getStatusColor(contact.status)}`}>
             ● {contact.status}
           </Text>
         </View>
         <View className="flex-row gap-3">
           <TouchableOpacity
             onPress={handleCall}
-            className="bg-primary rounded-full w-12 h-12 items-center justify-center"
-          >
+            className="bg-primary rounded-full w-12 h-12 items-center justify-center">
             <Phone size={20} color="white" />
           </TouchableOpacity>
           <TouchableOpacity
             onPress={handleWhatsApp}
-            className="bg-secondary rounded-full w-12 h-12 items-center justify-center"
-          >
+            className="bg-secondary rounded-full w-12 h-12 items-center justify-center">
             <MessageCircle size={20} color="white" />
           </TouchableOpacity>
         </View>
@@ -231,24 +242,22 @@ export default function VendorDirectory() {
     router.push(`/services/vendors/${categoryId}`);
   };
 
-  const displayedCategories = showAllCategories 
-    ? serviceCategories 
+  const displayedCategories = showAllCategories
+    ? serviceCategories
     : serviceCategories.slice(0, 4);
 
   return (
     <View className="flex-1 bg-background">
-      <StackHeader 
+      <StackHeader
         title="Vendor Directory"
         subtitle="Find trusted service providers"
         showBackButton={true}
       />
 
-      <ScrollView 
-        className="flex-1" 
+      <ScrollView
+        className="flex-1"
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ paddingBottom: 20 }}
-      >
-
+        contentContainerStyle={{ paddingBottom: 20 }}>
         {/* Emergency Contacts Section */}
         <View className="px-6 mb-8">
           <View className="flex-row items-center mb-4">
@@ -267,10 +276,10 @@ export default function VendorDirectory() {
           <HighlightCard
             title="Verified Vendors Only"
             variant="success"
-            size="sm"
-          >
+            size="sm">
             <Text className="text-text-secondary leading-5">
-              All vendors are verified with background checks. Always confirm rates before work begins.
+              All vendors are verified with background checks. Always confirm
+              rates before work begins.
             </Text>
           </HighlightCard>
         </View>
@@ -280,7 +289,7 @@ export default function VendorDirectory() {
           <Text className="text-headline-large font-semibold text-text-primary mb-4">
             Service Categories
           </Text>
-          
+
           {displayedCategories.map((category) => (
             <ServiceCategoryCard
               key={category.id}
@@ -292,8 +301,7 @@ export default function VendorDirectory() {
           {!showAllCategories && serviceCategories.length > 4 && (
             <TouchableOpacity
               onPress={() => setShowAllCategories(true)}
-              className="bg-primary/10 rounded-xl p-4 items-center"
-            >
+              className="bg-primary/10 rounded-xl p-4 items-center">
               <Text className="text-primary font-semibold text-body-large">
                 View All Categories ({serviceCategories.length - 4} more)
               </Text>

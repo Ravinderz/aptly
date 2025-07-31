@@ -10,27 +10,27 @@
  * @returns Formatted currency string
  */
 export const formatCurrency = (
-  amount: number, 
-  options: { 
-    showSymbol?: boolean; 
+  amount: number,
+  options: {
+    showSymbol?: boolean;
     decimals?: number;
     decimalPlaces?: number;
     showFullForm?: boolean;
     currency?: string;
     locale?: string;
-  } = {}
+  } = {},
 ): string => {
-  const { 
-    showSymbol = true, 
-    decimals = (amount % 1 !== 0 ? 2 : 0),
+  const {
+    showSymbol = true,
+    decimals = amount % 1 !== 0 ? 2 : 0,
     decimalPlaces = decimals,
     showFullForm = false,
     currency = 'INR',
-    locale = 'en-IN'
+    locale = 'en-IN',
   } = options;
-  
+
   const finalDecimals = decimalPlaces !== undefined ? decimalPlaces : decimals;
-  
+
   if (currency === 'USD' && locale === 'en-US') {
     const formatted = amount.toLocaleString('en-US', {
       minimumFractionDigits: finalDecimals,
@@ -38,18 +38,18 @@ export const formatCurrency = (
     });
     return showSymbol ? `$${formatted}` : formatted;
   }
-  
+
   const formatted = amount.toLocaleString('en-IN', {
     minimumFractionDigits: finalDecimals,
     maximumFractionDigits: finalDecimals,
   });
-  
+
   if (!showSymbol) return formatted;
-  
+
   if (showFullForm && amount >= 100000) {
     const lakhs = Math.floor(amount / 100000);
     const remainder = amount % 100000;
-    
+
     if (remainder === 0) {
       return `₹${lakhs} Lakh${lakhs > 1 ? 's' : ''}`;
     } else if (remainder >= 1000) {
@@ -57,11 +57,9 @@ export const formatCurrency = (
       return `₹${lakhs}.${thousands.toString().padStart(2, '0')} Lakhs`;
     }
   }
-  
+
   return `₹${formatted}`;
 };
-
-
 
 /**
  * Get relative time (e.g., "2 hours ago", "Yesterday")
@@ -74,7 +72,7 @@ export const getRelativeTime = (date: Date): string => {
   const diffInMinutes = Math.floor(diffInMs / (1000 * 60));
   const diffInHours = Math.floor(diffInMinutes / 60);
   const diffInDays = Math.floor(diffInHours / 24);
-  
+
   if (diffInMinutes < 1) {
     return 'Just now';
   } else if (diffInMinutes < 60) {
@@ -97,13 +95,13 @@ export const getRelativeTime = (date: Date): string => {
  */
 export const formatFileSize = (bytes: number, decimals?: number): string => {
   if (bytes === 0) return '0 Bytes';
-  
+
   const k = 1024;
   const sizes = ['Bytes', 'KB', 'MB', 'GB'];
   const i = Math.floor(Math.log(bytes) / Math.log(k));
-  
+
   const value = bytes / Math.pow(k, i);
-  
+
   // Determine format based on exact values or decimal specification
   let formattedValue: string;
   if (decimals !== undefined) {
@@ -115,10 +113,10 @@ export const formatFileSize = (bytes: number, decimals?: number): string => {
     // Show 2 decimal places for non-whole numbers by default
     formattedValue = value.toFixed(2);
   }
-  
+
   // Use 'B' for bytes under 1024, otherwise use full names
   const unit = sizes[i] === 'Bytes' && bytes < 1024 ? 'B' : sizes[i];
-  
+
   return `${formattedValue} ${unit}`;
 };
 
@@ -129,9 +127,13 @@ export const formatFileSize = (bytes: number, decimals?: number): string => {
  * @param ellipsis - Custom ellipsis string
  * @returns Truncated text
  */
-export const truncateText = (text: string, maxLength: number, ellipsis: string = '...'): string => {
+export const truncateText = (
+  text: string,
+  maxLength: number,
+  ellipsis: string = '...',
+): string => {
   if (text.length <= maxLength) return text;
-  
+
   const cutOff = maxLength - ellipsis.length;
   return `${text.substring(0, cutOff)}${ellipsis}`;
 };
@@ -152,12 +154,12 @@ export const capitalizeWords = (str: string): string => {
  */
 export const getInitials = (name: string): string => {
   if (!name) return 'U';
-  
+
   const words = name.trim().split(' ');
   if (words.length === 1) {
     return words[0].charAt(0).toUpperCase();
   }
-  
+
   return `${words[0].charAt(0)}${words[words.length - 1].charAt(0)}`.toUpperCase();
 };
 
@@ -169,10 +171,10 @@ export const getInitials = (name: string): string => {
 export const formatIndianCurrency = (amount: number): string => {
   const isNegative = amount < 0;
   const absAmount = Math.abs(amount);
-  
+
   const formatted = absAmount.toLocaleString('en-IN');
   const result = `₹${formatted}`;
-  
+
   return isNegative ? `-${result}` : result;
 };
 
@@ -186,17 +188,17 @@ export const formatIndianCurrency = (amount: number): string => {
 export const formatPhoneNumber = (
   phone: string,
   country: string,
-  options: { format?: string } = {}
+  options: { format?: string } = {},
 ): string => {
   const { format = 'international' } = options;
   const digits = phone.replace(/\D/g, '');
-  
+
   if (country === 'IN') {
     let number = digits;
     if (digits.length === 12 && digits.startsWith('91')) {
       number = digits.slice(2);
     }
-    
+
     if (number.length === 10) {
       switch (format) {
         case 'national':
@@ -209,7 +211,7 @@ export const formatPhoneNumber = (
       }
     }
   }
-  
+
   return phone;
 };
 
@@ -219,24 +221,21 @@ export const formatPhoneNumber = (
  * @param format - Format string or preset
  * @returns Formatted date
  */
-export const formatDate = (
-  date: Date | string,
-  format?: string
-): string => {
+export const formatDate = (date: Date | string, format?: string): string => {
   const dateObj = typeof date === 'string' ? new Date(date) : date;
-  
+
   if (isNaN(dateObj.getTime())) {
     return 'Invalid Date';
   }
-  
+
   if (!format) {
     return dateObj.toLocaleDateString('en-US', {
       month: 'short',
-      day: 'numeric', 
-      year: 'numeric'
+      day: 'numeric',
+      year: 'numeric',
     });
   }
-  
+
   // Handle custom format strings
   if (format === 'dd/MM/yyyy') {
     const day = dateObj.getDate().toString().padStart(2, '0');
@@ -244,34 +243,34 @@ export const formatDate = (
     const year = dateObj.getFullYear();
     return `${day}/${month}/${year}`;
   }
-  
+
   if (format === 'MMMM d, yyyy') {
     return dateObj.toLocaleDateString('en-US', {
       month: 'long',
       day: 'numeric',
-      year: 'numeric'
+      year: 'numeric',
     });
   }
-  
+
   // Default to preset formats
   switch (format) {
     case 'short':
       return dateObj.toLocaleDateString('en-IN', {
         day: 'numeric',
         month: 'short',
-        year: 'numeric'
+        year: 'numeric',
       });
     case 'long':
       return dateObj.toLocaleDateString('en-IN', {
         day: 'numeric',
         month: 'long',
-        year: 'numeric'
+        year: 'numeric',
       });
     default:
       return dateObj.toLocaleDateString('en-US', {
         month: 'short',
-        day: 'numeric', 
-        year: 'numeric'
+        day: 'numeric',
+        year: 'numeric',
       });
   }
 };
@@ -291,10 +290,13 @@ export const formatRelativeTime = (date: Date): string => {
  * @param decimals - Number of decimal places
  * @returns Formatted percentage
  */
-export const formatPercentage = (value: number, decimals: number = 0): string => {
+export const formatPercentage = (
+  value: number,
+  decimals: number = 0,
+): string => {
   // Convert decimal to percentage (0.25 -> 25%)
   const percentage = value * 100;
-  return decimals === 0 && percentage % 1 === 0 
+  return decimals === 0 && percentage % 1 === 0
     ? `${Math.round(percentage)}%`
     : `${percentage.toFixed(decimals)}%`;
 };
@@ -308,20 +310,25 @@ export const formatDuration = (seconds: number, format?: string): string => {
   const hours = Math.floor(seconds / 3600);
   const minutes = Math.floor((seconds % 3600) / 60);
   const remainingSeconds = seconds % 60;
-  
+
   if (format === 'long') {
     const parts = [];
     if (hours > 0) parts.push(`${hours} hour${hours !== 1 ? 's' : ''}`);
     if (minutes > 0) parts.push(`${minutes} minute${minutes !== 1 ? 's' : ''}`);
-    if (remainingSeconds > 0) parts.push(`${remainingSeconds} second${remainingSeconds !== 1 ? 's' : ''}`);
+    if (remainingSeconds > 0)
+      parts.push(
+        `${remainingSeconds} second${remainingSeconds !== 1 ? 's' : ''}`,
+      );
     return parts.join(' ');
   }
-  
+
   // Default short format
   if (seconds < 60) {
     return `${seconds}s`;
   } else if (seconds < 3600) {
-    return remainingSeconds > 0 ? `${minutes}m ${remainingSeconds}s` : `${minutes}m 0s`;
+    return remainingSeconds > 0
+      ? `${minutes}m ${remainingSeconds}s`
+      : `${minutes}m 0s`;
   } else {
     const parts = [`${hours}h`];
     if (minutes > 0) parts.push(`${minutes}m`);
@@ -345,23 +352,28 @@ export const capitalizeFirst = (str: string): string => {
  * @param address - Address object or string
  * @returns Formatted address
  */
-export const formatAddress = (address: any, options?: { includeCountry?: boolean }): string => {
+export const formatAddress = (
+  address: any,
+  options?: { includeCountry?: boolean },
+): string => {
   if (typeof address === 'string') return address;
-  
+
   const { includeCountry = true } = options || {};
-  
+
   const parts = [
     address.line1,
     address.line2,
     address.city,
     // Format state and pincode together when both exist
-    address.state && address.pincode ? `${address.state} ${address.pincode}` : address.state || address.pincode,
+    address.state && address.pincode
+      ? `${address.state} ${address.pincode}`
+      : address.state || address.pincode,
   ].filter(Boolean);
-  
+
   if (includeCountry && address.country) {
     parts.push(address.country);
   }
-  
+
   return parts.join(', ');
 };
 
@@ -372,7 +384,7 @@ export const formatAddress = (address: any, options?: { includeCountry?: boolean
  */
 export const formatVehicleNumber = (vehicleNumber: string): string => {
   const clean = vehicleNumber.replace(/\s/g, '').toUpperCase();
-  
+
   // Indian format patterns:
   // Old format: XX00XXXX (8 chars) -> XX 00 XXXX
   // New format: XX00XX0000 (10 chars) -> XX 00 XX 0000
@@ -381,6 +393,6 @@ export const formatVehicleNumber = (vehicleNumber: string): string => {
   } else if (clean.length === 10) {
     return clean.replace(/(\w{2})(\d{2})(\w{2})(\d{4})/, '$1 $2 $3 $4');
   }
-  
+
   return vehicleNumber;
 };

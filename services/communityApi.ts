@@ -1,4 +1,10 @@
-import { Post, Comment, CreatePostRequest, CreateCommentRequest, User } from '@/types/community';
+import {
+  Post,
+  Comment,
+  CreatePostRequest,
+  CreateCommentRequest,
+  User,
+} from '@/types/community';
 
 // Mock current user - in production this would come from AuthContext
 const CURRENT_USER: User = {
@@ -10,55 +16,55 @@ const CURRENT_USER: User = {
   phone: '+91-9876543210',
   bio: 'Software Developer and tech enthusiast. Always happy to help with tech issues in the society.',
   joinedDate: '2023-01-15',
-  connectionsCount: 12
+  connectionsCount: 12,
 };
 
 // Mock users data
 const MOCK_USERS: User[] = [
   CURRENT_USER,
-  { 
-    id: 'user2', 
-    name: 'Priya Sharma', 
-    flatNumber: 'B-305', 
+  {
+    id: 'user2',
+    name: 'Priya Sharma',
+    flatNumber: 'B-305',
     role: 'committee',
     email: 'priya.sharma@example.com',
     phone: '+91-9876543211',
     bio: 'Committee member handling maintenance and society events.',
     joinedDate: '2022-08-20',
-    connectionsCount: 24
+    connectionsCount: 24,
   },
-  { 
-    id: 'user3', 
-    name: 'Amit Kumar', 
-    flatNumber: 'C-102', 
+  {
+    id: 'user3',
+    name: 'Amit Kumar',
+    flatNumber: 'C-102',
     role: 'resident',
     email: 'amit.kumar@example.com',
     phone: '+91-9876543212',
     bio: 'Marketing professional. Love photography and organizing social events.',
     joinedDate: '2023-03-10',
-    connectionsCount: 8
+    connectionsCount: 8,
   },
-  { 
-    id: 'user4', 
-    name: 'Neha Gupta', 
-    flatNumber: 'A-401', 
+  {
+    id: 'user4',
+    name: 'Neha Gupta',
+    flatNumber: 'A-401',
     role: 'resident',
     email: 'neha.gupta@example.com',
     phone: '+91-9876543213',
     bio: 'Teacher and event coordinator. Always excited about community activities!',
     joinedDate: '2022-12-05',
-    connectionsCount: 16
+    connectionsCount: 16,
   },
-  { 
-    id: 'user5', 
-    name: 'Society Admin', 
-    flatNumber: 'Office', 
+  {
+    id: 'user5',
+    name: 'Society Admin',
+    flatNumber: 'Office',
     role: 'admin',
     email: 'admin@aptlysociety.com',
     phone: '+91-9876543214',
     bio: 'Managing day-to-day operations and resident services.',
     joinedDate: '2022-01-01',
-    connectionsCount: 45
+    connectionsCount: 45,
   },
 ];
 
@@ -70,7 +76,8 @@ let MOCK_POSTS: Post[] = [
     userName: 'Priya Sharma',
     flatNumber: 'B-305',
     category: 'announcement',
-    content: 'Reminder: Society maintenance meeting scheduled for this Saturday at 5 PM in the community hall. Please attend to discuss upcoming infrastructure improvements.',
+    content:
+      'Reminder: Society maintenance meeting scheduled for this Saturday at 5 PM in the community hall. Please attend to discuss upcoming infrastructure improvements.',
     createdAt: new Date(Date.now() - 2 * 60 * 60 * 1000), // 2 hours ago
     updatedAt: new Date(Date.now() - 2 * 60 * 60 * 1000),
     likesCount: 12,
@@ -78,7 +85,7 @@ let MOCK_POSTS: Post[] = [
     isLikedByUser: false,
     canEdit: false,
     canDelete: false,
-    status: 'active'
+    status: 'active',
   },
   {
     id: 'post2',
@@ -86,7 +93,8 @@ let MOCK_POSTS: Post[] = [
     userName: 'Ravinder Singh',
     flatNumber: 'A-201',
     category: 'buy_sell',
-    content: 'Selling barely used dining table set (4 seater) in excellent condition. Moving to a new place. Price: ₹8,000 (negotiable). Contact me if interested!',
+    content:
+      'Selling barely used dining table set (4 seater) in excellent condition. Moving to a new place. Price: ₹8,000 (negotiable). Contact me if interested!',
     createdAt: new Date(Date.now() - 4 * 60 * 60 * 1000), // 4 hours ago
     updatedAt: new Date(Date.now() - 4 * 60 * 60 * 1000),
     likesCount: 5,
@@ -94,7 +102,7 @@ let MOCK_POSTS: Post[] = [
     isLikedByUser: true,
     canEdit: true,
     canDelete: true,
-    status: 'active'
+    status: 'active',
   },
   {
     id: 'post3',
@@ -102,7 +110,8 @@ let MOCK_POSTS: Post[] = [
     userName: 'Amit Kumar',
     flatNumber: 'C-102',
     category: 'lost_found',
-    content: 'Found a set of keys near the main gate yesterday evening. Has a BMW keychain. Please contact me if these are yours.',
+    content:
+      'Found a set of keys near the main gate yesterday evening. Has a BMW keychain. Please contact me if these are yours.',
     createdAt: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000), // 1 day ago
     updatedAt: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000),
     likesCount: 8,
@@ -110,7 +119,7 @@ let MOCK_POSTS: Post[] = [
     isLikedByUser: false,
     canEdit: false,
     canDelete: false,
-    status: 'active'
+    status: 'active',
   },
   {
     id: 'post4',
@@ -118,7 +127,8 @@ let MOCK_POSTS: Post[] = [
     userName: 'Neha Gupta',
     flatNumber: 'A-401',
     category: 'events',
-    content: 'Planning a Holi celebration in the society courtyard next weekend! Please let me know if you\'d like to contribute or help with arrangements. Let\'s make it memorable! 🎨🎉',
+    content:
+      "Planning a Holi celebration in the society courtyard next weekend! Please let me know if you'd like to contribute or help with arrangements. Let's make it memorable! 🎨🎉",
     createdAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000), // 2 days ago
     updatedAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000),
     likesCount: 15,
@@ -126,8 +136,8 @@ let MOCK_POSTS: Post[] = [
     isLikedByUser: true,
     canEdit: false,
     canDelete: false,
-    status: 'active'
-  }
+    status: 'active',
+  },
 ];
 
 // Mock comments data
@@ -140,7 +150,7 @@ let MOCK_COMMENTS: Comment[] = [
     flatNumber: 'A-201',
     content: 'Will definitely attend. Thanks for organizing!',
     createdAt: new Date(Date.now() - 1 * 60 * 60 * 1000), // 1 hour ago
-    canDelete: true
+    canDelete: true,
   },
   {
     id: 'comment2',
@@ -150,7 +160,7 @@ let MOCK_COMMENTS: Comment[] = [
     flatNumber: 'A-401',
     content: 'Interested! Can I see some pictures?',
     createdAt: new Date(Date.now() - 3 * 60 * 60 * 1000), // 3 hours ago
-    canDelete: false
+    canDelete: false,
   },
   {
     id: 'comment3',
@@ -158,9 +168,10 @@ let MOCK_COMMENTS: Comment[] = [
     userId: 'user3',
     userName: 'Amit Kumar',
     flatNumber: 'C-102',
-    content: 'Great idea! I can help with decorations and organizing games for kids.',
+    content:
+      'Great idea! I can help with decorations and organizing games for kids.',
     createdAt: new Date(Date.now() - 6 * 60 * 60 * 1000), // 6 hours ago
-    canDelete: false
+    canDelete: false,
   },
   {
     id: 'comment4',
@@ -168,14 +179,15 @@ let MOCK_COMMENTS: Comment[] = [
     userId: 'user1',
     userName: 'Ravinder Singh',
     flatNumber: 'A-201',
-    content: 'Count me in! Will bring some sweets. Should we coordinate on WhatsApp?',
+    content:
+      'Count me in! Will bring some sweets. Should we coordinate on WhatsApp?',
     createdAt: new Date(Date.now() - 4 * 60 * 60 * 1000), // 4 hours ago
-    canDelete: true
-  }
+    canDelete: true,
+  },
 ];
 
 // API simulation delay
-const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 /**
  * Community API Service
@@ -190,13 +202,13 @@ export const communityApi = {
   // Fetch all posts
   getPosts: async (): Promise<Post[]> => {
     await delay(800);
-    return MOCK_POSTS.filter(post => post.status === 'active');
+    return MOCK_POSTS.filter((post) => post.status === 'active');
   },
 
   // Create new post
   createPost: async (request: CreatePostRequest): Promise<Post> => {
     await delay(1000);
-    
+
     const newPost: Post = {
       id: `post${Date.now()}`,
       userId: CURRENT_USER.id,
@@ -212,7 +224,7 @@ export const communityApi = {
       isLikedByUser: false,
       canEdit: true,
       canDelete: true,
-      status: 'active'
+      status: 'active',
     };
 
     MOCK_POSTS.unshift(newPost);
@@ -220,10 +232,12 @@ export const communityApi = {
   },
 
   // Toggle like on post
-  toggleLike: async (postId: string): Promise<{ liked: boolean; likesCount: number }> => {
+  toggleLike: async (
+    postId: string,
+  ): Promise<{ liked: boolean; likesCount: number }> => {
     await delay(300);
-    
-    const post = MOCK_POSTS.find(p => p.id === postId);
+
+    const post = MOCK_POSTS.find((p) => p.id === postId);
     if (!post) throw new Error('Post not found');
 
     if (post.isLikedByUser) {
@@ -236,22 +250,22 @@ export const communityApi = {
 
     return {
       liked: post.isLikedByUser,
-      likesCount: post.likesCount
+      likesCount: post.likesCount,
     };
   },
 
   // Get comments for a post
   getComments: async (postId: string): Promise<Comment[]> => {
     await delay(500);
-    return MOCK_COMMENTS
-      .filter(comment => comment.postId === postId)
-      .sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime()); // Oldest first for comments
+    return MOCK_COMMENTS.filter((comment) => comment.postId === postId).sort(
+      (a, b) => a.createdAt.getTime() - b.createdAt.getTime(),
+    ); // Oldest first for comments
   },
 
   // Add comment to post
   addComment: async (request: CreateCommentRequest): Promise<Comment> => {
     await delay(600);
-    
+
     const newComment: Comment = {
       id: `comment${Date.now()}`,
       postId: request.postId,
@@ -261,13 +275,13 @@ export const communityApi = {
       content: request.content.trim(),
       createdAt: new Date(),
       parentId: request.parentId,
-      canDelete: true
+      canDelete: true,
     };
 
     MOCK_COMMENTS.push(newComment);
-    
+
     // Update comment count on post
-    const post = MOCK_POSTS.find(p => p.id === request.postId);
+    const post = MOCK_POSTS.find((p) => p.id === request.postId);
     if (post) {
       post.commentsCount += 1;
     }
@@ -278,10 +292,10 @@ export const communityApi = {
   // Delete post
   deletePost: async (postId: string): Promise<boolean> => {
     await delay(500);
-    
-    const postIndex = MOCK_POSTS.findIndex(p => p.id === postId);
+
+    const postIndex = MOCK_POSTS.findIndex((p) => p.id === postId);
     if (postIndex === -1) throw new Error('Post not found');
-    
+
     const post = MOCK_POSTS[postIndex];
     if (post.userId !== CURRENT_USER.id && CURRENT_USER.role !== 'admin') {
       throw new Error('Not authorized to delete this post');
@@ -294,17 +308,17 @@ export const communityApi = {
   // Delete comment
   deleteComment: async (commentId: string): Promise<boolean> => {
     await delay(400);
-    
-    const commentIndex = MOCK_COMMENTS.findIndex(c => c.id === commentId);
+
+    const commentIndex = MOCK_COMMENTS.findIndex((c) => c.id === commentId);
     if (commentIndex === -1) throw new Error('Comment not found');
-    
+
     const comment = MOCK_COMMENTS[commentIndex];
     if (comment.userId !== CURRENT_USER.id && CURRENT_USER.role !== 'admin') {
       throw new Error('Not authorized to delete this comment');
     }
 
     // Update comment count on post
-    const post = MOCK_POSTS.find(p => p.id === comment.postId);
+    const post = MOCK_POSTS.find((p) => p.id === comment.postId);
     if (post) {
       post.commentsCount = Math.max(0, post.commentsCount - 1);
     }
@@ -314,38 +328,41 @@ export const communityApi = {
   },
 
   // Update post
-  updatePost: async (postId: string, updates: { content: string; imageUrl?: string }): Promise<Post> => {
+  updatePost: async (
+    postId: string,
+    updates: { content: string; imageUrl?: string },
+  ): Promise<Post> => {
     await delay(800);
-    
-    const postIndex = MOCK_POSTS.findIndex(p => p.id === postId);
+
+    const postIndex = MOCK_POSTS.findIndex((p) => p.id === postId);
     if (postIndex === -1) {
       throw new Error('Post not found');
     }
 
     const post = MOCK_POSTS[postIndex];
-    
+
     // Update the post
     MOCK_POSTS[postIndex] = {
       ...post,
       content: updates.content.trim(),
       imageUrl: updates.imageUrl,
-      updatedAt: new Date()
+      updatedAt: new Date(),
     };
-    
+
     return MOCK_POSTS[postIndex];
   },
 
   // Get user by ID (for mentions, etc.)
   getUser: async (userId: string): Promise<User | null> => {
     await delay(200);
-    return MOCK_USERS.find(user => user.id === userId) || null;
+    return MOCK_USERS.find((user) => user.id === userId) || null;
   },
 
   // Get posts by user ID
   getUserPosts: async (userId: string): Promise<Post[]> => {
     await delay(600);
-    return MOCK_POSTS
-      .filter(post => post.userId === userId && post.status === 'active')
-      .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime()); // Newest first
-  }
+    return MOCK_POSTS.filter(
+      (post) => post.userId === userId && post.status === 'active',
+    ).sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime()); // Newest first
+  },
 };

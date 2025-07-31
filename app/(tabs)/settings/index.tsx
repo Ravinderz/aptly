@@ -2,36 +2,42 @@ import React from 'react';
 import { ScrollView, SafeAreaView, View } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useAuth } from '@/contexts/AuthContext';
-import { showErrorAlert, showSuccessAlert, showConfirmAlert } from '@/utils/alert';
-import { 
-  User, 
-  Users, 
-  Car, 
-  FileText, 
-  Bell, 
-  Phone, 
-  Shield, 
+import {
+  showErrorAlert,
+  showSuccessAlert,
+  showConfirmAlert,
+} from '@/utils/alert';
+import {
+  User,
+  Users,
+  Car,
+  FileText,
+  Bell,
+  Phone,
+  Shield,
   LogOut,
   HelpCircle,
   Settings as SettingsIcon,
   Camera,
   Vote,
-  BarChart3
+  BarChart3,
 } from 'lucide-react-native';
 import ProfileHeader from '../../../components/ui/ProfileHeader';
-import ProfileSection, { ProfileItem } from '../../../components/ui/ProfileSection';
+import ProfileSection, {
+  ProfileItem,
+} from '../../../components/ui/ProfileSection';
 import * as ImagePicker from 'expo-image-picker';
 
 export default function Profile() {
   const router = useRouter();
   const { user, logout } = useAuth();
-  
+
   // Use real user data from auth context, fallback to mock data
   const userData = {
-    name: user?.fullName || "Rajesh Kumar Sharma",
-    role: user?.ownershipType === 'owner' ? "Flat Owner" : "Tenant",
-    flatNumber: user?.flatNumber || "A-301",
-    societyName: user?.societyCode || "Green Valley Apartments",
+    name: user?.fullName || 'Rajesh Kumar Sharma',
+    role: user?.ownershipType === 'owner' ? 'Flat Owner' : 'Tenant',
+    flatNumber: user?.flatNumber || 'A-301',
+    societyName: user?.societyCode || 'Green Valley Apartments',
     profileImage: undefined, // Add image URL when available
   };
 
@@ -109,17 +115,16 @@ export default function Profile() {
       () => {}, // Cancel callback
       'Logout',
       'Cancel',
-      true // destructive
+      true, // destructive
     );
   };
 
   return (
     <SafeAreaView className="flex-1 bg-background">
-      <ScrollView 
-        className="flex-1" 
+      <ScrollView
+        className="flex-1"
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ paddingBottom: 20 }}
-      >
+        contentContainerStyle={{ paddingBottom: 20 }}>
         {/* Profile Header */}
         <ProfileHeader
           userName={userData.name}
@@ -182,14 +187,14 @@ export default function Profile() {
             icon={<Vote size={20} color="#6366f1" />}
             title="Governance Settings"
             subtitle="Voting preferences, emergency alerts"
-            onPress={() => router.push("/(tabs)/settings/governance-settings")}
+            onPress={() => router.push('/(tabs)/settings/governance-settings')}
           />
           <View className="h-px bg-divider mx-4" />
           <ProfileItem
             icon={<BarChart3 size={20} color="#8B5CF6" />}
             title="Analytics Settings"
             subtitle="Performance monitoring, data preferences"
-            onPress={() => router.push("/(tabs)/settings/analytics-settings")}
+            onPress={() => router.push('/(tabs)/settings/analytics-settings')}
           />
         </ProfileSection>
 

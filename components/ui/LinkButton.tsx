@@ -1,5 +1,5 @@
-import React from "react";
-import { Text, TouchableOpacity } from "react-native";
+import React from 'react';
+import { Text, TouchableOpacity } from 'react-native';
 
 const LinkButton = ({
   label,
@@ -10,7 +10,9 @@ const LinkButton = ({
 }) => {
   return (
     <TouchableOpacity onPress={handleViewAll}>
-      <Text className="text-label-large font-semibold text-primary">{label}</Text>
+      <Text className="text-label-large font-semibold text-primary">
+        {label}
+      </Text>
     </TouchableOpacity>
   );
 };

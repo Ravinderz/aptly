@@ -1,12 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { 
-  SafeAreaView, 
-  ScrollView, 
-  View, 
-  Text, 
-  TouchableOpacity
+import {
+  SafeAreaView,
+  View,
+  Text,
+  TouchableOpacity,
 } from 'react-native';
-import { router } from 'expo-router';
 import LucideIcons from '@/components/ui/LucideIcons';
 import { showSuccessAlert, showErrorAlert } from '@/utils/alert';
 import { safeGoBack } from '@/utils/navigation';
@@ -26,19 +24,20 @@ import type {
   PolicyProposal,
   VotingAnalytics,
   EmergencyAnalytics,
-  GovernanceDashboard as GovernanceDashboardData
+  GovernanceDashboard as GovernanceDashboardData,
 } from '@/types/governance';
 
 // UI Components
-import { Card } from '@/components/ui/Card';
-import { Button } from '@/components/ui/Button';
 import { TabHeader } from '@/components/ui/headers';
 
-interface GovernancePageProps {}
-
 export default function GovernancePage() {
-  const [activeTab, setActiveTab] = useState<'dashboard' | 'voting' | 'emergency' | 'succession' | 'policies'>('dashboard');
-  const [userRole, setUserRole] = useState<'resident' | 'committee_member' | 'admin'>('resident');
+  const [activeTab, setActiveTab] = useState<
+    'dashboard' | 'voting' | 'emergency' | 'succession' | 'policies'
+  >('dashboard');
+  const [userRole, setUserRole] = useState<
+    'resident' | 'committee_member' | 'admin'
+  >('resident');
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [currentUserId, setCurrentUserId] = useState('user-123');
   const [isLoading, setIsLoading] = useState(true);
 
@@ -50,7 +49,7 @@ export default function GovernancePage() {
     policyProposals: [] as PolicyProposal[],
     dashboardData: null as GovernanceDashboardData | null,
     votingAnalytics: null as VotingAnalytics | null,
-    emergencyAnalytics: null as EmergencyAnalytics | null
+    emergencyAnalytics: null as EmergencyAnalytics | null,
   });
 
   useEffect(() => {
@@ -61,7 +60,7 @@ export default function GovernancePage() {
   const loadGovernanceData = async () => {
     try {
       setIsLoading(true);
-      
+
       // Mock API calls - replace with real API calls
       const mockVotingCampaigns: VotingCampaign[] = [
         {
@@ -85,7 +84,7 @@ export default function GovernancePage() {
               manifesto: 'Transparent financial management',
               nominatedBy: 'user-456',
               endorsements: [],
-              votes: 45
+              votes: 45,
             },
             {
               id: 'candidate-2',
@@ -97,23 +96,24 @@ export default function GovernancePage() {
               manifesto: 'Better community engagement',
               nominatedBy: 'user-567',
               endorsements: [],
-              votes: 38
-            }
+              votes: 38,
+            },
           ],
           options: [],
           totalVotes: 83,
           eligibleVoters: ['user1', 'user2', 'user3'],
           createdBy: 'admin-1',
           createdAt: '2024-01-01T10:00:00Z',
-          updatedAt: '2024-01-15T10:00:00Z'
-        }
+          updatedAt: '2024-01-15T10:00:00Z',
+        },
       ];
 
       const mockEmergencyAlerts: EmergencyAlert[] = [
         {
           id: 'alert-1',
           title: 'Water Supply Disruption',
-          description: 'Water supply will be disrupted from 2 PM to 6 PM for maintenance',
+          description:
+            'Water supply will be disrupted from 2 PM to 6 PM for maintenance',
           severity: 'medium',
           category: 'utilities',
           status: 'active',
@@ -131,33 +131,37 @@ export default function GovernancePage() {
               timeoutMinutes: 30,
               isActivated: true,
               activatedAt: '2024-01-20T08:00:00Z',
-              acknowledgedAt: '2024-01-20T08:15:00Z'
-            }
+              acknowledgedAt: '2024-01-20T08:15:00Z',
+            },
           ],
           isResolved: false,
           createdBy: 'admin-1',
           createdAt: '2024-01-20T08:00:00Z',
-          updatedAt: '2024-01-20T08:00:00Z'
-        }
+          updatedAt: '2024-01-20T08:00:00Z',
+        },
       ];
 
       const mockDashboardData: GovernanceDashboardData = {
         society_id: 'society-1',
-        activeVotingCampaigns: mockVotingCampaigns.filter(c => c.status === 'active').length,
+        activeVotingCampaigns: mockVotingCampaigns.filter(
+          (c) => c.status === 'active',
+        ).length,
         totalVoters: 150,
-        activeEmergencies: mockEmergencyAlerts.filter(a => a.status === 'active').length,
+        activeEmergencies: mockEmergencyAlerts.filter(
+          (a) => a.status === 'active',
+        ).length,
         pendingPolicies: 2,
         averageParticipation: 55.3,
         lastEmergencyDate: '2024-01-15T00:00:00Z',
         succession: {
           planExists: false,
-          deputiesAssigned: 0
+          deputiesAssigned: 0,
         },
         implementedPoliciesThisYear: 5,
         communityEngagement: {
           eventsThisMonth: 3,
           averageAttendance: 65,
-          satisfactionScore: 4.2
+          satisfactionScore: 4.2,
         },
         recentActivities: [
           {
@@ -166,8 +170,8 @@ export default function GovernancePage() {
             description: 'New vote cast in Committee Election 2024',
             timestamp: '2024-01-20T10:30:00Z',
             userId: 'user-456',
-            metadata: { campaignId: 'campaign-1' }
-          }
+            metadata: { campaignId: 'campaign-1' },
+          },
         ],
         upcomingEvents: [
           {
@@ -175,9 +179,9 @@ export default function GovernancePage() {
             title: 'Committee Meeting',
             date: '2024-01-25T18:00:00Z',
             type: 'meeting',
-            location: 'Community Hall'
-          }
-        ]
+            location: 'Community Hall',
+          },
+        ],
       };
 
       setMockData({
@@ -187,12 +191,11 @@ export default function GovernancePage() {
         policyProposals: [],
         dashboardData: mockDashboardData,
         votingAnalytics: null,
-        emergencyAnalytics: null
+        emergencyAnalytics: null,
       });
 
       // Simulate checking user role (in real app, get from auth context)
       setUserRole('committee_member'); // or get from auth
-      
     } catch (error) {
       console.error('Failed to load governance data:', error);
       showErrorAlert('Error', 'Failed to load governance data');
@@ -208,7 +211,7 @@ export default function GovernancePage() {
       console.log('Creating campaign:', campaign);
       showSuccessAlert('Success', 'Campaign created successfully');
       await loadGovernanceData(); // Refresh data
-    } catch (error) {
+    } catch (_error) {
       showErrorAlert('Error', 'Failed to create campaign');
     }
   };
@@ -219,7 +222,7 @@ export default function GovernancePage() {
       console.log('Submitting vote:', { campaignId, candidateId });
       showSuccessAlert('Success', 'Vote submitted successfully');
       await loadGovernanceData(); // Refresh data
-    } catch (error) {
+    } catch (_error) {
       showErrorAlert('Error', 'Failed to submit vote');
     }
   };
@@ -230,7 +233,7 @@ export default function GovernancePage() {
       console.log('Creating emergency alert:', alert);
       showSuccessAlert('Success', 'Emergency alert created');
       await loadGovernanceData(); // Refresh data
-    } catch (error) {
+    } catch (_error) {
       showErrorAlert('Error', 'Failed to create emergency alert');
     }
   };
@@ -241,7 +244,7 @@ export default function GovernancePage() {
       console.log('Resolving emergency:', alertId);
       showSuccessAlert('Success', 'Emergency resolved');
       await loadGovernanceData(); // Refresh data
-    } catch (error) {
+    } catch (_error) {
       showErrorAlert('Error', 'Failed to resolve emergency');
     }
   };
@@ -252,7 +255,7 @@ export default function GovernancePage() {
       console.log('Creating succession plan:', plan);
       showSuccessAlert('Success', 'Succession plan created');
       await loadGovernanceData(); // Refresh data
-    } catch (error) {
+    } catch (_error) {
       showErrorAlert('Error', 'Failed to create succession plan');
     }
   };
@@ -263,29 +266,34 @@ export default function GovernancePage() {
       console.log('Triggering succession:', planId);
       showSuccessAlert('Success', 'Succession triggered');
       await loadGovernanceData(); // Refresh data
-    } catch (error) {
+    } catch (_error) {
       showErrorAlert('Error', 'Failed to trigger succession');
     }
   };
 
-  const handleCreatePolicyProposal = async (proposal: Partial<PolicyProposal>) => {
+  const handleCreatePolicyProposal = async (
+    proposal: Partial<PolicyProposal>,
+  ) => {
     try {
       // API call to create policy proposal
       console.log('Creating policy proposal:', proposal);
       showSuccessAlert('Success', 'Policy proposal created');
       await loadGovernanceData(); // Refresh data
-    } catch (error) {
+    } catch (_error) {
       showErrorAlert('Error', 'Failed to create policy proposal');
     }
   };
 
-  const handleVoteOnPolicy = async (proposalId: string, vote: 'approve' | 'reject') => {
+  const handleVoteOnPolicy = async (
+    proposalId: string,
+    vote: 'approve' | 'reject',
+  ) => {
     try {
       // API call to vote on policy
       console.log('Voting on policy:', { proposalId, vote });
       showSuccessAlert('Success', 'Vote on policy submitted');
       await loadGovernanceData(); // Refresh data
-    } catch (error) {
+    } catch (_error) {
       showErrorAlert('Error', 'Failed to vote on policy');
     }
   };
@@ -294,7 +302,9 @@ export default function GovernancePage() {
     return (
       <SafeAreaView className="flex-1 bg-background">
         <View className="flex-1 items-center justify-center">
-          <Text className="text-body-large text-text-secondary">Loading governance data...</Text>
+          <Text className="text-body-large text-text-secondary">
+            Loading governance data...
+          </Text>
         </View>
       </SafeAreaView>
     );
@@ -316,74 +326,78 @@ export default function GovernancePage() {
             />
           ) : (
             <View className="flex-1 items-center justify-center p-6">
-              <Text className="text-text-secondary">No dashboard data available</Text>
+              <Text className="text-text-secondary">
+                No dashboard data available
+              </Text>
             </View>
           );
 
-      case 'voting':
-        return (
-          <VotingSystem
-            campaigns={mockData.votingCampaigns}
-            userVotes={[]} // Would come from API
-            analytics={mockData.votingAnalytics ? [mockData.votingAnalytics] : []}
-            onCreateCampaign={handleCreateCampaign}
-            onVote={handleVote}
-            currentUserId={currentUserId}
-            userRole={userRole}
-          />
-        );
+        case 'voting':
+          return (
+            <VotingSystem
+              campaigns={mockData.votingCampaigns}
+              userVotes={[]} // Would come from API
+              analytics={
+                mockData.votingAnalytics ? [mockData.votingAnalytics] : []
+              }
+              onCreateCampaign={handleCreateCampaign}
+              onVote={handleVote}
+              currentUserId={currentUserId}
+              userRole={userRole}
+            />
+          );
 
-      case 'emergency':
-        return (
-          <EmergencyManagement
-            alerts={mockData.emergencyAlerts}
-            emergencyContacts={[]} // Would come from API
-            analytics={mockData.emergencyAnalytics || undefined}
-            onCreateAlert={handleCreateEmergencyAlert}
-            onResolveEmergency={handleResolveEmergency}
-            onEmergencyCall={async (contact: any) => {
-              // Handle emergency call
-              console.log('Emergency call to:', contact);
-            }}
-            currentUserId={currentUserId}
-            userRole={userRole}
-          />
-        );
+        case 'emergency':
+          return (
+            <EmergencyManagement
+              alerts={mockData.emergencyAlerts}
+              emergencyContacts={[]} // Would come from API
+              analytics={mockData.emergencyAnalytics || undefined}
+              onCreateAlert={handleCreateEmergencyAlert}
+              onResolveEmergency={handleResolveEmergency}
+              onEmergencyCall={async (contact: any) => {
+                // Handle emergency call
+                console.log('Emergency call to:', contact);
+              }}
+              currentUserId={currentUserId}
+              userRole={userRole}
+            />
+          );
 
-      case 'succession':
-        return (
-          <SuccessionManagement
-            successionPlans={mockData.successionPlans}
-            deputies={[]} // Would come from API
-            handoverTasks={[]} // Would come from API
-            onCreatePlan={handleCreateSuccessionPlan}
-            onTriggerSuccession={handleTriggerSuccession}
-            onAssignDeputy={async (assignment: any) => {
-              console.log('Assigning deputy:', assignment);
-            }}
-            onCompleteHandover={async (taskId: any) => {
-              console.log('Completing handover task:', taskId);
-            }}
-            currentUserId={currentUserId}
-            userRole={userRole}
-          />
-        );
+        case 'succession':
+          return (
+            <SuccessionManagement
+              successionPlans={mockData.successionPlans}
+              deputies={[]} // Would come from API
+              handoverTasks={[]} // Would come from API
+              onCreatePlan={handleCreateSuccessionPlan}
+              onTriggerSuccession={handleTriggerSuccession}
+              onAssignDeputy={async (assignment: any) => {
+                console.log('Assigning deputy:', assignment);
+              }}
+              onCompleteHandover={async (taskId: any) => {
+                console.log('Completing handover task:', taskId);
+              }}
+              currentUserId={currentUserId}
+              userRole={userRole}
+            />
+          );
 
-      case 'policies':
-        return (
-          <PolicyGovernance
-            proposals={mockData.policyProposals}
-            activePolicies={[]} // Would come from API
-            consultations={[]} // Would come from API
-            onCreateProposal={handleCreatePolicyProposal}
-            onVoteOnPolicy={handleVoteOnPolicy}
-            onSubmitFeedback={async (proposalId, feedback) => {
-              console.log('Submitting feedback:', { proposalId, feedback });
-            }}
-            currentUserId={currentUserId}
-            userRole={userRole}
-          />
-        );
+        case 'policies':
+          return (
+            <PolicyGovernance
+              proposals={mockData.policyProposals}
+              activePolicies={[]} // Would come from API
+              consultations={[]} // Would come from API
+              onCreateProposal={handleCreatePolicyProposal}
+              onVoteOnPolicy={handleVoteOnPolicy}
+              onSubmitFeedback={async (proposalId, feedback) => {
+                console.log('Submitting feedback:', { proposalId, feedback });
+              }}
+              currentUserId={currentUserId}
+              userRole={userRole}
+            />
+          );
 
         default:
           return (
@@ -399,10 +413,9 @@ export default function GovernancePage() {
           <Text className="text-error text-center">
             Something went wrong. Please try switching to another tab.
           </Text>
-          <TouchableOpacity 
-            onPress={() => setActiveTab('dashboard')} 
-            className="mt-4 px-4 py-2 bg-primary rounded-lg"
-          >
+          <TouchableOpacity
+            onPress={() => setActiveTab('dashboard')}
+            className="mt-4 px-4 py-2 bg-primary rounded-lg">
             <Text className="text-white">Go to Dashboard</Text>
           </TouchableOpacity>
         </View>
@@ -424,27 +437,39 @@ export default function GovernancePage() {
       <View className="flex-row bg-surface-primary border-b border-border-primary">
         {[
           { key: 'dashboard', label: 'Overview', icon: 'home-outline' },
-          { key: 'voting', label: 'Voting', icon: 'ballot-outline', count: mockData.votingCampaigns.filter(c => c.status === 'active').length },
-          { key: 'emergency', label: 'Emergency', icon: 'warning-outline', count: mockData.emergencyAlerts.filter(a => a.status === 'active').length },
+          {
+            key: 'voting',
+            label: 'Voting',
+            icon: 'ballot-outline',
+            count: mockData.votingCampaigns.filter((c) => c.status === 'active')
+              .length,
+          },
+          {
+            key: 'emergency',
+            label: 'Emergency',
+            icon: 'warning-outline',
+            count: mockData.emergencyAlerts.filter((a) => a.status === 'active')
+              .length,
+          },
           { key: 'succession', label: 'Leadership', icon: 'people-outline' },
-          { key: 'policies', label: 'Policies', icon: 'document-text-outline' }
+          { key: 'policies', label: 'Policies', icon: 'document-text-outline' },
         ].map((tab) => (
           <TouchableOpacity
             key={tab.key}
             onPress={() => setActiveTab(tab.key as any)}
             className={`flex-1 p-3 border-b-2 ${
               activeTab === tab.key ? 'border-primary' : 'border-transparent'
-            }`}
-          >
+            }`}>
             <View className="items-center relative">
-              <LucideIcons 
-                name={tab.icon as any} 
-                size={18} 
-                color={activeTab === tab.key ? '#6366f1' : '#757575'} 
+              <LucideIcons
+                name={tab.icon as any}
+                size={18}
+                color={activeTab === tab.key ? '#6366f1' : '#757575'}
               />
-              <Text className={`text-label-small font-medium mt-1 ${
-                activeTab === tab.key ? 'text-primary' : 'text-text-secondary'
-              }`}>
+              <Text
+                className={`text-label-small font-medium mt-1 ${
+                  activeTab === tab.key ? 'text-primary' : 'text-text-secondary'
+                }`}>
                 {tab.label}
               </Text>
               {tab.count && tab.count > 0 && (
@@ -460,9 +485,7 @@ export default function GovernancePage() {
       </View>
 
       {/* Content */}
-      <View className="flex-1 bg-surface-secondary">
-        {renderContent()}
-      </View>
+      <View className="flex-1 bg-surface-secondary">{renderContent()}</View>
     </SafeAreaView>
   );
 }

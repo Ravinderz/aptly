@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { 
-  SafeAreaView, 
-  ScrollView, 
-  View, 
-  Text, 
+import {
+  SafeAreaView,
+  ScrollView,
+  View,
+  Text,
   TouchableOpacity,
   Switch,
-  TextInput
+  TextInput,
 } from 'react-native';
 import { router } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -43,14 +43,14 @@ const defaultSettings: EmergencySettings = {
     medical: true,
     security: true,
     natural: true,
-    maintenance: false
+    maintenance: false,
   },
   escalationEnabled: true,
   escalationDelay: 15,
   backupContact: '',
   locationSharing: false,
   soundAlerts: true,
-  vibrationAlerts: true
+  vibrationAlerts: true,
 };
 
 export default function EmergencySettingsPage() {
@@ -75,14 +75,20 @@ export default function EmergencySettingsPage() {
 
   const saveSettings = async () => {
     // Validate backup contact if provided
-    if (settings.backupContact && !validateIndianPhoneNumber(settings.backupContact)) {
+    if (
+      settings.backupContact &&
+      !validateIndianPhoneNumber(settings.backupContact)
+    ) {
       setPhoneError('Please enter a valid Indian mobile number');
       return;
     }
 
     try {
       setIsSaving(true);
-      await AsyncStorage.setItem('emergency_settings', JSON.stringify(settings));
+      await AsyncStorage.setItem(
+        'emergency_settings',
+        JSON.stringify(settings),
+      );
       showSuccessAlert('Success', 'Emergency settings updated successfully');
     } catch (error) {
       showErrorAlert('Error', 'Failed to save settings');
@@ -92,19 +98,22 @@ export default function EmergencySettingsPage() {
   };
 
   const handleToggle = (key: keyof EmergencySettings, value: boolean) => {
-    setSettings(prev => ({ ...prev, [key]: value }));
+    setSettings((prev) => ({ ...prev, [key]: value }));
   };
 
-  const handleAlertTypeToggle = (type: keyof EmergencySettings['alertTypes'], value: boolean) => {
-    setSettings(prev => ({
+  const handleAlertTypeToggle = (
+    type: keyof EmergencySettings['alertTypes'],
+    value: boolean,
+  ) => {
+    setSettings((prev) => ({
       ...prev,
-      alertTypes: { ...prev.alertTypes, [type]: value }
+      alertTypes: { ...prev.alertTypes, [type]: value },
     }));
   };
 
   const handleBackupContactChange = (text: string) => {
     const cleaned = text.replace(/[^0-9]/g, '');
-    setSettings(prev => ({ ...prev, backupContact: cleaned }));
+    setSettings((prev) => ({ ...prev, backupContact: cleaned }));
     setPhoneError('');
   };
 
@@ -113,15 +122,35 @@ export default function EmergencySettingsPage() {
     { value: 10, label: '10 minutes' },
     { value: 15, label: '15 minutes' },
     { value: 30, label: '30 minutes' },
-    { value: 60, label: '1 hour' }
+    { value: 60, label: '1 hour' },
   ];
 
   const alertTypeLabels = {
-    fire: { name: 'Fire Emergency', icon: '🔥', description: 'Fire outbreaks and smoke detection' },
-    medical: { name: 'Medical Emergency', icon: '🚑', description: 'Health emergencies and medical assistance' },
-    security: { name: 'Security Alert', icon: '🚨', description: 'Security breaches and safety concerns' },
-    natural: { name: 'Natural Disaster', icon: '🌪️', description: 'Earthquakes, floods, and weather alerts' },
-    maintenance: { name: 'Critical Maintenance', icon: '⚠️', description: 'Urgent maintenance and infrastructure issues' }
+    fire: {
+      name: 'Fire Emergency',
+      icon: '🔥',
+      description: 'Fire outbreaks and smoke detection',
+    },
+    medical: {
+      name: 'Medical Emergency',
+      icon: '🚑',
+      description: 'Health emergencies and medical assistance',
+    },
+    security: {
+      name: 'Security Alert',
+      icon: '🚨',
+      description: 'Security breaches and safety concerns',
+    },
+    natural: {
+      name: 'Natural Disaster',
+      icon: '🌪️',
+      description: 'Earthquakes, floods, and weather alerts',
+    },
+    maintenance: {
+      name: 'Critical Maintenance',
+      icon: '⚠️',
+      description: 'Urgent maintenance and infrastructure issues',
+    },
   };
 
   return (
@@ -131,18 +160,17 @@ export default function EmergencySettingsPage() {
         onBackPress={() => safeGoBack()}
       />
 
-      <ScrollView 
-        className="flex-1" 
+      <ScrollView
+        className="flex-1"
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ padding: 16, paddingBottom: 100 }}
-      >
+        contentContainerStyle={{ padding: 16, paddingBottom: 100 }}>
         {/* Main Alert Settings */}
         <Card className="mb-4">
           <View className="p-4">
             <Text className="text-headline-small font-semibold text-text-primary mb-4">
               Alert Preferences
             </Text>
-            
+
             <View className="space-y-4">
               <View className="flex-row items-center justify-between">
                 <View className="flex-1 mr-4">
@@ -155,7 +183,9 @@ export default function EmergencySettingsPage() {
                 </View>
                 <Switch
                   value={settings.receiveAlerts}
-                  onValueChange={(value) => handleToggle('receiveAlerts', value)}
+                  onValueChange={(value) =>
+                    handleToggle('receiveAlerts', value)
+                  }
                   trackColor={{ false: '#D1D5DB', true: '#6366f1' }}
                   thumbColor={settings.receiveAlerts ? '#FFFFFF' : '#757575'}
                 />
@@ -189,7 +219,9 @@ export default function EmergencySettingsPage() {
                 </View>
                 <Switch
                   value={settings.vibrationAlerts}
-                  onValueChange={(value) => handleToggle('vibrationAlerts', value)}
+                  onValueChange={(value) =>
+                    handleToggle('vibrationAlerts', value)
+                  }
                   trackColor={{ false: '#D1D5DB', true: '#6366f1' }}
                   thumbColor={settings.vibrationAlerts ? '#FFFFFF' : '#757575'}
                 />
@@ -205,10 +237,12 @@ export default function EmergencySettingsPage() {
               <Text className="text-headline-small font-semibold text-text-primary mb-4">
                 Alert Types
               </Text>
-              
+
               <View className="space-y-3">
                 {Object.entries(alertTypeLabels).map(([key, label]) => (
-                  <View key={key} className="flex-row items-center justify-between">
+                  <View
+                    key={key}
+                    className="flex-row items-center justify-between">
                     <View className="flex-1 mr-4">
                       <View className="flex-row items-center mb-1">
                         <Text className="text-lg mr-2">{label.icon}</Text>
@@ -221,10 +255,25 @@ export default function EmergencySettingsPage() {
                       </Text>
                     </View>
                     <Switch
-                      value={settings.alertTypes[key as keyof typeof settings.alertTypes]}
-                      onValueChange={(value) => handleAlertTypeToggle(key as keyof typeof settings.alertTypes, value)}
+                      value={
+                        settings.alertTypes[
+                          key as keyof typeof settings.alertTypes
+                        ]
+                      }
+                      onValueChange={(value) =>
+                        handleAlertTypeToggle(
+                          key as keyof typeof settings.alertTypes,
+                          value,
+                        )
+                      }
                       trackColor={{ false: '#D1D5DB', true: '#6366f1' }}
-                      thumbColor={settings.alertTypes[key as keyof typeof settings.alertTypes] ? '#FFFFFF' : '#757575'}
+                      thumbColor={
+                        settings.alertTypes[
+                          key as keyof typeof settings.alertTypes
+                        ]
+                          ? '#FFFFFF'
+                          : '#757575'
+                      }
                     />
                   </View>
                 ))}
@@ -239,7 +288,7 @@ export default function EmergencySettingsPage() {
             <Text className="text-headline-small font-semibold text-text-primary mb-4">
               Escalation Settings
             </Text>
-            
+
             <View className="space-y-4">
               <View className="flex-row items-center justify-between">
                 <View className="flex-1 mr-4">
@@ -252,9 +301,13 @@ export default function EmergencySettingsPage() {
                 </View>
                 <Switch
                   value={settings.escalationEnabled}
-                  onValueChange={(value) => handleToggle('escalationEnabled', value)}
+                  onValueChange={(value) =>
+                    handleToggle('escalationEnabled', value)
+                  }
                   trackColor={{ false: '#D1D5DB', true: '#6366f1' }}
-                  thumbColor={settings.escalationEnabled ? '#FFFFFF' : '#757575'}
+                  thumbColor={
+                    settings.escalationEnabled ? '#FFFFFF' : '#757575'
+                  }
                 />
               </View>
 
@@ -267,16 +320,23 @@ export default function EmergencySettingsPage() {
                     {escalationDelayOptions.map((option) => (
                       <TouchableOpacity
                         key={option.value}
-                        onPress={() => setSettings(prev => ({ ...prev, escalationDelay: option.value }))}
+                        onPress={() =>
+                          setSettings((prev) => ({
+                            ...prev,
+                            escalationDelay: option.value,
+                          }))
+                        }
                         className={`p-3 rounded-lg border ${
                           settings.escalationDelay === option.value
                             ? 'border-primary bg-primary/10'
                             : 'border-divider bg-background'
-                        }`}
-                      >
-                        <Text className={`text-body-medium ${
-                          settings.escalationDelay === option.value ? 'text-primary font-medium' : 'text-text-primary'
                         }`}>
+                        <Text
+                          className={`text-body-medium ${
+                            settings.escalationDelay === option.value
+                              ? 'text-primary font-medium'
+                              : 'text-text-primary'
+                          }`}>
                           {option.label}
                         </Text>
                       </TouchableOpacity>
@@ -294,7 +354,7 @@ export default function EmergencySettingsPage() {
             <Text className="text-headline-small font-semibold text-text-primary mb-4">
               Backup Contact
             </Text>
-            
+
             <View className="mb-4">
               <Text className="text-body-medium font-medium text-text-primary mb-2">
                 Emergency Contact Number
@@ -316,7 +376,8 @@ export default function EmergencySettingsPage() {
                 </Text>
               ) : (
                 <Text className="text-text-secondary text-body-small mt-1">
-                  This contact will be notified if you don't respond to emergency alerts
+                  This contact will be notified if you don't respond to
+                  emergency alerts
                 </Text>
               )}
             </View>
@@ -332,7 +393,9 @@ export default function EmergencySettingsPage() {
               </View>
               <Switch
                 value={settings.locationSharing}
-                onValueChange={(value) => handleToggle('locationSharing', value)}
+                onValueChange={(value) =>
+                  handleToggle('locationSharing', value)
+                }
                 trackColor={{ false: '#D1D5DB', true: '#6366f1' }}
                 thumbColor={settings.locationSharing ? '#FFFFFF' : '#757575'}
               />
@@ -346,17 +409,15 @@ export default function EmergencySettingsPage() {
             🚨 Emergency Response
           </Text>
           <Text className="text-text-secondary text-body-small leading-5">
-            Emergency alerts are critical for your safety. Disabling certain alert types may put you at risk during actual emergencies. Please configure these settings carefully.
+            Emergency alerts are critical for your safety. Disabling certain
+            alert types may put you at risk during actual emergencies. Please
+            configure these settings carefully.
           </Text>
         </Card>
 
         {/* Save Button */}
-        <Button
-          variant="primary"
-          onPress={saveSettings}
-          disabled={isSaving}
-        >
-          {isSaving ? "Saving..." : "Save Settings"}
+        <Button variant="primary" onPress={saveSettings} disabled={isSaving}>
+          {isSaving ? 'Saving...' : 'Save Settings'}
         </Button>
       </ScrollView>
     </SafeAreaView>

@@ -5,7 +5,7 @@ import {
   TouchableOpacity,
   Text,
   FlatList,
-  TextInputProps
+  TextInputProps,
 } from 'react-native';
 import { User } from '@/types/community';
 import { getMentionSuggestions, insertMention } from '@/utils/mentions';
@@ -58,11 +58,11 @@ const MentionInput: React.FC<MentionInputProps> = ({
 
   const handleTextChange = (text: string) => {
     onChangeText(text);
-    
+
     // Check if user is typing a mention
     const beforeCursor = text.substring(0, cursorPosition);
     const atIndex = beforeCursor.lastIndexOf('@');
-    
+
     if (atIndex !== -1 && atIndex === beforeCursor.length - 1) {
       // Just typed @
       setMentionQuery('');
@@ -89,19 +89,19 @@ const MentionInput: React.FC<MentionInputProps> = ({
   const selectMention = (user: User) => {
     const username = user.name.replace(/\s/g, '');
     const result = insertMention(value, cursorPosition, username);
-    
+
     onChangeText(result.newText);
     setShowSuggestions(false);
     setMentionQuery('');
-    
+
     // Focus and set cursor position
     setTimeout(() => {
       textInputRef.current?.focus();
       textInputRef.current?.setNativeProps({
         selection: {
           start: result.newCursorPosition,
-          end: result.newCursorPosition
-        }
+          end: result.newCursorPosition,
+        },
       });
     }, 100);
   };
@@ -110,12 +110,13 @@ const MentionInput: React.FC<MentionInputProps> = ({
     <TouchableOpacity
       onPress={() => selectMention(user)}
       className="flex-row items-center px-4 py-3 bg-surface border-b border-divider"
-      activeOpacity={0.7}
-    >
+      activeOpacity={0.7}>
       <UserAvatar name={user.name} size="sm" />
       <View className="ml-3 flex-1">
         <Text className="text-text-primary font-semibold">{user.name}</Text>
-        <Text className="text-text-secondary text-sm">Flat {user.flatNumber}</Text>
+        <Text className="text-text-secondary text-sm">
+          Flat {user.flatNumber}
+        </Text>
       </View>
       <Text className="text-primary text-sm font-medium">
         @{user.name.replace(/\s/g, '')}
@@ -136,7 +137,7 @@ const MentionInput: React.FC<MentionInputProps> = ({
         editable={!disabled}
         {...textInputProps}
       />
-      
+
       {showSuggestions && suggestions.length > 0 && (
         <View className="absolute bottom-full left-0 right-0 bg-background border border-divider rounded-xl shadow-lg max-h-48 z-50">
           <View className="px-4 py-2 border-b border-divider">

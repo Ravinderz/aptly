@@ -61,16 +61,17 @@ export const Button: React.FC<ButtonProps> = ({
         buttonSizes[size],
         fullWidth && 'w-full',
         isDisabled && 'opacity-50',
-        className
+        className,
       )}
       onPress={onPress}
       disabled={isDisabled}
-      activeOpacity={0.8}
-    >
+      activeOpacity={0.8}>
       {loading && (
         <ActivityIndicator
           size="small"
-          color={variant === 'outline' || variant === 'ghost' ? '#6366f1' : '#FFFFFF'}
+          color={
+            variant === 'outline' || variant === 'ghost' ? '#6366f1' : '#FFFFFF'
+          }
           className="mr-2"
         />
       )}

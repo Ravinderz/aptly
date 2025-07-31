@@ -1,11 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { 
-  SafeAreaView, 
-  View, 
-  Text, 
-  TouchableOpacity
-} from 'react-native';
-import { router } from 'expo-router';
+import { SafeAreaView, View, Text, TouchableOpacity } from 'react-native';
 import LucideIcons from '@/components/ui/LucideIcons';
 import { showSuccessAlert, showErrorAlert } from '@/utils/alert';
 import { safeGoBack } from '@/utils/navigation';
@@ -26,15 +20,19 @@ import type {
   NotificationCampaign,
   NotificationPreference,
   IntelligentDelivery,
-  OptimizationRecommendation
+  OptimizationRecommendation,
 } from '@/types/analytics';
 
 // UI Components
 import { TabHeader } from '@/components/ui/headers';
 
 export default function AnalyticsPage() {
-  const [activeTab, setActiveTab] = useState<'dashboard' | 'audit' | 'notifications' | 'performance'>('dashboard');
-  const [userRole, setUserRole] = useState<'resident' | 'committee_member' | 'admin'>('resident');
+  const [activeTab, setActiveTab] = useState<
+    'dashboard' | 'audit' | 'notifications' | 'performance'
+  >('dashboard');
+  const [userRole, setUserRole] = useState<
+    'resident' | 'committee_member' | 'admin'
+  >('resident');
   const [currentUserId] = useState('user-123');
   const [isLoading, setIsLoading] = useState(true);
 
@@ -48,7 +46,7 @@ export default function AnalyticsPage() {
     notificationCampaigns: [] as NotificationCampaign[],
     userPreferences: [] as NotificationPreference[],
     intelligentDelivery: [] as IntelligentDelivery[],
-    optimizationRecommendations: [] as OptimizationRecommendation[]
+    optimizationRecommendations: [] as OptimizationRecommendation[],
   });
 
   useEffect(() => {
@@ -59,7 +57,7 @@ export default function AnalyticsPage() {
   const loadAnalyticsData = async () => {
     try {
       setIsLoading(true);
-      
+
       // Mock API calls - replace with real API calls
       const mockSocietyAnalytics: SocietyAnalytics = {
         societyId: 'society-1',
@@ -67,7 +65,7 @@ export default function AnalyticsPage() {
         reportPeriod: {
           startDate: '2024-01-01T00:00:00Z',
           endDate: '2024-01-31T23:59:59Z',
-          type: 'monthly'
+          type: 'monthly',
         },
         generatedAt: '2024-01-31T23:59:59Z',
         kpis: {
@@ -85,7 +83,7 @@ export default function AnalyticsPage() {
           digitalAdoptionRate: 73.6,
           emergencyResponseTime: 8.5,
           securityIncidentRate: 0.8,
-          visitorComplianceRate: 94.2
+          visitorComplianceRate: 94.2,
         },
         operationalMetrics: {
           maintenance: {
@@ -93,13 +91,13 @@ export default function AnalyticsPage() {
             completedRequests: 42,
             averageResolutionTime: 4.2,
             requestsByCategory: {
-              'Plumbing': 18,
-              'Electrical': 12,
-              'Painting': 8,
-              'Other': 7
+              Plumbing: 18,
+              Electrical: 12,
+              Painting: 8,
+              Other: 7,
             },
             residentSatisfactionRating: 4.1,
-            costPerRequest: 1850
+            costPerRequest: 1850,
           },
           visitorManagement: {
             totalVisitors: 287,
@@ -109,25 +107,37 @@ export default function AnalyticsPage() {
             securityIncidents: 2,
             peakVisitorHours: [
               { startHour: 18, endHour: 20, value: 45 },
-              { startHour: 10, endHour: 12, value: 32 }
-            ]
+              { startHour: 10, endHour: 12, value: 32 },
+            ],
           },
           amenityUtilization: {
             bookingRate: 68.5,
             noShowRate: 8.2,
             averageBookingDuration: 2.5,
             mostPopularAmenities: [
-              { amenityId: 'gym', amenityName: 'Gymnasium', bookingCount: 124, revenue: 6200, rating: 4.3 },
-              { amenityId: 'hall', amenityName: 'Community Hall', bookingCount: 18, revenue: 9000, rating: 4.7 }
+              {
+                amenityId: 'gym',
+                amenityName: 'Gymnasium',
+                bookingCount: 124,
+                revenue: 6200,
+                rating: 4.3,
+              },
+              {
+                amenityId: 'hall',
+                amenityName: 'Community Hall',
+                bookingCount: 18,
+                revenue: 9000,
+                rating: 4.7,
+              },
             ],
-            revenueGenerated: 15200
+            revenueGenerated: 15200,
           },
           communication: {
             noticeReadRate: 76.8,
             notificationDeliveryRate: 98.2,
             communityPostEngagement: 34.5,
-            averageResponseTime: 3.2
-          }
+            averageResponseTime: 3.2,
+          },
         },
         financialAnalytics: {
           collections: {
@@ -136,61 +146,96 @@ export default function AnalyticsPage() {
             outstandingAmount: 390000,
             collectionTrend: [
               { timestamp: '2024-01-01', value: 4675000 },
-              { timestamp: '2024-01-15', value: 4750000 }
+              { timestamp: '2024-01-15', value: 4750000 },
             ],
             paymentMethodBreakdown: [
-              { method: 'Online', count: 89, percentage: 62.7, averageAmount: 4200 },
-              { method: 'Cash', count: 35, percentage: 24.6, averageAmount: 3800 },
-              { method: 'Cheque', count: 18, percentage: 12.7, averageAmount: 5500 }
-            ]
+              {
+                method: 'Online',
+                count: 89,
+                percentage: 62.7,
+                averageAmount: 4200,
+              },
+              {
+                method: 'Cash',
+                count: 35,
+                percentage: 24.6,
+                averageAmount: 3800,
+              },
+              {
+                method: 'Cheque',
+                count: 18,
+                percentage: 12.7,
+                averageAmount: 5500,
+              },
+            ],
           },
           expenses: {
             totalExpenses: 3890000,
             expenseByCategory: [
-              { category: 'Maintenance', amount: 1560000, percentage: 40.1, trend: 'up' },
-              { category: 'Security', amount: 980000, percentage: 25.2, trend: 'stable' },
-              { category: 'Utilities', amount: 750000, percentage: 19.3, trend: 'down' },
-              { category: 'Administration', amount: 600000, percentage: 15.4, trend: 'stable' }
+              {
+                category: 'Maintenance',
+                amount: 1560000,
+                percentage: 40.1,
+                trend: 'up',
+              },
+              {
+                category: 'Security',
+                amount: 980000,
+                percentage: 25.2,
+                trend: 'stable',
+              },
+              {
+                category: 'Utilities',
+                amount: 750000,
+                percentage: 19.3,
+                trend: 'down',
+              },
+              {
+                category: 'Administration',
+                amount: 600000,
+                percentage: 15.4,
+                trend: 'stable',
+              },
             ],
             budgetVariance: -5.2,
             costPerSqFt: 42.5,
             expenseTrend: [
               { timestamp: '2024-01-01', value: 3890000 },
-              { timestamp: '2024-01-15', value: 3920000 }
-            ]
+              { timestamp: '2024-01-15', value: 3920000 },
+            ],
           },
           revenue: {
             utilityBillCommissions: 45000,
             amenityBookingRevenue: 15200,
             parkingFees: 28000,
             otherRevenues: 12000,
-            revenueGrowthRate: 8.3
+            revenueGrowthRate: 8.3,
           },
           healthIndicators: {
             cashFlowRatio: 1.24,
             debtToAssetRatio: 0.15,
             emergencyFundRatio: 0.18,
-            collectionConsistency: 0.92
-          }
+            collectionConsistency: 0.92,
+          },
         },
         governanceMetrics: {
           democraticParticipation: {
             votingParticipationRate: 72.4,
             policyProposalEngagement: 45.8,
             meetingAttendance: 38.2,
-            feedbackResponseRate: 56.7
+            feedbackResponseRate: 56.7,
           },
           leadership: {
             decisionMakingSpeed: 5.2,
             implementationSuccess: 84.6,
             residentApprovalRating: 4.1,
-            transparencyScore: 7.8
+            transparencyScore: 7.8,
           },
           compliance: {
             policyComplianceRate: 91.5,
             regulatoryAdherence: 96.8,
             auditFindings: [],
-            correctionTime: 3.5
+            correctionTime: 3.5,
           },
           emergencyPreparedness: {
             responseReadiness: 87.2,
@@ -200,10 +245,10 @@ export default function AnalyticsPage() {
               operational: 23,
               needsMaintenance: 2,
               outOfService: 0,
-              lastInspection: '2024-01-15T10:00:00Z'
+              lastInspection: '2024-01-15T10:00:00Z',
             },
-            contactUpdatedRate: 89.3
-          }
+            contactUpdatedRate: 89.3,
+          },
         },
         communityMetrics: {
           engagement: {
@@ -212,21 +257,21 @@ export default function AnalyticsPage() {
             weeklyActiveUsers: 78,
             monthlyActiveUsers: 104,
             engagementRate: 34.7,
-            sessionDuration: 12.5
+            sessionDuration: 12.5,
           },
           communication: {
             postsPerUser: 2.8,
             commentsPerPost: 4.3,
             likesPerPost: 12.7,
             mentionsPerUser: 1.6,
-            responsiveness: 76.4
+            responsiveness: 76.4,
           },
           communityHealth: {
             conflictResolutionRate: 94.2,
             cooperationIndex: 0.82,
             diversityIndex: 0.67,
             inclusionScore: 7.4,
-            wellbeingIndex: 7.8
+            wellbeingIndex: 7.8,
           },
           events: {
             eventAttendance: 42.1,
@@ -235,10 +280,10 @@ export default function AnalyticsPage() {
               positive: 68.4,
               negative: 12.7,
               neutral: 18.9,
-              overallScore: 0.74
+              overallScore: 0.74,
             },
-            recurringParticipants: 28
-          }
+            recurringParticipants: 28,
+          },
         },
         performanceInsights: [
           {
@@ -251,13 +296,16 @@ export default function AnalyticsPage() {
             trend: 'up',
             dataPoints: [
               { timestamp: '2024-01-01', value: 4.8 },
-              { timestamp: '2024-01-31', value: 4.2 }
+              { timestamp: '2024-01-31', value: 4.2 },
             ],
-            recommendations: ['Continue current practices', 'Consider hiring additional staff'],
+            recommendations: [
+              'Continue current practices',
+              'Consider hiring additional staff',
+            ],
             estimatedImprovement: 15,
             implementationEffort: 'low',
-            tags: ['maintenance', 'efficiency']
-          }
+            tags: ['maintenance', 'efficiency'],
+          },
         ],
         recommendations: [
           {
@@ -272,7 +320,7 @@ export default function AnalyticsPage() {
               currentValue: 73.6,
               projectedValue: 85.0,
               improvement: 11.4,
-              unit: 'percentage'
+              unit: 'percentage',
             },
             implementationSteps: [
               {
@@ -281,11 +329,17 @@ export default function AnalyticsPage() {
                 description: 'Conduct weekly app training for residents',
                 estimatedDuration: '2 weeks',
                 dependencies: [],
-                resources: ['Training materials', 'Volunteer trainers']
-              }
+                resources: ['Training materials', 'Volunteer trainers'],
+              },
             ],
             requiredResources: [
-              { type: 'human', name: 'Trainer', quantity: 2, unit: 'people', cost: 5000 }
+              {
+                type: 'human',
+                name: 'Trainer',
+                quantity: 2,
+                unit: 'people',
+                cost: 5000,
+              },
             ],
             timeframe: '4-6 weeks',
             successMetrics: [
@@ -293,18 +347,18 @@ export default function AnalyticsPage() {
                 metric: 'App Downloads',
                 target: 140,
                 measurementMethod: 'App store analytics',
-                frequency: 'weekly'
-              }
+                frequency: 'weekly',
+              },
             ],
             riskFactors: [
               {
                 risk: 'Low participation',
                 probability: 0.3,
                 impact: 'medium',
-                mitigation: 'Provide incentives for participation'
-              }
-            ]
-          }
+                mitigation: 'Provide incentives for participation',
+              },
+            ],
+          },
         ],
         trends: [
           {
@@ -315,9 +369,15 @@ export default function AnalyticsPage() {
             significance: 0.92,
             anomalies: [],
             forecast: [
-              { timestamp: '2024-02-28', value: 4.35, confidence: 0.85, upperBound: 4.5, lowerBound: 4.2 }
-            ]
-          }
+              {
+                timestamp: '2024-02-28',
+                value: 4.35,
+                confidence: 0.85,
+                upperBound: 4.5,
+                lowerBound: 4.2,
+              },
+            ],
+          },
         ],
         predictions: [
           {
@@ -327,8 +387,18 @@ export default function AnalyticsPage() {
             confidence: 0.88,
             timeHorizon: '3 months',
             influencingFactors: [
-              { name: 'Economic conditions', importance: 0.7, correlation: 0.65, trend: 'stable' },
-              { name: 'Digital payment adoption', importance: 0.8, correlation: 0.72, trend: 'up' }
+              {
+                name: 'Economic conditions',
+                importance: 0.7,
+                correlation: 0.65,
+                trend: 'stable',
+              },
+              {
+                name: 'Digital payment adoption',
+                importance: 0.8,
+                correlation: 0.72,
+                trend: 'up',
+              },
             ],
             scenarios: [
               {
@@ -336,12 +406,15 @@ export default function AnalyticsPage() {
                 description: 'High digital adoption',
                 probability: 0.3,
                 predictedOutcome: 96.5,
-                keyAssumptions: ['Successful training program', 'No economic downturn']
-              }
+                keyAssumptions: [
+                  'Successful training program',
+                  'No economic downturn',
+                ],
+              },
             ],
-            lastUpdated: '2024-01-31T23:59:59Z'
-          }
-        ]
+            lastUpdated: '2024-01-31T23:59:59Z',
+          },
+        ],
       };
 
       const mockSystemHealth: SystemHealth = {
@@ -353,7 +426,7 @@ export default function AnalyticsPage() {
             responseTime: 450,
             lastCheck: '2024-01-31T23:45:00Z',
             errorRate: 0.8,
-            dependencies: ['API Server', 'Database']
+            dependencies: ['API Server', 'Database'],
           },
           {
             component: 'API Server',
@@ -361,8 +434,8 @@ export default function AnalyticsPage() {
             responseTime: 850,
             lastCheck: '2024-01-31T23:45:00Z',
             errorRate: 2.1,
-            dependencies: ['Database', 'Payment Gateway']
-          }
+            dependencies: ['Database', 'Payment Gateway'],
+          },
         ],
         dependencies: [
           {
@@ -370,8 +443,8 @@ export default function AnalyticsPage() {
             status: 'healthy',
             latency: 680,
             availability: 99.8,
-            lastCheck: '2024-01-31T23:45:00Z'
-          }
+            lastCheck: '2024-01-31T23:45:00Z',
+          },
         ],
         resources: {
           cpu: {
@@ -380,7 +453,7 @@ export default function AnalyticsPage() {
             peak: 78,
             threshold: 80,
             unit: '%',
-            trend: 'stable'
+            trend: 'stable',
           },
           memory: {
             current: 68,
@@ -388,7 +461,7 @@ export default function AnalyticsPage() {
             peak: 85,
             threshold: 90,
             unit: '%',
-            trend: 'up'
+            trend: 'up',
           },
           storage: {
             current: 234,
@@ -396,7 +469,7 @@ export default function AnalyticsPage() {
             peak: 280,
             threshold: 500,
             unit: 'GB',
-            trend: 'up'
+            trend: 'up',
           },
           network: {
             current: 125,
@@ -404,8 +477,8 @@ export default function AnalyticsPage() {
             peak: 280,
             threshold: 1000,
             unit: 'Mbps',
-            trend: 'stable'
-          }
+            trend: 'stable',
+          },
         },
         activeAlerts: [
           {
@@ -414,8 +487,8 @@ export default function AnalyticsPage() {
             title: 'High API Response Time',
             description: 'API response time above normal threshold',
             component: 'API Server',
-            triggeredAt: '2024-01-31T22:30:00Z'
-          }
+            triggeredAt: '2024-01-31T22:30:00Z',
+          },
         ],
         recentIncidents: [
           {
@@ -426,14 +499,14 @@ export default function AnalyticsPage() {
             affectedServices: ['Billing System'],
             startTime: '2024-01-30T14:00:00Z',
             resolvedTime: '2024-01-30T14:45:00Z',
-            rootCause: 'Network congestion'
-          }
+            rootCause: 'Network congestion',
+          },
         ],
         uptime: 99.2,
         lastDowntime: '2024-01-30T14:00:00Z',
         mtbf: 720,
         mttr: 45,
-        lastUpdated: '2024-01-31T23:45:00Z'
+        lastUpdated: '2024-01-31T23:45:00Z',
       };
 
       setMockData({
@@ -445,12 +518,11 @@ export default function AnalyticsPage() {
         notificationCampaigns: [],
         userPreferences: [],
         intelligentDelivery: [],
-        optimizationRecommendations: []
+        optimizationRecommendations: [],
       });
 
       // Simulate checking user role (in real app, get from auth context)
       setUserRole('admin'); // or get from auth
-      
     } catch (error) {
       console.error('Failed to load analytics data:', error);
       showErrorAlert('Error', 'Failed to load analytics data');
@@ -463,13 +535,18 @@ export default function AnalyticsPage() {
   const handleExportReport = async (format: 'json' | 'csv' | 'pdf') => {
     try {
       console.log('Exporting report in format:', format);
-      showSuccessAlert('Success', `Report exported in ${format.toUpperCase()} format`);
+      showSuccessAlert(
+        'Success',
+        `Report exported in ${format.toUpperCase()} format`,
+      );
     } catch {
       showErrorAlert('Error', 'Failed to export report');
     }
   };
 
-  const handleCreateNotificationTemplate = async (template: Partial<NotificationTemplate>) => {
+  const handleCreateNotificationTemplate = async (
+    template: Partial<NotificationTemplate>,
+  ) => {
     try {
       console.log('Creating notification template:', template);
       showSuccessAlert('Success', 'Notification template created');
@@ -478,7 +555,9 @@ export default function AnalyticsPage() {
     }
   };
 
-  const handleCreateNotificationCampaign = async (campaign: Partial<NotificationCampaign>) => {
+  const handleCreateNotificationCampaign = async (
+    campaign: Partial<NotificationCampaign>,
+  ) => {
     try {
       console.log('Creating notification campaign:', campaign);
       showSuccessAlert('Success', 'Notification campaign created');
@@ -487,9 +566,15 @@ export default function AnalyticsPage() {
     }
   };
 
-  const handleUpdateNotificationPreferences = async (userId: string, preferences: Partial<NotificationPreference>) => {
+  const handleUpdateNotificationPreferences = async (
+    userId: string,
+    preferences: Partial<NotificationPreference>,
+  ) => {
     try {
-      console.log('Updating notification preferences:', { userId, preferences });
+      console.log('Updating notification preferences:', {
+        userId,
+        preferences,
+      });
       showSuccessAlert('Success', 'Preferences updated successfully');
     } catch {
       showErrorAlert('Error', 'Failed to update preferences');
@@ -527,7 +612,9 @@ export default function AnalyticsPage() {
     return (
       <SafeAreaView className="flex-1 bg-background">
         <View className="flex-1 items-center justify-center">
-          <Text className="text-body-large text-text-secondary">Loading analytics data...</Text>
+          <Text className="text-body-large text-text-secondary">
+            Loading analytics data...
+          </Text>
         </View>
       </SafeAreaView>
     );
@@ -540,10 +627,17 @@ export default function AnalyticsPage() {
           <AnalyticsDashboard
             societyAnalytics={mockData.societyAnalytics}
             onGenerateReport={async (period, categories) => {
-              console.log('Generate report for period:', period, 'categories:', categories);
+              console.log(
+                'Generate report for period:',
+                period,
+                'categories:',
+                categories,
+              );
               await handleExportReport('pdf');
             }}
-            onImplementRecommendation={async (id) => console.log('Implement recommendation:', id)}
+            onImplementRecommendation={async (id) =>
+              console.log('Implement recommendation:', id)
+            }
             currentUserId="current-user-id"
             userRole={userRole}
           />
@@ -553,8 +647,12 @@ export default function AnalyticsPage() {
         return (
           <AuditSystem
             auditLogs={mockData.auditEntries}
-            onExportLogs={async (query, format) => console.log('Export logs:', format)}
-            onGenerateReport={async (timeframe, categories) => console.log('Generate report:', timeframe)}
+            onExportLogs={async (query, format) =>
+              console.log('Export logs:', format)
+            }
+            onGenerateReport={async (timeframe, categories) =>
+              console.log('Generate report:', timeframe)
+            }
             currentUserId="current-user-id"
             userRole={userRole}
           />
@@ -609,25 +707,37 @@ export default function AnalyticsPage() {
         {[
           { key: 'dashboard', label: 'Overview', icon: 'analytics-outline' },
           { key: 'audit', label: 'Audit', icon: 'shield-checkmark-outline' },
-          { key: 'notifications', label: 'Notifications', icon: 'notifications-outline', count: mockData.notificationCampaigns.filter(c => c.status === 'running').length },
-          { key: 'performance', label: 'Performance', icon: 'speedometer-outline', count: mockData.systemHealth?.activeAlerts.length || 0 }
+          {
+            key: 'notifications',
+            label: 'Notifications',
+            icon: 'notifications-outline',
+            count: mockData.notificationCampaigns.filter(
+              (c) => c.status === 'running',
+            ).length,
+          },
+          {
+            key: 'performance',
+            label: 'Performance',
+            icon: 'speedometer-outline',
+            count: mockData.systemHealth?.activeAlerts.length || 0,
+          },
         ].map((tab) => (
           <TouchableOpacity
             key={tab.key}
             onPress={() => setActiveTab(tab.key as any)}
             className={`flex-1 p-3 border-b-2 ${
               activeTab === tab.key ? 'border-primary' : 'border-transparent'
-            }`}
-          >
+            }`}>
             <View className="items-center relative">
-              <LucideIcons 
-                name={tab.icon as any} 
-                size={18} 
-                color={activeTab === tab.key ? '#6366f1' : '#757575'} 
+              <LucideIcons
+                name={tab.icon as any}
+                size={18}
+                color={activeTab === tab.key ? '#6366f1' : '#757575'}
               />
-              <Text className={`text-label-small font-medium mt-1 ${
-                activeTab === tab.key ? 'text-primary' : 'text-text-secondary'
-              }`}>
+              <Text
+                className={`text-label-small font-medium mt-1 ${
+                  activeTab === tab.key ? 'text-primary' : 'text-text-secondary'
+                }`}>
                 {tab.label}
               </Text>
               {tab.count && tab.count > 0 && (
@@ -643,9 +753,7 @@ export default function AnalyticsPage() {
       </View>
 
       {/* Content */}
-      <View className="flex-1 bg-surface-secondary">
-        {renderContent()}
-      </View>
+      <View className="flex-1 bg-surface-secondary">{renderContent()}</View>
     </SafeAreaView>
   );
 }

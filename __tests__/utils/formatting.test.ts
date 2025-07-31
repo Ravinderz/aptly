@@ -13,32 +13,42 @@ import {
   formatAddress,
   formatVehicleNumber,
   getRelativeTime,
-  getInitials
+  getInitials,
 } from '../../utils/formatting';
 
 describe('Formatting Utils', () => {
   describe('formatCurrency', () => {
     test('should format currency with default options', () => {
       expect(formatCurrency(1000)).toBe('₹1,000');
-      expect(formatCurrency(1000.50)).toBe('₹1,000.50');
+      expect(formatCurrency(1000.5)).toBe('₹1,000.50');
       expect(formatCurrency(0)).toBe('₹0');
     });
 
     test('should format currency with custom options', () => {
       expect(formatCurrency(1000, { showSymbol: false })).toBe('1,000');
-      expect(formatCurrency(1000, { currency: 'USD', locale: 'en-US' })).toMatch(/\$1,000/);
+      expect(
+        formatCurrency(1000, { currency: 'USD', locale: 'en-US' }),
+      ).toMatch(/\$1,000/);
       expect(formatCurrency(1000.567, { decimalPlaces: 1 })).toBe('₹1,000.6');
     });
 
     test('should format currency with full form for lakhs', () => {
       expect(formatCurrency(500000, { showFullForm: true })).toBe('₹5 Lakhs');
       expect(formatCurrency(100000, { showFullForm: true })).toBe('₹1 Lakh');
-      expect(formatCurrency(515000, { showFullForm: true })).toBe('₹5.15 Lakhs');
+      expect(formatCurrency(515000, { showFullForm: true })).toBe(
+        '₹5.15 Lakhs',
+      );
       expect(formatCurrency(99000, { showFullForm: true })).toBe('₹99,000'); // Under 1 lakh
     });
 
     test('should handle USD currency format', () => {
-      expect(formatCurrency(1000, { currency: 'USD', locale: 'en-US', showSymbol: false })).toBe('1,000');
+      expect(
+        formatCurrency(1000, {
+          currency: 'USD',
+          locale: 'en-US',
+          showSymbol: false,
+        }),
+      ).toBe('1,000');
     });
 
     test('should handle decimals option', () => {
@@ -66,8 +76,12 @@ describe('Formatting Utils', () => {
     });
 
     test('should handle different formats', () => {
-      expect(formatPhoneNumber('9876543210', 'IN', { format: 'national' })).toBe('98765 43210');
-      expect(formatPhoneNumber('9876543210', 'IN', { format: 'dots' })).toBe('987.654.3210');
+      expect(
+        formatPhoneNumber('9876543210', 'IN', { format: 'national' }),
+      ).toBe('98765 43210');
+      expect(formatPhoneNumber('9876543210', 'IN', { format: 'dots' })).toBe(
+        '987.654.3210',
+      );
     });
   });
 
@@ -94,14 +108,14 @@ describe('Formatting Utils', () => {
     test('should format recent times', () => {
       const now = new Date();
       const fiveMinutesAgo = new Date(now.getTime() - 5 * 60 * 1000);
-      
+
       expect(formatRelativeTime(fiveMinutesAgo)).toBe('5 minutes ago');
     });
 
     test('should format older times', () => {
       const now = new Date();
       const yesterday = new Date(now.getTime() - 24 * 60 * 60 * 1000);
-      
+
       expect(formatRelativeTime(yesterday)).toBe('1 day ago');
     });
   });
@@ -160,7 +174,9 @@ describe('Formatting Utils', () => {
 
     test('should handle custom ellipsis', () => {
       expect(truncateText(longText, 20, '...')).toBe('This is a very lo...');
-      expect(truncateText(longText, 20, ' [more]')).toBe('This is a ver [more]');
+      expect(truncateText(longText, 20, ' [more]')).toBe(
+        'This is a ver [more]',
+      );
     });
   });
 
@@ -175,7 +191,9 @@ describe('Formatting Utils', () => {
   describe('capitalizeWords', () => {
     test('should capitalize all words', () => {
       expect(capitalizeWords('hello world')).toBe('Hello World');
-      expect(capitalizeWords('the quick brown fox')).toBe('The Quick Brown Fox');
+      expect(capitalizeWords('the quick brown fox')).toBe(
+        'The Quick Brown Fox',
+      );
     });
 
     test('should handle edge cases', () => {
@@ -192,11 +210,13 @@ describe('Formatting Utils', () => {
         city: 'Mumbai',
         state: 'Maharashtra',
         pincode: '400001',
-        country: 'India'
+        country: 'India',
       };
 
       const formatted = formatAddress(address);
-      expect(formatted).toBe('123 Main Street, Apartment 4B, Mumbai, Maharashtra 400001, India');
+      expect(formatted).toBe(
+        '123 Main Street, Apartment 4B, Mumbai, Maharashtra 400001, India',
+      );
     });
 
     test('should handle partial addresses', () => {
@@ -204,7 +224,7 @@ describe('Formatting Utils', () => {
         line1: '123 Main Street',
         city: 'Mumbai',
         state: 'Maharashtra',
-        pincode: '400001'
+        pincode: '400001',
       };
 
       const formatted = formatAddress(address, { includeCountry: false });
@@ -233,28 +253,44 @@ describe('Formatting Utils', () => {
 
     test('should handle invalid lengths', () => {
       expect(formatVehicleNumber('ABC123')).toBe('ABC123'); // Too short
-      expect(formatVehicleNumber('VERYLONGVEHICLENUMBER')).toBe('VERYLONGVEHICLENUMBER'); // Too long
+      expect(formatVehicleNumber('VERYLONGVEHICLENUMBER')).toBe(
+        'VERYLONGVEHICLENUMBER',
+      ); // Too long
     });
   });
 
   describe('getRelativeTime', () => {
     test('should format relative time correctly', () => {
       const now = new Date();
-      
+
       // Just now
-      expect(getRelativeTime(new Date(now.getTime() - 30 * 1000))).toBe('Just now');
-      
+      expect(getRelativeTime(new Date(now.getTime() - 30 * 1000))).toBe(
+        'Just now',
+      );
+
       // Minutes ago
-      expect(getRelativeTime(new Date(now.getTime() - 5 * 60 * 1000))).toBe('5 minutes ago');
-      expect(getRelativeTime(new Date(now.getTime() - 1 * 60 * 1000))).toBe('1 minute ago');
-      
+      expect(getRelativeTime(new Date(now.getTime() - 5 * 60 * 1000))).toBe(
+        '5 minutes ago',
+      );
+      expect(getRelativeTime(new Date(now.getTime() - 1 * 60 * 1000))).toBe(
+        '1 minute ago',
+      );
+
       // Hours ago
-      expect(getRelativeTime(new Date(now.getTime() - 2 * 60 * 60 * 1000))).toBe('2 hours ago');
-      expect(getRelativeTime(new Date(now.getTime() - 1 * 60 * 60 * 1000))).toBe('1 hour ago');
-      
+      expect(
+        getRelativeTime(new Date(now.getTime() - 2 * 60 * 60 * 1000)),
+      ).toBe('2 hours ago');
+      expect(
+        getRelativeTime(new Date(now.getTime() - 1 * 60 * 60 * 1000)),
+      ).toBe('1 hour ago');
+
       // Days ago
-      expect(getRelativeTime(new Date(now.getTime() - 1 * 24 * 60 * 60 * 1000))).toBe('1 day ago');
-      expect(getRelativeTime(new Date(now.getTime() - 3 * 24 * 60 * 60 * 1000))).toBe('3 days ago');
+      expect(
+        getRelativeTime(new Date(now.getTime() - 1 * 24 * 60 * 60 * 1000)),
+      ).toBe('1 day ago');
+      expect(
+        getRelativeTime(new Date(now.getTime() - 3 * 24 * 60 * 60 * 1000)),
+      ).toBe('3 days ago');
     });
 
     test('should use formatDate for week+ old dates', () => {
@@ -306,7 +342,7 @@ describe('Formatting Utils', () => {
         line2: '',
         city: 'Mumbai',
         state: '',
-        pincode: '400001'
+        pincode: '400001',
       };
       expect(formatAddress(address)).toBe('123 Main Street, Mumbai, 400001');
     });

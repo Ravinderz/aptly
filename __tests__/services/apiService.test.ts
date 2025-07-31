@@ -19,10 +19,12 @@ jest.mock('../../services/auth.service', () => ({
 // Mock NetInfo
 jest.mock('@react-native-community/netinfo', () => ({
   addEventListener: jest.fn(() => jest.fn()),
-  fetch: jest.fn(() => Promise.resolve({
-    isConnected: true,
-    isInternetReachable: true,
-  })),
+  fetch: jest.fn(() =>
+    Promise.resolve({
+      isConnected: true,
+      isInternetReachable: true,
+    }),
+  ),
 }));
 
 describe('APIService', () => {
@@ -32,7 +34,7 @@ describe('APIService', () => {
   beforeEach(() => {
     // Reset all mocks
     jest.clearAllMocks();
-    
+
     // Mock axios instance - simplified for makeRequest testing
     mockAxiosInstance = jest.fn();
     mockAxiosInstance.interceptors = {
@@ -42,7 +44,7 @@ describe('APIService', () => {
     mockAxiosInstance.defaults = { headers: { common: {} } };
 
     mockedAxios.create.mockReturnValue(mockAxiosInstance);
-    
+
     // Get fresh instance
     apiService = APIService.getInstance();
   });
@@ -68,14 +70,14 @@ describe('APIService', () => {
 
       expect(mockAxiosInstance).toHaveBeenCalledWith({
         method: 'GET',
-        url: '/auth/me'
+        url: '/auth/me',
       });
       expect(result).toEqual(mockResponse.data);
     });
 
     test('should make POST request via registerPhone', async () => {
       const mockResponse = { data: { success: true }, status: 201 };
-      
+
       mockAxiosInstance.mockResolvedValue(mockResponse);
 
       const result = await apiService.registerPhone('9876543210', 'SOC123');
@@ -83,7 +85,7 @@ describe('APIService', () => {
       expect(mockAxiosInstance).toHaveBeenCalledWith({
         method: 'POST',
         url: '/auth/register-phone',
-        data: { phoneNumber: '9876543210', societyCode: 'SOC123' }
+        data: { phoneNumber: '9876543210', societyCode: 'SOC123' },
       });
       expect(result).toEqual(mockResponse.data);
     });
@@ -91,7 +93,7 @@ describe('APIService', () => {
     test('should make GET request with params via getMaintenanceRequests', async () => {
       const mockResponse = { data: { requests: [] }, status: 200 };
       const filters = { status: 'open' };
-      
+
       mockAxiosInstance.mockResolvedValue(mockResponse);
 
       const result = await apiService.getMaintenanceRequests(filters);
@@ -99,10 +101,11 @@ describe('APIService', () => {
       expect(mockAxiosInstance).toHaveBeenCalledWith({
         method: 'GET',
         url: '/services/maintenance',
-        params: filters
+        params: filters,
       });
       expect(result).toEqual(mockResponse.data);
     });
+  });
 
   describe('Error Handling', () => {
     test('should handle network errors via getCurrentUser', async () => {
@@ -111,12 +114,13 @@ describe('APIService', () => {
         message: 'Network Error',
         request: {},
       };
-      
+
       mockAxiosInstance.mockRejectedValue(networkError);
 
       await expect(apiService.getCurrentUser()).rejects.toMatchObject({
         code: 'NETWORK_ERROR',
-        message: 'Unable to connect to server. Please check your internet connection.',
+        message:
+          'Unable to connect to server. Please check your internet connection.',
         statusCode: 0,
         retryable: true,
       });
@@ -129,7 +133,7 @@ describe('APIService', () => {
           data: { message: 'Unauthorized' },
         },
       };
-      
+
       mockAxiosInstance.mockRejectedValue(unauthorizedError);
 
       await expect(apiService.getCurrentUser()).rejects.toMatchObject({
@@ -147,10 +151,12 @@ describe('APIService', () => {
           data: { message: 'Not Found' },
         },
       };
-      
+
       mockAxiosInstance.mockRejectedValue(notFoundError);
 
-      await expect(apiService.getMaintenanceRequest('invalid-id')).rejects.toMatchObject({
+      await expect(
+        apiService.getMaintenanceRequest('invalid-id'),
+      ).rejects.toMatchObject({
         code: 'HTTP_404',
         message: 'Not Found',
         statusCode: 404,
@@ -165,7 +171,7 @@ describe('APIService', () => {
           data: { message: 'Internal Server Error' },
         },
       };
-      
+
       mockAxiosInstance.mockRejectedValue(serverError);
 
       await expect(apiService.getBills()).rejects.toMatchObject({
@@ -191,7 +197,7 @@ describe('APIService', () => {
 
       expect(mockAxiosInstance).toHaveBeenCalledWith({
         method: 'GET',
-        url: '/services/billing/bills/bill-123'
+        url: '/services/billing/bills/bill-123',
       });
       expect(result).toEqual(mockResponse.data);
     });
@@ -230,7 +236,7 @@ describe('APIService', () => {
         },
         status: 200,
       };
-      
+
       mockAxiosInstance.mockResolvedValue(mockResponse);
 
       const result = await apiService.uploadFile('mock-file-uri', '/upload');
@@ -247,7 +253,7 @@ describe('APIService', () => {
           data: { message: 'Invalid file format' },
         },
       };
-      
+
       mockAxiosInstance.mockRejectedValue(uploadError);
 
       const result = await apiService.uploadFile('invalid-file', '/upload');

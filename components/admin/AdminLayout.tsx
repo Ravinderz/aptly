@@ -45,7 +45,7 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({
   onSettingsPress,
   onBackPress,
   customHeaderActions,
-  emergencyAlerts = 0
+  emergencyAlerts = 0,
 }) => {
   const { currentMode } = useAdmin();
 
@@ -55,12 +55,16 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({
   }
 
   const ContentComponent = scrollable ? ScrollView : View;
-  const contentProps = scrollable 
+  const contentProps = scrollable
     ? { showsVerticalScrollIndicator: false }
     : { style: { flex: 1 } };
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: adminStyles.container.backgroundColor }}>
+    <SafeAreaView
+      style={{
+        flex: 1,
+        backgroundColor: adminStyles.container.backgroundColor,
+      }}>
       {/* Header */}
       {headerType === 'full' ? (
         <AdminHeader
@@ -92,7 +96,9 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({
 
       {/* Bottom Navigation */}
       {showBottomNav && (
-        <QuickAdminNav onNavigate={(screen) => console.log(`Navigate to: ${screen}`)} />
+        <QuickAdminNav
+          onNavigate={(screen) => console.log(`Navigate to: ${screen}`)}
+        />
       )}
     </SafeAreaView>
   );
@@ -115,8 +121,7 @@ export const AdminDashboardLayout: React.FC<{
     onMenuPress={() => console.log('Open menu')}
     onSearchPress={() => console.log('Open search')}
     onNotificationPress={() => console.log('Open notifications')}
-    onSettingsPress={() => console.log('Open settings')}
-  >
+    onSettingsPress={() => console.log('Open settings')}>
     {children}
   </AdminLayout>
 );
@@ -140,21 +145,20 @@ export const AdminFormLayout: React.FC<{
             backgroundColor: 'rgba(245, 158, 11, 0.2)',
             paddingHorizontal: 12,
             paddingVertical: 6,
-            borderRadius: 6
+            borderRadius: 6,
           }}
-          onPress={onSave}
-        >
-          <Text style={{
-            color: '#f59e0b',
-            fontSize: 14,
-            fontWeight: '600'
-          }}>
+          onPress={onSave}>
+          <Text
+            style={{
+              color: '#f59e0b',
+              fontSize: 14,
+              fontWeight: '600',
+            }}>
             {saveText}
           </Text>
         </TouchableOpacity>
       ) : undefined
-    }
-  >
+    }>
     {children}
   </AdminLayout>
 );
@@ -166,7 +170,14 @@ export const AdminListLayout: React.FC<{
   onSearch?: () => void;
   onAdd?: () => void;
   addText?: string;
-}> = ({ children, title, showSearch = true, onSearch, onAdd, addText = 'Add' }) => (
+}> = ({
+  children,
+  title,
+  showSearch = true,
+  onSearch,
+  onAdd,
+  addText = 'Add',
+}) => (
   <AdminLayout
     headerType="full"
     title={title}
@@ -180,21 +191,20 @@ export const AdminListLayout: React.FC<{
             backgroundColor: 'rgba(245, 158, 11, 0.2)',
             paddingHorizontal: 12,
             paddingVertical: 6,
-            borderRadius: 6
+            borderRadius: 6,
           }}
-          onPress={onAdd}
-        >
-          <Text style={{
-            color: '#f59e0b',
-            fontSize: 14,
-            fontWeight: '600'
-          }}>
+          onPress={onAdd}>
+          <Text
+            style={{
+              color: '#f59e0b',
+              fontSize: 14,
+              fontWeight: '600',
+            }}>
             {addText}
           </Text>
         </TouchableOpacity>
       ) : undefined
-    }
-  >
+    }>
     {children}
   </AdminLayout>
 );

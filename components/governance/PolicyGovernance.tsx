@@ -1,14 +1,24 @@
 import React, { useState } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, TextInput } from 'react-native';
-import { showConfirmAlert, showSuccessAlert, showErrorAlert } from '@/utils/alert';
+import {
+  View,
+  Text,
+  ScrollView,
+  TouchableOpacity,
+  TextInput,
+} from 'react-native';
+import {
+  showConfirmAlert,
+  showSuccessAlert,
+  showErrorAlert,
+} from '@/utils/alert';
 import LucideIcons from '../ui/LucideIcons';
 import { router } from 'expo-router';
 
 // Types
-import type { 
-  PolicyProposal, 
+import type {
+  PolicyProposal,
   PolicyCategory,
-  PolicyStatus 
+  PolicyStatus,
 } from '../../types/governance';
 
 // UI Components
@@ -19,8 +29,15 @@ import { AlertCard } from '../ui/AlertCard';
 interface PolicyGovernanceProps {
   proposals: PolicyProposal[];
   onCreateProposal: (proposalData: any) => Promise<void>;
-  onReviewProposal: (proposalId: string, decision: string, notes: string) => Promise<void>;
-  onVoteOnProposal: (proposalId: string, vote: 'approve' | 'reject') => Promise<void>;
+  onReviewProposal: (
+    proposalId: string,
+    decision: string,
+    notes: string,
+  ) => Promise<void>;
+  onVoteOnProposal: (
+    proposalId: string,
+    vote: 'approve' | 'reject',
+  ) => Promise<void>;
   onCommentOnProposal: (proposalId: string, comment: string) => Promise<void>;
   currentUserId: string;
   userRole: 'resident' | 'committee_member' | 'admin';
@@ -33,21 +50,32 @@ export const PolicyGovernance: React.FC<PolicyGovernanceProps> = ({
   onVoteOnProposal,
   onCommentOnProposal,
   currentUserId,
-  userRole
+  userRole,
 }) => {
-  const [activeTab, setActiveTab] = useState<'active' | 'review' | 'voting' | 'implemented'>('active');
-  const [selectedProposal, setSelectedProposal] = useState<PolicyProposal | null>(null);
+  const [activeTab, setActiveTab] = useState<
+    'active' | 'review' | 'voting' | 'implemented'
+  >('active');
+  const [selectedProposal, setSelectedProposal] =
+    useState<PolicyProposal | null>(null);
   const [commentText, setCommentText] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const activeProposals = proposals.filter(p => p.status === 'submitted' || p.status === 'public_consultation');
-  const reviewProposals = proposals.filter(p => p.status === 'under_review');
-  const votingProposals = proposals.filter(p => p.status === 'voting');
-  const implementedProposals = proposals.filter(p => p.status === 'implemented');
+  const activeProposals = proposals.filter(
+    (p) => p.status === 'submitted' || p.status === 'public_consultation',
+  );
+  const reviewProposals = proposals.filter((p) => p.status === 'under_review');
+  const votingProposals = proposals.filter((p) => p.status === 'voting');
+  const implementedProposals = proposals.filter(
+    (p) => p.status === 'implemented',
+  );
 
-  const canCreateProposal = userRole === 'committee_member' || userRole === 'admin';
+  const canCreateProposal =
+    userRole === 'committee_member' || userRole === 'admin';
 
-  const handleVote = async (proposal: PolicyProposal, vote: 'approve' | 'reject') => {
+  const handleVote = async (
+    proposal: PolicyProposal,
+    vote: 'approve' | 'reject',
+  ) => {
     showConfirmAlert(
       'Confirm Vote',
       `Are you sure you want to ${vote} this policy proposal?`,
@@ -58,7 +86,7 @@ export const PolicyGovernance: React.FC<PolicyGovernanceProps> = ({
         } catch {
           showErrorAlert('Error', 'Failed to record your vote.');
         }
-      }
+      },
     );
   };
 
@@ -81,7 +109,9 @@ export const PolicyGovernance: React.FC<PolicyGovernanceProps> = ({
     const statusStyle = getStatusStyle(proposal.status);
     const categoryStyle = getCategoryStyle(proposal.category);
     const timeAgo = getTimeAgo(proposal.createdAt);
-    const userHasVoted = proposal.approvals.some(a => a.userId === currentUserId);
+    const userHasVoted = proposal.approvals.some(
+      (a) => a.userId === currentUserId,
+    );
 
     return (
       <Card key={proposal.id} className="mb-4">
@@ -92,13 +122,16 @@ export const PolicyGovernance: React.FC<PolicyGovernanceProps> = ({
               <Text className="text-headline-small font-semibold text-text-primary mb-1">
                 {proposal.title}
               </Text>
-              <Text className="text-body-medium text-text-secondary mb-2" numberOfLines={2}>
+              <Text
+                className="text-body-medium text-text-secondary mb-2"
+                numberOfLines={2}>
                 {proposal.description}
               </Text>
-              
+
               <View className="flex-row items-center gap-2">
                 <View className={`px-2 py-1 rounded-full ${categoryStyle.bg}`}>
-                  <Text className={`text-label-small font-medium ${categoryStyle.text}`}>
+                  <Text
+                    className={`text-label-small font-medium ${categoryStyle.text}`}>
                     {formatCategory(proposal.category)}
                   </Text>
                 </View>
@@ -107,9 +140,10 @@ export const PolicyGovernance: React.FC<PolicyGovernanceProps> = ({
                 </Text>
               </View>
             </View>
-            
+
             <View className={`px-2 py-1 rounded-full ${statusStyle.bg}`}>
-              <Text className={`text-label-small font-medium ${statusStyle.text}`}>
+              <Text
+                className={`text-label-small font-medium ${statusStyle.text}`}>
                 {proposal.status.toUpperCase()}
               </Text>
             </View>
@@ -124,7 +158,7 @@ export const PolicyGovernance: React.FC<PolicyGovernanceProps> = ({
                   Affects: {proposal.impact.affectedResidents} residents
                 </Text>
               </View>
-              
+
               {proposal.impact.financialImpact > 0 && (
                 <View className="flex-row items-center">
                   <LucideIcons name="dollar-sign" size={16} color="#757575" />
@@ -145,12 +179,16 @@ export const PolicyGovernance: React.FC<PolicyGovernanceProps> = ({
               {proposal.proposedChanges.slice(0, 2).map((change, index) => (
                 <View key={index} className="mb-2 last:mb-0">
                   <View className="flex-row items-center mb-1">
-                    <View className={`w-2 h-2 rounded-full mr-2 ${getChangeTypeStyle(change.changeType).bg}`} />
+                    <View
+                      className={`w-2 h-2 rounded-full mr-2 ${getChangeTypeStyle(change.changeType).bg}`}
+                    />
                     <Text className="text-body-small font-medium text-text-primary">
                       {change.section}
                     </Text>
                   </View>
-                  <Text className="text-body-small text-text-secondary ml-4" numberOfLines={2}>
+                  <Text
+                    className="text-body-small text-text-secondary ml-4"
+                    numberOfLines={2}>
                     {change.rationale}
                   </Text>
                 </View>
@@ -168,17 +206,22 @@ export const PolicyGovernance: React.FC<PolicyGovernanceProps> = ({
             <View className="mb-3">
               <View className="flex-row items-center justify-between mb-2">
                 <Text className="text-body-small font-medium text-text-primary">
-                  Approvals ({proposal.approvals.length}/{proposal.requiredApprovals})
+                  Approvals ({proposal.approvals.length}/
+                  {proposal.requiredApprovals})
                 </Text>
                 <Text className="text-body-small text-text-secondary">
-                  {((proposal.approvals.length / proposal.requiredApprovals) * 100).toFixed(0)}%
+                  {(
+                    (proposal.approvals.length / proposal.requiredApprovals) *
+                    100
+                  ).toFixed(0)}
+                  %
                 </Text>
               </View>
               <View className="h-2 bg-surface-secondary rounded-full">
-                <View 
-                  className="h-full bg-success rounded-full" 
-                  style={{ 
-                    width: `${Math.min((proposal.approvals.length / proposal.requiredApprovals) * 100, 100)}%` 
+                <View
+                  className="h-full bg-success rounded-full"
+                  style={{
+                    width: `${Math.min((proposal.approvals.length / proposal.requiredApprovals) * 100, 100)}%`,
                   }}
                 />
               </View>
@@ -194,8 +237,12 @@ export const PolicyGovernance: React.FC<PolicyGovernanceProps> = ({
               <ScrollView horizontal showsHorizontalScrollIndicator={false}>
                 <View className="flex-row gap-2">
                   {proposal.comments.slice(0, 3).map((comment) => (
-                    <View key={comment.id} className="w-48 bg-surface-secondary p-2 rounded">
-                      <Text className="text-body-small text-text-primary" numberOfLines={2}>
+                    <View
+                      key={comment.id}
+                      className="w-48 bg-surface-secondary p-2 rounded">
+                      <Text
+                        className="text-body-small text-text-primary"
+                        numberOfLines={2}>
                         {comment.content}
                       </Text>
                       <Text className="text-label-small text-text-secondary mt-1">
@@ -242,7 +289,7 @@ export const PolicyGovernance: React.FC<PolicyGovernanceProps> = ({
                 className="flex-1"
               />
             ) : null}
-            
+
             <Button
               title="Details"
               variant="ghost"
@@ -260,7 +307,9 @@ export const PolicyGovernance: React.FC<PolicyGovernanceProps> = ({
     if (!selectedProposal) return null;
 
     return (
-      <View className="absolute inset-0 bg-black/50 items-center justify-center p-4" style={{ zIndex: 1000 }}>
+      <View
+        className="absolute inset-0 bg-black/50 items-center justify-center p-4"
+        style={{ zIndex: 1000 }}>
         <View className="bg-surface-primary rounded-2xl max-h-[70%] w-full max-w-md">
           {/* Header */}
           <View className="p-4 border-b border-border-primary">
@@ -272,7 +321,9 @@ export const PolicyGovernance: React.FC<PolicyGovernanceProps> = ({
                 <LucideIcons name="x" size={24} color="#757575" />
               </TouchableOpacity>
             </View>
-            <Text className="text-body-medium text-text-secondary mt-1" numberOfLines={1}>
+            <Text
+              className="text-body-medium text-text-secondary mt-1"
+              numberOfLines={1}>
               {selectedProposal.title}
             </Text>
           </View>
@@ -319,7 +370,7 @@ export const PolicyGovernance: React.FC<PolicyGovernanceProps> = ({
                 className="flex-1"
               />
               <Button
-                title={isSubmitting ? "Submitting..." : "Submit Comment"}
+                title={isSubmitting ? 'Submitting...' : 'Submit Comment'}
                 variant="primary"
                 size="md"
                 onPress={() => handleComment(selectedProposal.id)}
@@ -338,10 +389,9 @@ export const PolicyGovernance: React.FC<PolicyGovernanceProps> = ({
 
     return (
       <Card className="mb-4">
-        <TouchableOpacity 
+        <TouchableOpacity
           onPress={() => router.push('/governance/policies/create')}
-          className="p-4 items-center"
-        >
+          className="p-4 items-center">
           <View className="w-16 h-16 bg-primary/10 rounded-full items-center justify-center mb-3">
             <LucideIcons name="file-text" size={32} color="#6366f1" />
           </View>
@@ -361,26 +411,27 @@ export const PolicyGovernance: React.FC<PolicyGovernanceProps> = ({
       active: {
         icon: 'file',
         title: 'No Active Proposals',
-        message: 'No policy proposals are currently open for discussion.'
+        message: 'No policy proposals are currently open for discussion.',
       },
       review: {
         icon: 'eye',
         title: 'No Proposals Under Review',
-        message: 'No proposals are currently being reviewed by the committee.'
+        message: 'No proposals are currently being reviewed by the committee.',
       },
       voting: {
         icon: 'vote',
         title: 'No Voting in Progress',
-        message: 'No policy proposals are currently open for voting.'
+        message: 'No policy proposals are currently open for voting.',
       },
       implemented: {
         icon: 'check-check',
         title: 'No Implemented Policies',
-        message: 'No policies have been implemented yet.'
-      }
+        message: 'No policies have been implemented yet.',
+      },
     };
 
-    const state = emptyStates[type as keyof typeof emptyStates] || emptyStates.active;
+    const state =
+      emptyStates[type as keyof typeof emptyStates] || emptyStates.active;
 
     return (
       <View className="items-center py-8">
@@ -413,28 +464,38 @@ export const PolicyGovernance: React.FC<PolicyGovernanceProps> = ({
           { key: 'active', label: 'Active', count: activeProposals.length },
           { key: 'review', label: 'Review', count: reviewProposals.length },
           { key: 'voting', label: 'Voting', count: votingProposals.length },
-          { key: 'implemented', label: 'Implemented', count: implementedProposals.length }
+          {
+            key: 'implemented',
+            label: 'Implemented',
+            count: implementedProposals.length,
+          },
         ].map((tab) => (
           <TouchableOpacity
             key={tab.key}
             onPress={() => setActiveTab(tab.key as any)}
             className={`flex-1 p-4 border-b-2 ${
               activeTab === tab.key ? 'border-primary' : 'border-transparent'
-            }`}
-          >
+            }`}>
             <View className="items-center">
-              <Text className={`text-body-small font-medium ${
-                activeTab === tab.key ? 'text-primary' : 'text-text-secondary'
-              }`}>
+              <Text
+                className={`text-body-small font-medium ${
+                  activeTab === tab.key ? 'text-primary' : 'text-text-secondary'
+                }`}>
                 {tab.label}
               </Text>
               {tab.count > 0 && (
-                <View className={`rounded-full px-2 py-1 mt-1 ${
-                  activeTab === tab.key ? 'bg-primary' : 'bg-surface-secondary'
-                }`}>
-                  <Text className={`text-label-small ${
-                    activeTab === tab.key ? 'text-white' : 'text-text-secondary'
+                <View
+                  className={`rounded-full px-2 py-1 mt-1 ${
+                    activeTab === tab.key
+                      ? 'bg-primary'
+                      : 'bg-surface-secondary'
                   }`}>
+                  <Text
+                    className={`text-label-small ${
+                      activeTab === tab.key
+                        ? 'text-white'
+                        : 'text-text-secondary'
+                    }`}>
                     {tab.count}
                   </Text>
                 </View>
@@ -450,41 +511,33 @@ export const PolicyGovernance: React.FC<PolicyGovernanceProps> = ({
           {activeTab === 'active' && (
             <View>
               {canCreateProposal && renderCreateProposalCard()}
-              {activeProposals.length > 0 ? (
-                activeProposals.map(renderProposalCard)
-              ) : (
-                renderEmptyState('active')
-              )}
+              {activeProposals.length > 0
+                ? activeProposals.map(renderProposalCard)
+                : renderEmptyState('active')}
             </View>
           )}
 
           {activeTab === 'review' && (
             <View>
-              {reviewProposals.length > 0 ? (
-                reviewProposals.map(renderProposalCard)
-              ) : (
-                renderEmptyState('review')
-              )}
+              {reviewProposals.length > 0
+                ? reviewProposals.map(renderProposalCard)
+                : renderEmptyState('review')}
             </View>
           )}
 
           {activeTab === 'voting' && (
             <View>
-              {votingProposals.length > 0 ? (
-                votingProposals.map(renderProposalCard)
-              ) : (
-                renderEmptyState('voting')
-              )}
+              {votingProposals.length > 0
+                ? votingProposals.map(renderProposalCard)
+                : renderEmptyState('voting')}
             </View>
           )}
 
           {activeTab === 'implemented' && (
             <View>
-              {implementedProposals.length > 0 ? (
-                implementedProposals.map(renderProposalCard)
-              ) : (
-                renderEmptyState('implemented')
-              )}
+              {implementedProposals.length > 0
+                ? implementedProposals.map(renderProposalCard)
+                : renderEmptyState('implemented')}
             </View>
           )}
         </View>
@@ -507,7 +560,7 @@ const getStatusStyle = (status: PolicyStatus) => {
     approved: { bg: 'bg-green-50', text: 'text-green-700' },
     rejected: { bg: 'bg-red-50', text: 'text-red-700' },
     implemented: { bg: 'bg-emerald-50', text: 'text-emerald-700' },
-    rolled_back: { bg: 'bg-red-50', text: 'text-red-700' }
+    rolled_back: { bg: 'bg-red-50', text: 'text-red-700' },
   };
   return styles[status] || styles.draft;
 };
@@ -524,7 +577,7 @@ const getCategoryStyle = (category: PolicyCategory) => {
     amenity: { bg: 'bg-pink-50', text: 'text-pink-700' },
     environmental: { bg: 'bg-emerald-50', text: 'text-emerald-700' },
     emergency: { bg: 'bg-red-50', text: 'text-red-700' },
-    governance: { bg: 'bg-indigo-50', text: 'text-indigo-700' }
+    governance: { bg: 'bg-indigo-50', text: 'text-indigo-700' },
   };
   return styles[category] || styles.governance;
 };
@@ -533,13 +586,13 @@ const getChangeTypeStyle = (type: string) => {
   const styles = {
     add: { bg: 'bg-green-500' },
     modify: { bg: 'bg-yellow-500' },
-    remove: { bg: 'bg-red-500' }
+    remove: { bg: 'bg-red-500' },
   };
   return styles[type as keyof typeof styles] || styles.modify;
 };
 
 const formatCategory = (category: PolicyCategory): string => {
-  return category.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+  return category.replace(/_/g, ' ').replace(/\b\w/g, (l) => l.toUpperCase());
 };
 
 const getTimeAgo = (dateString: string): string => {
@@ -547,7 +600,7 @@ const getTimeAgo = (dateString: string): string => {
   const date = new Date(dateString);
   const diffMs = now.getTime() - date.getTime();
   const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
-  
+
   if (diffDays === 0) return 'Today';
   if (diffDays === 1) return 'Yesterday';
   if (diffDays < 7) return `${diffDays}d ago`;

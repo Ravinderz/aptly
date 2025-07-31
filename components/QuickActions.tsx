@@ -1,18 +1,18 @@
-import { useRouter } from "expo-router";
-import React from "react";
-import { View } from "react-native";
-import QuickActionTouchableCard from "./ui/QuickActionTouchableCard";
-import SectionHeading from "./ui/SectionHeading";
+import { useRouter } from 'expo-router';
+import React from 'react';
+import { View } from 'react-native';
+import QuickActionTouchableCard from './ui/QuickActionTouchableCard';
+import SectionHeading from './ui/SectionHeading';
 
 const QuickActions = () => {
   const router = useRouter();
 
   const handleQuickActionPress = (action: string) => {
-    console.log("handleQuickActionPress", action);
+    console.log('handleQuickActionPress', action);
     // Handle the quick action press here
     // For example, navigate to a different screen or perform an action
     router.push({
-      pathname: "/(tabs)/visitor/addVisitor",
+      pathname: '/(tabs)/visitor/addVisitor',
       params: { action: action },
     });
   };
@@ -26,7 +26,7 @@ const QuickActions = () => {
             label="Add Visitor"
             icon="bookUser"
             color="#6366f1"
-            onPress={() => handleQuickActionPress("Add Visitor")}
+            onPress={() => handleQuickActionPress('Add Visitor')}
           />
         </View>
         <View className="flex-1">

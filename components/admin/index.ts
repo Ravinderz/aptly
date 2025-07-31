@@ -4,11 +4,11 @@
 export { AdminDashboard } from './AdminDashboard';
 export { AdminHeader, SimpleAdminHeader } from './AdminHeader';
 export { AdminNavigation, QuickAdminNav } from './AdminNavigation';
-export { 
+export {
   AdminLayout,
   AdminDashboardLayout,
   AdminFormLayout,
-  AdminListLayout
+  AdminListLayout,
 } from './AdminLayout';
 export { ModeToggle, HeaderModeIndicator } from './ModeToggle';
 
@@ -22,7 +22,7 @@ export { default as SecurityAdmin } from './SecurityAdmin';
 
 // Phase 7: Permission & Role-Based Components
 export { default as PermissionGate } from './PermissionGate';
-export { 
+export {
   default as RoleBasedRenderer,
   RoleVariants,
   ConditionalRender,
@@ -33,7 +33,7 @@ export {
   PermissionButton,
   RoleBadge,
   EscalationPath,
-  MultiSocietyRole
+  MultiSocietyRole,
 } from './RoleBasedRenderer';
 
 // Phase 7: Adaptive Layout & Navigation
@@ -51,7 +51,7 @@ export {
   SocietySelectorWidget,
   CrossSocietyAlert,
   MultiSocietyPerformance,
-  default as DashboardWidgets
+  default as DashboardWidgets,
 } from './DashboardWidgets';
 
 // Context and Utilities
@@ -71,11 +71,11 @@ export const Phase7Components = {
   SocietySelectorWidget,
   CrossSocietyAlert,
   MultiSocietyPerformance,
-  
+
   // Role-Specific Dashboards
   FinancialManager,
   SecurityAdmin,
-  
+
   // Permission-Based UI
   PermissionGate,
   RoleBasedRenderer,
@@ -87,14 +87,14 @@ export const Phase7Components = {
   RoleBadge,
   EscalationPath,
   MultiSocietyRole,
-  
+
   // Adaptive Layouts
   AdaptiveAdminLayout,
   DynamicNavigation,
-  
+
   // Utility Components
   PermissionButton,
-  withRoleContext
+  withRoleContext,
 };
 
 // Quick Access Categories
@@ -104,7 +104,7 @@ export const MultiSocietyComponents = {
   MultiSocietyComparison,
   SocietySelectorWidget,
   CrossSocietyAlert,
-  MultiSocietyPerformance
+  MultiSocietyPerformance,
 };
 
 export const RoleComponents = {
@@ -117,5 +117,5 @@ export const RoleComponents = {
   EscalationPath,
   SuperAdminOnly,
   CommunityManagerUp,
-  SubAdminOnly
+  SubAdminOnly,
 };

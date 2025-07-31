@@ -1,6 +1,19 @@
 import React, { useState, useEffect } from 'react';
-import { ScrollView, SafeAreaView, View, Text, RefreshControl, ActivityIndicator } from 'react-native';
-import { ArrowLeft, MessageSquare, Users, Calendar, MapPin } from 'lucide-react-native';
+import {
+  ScrollView,
+  SafeAreaView,
+  View,
+  Text,
+  RefreshControl,
+  ActivityIndicator,
+} from 'react-native';
+import {
+  ArrowLeft,
+  MessageSquare,
+  Users,
+  Calendar,
+  MapPin,
+} from 'lucide-react-native';
 import { router, useLocalSearchParams } from 'expo-router';
 import { Button } from '../../../../components/ui/Button';
 import PostCard from '../../../../components/ui/PostCard';
@@ -23,7 +36,7 @@ export default function UserProfile() {
     if (userId) {
       loadUserProfile();
     }
-  }, [userId]);
+  }, [userId, loadUserProfile]);
 
   const loadUserProfile = async () => {
     try {
@@ -31,9 +44,9 @@ export default function UserProfile() {
       const [userData, postsData, currentUserData] = await Promise.all([
         communityApi.getUser(userId!),
         communityApi.getUserPosts(userId!),
-        communityApi.getCurrentUser()
+        communityApi.getCurrentUser(),
       ]);
-      
+
       setUser(userData);
       setUserPosts(postsData);
       setCurrentUser(currentUserData);
@@ -52,11 +65,13 @@ export default function UserProfile() {
   };
 
   const handleLike = (postId: string, liked: boolean, likesCount: number) => {
-    setUserPosts(prev => prev.map(post => 
-      post.id === postId 
-        ? { ...post, isLikedByUser: liked, likesCount }
-        : post
-    ));
+    setUserPosts((prev) =>
+      prev.map((post) =>
+        post.id === postId
+          ? { ...post, isLikedByUser: liked, likesCount }
+          : post,
+      ),
+    );
   };
 
   const handleComment = (postId: string) => {
@@ -64,7 +79,7 @@ export default function UserProfile() {
   };
 
   const handleDeletePost = (postId: string) => {
-    setUserPosts(prev => prev.filter(post => post.id !== postId));
+    setUserPosts((prev) => prev.filter((post) => post.id !== postId));
   };
 
   const handleMentionPress = (mentionUserId: string) => {
@@ -92,8 +107,7 @@ export default function UserProfile() {
             variant="ghost"
             size="sm"
             onPress={() => router.back()}
-            className="mr-2 p-2"
-          >
+            className="mr-2 p-2">
             <ArrowLeft size={20} color="#6366f1" />
           </Button>
           <Text className="text-text-primary text-headline-large font-semibold">
@@ -101,7 +115,9 @@ export default function UserProfile() {
           </Text>
         </View>
         <View className="flex-1 items-center justify-center">
-          <Text className="text-text-secondary">This user profile could not be found.</Text>
+          <Text className="text-text-secondary">
+            This user profile could not be found.
+          </Text>
           <Button onPress={() => router.back()} className="mt-4">
             Go Back
           </Button>
@@ -118,8 +134,7 @@ export default function UserProfile() {
           variant="ghost"
           size="sm"
           onPress={() => router.back()}
-          className="mr-2 p-2"
-        >
+          className="mr-2 p-2">
           <ArrowLeft size={20} color="#6366f1" />
         </Button>
         <Text className="text-text-primary text-headline-large font-semibold">
@@ -127,13 +142,12 @@ export default function UserProfile() {
         </Text>
       </View>
 
-      <ScrollView 
+      <ScrollView
         className="flex-1"
         refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }
-        showsVerticalScrollIndicator={false}
-      >
+        showsVerticalScrollIndicator={false}>
         {/* Profile Header */}
         <Card className="m-4">
           <View className="items-center py-6">
@@ -165,9 +179,7 @@ export default function UserProfile() {
             <Text className="text-display-small font-bold text-text-primary mt-2">
               {userPosts.length}
             </Text>
-            <Text className="text-text-secondary text-label-medium">
-              Posts
-            </Text>
+            <Text className="text-text-secondary text-label-medium">Posts</Text>
           </Card>
 
           <Card className="flex-1 items-center p-4">

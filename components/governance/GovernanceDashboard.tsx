@@ -10,12 +10,12 @@ import { SuccessionManagement } from './SuccessionManagement';
 import { PolicyGovernance } from './PolicyGovernance';
 
 // Types
-import type { 
+import type {
   GovernanceDashboard as DashboardData,
   VotingCampaign,
   EmergencyAlert,
   SuccessionPlan,
-  PolicyProposal
+  PolicyProposal,
 } from '../../types/governance';
 
 // UI Components
@@ -40,20 +40,23 @@ export const GovernanceDashboard: React.FC<GovernanceDashboardProps> = ({
   successionPlan,
   policyProposals,
   currentUserId,
-  userRole
+  userRole,
 }) => {
-  const [activeSection, setActiveSection] = useState<'overview' | 'voting' | 'emergency' | 'succession' | 'policies'>('overview');
+  const [activeSection, setActiveSection] = useState<
+    'overview' | 'voting' | 'emergency' | 'succession' | 'policies'
+  >('overview');
 
-  const activeEmergencies = (emergencyAlerts || []).filter(alert => 
-    alert.status === 'active' || alert.status === 'escalated'
+  const activeEmergencies = (emergencyAlerts || []).filter(
+    (alert) => alert.status === 'active' || alert.status === 'escalated',
   );
 
-  const activeVoting = (votingCampaigns || []).filter(campaign => 
-    campaign.status === 'active'
+  const activeVoting = (votingCampaigns || []).filter(
+    (campaign) => campaign.status === 'active',
   );
 
-  const pendingPolicies = (policyProposals || []).filter(policy => 
-    policy.status === 'voting' || policy.status === 'public_consultation'
+  const pendingPolicies = (policyProposals || []).filter(
+    (policy) =>
+      policy.status === 'voting' || policy.status === 'public_consultation',
   );
 
   const renderOverview = () => (
@@ -72,14 +75,17 @@ export const GovernanceDashboard: React.FC<GovernanceDashboardProps> = ({
       {/* Quick Stats */}
       <View className="grid grid-cols-2 gap-3 mb-6">
         {/* Voting Stats */}
-        <TouchableOpacity 
+        <TouchableOpacity
           onPress={() => setActiveSection('voting')}
-          className="col-span-1"
-        >
+          className="col-span-1">
           <Card className="h-24">
             <View className="p-4 items-center justify-center h-full">
               <View className="flex-row items-center mb-1">
-                <LucideIcons name="checkmark-circle-outline" size={20} color="#6366f1" />
+                <LucideIcons
+                  name="checkmark-circle-outline"
+                  size={20}
+                  color="#6366f1"
+                />
                 <Text className="text-display-small font-bold text-primary ml-2">
                   {dashboardData.activeVotingCampaigns}
                 </Text>
@@ -97,21 +103,21 @@ export const GovernanceDashboard: React.FC<GovernanceDashboardProps> = ({
         </TouchableOpacity>
 
         {/* Emergency Stats */}
-        <TouchableOpacity 
+        <TouchableOpacity
           onPress={() => setActiveSection('emergency')}
-          className="col-span-1"
-        >
+          className="col-span-1">
           <Card className="h-24">
             <View className="p-4 items-center justify-center h-full">
               <View className="flex-row items-center mb-1">
-                <LucideIcons 
-                  name="alert-circle" 
-                  size={20} 
-                  color={activeEmergencies.length > 0 ? "#D32F2F" : "#4CAF50"} 
+                <LucideIcons
+                  name="alert-circle"
+                  size={20}
+                  color={activeEmergencies.length > 0 ? '#D32F2F' : '#4CAF50'}
                 />
-                <Text className={`text-display-small font-bold ml-2 ${
-                  activeEmergencies.length > 0 ? 'text-error' : 'text-success'
-                }`}>
+                <Text
+                  className={`text-display-small font-bold ml-2 ${
+                    activeEmergencies.length > 0 ? 'text-error' : 'text-success'
+                  }`}>
                   {dashboardData.activeEmergencies}
                 </Text>
               </View>
@@ -120,7 +126,10 @@ export const GovernanceDashboard: React.FC<GovernanceDashboardProps> = ({
               </Text>
               {dashboardData.lastEmergencyDate && (
                 <Text className="text-label-small text-text-secondary mt-1">
-                  Last: {new Date(dashboardData.lastEmergencyDate).toLocaleDateString()}
+                  Last:{' '}
+                  {new Date(
+                    dashboardData.lastEmergencyDate,
+                  ).toLocaleDateString()}
                 </Text>
               )}
             </View>
@@ -128,14 +137,17 @@ export const GovernanceDashboard: React.FC<GovernanceDashboardProps> = ({
         </TouchableOpacity>
 
         {/* Policy Stats */}
-        <TouchableOpacity 
+        <TouchableOpacity
           onPress={() => setActiveSection('policies')}
-          className="col-span-1"
-        >
+          className="col-span-1">
           <Card className="h-24">
             <View className="p-4 items-center justify-center h-full">
               <View className="flex-row items-center mb-1">
-                <LucideIcons name="document-text-outline" size={20} color="#FF9800" />
+                <LucideIcons
+                  name="document-text-outline"
+                  size={20}
+                  color="#FF9800"
+                />
                 <Text className="text-display-small font-bold text-warning ml-2">
                   {dashboardData.pendingPolicies}
                 </Text>
@@ -151,31 +163,40 @@ export const GovernanceDashboard: React.FC<GovernanceDashboardProps> = ({
         </TouchableOpacity>
 
         {/* Succession Stats */}
-        <TouchableOpacity 
+        <TouchableOpacity
           onPress={() => setActiveSection('succession')}
-          className="col-span-1"
-        >
+          className="col-span-1">
           <Card className="h-24">
             <View className="p-4 items-center justify-center h-full">
               <View className="flex-row items-center mb-1">
-                <LucideIcons 
-                  name="people-outline" 
-                  size={20} 
-                  color={dashboardData.succession.planExists ? "#4CAF50" : "#D32F2F"} 
+                <LucideIcons
+                  name="people-outline"
+                  size={20}
+                  color={
+                    dashboardData.succession.planExists ? '#4CAF50' : '#D32F2F'
+                  }
                 />
-                <Text className={`text-display-small font-bold ml-2 ${
-                  dashboardData.succession.planExists ? 'text-success' : 'text-error'
-                }`}>
+                <Text
+                  className={`text-display-small font-bold ml-2 ${
+                    dashboardData.succession.planExists
+                      ? 'text-success'
+                      : 'text-error'
+                  }`}>
                   {dashboardData.succession.deputiesAssigned}
                 </Text>
               </View>
               <Text className="text-body-small text-text-secondary text-center">
                 Deputies Assigned
               </Text>
-              <Text className={`text-label-small mt-1 ${
-                dashboardData.succession.planExists ? 'text-success' : 'text-error'
-              }`}>
-                {dashboardData.succession.planExists ? 'Plan Active' : 'No Plan'}
+              <Text
+                className={`text-label-small mt-1 ${
+                  dashboardData.succession.planExists
+                    ? 'text-success'
+                    : 'text-error'
+                }`}>
+                {dashboardData.succession.planExists
+                  ? 'Plan Active'
+                  : 'No Plan'}
               </Text>
             </View>
           </Card>
@@ -188,11 +209,15 @@ export const GovernanceDashboard: React.FC<GovernanceDashboardProps> = ({
           <Text className="text-headline-small font-semibold text-text-primary mb-3">
             Community Engagement
           </Text>
-          
+
           <View className="space-y-3">
             <View className="flex-row items-center justify-between">
               <View className="flex-row items-center">
-                <LucideIcons name="calendar-outline" size={16} color="#757575" />
+                <LucideIcons
+                  name="calendar-outline"
+                  size={16}
+                  color="#757575"
+                />
                 <Text className="text-body-medium text-text-secondary ml-2">
                   Events This Month
                 </Text>
@@ -201,7 +226,7 @@ export const GovernanceDashboard: React.FC<GovernanceDashboardProps> = ({
                 {dashboardData.communityEngagement.eventsThisMonth}
               </Text>
             </View>
-            
+
             <View className="flex-row items-center justify-between">
               <View className="flex-row items-center">
                 <LucideIcons name="people-outline" size={16} color="#757575" />
@@ -213,7 +238,7 @@ export const GovernanceDashboard: React.FC<GovernanceDashboardProps> = ({
                 {dashboardData.communityEngagement.averageAttendance}%
               </Text>
             </View>
-            
+
             <View className="flex-row items-center justify-between">
               <View className="flex-row items-center">
                 <LucideIcons name="star-outline" size={16} color="#757575" />
@@ -226,12 +251,16 @@ export const GovernanceDashboard: React.FC<GovernanceDashboardProps> = ({
                   {dashboardData.communityEngagement.satisfactionScore}/5
                 </Text>
                 <View className="flex-row">
-                  {[1,2,3,4,5].map(i => (
-                    <LucideIcons 
+                  {[1, 2, 3, 4, 5].map((i) => (
+                    <LucideIcons
                       key={i}
-                      name={i <= dashboardData.communityEngagement.satisfactionScore ? "star" : "star-outline"}
-                      size={12} 
-                      color="#FF9800" 
+                      name={
+                        i <= dashboardData.communityEngagement.satisfactionScore
+                          ? 'star'
+                          : 'star-outline'
+                      }
+                      size={12}
+                      color="#FF9800"
                     />
                   ))}
                 </View>
@@ -247,37 +276,34 @@ export const GovernanceDashboard: React.FC<GovernanceDashboardProps> = ({
           <Text className="text-headline-small font-semibold text-text-primary mb-3">
             Quick Actions
           </Text>
-          
+
           <View className="space-y-2">
             {activeVoting.length > 0 && (
               <Button
                 variant="primary"
                 size="md"
                 onPress={() => setActiveSection('voting')}
-                className="w-full"
-              >
+                className="w-full">
                 {`Vote in ${activeVoting.length} Campaign${activeVoting.length > 1 ? 's' : ''}`}
               </Button>
             )}
-            
+
             {pendingPolicies.length > 0 && (
               <Button
                 variant="secondary"
                 size="md"
                 onPress={() => setActiveSection('policies')}
-                className="w-full"
-              >
+                className="w-full">
                 {`Review ${pendingPolicies.length} Policy Proposal${pendingPolicies.length > 1 ? 's' : ''}`}
               </Button>
             )}
-            
+
             {(userRole === 'committee_member' || userRole === 'admin') && (
               <Button
                 variant="secondary"
                 size="md"
                 onPress={() => router.push('/governance/emergency/create')}
-                className="w-full"
-              >
+                className="w-full">
                 Report Emergency
               </Button>
             )}
@@ -291,7 +317,7 @@ export const GovernanceDashboard: React.FC<GovernanceDashboardProps> = ({
           <Text className="text-headline-small font-semibold text-text-primary mb-3">
             Recent Activity
           </Text>
-          
+
           <View className="space-y-3">
             {/* Sample recent activities - would be populated from API */}
             <View className="flex-row items-start">
@@ -305,7 +331,7 @@ export const GovernanceDashboard: React.FC<GovernanceDashboardProps> = ({
                 </Text>
               </View>
             </View>
-            
+
             <View className="flex-row items-start">
               <View className="w-2 h-2 bg-success rounded-full mt-2 mr-3" />
               <View className="flex-1">
@@ -317,7 +343,7 @@ export const GovernanceDashboard: React.FC<GovernanceDashboardProps> = ({
                 </Text>
               </View>
             </View>
-            
+
             <View className="flex-row items-start">
               <View className="w-2 h-2 bg-warning rounded-full mt-2 mr-3" />
               <View className="flex-1">
@@ -339,27 +365,46 @@ export const GovernanceDashboard: React.FC<GovernanceDashboardProps> = ({
     <View className="flex-row bg-surface-primary border-b border-border-primary">
       {[
         { key: 'overview', label: 'Overview', icon: 'home' },
-        { key: 'voting', label: 'Voting', icon: 'vote', badge: activeVoting.length },
-        { key: 'emergency', label: 'Emergency', icon: 'alert-circle', badge: activeEmergencies.length },
+        {
+          key: 'voting',
+          label: 'Voting',
+          icon: 'vote',
+          badge: activeVoting.length,
+        },
+        {
+          key: 'emergency',
+          label: 'Emergency',
+          icon: 'alert-circle',
+          badge: activeEmergencies.length,
+        },
         { key: 'succession', label: 'Succession', icon: 'users' },
-        { key: 'policies', label: 'Policies', icon: 'file-text', badge: pendingPolicies.length }
+        {
+          key: 'policies',
+          label: 'Policies',
+          icon: 'file-text',
+          badge: pendingPolicies.length,
+        },
       ].map((section) => (
         <TouchableOpacity
           key={section.key}
           onPress={() => setActiveSection(section.key as any)}
           className={`flex-1 p-3 border-b-2 ${
-            activeSection === section.key ? 'border-primary' : 'border-transparent'
-          }`}
-        >
+            activeSection === section.key
+              ? 'border-primary'
+              : 'border-transparent'
+          }`}>
           <View className="items-center relative">
-            <LucideIcons 
-              name={section.icon as any} 
-              size={18} 
-              color={activeSection === section.key ? '#6366f1' : '#757575'} 
+            <LucideIcons
+              name={section.icon as any}
+              size={18}
+              color={activeSection === section.key ? '#6366f1' : '#757575'}
             />
-            <Text className={`text-label-small font-medium mt-1 ${
-              activeSection === section.key ? 'text-primary' : 'text-text-secondary'
-            }`}>
+            <Text
+              className={`text-label-small font-medium mt-1 ${
+                activeSection === section.key
+                  ? 'text-primary'
+                  : 'text-text-secondary'
+              }`}>
               {section.label}
             </Text>
             {section.badge && section.badge > 0 && (
@@ -393,7 +438,7 @@ export const GovernanceDashboard: React.FC<GovernanceDashboardProps> = ({
       {/* Content */}
       <View className="flex-1 bg-surface-secondary">
         {activeSection === 'overview' && renderOverview()}
-        
+
         {activeSection === 'voting' && (
           <VotingSystem
             campaigns={votingCampaigns}
@@ -409,7 +454,7 @@ export const GovernanceDashboard: React.FC<GovernanceDashboardProps> = ({
             userRole={userRole}
           />
         )}
-        
+
         {activeSection === 'emergency' && (
           <EmergencyManagement
             alerts={emergencyAlerts}
@@ -430,7 +475,7 @@ export const GovernanceDashboard: React.FC<GovernanceDashboardProps> = ({
             userRole={userRole}
           />
         )}
-        
+
         {activeSection === 'succession' && (
           <SuccessionManagement
             successionPlan={successionPlan}
@@ -460,7 +505,7 @@ export const GovernanceDashboard: React.FC<GovernanceDashboardProps> = ({
             userRole={userRole}
           />
         )}
-        
+
         {activeSection === 'policies' && (
           <PolicyGovernance
             proposals={policyProposals}

@@ -4,7 +4,7 @@ import {
   getMentionSuggestions,
   insertMention,
   validateMentions,
-  Mention
+  Mention,
 } from '../../utils/mentions';
 import { User } from '../../types/community';
 
@@ -16,23 +16,23 @@ const mockUsers: User[] = [
     email: 'john@example.com',
     role: 'resident',
     flatNumber: 'A-101',
-    avatar: 'avatar1.jpg'
+    avatar: 'avatar1.jpg',
   },
   {
-    id: 'user-2', 
+    id: 'user-2',
     name: 'Jane Smith',
     email: 'jane@example.com',
     role: 'committee',
     flatNumber: 'B-202',
-    avatar: 'avatar2.jpg'
+    avatar: 'avatar2.jpg',
   },
   {
     id: 'user-3',
     name: 'Bob Wilson',
-    email: 'bob@example.com', 
+    email: 'bob@example.com',
     role: 'resident',
     flatNumber: 'C-303',
-    avatar: 'avatar3.jpg'
+    avatar: 'avatar3.jpg',
   },
   {
     id: 'user-4',
@@ -40,8 +40,8 @@ const mockUsers: User[] = [
     email: 'alice@example.com',
     role: 'admin',
     flatNumber: 'D-404',
-    avatar: 'avatar4.jpg'
-  }
+    avatar: 'avatar4.jpg',
+  },
 ];
 
 describe('Mentions Utilities', () => {
@@ -49,13 +49,13 @@ describe('Mentions Utilities', () => {
     test('should extract single mention from text', () => {
       const text = 'Hello @john, how are you?';
       const mentions = extractMentions(text);
-      
+
       expect(mentions).toHaveLength(1);
       expect(mentions[0]).toMatchObject({
         username: 'john',
         displayName: 'john',
         startIndex: 6,
-        endIndex: 11
+        endIndex: 11,
       });
       expect(mentions[0].id).toBeDefined();
       expect(mentions[0].flatNumber).toBe('');
@@ -64,16 +64,16 @@ describe('Mentions Utilities', () => {
     test('should extract multiple mentions from text', () => {
       const text = 'Hey @john and @jane, lets meet @bob';
       const mentions = extractMentions(text);
-      
+
       expect(mentions).toHaveLength(3);
       expect(mentions[0].username).toBe('john');
       expect(mentions[0].startIndex).toBe(4);
       expect(mentions[0].endIndex).toBe(9);
-      
+
       expect(mentions[1].username).toBe('jane');
       expect(mentions[1].startIndex).toBe(14);
       expect(mentions[1].endIndex).toBe(19);
-      
+
       expect(mentions[2].username).toBe('bob');
       expect(mentions[2].startIndex).toBe(31);
       expect(mentions[2].endIndex).toBe(35);
@@ -82,7 +82,7 @@ describe('Mentions Utilities', () => {
     test('should handle text with no mentions', () => {
       const text = 'Hello everyone, this is a regular message';
       const mentions = extractMentions(text);
-      
+
       expect(mentions).toHaveLength(0);
     });
 
@@ -100,7 +100,7 @@ describe('Mentions Utilities', () => {
     test('should extract mentions with numbers and underscores', () => {
       const text = 'Contact @user123 and @admin_user for help';
       const mentions = extractMentions(text);
-      
+
       expect(mentions).toHaveLength(2);
       expect(mentions[0].username).toBe('user123');
       expect(mentions[1].username).toBe('admin_user');
@@ -109,7 +109,7 @@ describe('Mentions Utilities', () => {
     test('should not extract mentions with special characters', () => {
       const text = 'Check @user-name or @user.name';
       const mentions = extractMentions(text);
-      
+
       expect(mentions).toHaveLength(2);
       expect(mentions[0].username).toBe('user'); // Stops at hyphen
       expect(mentions[1].username).toBe('user'); // Stops at dot
@@ -118,7 +118,7 @@ describe('Mentions Utilities', () => {
     test('should handle mentions at start and end of text', () => {
       const text = '@start middle @end';
       const mentions = extractMentions(text);
-      
+
       expect(mentions).toHaveLength(2);
       expect(mentions[0].username).toBe('start');
       expect(mentions[0].startIndex).toBe(0);
@@ -131,28 +131,40 @@ describe('Mentions Utilities', () => {
     test('should format text with single mention', () => {
       const text = 'Hello @john, how are you?';
       const parts = formatTextWithMentions(text);
-      
+
       expect(parts).toHaveLength(3);
       expect(parts[0]).toEqual({ text: 'Hello ', isMention: false });
-      expect(parts[1]).toEqual({ text: '@john', isMention: true, username: 'john' });
+      expect(parts[1]).toEqual({
+        text: '@john',
+        isMention: true,
+        username: 'john',
+      });
       expect(parts[2]).toEqual({ text: ', how are you?', isMention: false });
     });
 
     test('should format text with multiple mentions', () => {
       const text = 'Hey @john and @jane';
       const parts = formatTextWithMentions(text);
-      
+
       expect(parts).toHaveLength(4); // No trailing empty string
       expect(parts[0]).toEqual({ text: 'Hey ', isMention: false });
-      expect(parts[1]).toEqual({ text: '@john', isMention: true, username: 'john' });
+      expect(parts[1]).toEqual({
+        text: '@john',
+        isMention: true,
+        username: 'john',
+      });
       expect(parts[2]).toEqual({ text: ' and ', isMention: false });
-      expect(parts[3]).toEqual({ text: '@jane', isMention: true, username: 'jane' });
+      expect(parts[3]).toEqual({
+        text: '@jane',
+        isMention: true,
+        username: 'jane',
+      });
     });
 
     test('should handle text with no mentions', () => {
       const text = 'Hello everyone';
       const parts = formatTextWithMentions(text);
-      
+
       expect(parts).toHaveLength(1);
       expect(parts[0]).toEqual({ text: 'Hello everyone', isMention: false });
     });
@@ -166,58 +178,74 @@ describe('Mentions Utilities', () => {
     test('should handle text starting with mention', () => {
       const text = '@john hello';
       const parts = formatTextWithMentions(text);
-      
+
       expect(parts).toHaveLength(2);
-      expect(parts[0]).toEqual({ text: '@john', isMention: true, username: 'john' });
+      expect(parts[0]).toEqual({
+        text: '@john',
+        isMention: true,
+        username: 'john',
+      });
       expect(parts[1]).toEqual({ text: ' hello', isMention: false });
     });
 
     test('should handle text ending with mention', () => {
       const text = 'Hello @john';
       const parts = formatTextWithMentions(text);
-      
+
       expect(parts).toHaveLength(2);
       expect(parts[0]).toEqual({ text: 'Hello ', isMention: false });
-      expect(parts[1]).toEqual({ text: '@john', isMention: true, username: 'john' });
+      expect(parts[1]).toEqual({
+        text: '@john',
+        isMention: true,
+        username: 'john',
+      });
     });
 
     test('should handle consecutive mentions', () => {
       const text = '@john@jane';
       const parts = formatTextWithMentions(text);
-      
+
       expect(parts).toHaveLength(2);
-      expect(parts[0]).toEqual({ text: '@john', isMention: true, username: 'john' });
-      expect(parts[1]).toEqual({ text: '@jane', isMention: true, username: 'jane' });
+      expect(parts[0]).toEqual({
+        text: '@john',
+        isMention: true,
+        username: 'john',
+      });
+      expect(parts[1]).toEqual({
+        text: '@jane',
+        isMention: true,
+        username: 'jane',
+      });
     });
   });
 
   describe('getMentionSuggestions', () => {
     test('should return suggestions based on name', async () => {
       const suggestions = await getMentionSuggestions('john', mockUsers);
-      
+
       expect(suggestions).toHaveLength(1);
       expect(suggestions[0].name).toBe('John Doe');
     });
 
     test('should return suggestions based on flat number', async () => {
       const suggestions = await getMentionSuggestions('A-101', mockUsers);
-      
+
       expect(suggestions).toHaveLength(1);
       expect(suggestions[0].flatNumber).toBe('A-101');
     });
 
     test('should be case insensitive', async () => {
       const suggestions = await getMentionSuggestions('JANE', mockUsers);
-      
+
       expect(suggestions).toHaveLength(1);
       expect(suggestions[0].name).toBe('Jane Smith');
     });
 
     test('should return multiple matches', async () => {
       const suggestions = await getMentionSuggestions('o', mockUsers); // Matches John, Bob, Brown
-      
+
       expect(suggestions.length).toBeGreaterThan(1);
-      const names = suggestions.map(u => u.name);
+      const names = suggestions.map((u) => u.name);
       expect(names).toContain('John Doe');
       expect(names).toContain('Bob Wilson');
       expect(names).toContain('Alice Brown');
@@ -231,9 +259,9 @@ describe('Mentions Utilities', () => {
         email: `user${i}@example.com`,
         role: 'resident' as const,
         flatNumber: `A-${i}`,
-        avatar: `avatar${i}.jpg`
+        avatar: `avatar${i}.jpg`,
       }));
-      
+
       const suggestions = await getMentionSuggestions('user', manyUsers);
       expect(suggestions).toHaveLength(5);
     });
@@ -255,7 +283,7 @@ describe('Mentions Utilities', () => {
 
     test('should handle partial matches in flat numbers', async () => {
       const suggestions = await getMentionSuggestions('202', mockUsers);
-      
+
       expect(suggestions).toHaveLength(1);
       expect(suggestions[0].flatNumber).toBe('B-202');
     });
@@ -265,7 +293,7 @@ describe('Mentions Utilities', () => {
     test('should insert mention after @ symbol', () => {
       const text = 'Hello @j world';
       const result = insertMention(text, 8, 'john');
-      
+
       expect(result.newText).toBe('Hello @john  world');
       expect(result.newCursorPosition).toBe(12);
     });
@@ -273,7 +301,7 @@ describe('Mentions Utilities', () => {
     test('should replace partial mention after @', () => {
       const text = 'Hello @jo world';
       const result = insertMention(text, 9, 'john');
-      
+
       expect(result.newText).toBe('Hello @john  world');
       expect(result.newCursorPosition).toBe(12);
     });
@@ -281,7 +309,7 @@ describe('Mentions Utilities', () => {
     test('should insert mention at cursor when no @ found', () => {
       const text = 'Hello world';
       const result = insertMention(text, 5, 'john');
-      
+
       expect(result.newText).toBe('Hello@john  world');
       expect(result.newCursorPosition).toBe(11);
     });
@@ -289,7 +317,7 @@ describe('Mentions Utilities', () => {
     test('should handle insertion at start of text', () => {
       const text = '@j rest of text';
       const result = insertMention(text, 2, 'john');
-      
+
       expect(result.newText).toBe('@john  rest of text');
       expect(result.newCursorPosition).toBe(6);
     });
@@ -297,14 +325,14 @@ describe('Mentions Utilities', () => {
     test('should handle insertion at end of text', () => {
       const text = 'Text ends with @j';
       const result = insertMention(text, 17, 'john');
-      
+
       expect(result.newText).toBe('Text ends with @john ');
       expect(result.newCursorPosition).toBe(21);
     });
 
     test('should handle empty text', () => {
       const result = insertMention('', 0, 'john');
-      
+
       expect(result.newText).toBe('@john ');
       expect(result.newCursorPosition).toBe(6);
     });
@@ -312,7 +340,7 @@ describe('Mentions Utilities', () => {
     test('should handle multiple @ symbols', () => {
       const text = 'Hello @jane and @j world';
       const result = insertMention(text, 18, 'john');
-      
+
       expect(result.newText).toBe('Hello @jane and @john  world');
       expect(result.newCursorPosition).toBe(22);
     });
@@ -320,7 +348,7 @@ describe('Mentions Utilities', () => {
     test('should handle @ at the very beginning', () => {
       const text = '@';
       const result = insertMention(text, 1, 'john');
-      
+
       expect(result.newText).toBe('@john ');
       expect(result.newCursorPosition).toBe(6);
     });
@@ -328,7 +356,7 @@ describe('Mentions Utilities', () => {
     test('should not find @ when cursor is before it', () => {
       const text = 'Hello @john';
       const result = insertMention(text, 3, 'jane'); // Cursor before @
-      
+
       expect(result.newText).toBe('Hel@jane lo @john');
       expect(result.newCursorPosition).toBe(9);
     });
@@ -338,7 +366,7 @@ describe('Mentions Utilities', () => {
     test('should validate mentions against user database', async () => {
       const text = 'Hello @johndoe and @janesmith';
       const result = await validateMentions(text, mockUsers);
-      
+
       expect(result.validMentions).toHaveLength(2); // Both names match when spaces removed
       expect(result.invalidMentions).toHaveLength(0);
       expect(result.validMentions[0].displayName).toBe('John Doe');
@@ -348,7 +376,7 @@ describe('Mentions Utilities', () => {
     test('should identify valid and invalid mentions', async () => {
       const text = 'Hello @johndoe and @unknown';
       const result = await validateMentions(text, mockUsers);
-      
+
       expect(result.validMentions).toHaveLength(1);
       expect(result.invalidMentions).toHaveLength(1);
       expect(result.validMentions[0].displayName).toBe('John Doe');
@@ -358,7 +386,7 @@ describe('Mentions Utilities', () => {
     test('should match by name (spaces removed)', async () => {
       const text = 'Hello @johndoe';
       const result = await validateMentions(text, mockUsers);
-      
+
       expect(result.validMentions).toHaveLength(1);
       expect(result.validMentions[0].displayName).toBe('John Doe');
       expect(result.validMentions[0].flatNumber).toBe('A-101');
@@ -367,7 +395,7 @@ describe('Mentions Utilities', () => {
     test('should match by flat number (special chars removed)', async () => {
       const text = 'Hello @a101';
       const result = await validateMentions(text, mockUsers);
-      
+
       expect(result.validMentions).toHaveLength(1);
       expect(result.validMentions[0].displayName).toBe('John Doe');
       expect(result.validMentions[0].flatNumber).toBe('A-101');
@@ -376,7 +404,7 @@ describe('Mentions Utilities', () => {
     test('should be case insensitive', async () => {
       const text = 'Hello @JOHNDOE and @B202';
       const result = await validateMentions(text, mockUsers);
-      
+
       expect(result.validMentions).toHaveLength(2);
       expect(result.validMentions[0].displayName).toBe('John Doe');
       expect(result.validMentions[1].displayName).toBe('Jane Smith');
@@ -385,7 +413,7 @@ describe('Mentions Utilities', () => {
     test('should handle text with no mentions', async () => {
       const text = 'Hello everyone';
       const result = await validateMentions(text, mockUsers);
-      
+
       expect(result.validMentions).toHaveLength(0);
       expect(result.invalidMentions).toHaveLength(0);
     });
@@ -393,7 +421,7 @@ describe('Mentions Utilities', () => {
     test('should handle all invalid mentions', async () => {
       const text = 'Hello @unknown and @invalid';
       const result = await validateMentions(text, mockUsers);
-      
+
       expect(result.validMentions).toHaveLength(0);
       expect(result.invalidMentions).toHaveLength(2);
       expect(result.invalidMentions[0].username).toBe('unknown');
@@ -403,7 +431,7 @@ describe('Mentions Utilities', () => {
     test('should handle all valid mentions', async () => {
       const text = 'Hello @johndoe and @a101';
       const result = await validateMentions(text, mockUsers);
-      
+
       expect(result.validMentions).toHaveLength(2);
       expect(result.invalidMentions).toHaveLength(0);
       // Both should match John Doe - once by name, once by flat
@@ -414,7 +442,7 @@ describe('Mentions Utilities', () => {
     test('should handle empty user list', async () => {
       const text = 'Hello @john';
       const result = await validateMentions(text, []);
-      
+
       expect(result.validMentions).toHaveLength(0);
       expect(result.invalidMentions).toHaveLength(1);
       expect(result.invalidMentions[0].username).toBe('john');
@@ -423,7 +451,7 @@ describe('Mentions Utilities', () => {
     test('should handle complex flat number matching', async () => {
       const text = 'Contact @c303 and @d404';
       const result = await validateMentions(text, mockUsers);
-      
+
       expect(result.validMentions).toHaveLength(2);
       expect(result.validMentions[0].displayName).toBe('Bob Wilson');
       expect(result.validMentions[1].displayName).toBe('Alice Brown');

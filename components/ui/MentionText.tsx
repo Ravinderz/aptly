@@ -1,7 +1,7 @@
-import { showSuccessAlert } from "@/utils/alert";
-import { formatTextWithMentions } from "@/utils/mentions";
-import React from "react";
-import { Text, TouchableOpacity } from "react-native";
+import { showSuccessAlert } from '@/utils/alert';
+import { formatTextWithMentions } from '@/utils/mentions';
+import React from 'react';
+import { Text, TouchableOpacity } from 'react-native';
 
 interface MentionTextProps {
   children: string;
@@ -20,7 +20,7 @@ const MentionText: React.FC<MentionTextProps> = ({
     if (onMentionPress) {
       onMentionPress(username);
     } else {
-      showSuccessAlert("User Profile", `View profile for @${username}`);
+      showSuccessAlert('User Profile', `View profile for @${username}`);
     }
   };
 
@@ -32,8 +32,7 @@ const MentionText: React.FC<MentionTextProps> = ({
             <TouchableOpacity
               key={index}
               onPress={() => handleMentionPress(part.username!)}
-              className="bg-primary/10 rounded-xl px-2 py-1"
-            >
+              className="bg-primary/10 rounded-xl px-2 py-1">
               <Text className="text-primary font-semibold">{part.text}</Text>
             </TouchableOpacity>
           );

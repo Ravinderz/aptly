@@ -1,17 +1,23 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, TextInput } from 'react-native';
+import {
+  View,
+  Text,
+  ScrollView,
+  TouchableOpacity,
+  TextInput,
+} from 'react-native';
 import { showSuccessAlert, showErrorAlert } from '@/utils/alert';
 import LucideIcons from '@/components/ui/LucideIcons';
 import { router } from 'expo-router';
 
 // Types
-import type { 
-  AuditEntry, 
+import type {
+  AuditEntry,
   AuditAction,
   AuditResource,
   AuditSeverity,
   AuditCategory,
-  AuditLogQuery
+  AuditLogQuery,
 } from '@/types/analytics';
 
 // UI Components
@@ -23,8 +29,14 @@ import { AlertCard } from '@/components/ui/AlertCard';
 
 interface AuditSystemProps {
   auditLogs: AuditEntry[];
-  onExportLogs: (query: AuditLogQuery, format: 'json' | 'csv' | 'pdf') => Promise<void>;
-  onGenerateReport: (timeframe: string, categories: AuditCategory[]) => Promise<void>;
+  onExportLogs: (
+    query: AuditLogQuery,
+    format: 'json' | 'csv' | 'pdf',
+  ) => Promise<void>;
+  onGenerateReport: (
+    timeframe: string,
+    categories: AuditCategory[],
+  ) => Promise<void>;
   currentUserId: string;
   userRole: 'resident' | 'committee_member' | 'admin';
 }
@@ -34,9 +46,11 @@ export const AuditSystem: React.FC<AuditSystemProps> = ({
   onExportLogs,
   onGenerateReport,
   currentUserId,
-  userRole
+  userRole,
 }) => {
-  const [activeTab, setActiveTab] = useState<'logs' | 'analytics' | 'compliance' | 'reports'>('logs');
+  const [activeTab, setActiveTab] = useState<
+    'logs' | 'analytics' | 'compliance' | 'reports'
+  >('logs');
   const [searchQuery, setSearchQuery] = useState('');
   const [filters, setFilters] = useState<{
     severity?: AuditSeverity;
@@ -58,71 +72,91 @@ export const AuditSystem: React.FC<AuditSystemProps> = ({
     // Apply search query
     if (searchQuery.trim()) {
       const query = searchQuery.toLowerCase();
-      filtered = filtered.filter(log => 
-        log.action.toLowerCase().includes(query) ||
-        log.resource.toLowerCase().includes(query) ||
-        log.userId.toLowerCase().includes(query) ||
-        log.context.feature.toLowerCase().includes(query)
+      filtered = filtered.filter(
+        (log) =>
+          log.action.toLowerCase().includes(query) ||
+          log.resource.toLowerCase().includes(query) ||
+          log.userId.toLowerCase().includes(query) ||
+          log.context.feature.toLowerCase().includes(query),
       );
     }
 
     // Apply filters
     if (filters.severity) {
-      filtered = filtered.filter(log => log.severity === filters.severity);
+      filtered = filtered.filter((log) => log.severity === filters.severity);
     }
     if (filters.category) {
-      filtered = filtered.filter(log => log.category === filters.category);
+      filtered = filtered.filter((log) => log.category === filters.category);
     }
     if (filters.action) {
-      filtered = filtered.filter(log => log.action === filters.action);
+      filtered = filtered.filter((log) => log.action === filters.action);
     }
     if (filters.resource) {
-      filtered = filtered.filter(log => log.resource === filters.resource);
+      filtered = filtered.filter((log) => log.resource === filters.resource);
     }
     if (filters.dateRange) {
       const start = new Date(filters.dateRange.start);
       const end = new Date(filters.dateRange.end);
-      filtered = filtered.filter(log => {
+      filtered = filtered.filter((log) => {
         const logDate = new Date(log.timestamp);
         return logDate >= start && logDate <= end;
       });
     }
 
-    return filtered.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
+    return filtered.sort(
+      (a, b) =>
+        new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime(),
+    );
   }, [auditLogs, searchQuery, filters]);
 
   // Analytics calculations
   const analytics = useMemo(() => {
     const totalLogs = filteredLogs.length;
-    const last24Hours = filteredLogs.filter(log => {
+    const last24Hours = filteredLogs.filter((log) => {
       const logTime = new Date(log.timestamp).getTime();
-      const dayAgo = Date.now() - (24 * 60 * 60 * 1000);
+      const dayAgo = Date.now() - 24 * 60 * 60 * 1000;
       return logTime > dayAgo;
     }).length;
 
-    const severityBreakdown = filteredLogs.reduce((acc, log) => {
-      acc[log.severity] = (acc[log.severity] || 0) + 1;
-      return acc;
-    }, {} as Record<AuditSeverity, number>);
+    const severityBreakdown = filteredLogs.reduce(
+      (acc, log) => {
+        acc[log.severity] = (acc[log.severity] || 0) + 1;
+        return acc;
+      },
+      {} as Record<AuditSeverity, number>,
+    );
 
-    const categoryBreakdown = filteredLogs.reduce((acc, log) => {
-      acc[log.category] = (acc[log.category] || 0) + 1;
-      return acc;
-    }, {} as Record<AuditCategory, number>);
+    const categoryBreakdown = filteredLogs.reduce(
+      (acc, log) => {
+        acc[log.category] = (acc[log.category] || 0) + 1;
+        return acc;
+      },
+      {} as Record<AuditCategory, number>,
+    );
 
     const topUsers = Object.entries(
-      filteredLogs.reduce((acc, log) => {
-        acc[log.userId] = (acc[log.userId] || 0) + 1;
-        return acc;
-      }, {} as Record<string, number>)
-    ).sort(([,a], [,b]) => b - a).slice(0, 5);
+      filteredLogs.reduce(
+        (acc, log) => {
+          acc[log.userId] = (acc[log.userId] || 0) + 1;
+          return acc;
+        },
+        {} as Record<string, number>,
+      ),
+    )
+      .sort(([, a], [, b]) => b - a)
+      .slice(0, 5);
 
     const topActions = Object.entries(
-      filteredLogs.reduce((acc, log) => {
-        acc[log.action] = (acc[log.action] || 0) + 1;
-        return acc;
-      }, {} as Record<string, number>)
-    ).sort(([,a], [,b]) => b - a).slice(0, 5);
+      filteredLogs.reduce(
+        (acc, log) => {
+          acc[log.action] = (acc[log.action] || 0) + 1;
+          return acc;
+        },
+        {} as Record<string, number>,
+      ),
+    )
+      .sort(([, a], [, b]) => b - a)
+      .slice(0, 5);
 
     return {
       totalLogs,
@@ -130,7 +164,7 @@ export const AuditSystem: React.FC<AuditSystemProps> = ({
       severityBreakdown,
       categoryBreakdown,
       topUsers,
-      topActions
+      topActions,
     };
   }, [filteredLogs]);
 
@@ -138,20 +172,28 @@ export const AuditSystem: React.FC<AuditSystemProps> = ({
     try {
       setIsExporting(true);
       const query: AuditLogQuery = {
-        startDate: filters.dateRange?.start || new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString(),
+        startDate:
+          filters.dateRange?.start ||
+          new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString(),
         endDate: filters.dateRange?.end || new Date().toISOString(),
         severity: filters.severity,
         category: filters.category,
         action: filters.action,
         resource: filters.resource,
         limit: 10000,
-        includeMetadata: true
+        includeMetadata: true,
       };
-      
+
       await onExportLogs(query, format);
-      showSuccessAlert('Success', `Audit logs exported successfully as ${format.toUpperCase()}`);
+      showSuccessAlert(
+        'Success',
+        `Audit logs exported successfully as ${format.toUpperCase()}`,
+      );
     } catch (error) {
-      showErrorAlert('Export Failed', 'Failed to export audit logs. Please try again.');
+      showErrorAlert(
+        'Export Failed',
+        'Failed to export audit logs. Please try again.',
+      );
     } finally {
       setIsExporting(false);
     }
@@ -166,8 +208,7 @@ export const AuditSystem: React.FC<AuditSystemProps> = ({
       <TouchableOpacity
         key={entry.id}
         onPress={() => setSelectedEntry(entry)}
-        className="mb-3"
-      >
+        className="mb-3">
         <Card className={`border-l-4 ${severityStyle.border}`}>
           <View className="p-4">
             <View className="flex-row items-start justify-between mb-2">
@@ -178,25 +219,30 @@ export const AuditSystem: React.FC<AuditSystemProps> = ({
                     {formatAction(entry.action)}
                   </Text>
                 </View>
-                
+
                 <View className="flex-row items-center gap-2 mb-2">
-                  <View className={`px-2 py-1 rounded-full ${categoryStyle.bg}`}>
-                    <Text className={`text-label-small font-medium ${categoryStyle.text}`}>
+                  <View
+                    className={`px-2 py-1 rounded-full ${categoryStyle.bg}`}>
+                    <Text
+                      className={`text-label-small font-medium ${categoryStyle.text}`}>
                       {formatCategory(entry.category)}
                     </Text>
                   </View>
-                  
-                  <View className={`px-2 py-1 rounded-full ${severityStyle.bg}`}>
-                    <Text className={`text-label-small font-medium ${severityStyle.text}`}>
+
+                  <View
+                    className={`px-2 py-1 rounded-full ${severityStyle.bg}`}>
+                    <Text
+                      className={`text-label-small font-medium ${severityStyle.text}`}>
                       {entry.severity.toUpperCase()}
                     </Text>
                   </View>
                 </View>
 
                 <Text className="text-body-small text-text-secondary mb-1">
-                  Resource: {formatResource(entry.resource)} {entry.resourceId && `(${entry.resourceId})`}
+                  Resource: {formatResource(entry.resource)}{' '}
+                  {entry.resourceId && `(${entry.resourceId})`}
                 </Text>
-                
+
                 <Text className="text-body-small text-text-secondary">
                   User: {entry.userId} • {timeAgo} • IP: {entry.ipAddress}
                 </Text>
@@ -209,7 +255,9 @@ export const AuditSystem: React.FC<AuditSystemProps> = ({
                 {entry.context.errorMessage && (
                   <View className="flex-row items-center mt-1">
                     <LucideIcons name="warning" size={12} color="#D32F2F" />
-                    <Text className="text-label-small text-error ml-1">Error</Text>
+                    <Text className="text-label-small text-error ml-1">
+                      Error
+                    </Text>
                   </View>
                 )}
               </View>
@@ -223,7 +271,8 @@ export const AuditSystem: React.FC<AuditSystemProps> = ({
               </Text>
               {entry.changes && entry.changes.length > 0 && (
                 <Text className="text-body-small text-text-secondary mt-1">
-                  {entry.changes.length} field{entry.changes.length > 1 ? 's' : ''} changed
+                  {entry.changes.length} field
+                  {entry.changes.length > 1 ? 's' : ''} changed
                 </Text>
               )}
             </View>
@@ -266,30 +315,32 @@ export const AuditSystem: React.FC<AuditSystemProps> = ({
           <Text className="text-headline-small font-semibold text-text-primary mb-3">
             Severity Distribution
           </Text>
-          
-          {Object.entries(analytics.severityBreakdown).map(([severity, count]) => {
-            const percentage = (count / analytics.totalLogs) * 100;
-            const style = getSeverityStyle(severity as AuditSeverity);
-            
-            return (
-              <View key={severity} className="mb-3">
-                <View className="flex-row items-center justify-between mb-1">
-                  <Text className="text-body-medium text-text-primary">
-                    {severity.toUpperCase()}
-                  </Text>
-                  <Text className="text-body-medium font-medium text-text-primary">
-                    {count} ({percentage.toFixed(1)}%)
-                  </Text>
+
+          {Object.entries(analytics.severityBreakdown).map(
+            ([severity, count]) => {
+              const percentage = (count / analytics.totalLogs) * 100;
+              const style = getSeverityStyle(severity as AuditSeverity);
+
+              return (
+                <View key={severity} className="mb-3">
+                  <View className="flex-row items-center justify-between mb-1">
+                    <Text className="text-body-medium text-text-primary">
+                      {severity.toUpperCase()}
+                    </Text>
+                    <Text className="text-body-medium font-medium text-text-primary">
+                      {count} ({percentage.toFixed(1)}%)
+                    </Text>
+                  </View>
+                  <View className="h-2 bg-surface-secondary rounded-full">
+                    <View
+                      className={`h-full rounded-full ${style.progressBg}`}
+                      style={{ width: `${percentage}%` }}
+                    />
+                  </View>
                 </View>
-                <View className="h-2 bg-surface-secondary rounded-full">
-                  <View 
-                    className={`h-full rounded-full ${style.progressBg}`}
-                    style={{ width: `${percentage}%` }}
-                  />
-                </View>
-              </View>
-            );
-          })}
+              );
+            },
+          )}
         </View>
       </Card>
 
@@ -299,18 +350,22 @@ export const AuditSystem: React.FC<AuditSystemProps> = ({
           <Text className="text-headline-small font-semibold text-text-primary mb-3">
             Activity by Category
           </Text>
-          
+
           {Object.entries(analytics.categoryBreakdown)
-            .sort(([,a], [,b]) => b - a)
+            .sort(([, a], [, b]) => b - a)
             .slice(0, 6)
             .map(([category, count]) => {
               const percentage = (count / analytics.totalLogs) * 100;
               const style = getCategoryStyle(category as AuditCategory);
-              
+
               return (
-                <View key={category} className="flex-row items-center justify-between py-2">
+                <View
+                  key={category}
+                  className="flex-row items-center justify-between py-2">
                   <View className="flex-row items-center flex-1">
-                    <View className={`w-3 h-3 rounded-full mr-3 ${style.dotBg}`} />
+                    <View
+                      className={`w-3 h-3 rounded-full mr-3 ${style.dotBg}`}
+                    />
                     <Text className="text-body-medium text-text-primary flex-1">
                       {formatCategory(category as AuditCategory)}
                     </Text>
@@ -330,9 +385,11 @@ export const AuditSystem: React.FC<AuditSystemProps> = ({
           <Text className="text-headline-small font-semibold text-text-primary mb-3">
             Most Active Users
           </Text>
-          
+
           {analytics.topUsers.map(([userId, count], index) => (
-            <View key={userId} className="flex-row items-center justify-between py-2">
+            <View
+              key={userId}
+              className="flex-row items-center justify-between py-2">
               <View className="flex-row items-center flex-1">
                 <Text className="text-body-medium font-medium text-text-secondary mr-3">
                   #{index + 1}
@@ -356,9 +413,11 @@ export const AuditSystem: React.FC<AuditSystemProps> = ({
           <Text className="text-headline-small font-semibold text-text-primary mb-3">
             Most Common Actions
           </Text>
-          
+
           {analytics.topActions.map(([action, count], index) => (
-            <View key={action} className="flex-row items-center justify-between py-2">
+            <View
+              key={action}
+              className="flex-row items-center justify-between py-2">
               <View className="flex-row items-center flex-1">
                 <Text className="text-body-medium font-medium text-text-secondary mr-3">
                   #{index + 1}
@@ -386,7 +445,7 @@ export const AuditSystem: React.FC<AuditSystemProps> = ({
           <Text className="text-headline-small font-semibold text-text-primary mb-3">
             Compliance Status
           </Text>
-          
+
           <View className="space-y-3">
             {/* Data Retention Compliance */}
             <View className="flex-row items-center justify-between">
@@ -404,7 +463,11 @@ export const AuditSystem: React.FC<AuditSystemProps> = ({
             {/* GDPR Compliance */}
             <View className="flex-row items-center justify-between">
               <View className="flex-row items-center">
-                <LucideIcons name="lock-closed-outline" size={20} color="#4CAF50" />
+                <LucideIcons
+                  name="lock-closed-outline"
+                  size={20}
+                  color="#4CAF50"
+                />
                 <Text className="text-body-medium text-text-primary ml-3">
                   Privacy Protection
                 </Text>
@@ -417,7 +480,11 @@ export const AuditSystem: React.FC<AuditSystemProps> = ({
             {/* Audit Trail Integrity */}
             <View className="flex-row items-center justify-between">
               <View className="flex-row items-center">
-                <LucideIcons name="document-text-outline" size={20} color="#4CAF50" />
+                <LucideIcons
+                  name="document-text-outline"
+                  size={20}
+                  color="#4CAF50"
+                />
                 <Text className="text-body-medium text-text-primary ml-3">
                   Audit Trail Integrity
                 </Text>
@@ -449,33 +516,57 @@ export const AuditSystem: React.FC<AuditSystemProps> = ({
           <Text className="text-headline-small font-semibold text-text-primary mb-3">
             Data Retention Status
           </Text>
-          
+
           <View className="space-y-3">
             <View className="flex-row items-center justify-between">
-              <Text className="text-body-medium text-text-secondary">7 Days Retention</Text>
+              <Text className="text-body-medium text-text-secondary">
+                7 Days Retention
+              </Text>
               <Text className="text-body-medium font-medium text-text-primary">
-                {auditLogs.filter(log => log.retentionPolicy === '7_days').length} logs
+                {
+                  auditLogs.filter((log) => log.retentionPolicy === '7_days')
+                    .length
+                }{' '}
+                logs
               </Text>
             </View>
-            
+
             <View className="flex-row items-center justify-between">
-              <Text className="text-body-medium text-text-secondary">30 Days Retention</Text>
+              <Text className="text-body-medium text-text-secondary">
+                30 Days Retention
+              </Text>
               <Text className="text-body-medium font-medium text-text-primary">
-                {auditLogs.filter(log => log.retentionPolicy === '30_days').length} logs
+                {
+                  auditLogs.filter((log) => log.retentionPolicy === '30_days')
+                    .length
+                }{' '}
+                logs
               </Text>
             </View>
-            
+
             <View className="flex-row items-center justify-between">
-              <Text className="text-body-medium text-text-secondary">1 Year Retention</Text>
+              <Text className="text-body-medium text-text-secondary">
+                1 Year Retention
+              </Text>
               <Text className="text-body-medium font-medium text-text-primary">
-                {auditLogs.filter(log => log.retentionPolicy === '1_year').length} logs
+                {
+                  auditLogs.filter((log) => log.retentionPolicy === '1_year')
+                    .length
+                }{' '}
+                logs
               </Text>
             </View>
-            
+
             <View className="flex-row items-center justify-between">
-              <Text className="text-body-medium text-text-secondary">Permanent Retention</Text>
+              <Text className="text-body-medium text-text-secondary">
+                Permanent Retention
+              </Text>
               <Text className="text-body-medium font-medium text-text-primary">
-                {auditLogs.filter(log => log.retentionPolicy === 'permanent').length} logs
+                {
+                  auditLogs.filter((log) => log.retentionPolicy === 'permanent')
+                    .length
+                }{' '}
+                logs
               </Text>
             </View>
           </View>
@@ -488,13 +579,19 @@ export const AuditSystem: React.FC<AuditSystemProps> = ({
           <Text className="text-headline-small font-semibold text-text-primary mb-3">
             Recent Security Events
           </Text>
-          
+
           {auditLogs
-            .filter(log => log.category === 'security' && log.severity !== 'info')
+            .filter(
+              (log) => log.category === 'security' && log.severity !== 'info',
+            )
             .slice(0, 5)
             .map((log) => (
-              <View key={log.id} className="flex-row items-start py-2 border-b border-border-primary last:border-b-0">
-                <View className={`w-2 h-2 rounded-full mt-2 mr-3 ${getSeverityStyle(log.severity).dotBg}`} />
+              <View
+                key={log.id}
+                className="flex-row items-start py-2 border-b border-border-primary last:border-b-0">
+                <View
+                  className={`w-2 h-2 rounded-full mt-2 mr-3 ${getSeverityStyle(log.severity).dotBg}`}
+                />
                 <View className="flex-1">
                   <Text className="text-body-medium font-medium text-text-primary">
                     {formatAction(log.action)}
@@ -505,8 +602,9 @@ export const AuditSystem: React.FC<AuditSystemProps> = ({
                 </View>
               </View>
             ))}
-            
-          {auditLogs.filter(log => log.category === 'security').length === 0 && (
+
+          {auditLogs.filter((log) => log.category === 'security').length ===
+            0 && (
             <View className="items-center py-4">
               <LucideIcons name="shield-outline" size={32} color="#4CAF50" />
               <Text className="text-body-medium text-success mt-2">
@@ -527,35 +625,32 @@ export const AuditSystem: React.FC<AuditSystemProps> = ({
           <Text className="text-headline-small font-semibold text-text-primary mb-3">
             Quick Export
           </Text>
-          
+
           <View className="space-y-2">
             <Button
               variant="secondary"
               size="md"
               onPress={() => handleExport('csv')}
               disabled={!canExport || isExporting}
-              className="w-full"
-            >
+              className="w-full">
               Export Last 7 Days (CSV)
             </Button>
-            
+
             <Button
               variant="secondary"
               size="md"
               onPress={() => handleExport('pdf')}
               disabled={!canExport || isExporting}
-              className="w-full"
-            >
+              className="w-full">
               Export Last 30 Days (PDF)
             </Button>
-            
+
             <Button
               variant="secondary"
               size="md"
               onPress={() => handleExport('json')}
               disabled={!canExport || isExporting}
-              className="w-full"
-            >
+              className="w-full">
               Export Raw Data (JSON)
             </Button>
           </View>
@@ -568,32 +663,39 @@ export const AuditSystem: React.FC<AuditSystemProps> = ({
           <Text className="text-headline-small font-semibold text-text-primary mb-3">
             Generate Reports
           </Text>
-          
+
           <View className="space-y-2">
             <Button
               variant="primary"
               size="md"
-              onPress={() => onGenerateReport('monthly', ['security', 'compliance', 'data_privacy'])}
-              className="w-full"
-            >
+              onPress={() =>
+                onGenerateReport('monthly', [
+                  'security',
+                  'compliance',
+                  'data_privacy',
+                ])
+              }
+              className="w-full">
               Monthly Compliance Report
             </Button>
-            
+
             <Button
               variant="primary"
               size="md"
-              onPress={() => onGenerateReport('weekly', ['user_activity', 'authentication'])}
-              className="w-full"
-            >
+              onPress={() =>
+                onGenerateReport('weekly', ['user_activity', 'authentication'])
+              }
+              className="w-full">
               User Activity Report
             </Button>
-            
+
             <Button
               variant="primary"
               size="md"
-              onPress={() => onGenerateReport('daily', ['performance', 'system_event'])}
-              className="w-full"
-            >
+              onPress={() =>
+                onGenerateReport('daily', ['performance', 'system_event'])
+              }
+              className="w-full">
               System Performance Report
             </Button>
           </View>
@@ -606,7 +708,7 @@ export const AuditSystem: React.FC<AuditSystemProps> = ({
           <Text className="text-headline-small font-semibold text-text-primary mb-3">
             Scheduled Reports
           </Text>
-          
+
           <View className="space-y-3">
             <View className="flex-row items-center justify-between">
               <View>
@@ -621,7 +723,7 @@ export const AuditSystem: React.FC<AuditSystemProps> = ({
                 <Text className="text-label-small text-success">Active</Text>
               </View>
             </View>
-            
+
             <View className="flex-row items-center justify-between">
               <View>
                 <Text className="text-body-medium font-medium text-text-primary">
@@ -645,7 +747,9 @@ export const AuditSystem: React.FC<AuditSystemProps> = ({
     if (!selectedEntry) return null;
 
     return (
-      <View className="absolute inset-0 bg-black/50 items-center justify-center p-4" style={{ zIndex: 1000 }}>
+      <View
+        className="absolute inset-0 bg-black/50 items-center justify-center p-4"
+        style={{ zIndex: 1000 }}>
         <View className="bg-surface-primary rounded-2xl max-h-[80%] w-full max-w-lg">
           {/* Header */}
           <View className="p-4 border-b border-border-primary">
@@ -665,31 +769,43 @@ export const AuditSystem: React.FC<AuditSystemProps> = ({
               <Text className="text-body-large font-semibold text-text-primary mb-2">
                 {formatAction(selectedEntry.action)}
               </Text>
-              
+
               <View className="space-y-2">
                 <View className="flex-row justify-between">
-                  <Text className="text-body-small text-text-secondary">Timestamp:</Text>
+                  <Text className="text-body-small text-text-secondary">
+                    Timestamp:
+                  </Text>
                   <Text className="text-body-small text-text-primary">
                     {new Date(selectedEntry.timestamp).toLocaleString()}
                   </Text>
                 </View>
-                
+
                 <View className="flex-row justify-between">
-                  <Text className="text-body-small text-text-secondary">User:</Text>
-                  <Text className="text-body-small text-text-primary">{selectedEntry.userId}</Text>
+                  <Text className="text-body-small text-text-secondary">
+                    User:
+                  </Text>
+                  <Text className="text-body-small text-text-primary">
+                    {selectedEntry.userId}
+                  </Text>
                 </View>
-                
+
                 <View className="flex-row justify-between">
-                  <Text className="text-body-small text-text-secondary">Resource:</Text>
+                  <Text className="text-body-small text-text-secondary">
+                    Resource:
+                  </Text>
                   <Text className="text-body-small text-text-primary">
                     {formatResource(selectedEntry.resource)}
                   </Text>
                 </View>
-                
+
                 <View className="flex-row justify-between">
-                  <Text className="text-body-small text-text-secondary">Severity:</Text>
-                  <View className={`px-2 py-1 rounded-full ${getSeverityStyle(selectedEntry.severity).bg}`}>
-                    <Text className={`text-label-small ${getSeverityStyle(selectedEntry.severity).text}`}>
+                  <Text className="text-body-small text-text-secondary">
+                    Severity:
+                  </Text>
+                  <View
+                    className={`px-2 py-1 rounded-full ${getSeverityStyle(selectedEntry.severity).bg}`}>
+                    <Text
+                      className={`text-label-small ${getSeverityStyle(selectedEntry.severity).text}`}>
                       {selectedEntry.severity.toUpperCase()}
                     </Text>
                   </View>
@@ -704,7 +820,9 @@ export const AuditSystem: React.FC<AuditSystemProps> = ({
                   Changes Made
                 </Text>
                 {selectedEntry.changes.map((change, index) => (
-                  <View key={index} className="bg-surface-secondary p-3 rounded mb-2">
+                  <View
+                    key={index}
+                    className="bg-surface-secondary p-3 rounded mb-2">
                     <Text className="text-body-small font-medium text-text-primary mb-1">
                       {change.field}
                     </Text>
@@ -788,8 +906,8 @@ export const AuditSystem: React.FC<AuditSystemProps> = ({
           Access Restricted
         </Text>
         <Text className="text-body-medium text-text-secondary text-center">
-          You don't have permission to view audit logs.
-          Contact your administrator for access.
+          You don't have permission to view audit logs. Contact your
+          administrator for access.
         </Text>
       </View>
     );
@@ -817,39 +935,55 @@ export const AuditSystem: React.FC<AuditSystemProps> = ({
             leftIcon="search-outline"
             className="mb-3"
           />
-          
+
           <ScrollView horizontal showsHorizontalScrollIndicator={false}>
             <View className="flex-row gap-2">
               <TouchableOpacity
-                onPress={() => setFilters(prev => ({ ...prev, severity: prev.severity === 'critical' ? undefined : 'critical' }))}
+                onPress={() =>
+                  setFilters((prev) => ({
+                    ...prev,
+                    severity:
+                      prev.severity === 'critical' ? undefined : 'critical',
+                  }))
+                }
                 className={`px-3 py-2 rounded-full border ${
-                  filters.severity === 'critical' 
-                    ? 'border-error bg-error/10' 
+                  filters.severity === 'critical'
+                    ? 'border-error bg-error/10'
                     : 'border-border-primary bg-surface-secondary'
-                }`}
-              >
-                <Text className={`text-label-small ${
-                  filters.severity === 'critical' ? 'text-error' : 'text-text-secondary'
                 }`}>
+                <Text
+                  className={`text-label-small ${
+                    filters.severity === 'critical'
+                      ? 'text-error'
+                      : 'text-text-secondary'
+                  }`}>
                   Critical
                 </Text>
               </TouchableOpacity>
-              
+
               <TouchableOpacity
-                onPress={() => setFilters(prev => ({ ...prev, category: prev.category === 'security' ? undefined : 'security' }))}
+                onPress={() =>
+                  setFilters((prev) => ({
+                    ...prev,
+                    category:
+                      prev.category === 'security' ? undefined : 'security',
+                  }))
+                }
                 className={`px-3 py-2 rounded-full border ${
-                  filters.category === 'security' 
-                    ? 'border-warning bg-warning/10' 
+                  filters.category === 'security'
+                    ? 'border-warning bg-warning/10'
                     : 'border-border-primary bg-surface-secondary'
-                }`}
-              >
-                <Text className={`text-label-small ${
-                  filters.category === 'security' ? 'text-warning' : 'text-text-secondary'
                 }`}>
+                <Text
+                  className={`text-label-small ${
+                    filters.category === 'security'
+                      ? 'text-warning'
+                      : 'text-text-secondary'
+                  }`}>
                   Security
                 </Text>
               </TouchableOpacity>
-              
+
               {/* Add more filter buttons as needed */}
             </View>
           </ScrollView>
@@ -862,24 +996,24 @@ export const AuditSystem: React.FC<AuditSystemProps> = ({
           { key: 'logs', label: 'Audit Logs', icon: 'List' },
           { key: 'analytics', label: 'Analytics', icon: 'BarChart3' },
           { key: 'compliance', label: 'Compliance', icon: 'Shield' },
-          { key: 'reports', label: 'Reports', icon: 'FileText' }
+          { key: 'reports', label: 'Reports', icon: 'FileText' },
         ].map((tab) => (
           <TouchableOpacity
             key={tab.key}
             onPress={() => setActiveTab(tab.key as any)}
             className={`flex-1 p-4 border-b-2 ${
               activeTab === tab.key ? 'border-primary' : 'border-transparent'
-            }`}
-          >
+            }`}>
             <View className="items-center">
-              <LucideIcons 
-                name={tab.icon as string} 
-                size={20} 
-                color={activeTab === tab.key ? '#6366f1' : '#757575'} 
+              <LucideIcons
+                name={tab.icon as string}
+                size={20}
+                color={activeTab === tab.key ? '#6366f1' : '#757575'}
               />
-              <Text className={`text-body-small font-medium mt-1 ${
-                activeTab === tab.key ? 'text-primary' : 'text-text-secondary'
-              }`}>
+              <Text
+                className={`text-body-small font-medium mt-1 ${
+                  activeTab === tab.key ? 'text-primary' : 'text-text-secondary'
+                }`}>
                 {tab.label}
               </Text>
             </View>
@@ -895,7 +1029,11 @@ export const AuditSystem: React.FC<AuditSystemProps> = ({
               filteredLogs.map(renderLogEntry)
             ) : (
               <View className="items-center py-8">
-                <LucideIcons name="document-text-outline" size={48} color="#757575" />
+                <LucideIcons
+                  name="document-text-outline"
+                  size={48}
+                  color="#757575"
+                />
                 <Text className="text-headline-small text-text-secondary mt-4 mb-2">
                   No Audit Logs Found
                 </Text>
@@ -908,7 +1046,7 @@ export const AuditSystem: React.FC<AuditSystemProps> = ({
             )}
           </ScrollView>
         )}
-        
+
         {activeTab === 'analytics' && renderAnalytics()}
         {activeTab === 'compliance' && renderCompliance()}
         {activeTab === 'reports' && renderReports()}
@@ -923,41 +1061,41 @@ export const AuditSystem: React.FC<AuditSystemProps> = ({
 // Helper functions
 const getSeverityStyle = (severity: AuditSeverity) => {
   const styles = {
-    critical: { 
-      bg: 'bg-red-50', 
-      text: 'text-red-700', 
+    critical: {
+      bg: 'bg-red-50',
+      text: 'text-red-700',
       border: 'border-l-red-500',
       progressBg: 'bg-red-500',
-      dotBg: 'bg-red-500'
+      dotBg: 'bg-red-500',
     },
-    high: { 
-      bg: 'bg-orange-50', 
-      text: 'text-orange-700', 
+    high: {
+      bg: 'bg-orange-50',
+      text: 'text-orange-700',
       border: 'border-l-orange-500',
       progressBg: 'bg-orange-500',
-      dotBg: 'bg-orange-500'
+      dotBg: 'bg-orange-500',
     },
-    medium: { 
-      bg: 'bg-yellow-50', 
-      text: 'text-yellow-700', 
+    medium: {
+      bg: 'bg-yellow-50',
+      text: 'text-yellow-700',
       border: 'border-l-yellow-500',
       progressBg: 'bg-yellow-500',
-      dotBg: 'bg-yellow-500'
+      dotBg: 'bg-yellow-500',
     },
-    low: { 
-      bg: 'bg-blue-50', 
-      text: 'text-blue-700', 
+    low: {
+      bg: 'bg-blue-50',
+      text: 'text-blue-700',
       border: 'border-l-blue-500',
       progressBg: 'bg-blue-500',
-      dotBg: 'bg-blue-500'
+      dotBg: 'bg-blue-500',
     },
-    info: { 
-      bg: 'bg-gray-50', 
-      text: 'text-gray-700', 
+    info: {
+      bg: 'bg-gray-50',
+      text: 'text-gray-700',
       border: 'border-l-gray-500',
       progressBg: 'bg-gray-500',
-      dotBg: 'bg-gray-500'
-    }
+      dotBg: 'bg-gray-500',
+    },
   };
   return styles[severity] || styles.info;
 };
@@ -965,33 +1103,85 @@ const getSeverityStyle = (severity: AuditSeverity) => {
 const getCategoryStyle = (category: AuditCategory) => {
   const styles = {
     security: { bg: 'bg-red-50', text: 'text-red-700', dotBg: 'bg-red-500' },
-    authentication: { bg: 'bg-blue-50', text: 'text-blue-700', dotBg: 'bg-blue-500' },
-    authorization: { bg: 'bg-purple-50', text: 'text-purple-700', dotBg: 'bg-purple-500' },
-    data_privacy: { bg: 'bg-green-50', text: 'text-green-700', dotBg: 'bg-green-500' },
-    financial: { bg: 'bg-emerald-50', text: 'text-emerald-700', dotBg: 'bg-emerald-500' },
-    governance: { bg: 'bg-indigo-50', text: 'text-indigo-700', dotBg: 'bg-indigo-500' },
-    administrative: { bg: 'bg-cyan-50', text: 'text-cyan-700', dotBg: 'bg-cyan-500' },
-    operational: { bg: 'bg-orange-50', text: 'text-orange-700', dotBg: 'bg-orange-500' },
-    performance: { bg: 'bg-yellow-50', text: 'text-yellow-700', dotBg: 'bg-yellow-500' },
-    compliance: { bg: 'bg-pink-50', text: 'text-pink-700', dotBg: 'bg-pink-500' },
-    user_activity: { bg: 'bg-violet-50', text: 'text-violet-700', dotBg: 'bg-violet-500' },
-    system_event: { bg: 'bg-slate-50', text: 'text-slate-700', dotBg: 'bg-slate-500' },
-    integration: { bg: 'bg-teal-50', text: 'text-teal-700', dotBg: 'bg-teal-500' },
-    maintenance: { bg: 'bg-amber-50', text: 'text-amber-700', dotBg: 'bg-amber-500' }
+    authentication: {
+      bg: 'bg-blue-50',
+      text: 'text-blue-700',
+      dotBg: 'bg-blue-500',
+    },
+    authorization: {
+      bg: 'bg-purple-50',
+      text: 'text-purple-700',
+      dotBg: 'bg-purple-500',
+    },
+    data_privacy: {
+      bg: 'bg-green-50',
+      text: 'text-green-700',
+      dotBg: 'bg-green-500',
+    },
+    financial: {
+      bg: 'bg-emerald-50',
+      text: 'text-emerald-700',
+      dotBg: 'bg-emerald-500',
+    },
+    governance: {
+      bg: 'bg-indigo-50',
+      text: 'text-indigo-700',
+      dotBg: 'bg-indigo-500',
+    },
+    administrative: {
+      bg: 'bg-cyan-50',
+      text: 'text-cyan-700',
+      dotBg: 'bg-cyan-500',
+    },
+    operational: {
+      bg: 'bg-orange-50',
+      text: 'text-orange-700',
+      dotBg: 'bg-orange-500',
+    },
+    performance: {
+      bg: 'bg-yellow-50',
+      text: 'text-yellow-700',
+      dotBg: 'bg-yellow-500',
+    },
+    compliance: {
+      bg: 'bg-pink-50',
+      text: 'text-pink-700',
+      dotBg: 'bg-pink-500',
+    },
+    user_activity: {
+      bg: 'bg-violet-50',
+      text: 'text-violet-700',
+      dotBg: 'bg-violet-500',
+    },
+    system_event: {
+      bg: 'bg-slate-50',
+      text: 'text-slate-700',
+      dotBg: 'bg-slate-500',
+    },
+    integration: {
+      bg: 'bg-teal-50',
+      text: 'text-teal-700',
+      dotBg: 'bg-teal-500',
+    },
+    maintenance: {
+      bg: 'bg-amber-50',
+      text: 'text-amber-700',
+      dotBg: 'bg-amber-500',
+    },
   };
   return styles[category] || styles.system_event;
 };
 
 const formatAction = (action: AuditAction): string => {
-  return action.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+  return action.replace(/_/g, ' ').replace(/\b\w/g, (l) => l.toUpperCase());
 };
 
 const formatResource = (resource: AuditResource): string => {
-  return resource.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+  return resource.replace(/_/g, ' ').replace(/\b\w/g, (l) => l.toUpperCase());
 };
 
 const formatCategory = (category: AuditCategory): string => {
-  return category.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+  return category.replace(/_/g, ' ').replace(/\b\w/g, (l) => l.toUpperCase());
 };
 
 const getTimeAgo = (timestamp: string): string => {

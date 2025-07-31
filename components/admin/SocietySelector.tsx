@@ -1,6 +1,20 @@
 import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, Modal, FlatList, ActivityIndicator } from 'react-native';
-import { ChevronDown, Check, Building2, MapPin, Users, Settings } from 'lucide-react-native';
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  Modal,
+  FlatList,
+  ActivityIndicator,
+} from 'react-native';
+import {
+  ChevronDown,
+  Check,
+  Building2,
+  MapPin,
+  Users,
+  Settings,
+} from 'lucide-react-native';
 import { useAdmin } from '@/contexts/AdminContext';
 import { Society } from '@/types/admin';
 import { useAlert } from '@/components/ui/AlertCard';
@@ -14,14 +28,14 @@ interface SocietySelectorProps {
 const SocietySelector: React.FC<SocietySelectorProps> = ({
   compact = false,
   showStats = true,
-  onSocietyChange
+  onSocietyChange,
 }) => {
-  const { 
-    activeSociety, 
-    availableSocieties, 
-    switchSociety, 
+  const {
+    activeSociety,
+    availableSocieties,
+    switchSociety,
     adminUser,
-    currentMode 
+    currentMode,
   } = useAdmin();
   const { showAlert, AlertComponent } = useAlert();
   const [isModalVisible, setIsModalVisible] = useState(false);
@@ -36,32 +50,33 @@ const SocietySelector: React.FC<SocietySelectorProps> = ({
     setIsLoading(true);
     try {
       await switchSociety(societyId);
-      
-      const newSociety = availableSocieties.find(s => s.id === societyId);
+
+      const newSociety = availableSocieties.find((s) => s.id === societyId);
       if (newSociety && onSocietyChange) {
         onSocietyChange(newSociety);
       }
-      
+
       setIsModalVisible(false);
-      
+
       showAlert({
         type: 'success',
         title: 'Society Switched',
         message: `You are now managing ${newSociety?.name}`,
         primaryAction: {
           label: 'OK',
-          onPress: () => {}
-        }
+          onPress: () => {},
+        },
       });
     } catch (error) {
       showAlert({
         type: 'error',
         title: 'Switch Failed',
-        message: error instanceof Error ? error.message : 'Failed to switch society',
+        message:
+          error instanceof Error ? error.message : 'Failed to switch society',
         primaryAction: {
           label: 'OK',
-          onPress: () => {}
-        }
+          onPress: () => {},
+        },
       });
     } finally {
       setIsLoading(false);
@@ -71,25 +86,29 @@ const SocietySelector: React.FC<SocietySelectorProps> = ({
   const getSocietyStatus = (society: Society) => {
     const isActive = society.status === 'active';
     const hasAccess = adminUser?.societies.some(
-      s => s.societyId === society.id && s.isActive
+      (s) => s.societyId === society.id && s.isActive,
     );
-    
+
     return {
       accessible: isActive && hasAccess,
       statusColor: isActive ? 'text-green-600' : 'text-red-600',
-      statusText: isActive ? 'Active' : 'Inactive'
+      statusText: isActive ? 'Active' : 'Inactive',
     };
   };
 
   const getUserRoleInSociety = (societyId: string) => {
-    const societyAccess = adminUser?.societies.find(s => s.societyId === societyId);
+    const societyAccess = adminUser?.societies.find(
+      (s) => s.societyId === societyId,
+    );
     return societyAccess?.role || 'Unknown';
   };
 
   const formatRole = (role: string) => {
-    return role.replace('_', ' ').split(' ').map(word => 
-      word.charAt(0).toUpperCase() + word.slice(1)
-    ).join(' ');
+    return role
+      .replace('_', ' ')
+      .split(' ')
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(' ');
   };
 
   if (currentMode !== 'admin' || availableSocieties.length <= 1) {
@@ -103,19 +122,22 @@ const SocietySelector: React.FC<SocietySelectorProps> = ({
 
     return (
       <TouchableOpacity
-        onPress={() => status.accessible ? handleSocietySwitch(society.id) : null}
+        onPress={() =>
+          status.accessible ? handleSocietySwitch(society.id) : null
+        }
         disabled={!status.accessible || isLoading}
         className={`p-4 border-b border-divider/30 ${
           !status.accessible ? 'opacity-50' : ''
         } ${isSelected ? 'bg-primary/5' : ''}`}
-        activeOpacity={0.7}
-      >
+        activeOpacity={0.7}>
         <View className="flex-row items-start justify-between">
           <View className="flex-1 mr-3">
             {/* Society Name and Code */}
             <View className="flex-row items-center mb-2">
               <Building2 size={16} className="text-primary mr-2" />
-              <Text className="text-body-large font-semibold text-text-primary flex-1" numberOfLines={1}>
+              <Text
+                className="text-body-large font-semibold text-text-primary flex-1"
+                numberOfLines={1}>
                 {society.name}
               </Text>
               {isSelected && (
@@ -131,10 +153,13 @@ const SocietySelector: React.FC<SocietySelectorProps> = ({
                 {society.code}
               </Text>
               <View className="flex-row items-center">
-                <View className={`w-2 h-2 rounded-full mr-1 ${
-                  society.status === 'active' ? 'bg-green-500' : 'bg-red-500'
-                }`} />
-                <Text className={`text-label-small font-medium ${status.statusColor}`}>
+                <View
+                  className={`w-2 h-2 rounded-full mr-1 ${
+                    society.status === 'active' ? 'bg-green-500' : 'bg-red-500'
+                  }`}
+                />
+                <Text
+                  className={`text-label-small font-medium ${status.statusColor}`}>
                   {status.statusText}
                 </Text>
               </View>
@@ -151,7 +176,9 @@ const SocietySelector: React.FC<SocietySelectorProps> = ({
             {/* Address */}
             <View className="flex-row items-start mb-2">
               <MapPin size={14} className="text-text-secondary mr-2 mt-0.5" />
-              <Text className="text-label-medium text-text-secondary flex-1" numberOfLines={2}>
+              <Text
+                className="text-label-medium text-text-secondary flex-1"
+                numberOfLines={2}>
                 {society.address}
               </Text>
             </View>
@@ -161,7 +188,8 @@ const SocietySelector: React.FC<SocietySelectorProps> = ({
               <View className="flex-row items-center">
                 <Users size={14} className="text-text-secondary mr-2" />
                 <Text className="text-label-medium text-text-secondary">
-                  {society.activeResidents}/{society.totalFlats} residents • {society.adminCount} admins
+                  {society.activeResidents}/{society.totalFlats} residents •{' '}
+                  {society.adminCount} admins
                 </Text>
               </View>
             )}
@@ -179,18 +207,20 @@ const SocietySelector: React.FC<SocietySelectorProps> = ({
         className={`flex-row items-center ${
           compact ? 'py-2 px-3' : 'py-3 px-4'
         } bg-surface border border-divider rounded-xl`}
-        activeOpacity={0.7}
-      >
+        activeOpacity={0.7}>
         <Building2 size={compact ? 16 : 20} className="text-primary mr-2" />
         <View className="flex-1 mr-2">
-          <Text className={`${
-            compact ? 'text-label-large' : 'text-body-medium'
-          } font-semibold text-text-primary`} numberOfLines={1}>
+          <Text
+            className={`${
+              compact ? 'text-label-large' : 'text-body-medium'
+            } font-semibold text-text-primary`}
+            numberOfLines={1}>
             {activeSociety?.name || 'Select Society'}
           </Text>
           {!compact && activeSociety && (
             <Text className="text-label-medium text-text-secondary">
-              {activeSociety.code} • {formatRole(getUserRoleInSociety(activeSociety.id))}
+              {activeSociety.code} •{' '}
+              {formatRole(getUserRoleInSociety(activeSociety.id))}
             </Text>
           )}
         </View>
@@ -202,8 +232,7 @@ const SocietySelector: React.FC<SocietySelectorProps> = ({
         visible={isModalVisible}
         animationType="slide"
         presentationStyle="pageSheet"
-        onRequestClose={() => setIsModalVisible(false)}
-      >
+        onRequestClose={() => setIsModalVisible(false)}>
         <View className="flex-1 bg-background">
           {/* Header */}
           <View className="flex-row items-center justify-between p-6 border-b border-divider bg-surface">
@@ -217,8 +246,7 @@ const SocietySelector: React.FC<SocietySelectorProps> = ({
             </View>
             <TouchableOpacity
               onPress={() => setIsModalVisible(false)}
-              className="p-2 bg-background rounded-lg"
-            >
+              className="p-2 bg-background rounded-lg">
               <Text className="text-primary font-medium">Done</Text>
             </TouchableOpacity>
           </View>
@@ -233,7 +261,7 @@ const SocietySelector: React.FC<SocietySelectorProps> = ({
                 </Text>
               </View>
             )}
-            
+
             <FlatList
               data={availableSocieties}
               keyExtractor={(item) => item.id}
@@ -246,7 +274,8 @@ const SocietySelector: React.FC<SocietySelectorProps> = ({
           {/* Footer Info */}
           <View className="p-4 bg-surface border-t border-divider">
             <Text className="text-label-medium text-text-secondary text-center">
-              You have access to {availableSocieties.length} {availableSocieties.length === 1 ? 'society' : 'societies'}
+              You have access to {availableSocieties.length}{' '}
+              {availableSocieties.length === 1 ? 'society' : 'societies'}
             </Text>
           </View>
         </View>

@@ -1,5 +1,5 @@
-import { showAlert, showConfirmAlert, showSuccessAlert } from "@/utils/alert";
-import { useLocalSearchParams, useRouter } from "expo-router";
+import { showAlert, showConfirmAlert, showSuccessAlert } from '@/utils/alert';
+import { useLocalSearchParams, useRouter } from 'expo-router';
 import {
   AlertCircle,
   ArrowLeft,
@@ -13,97 +13,97 @@ import {
   QrCode,
   Share,
   Smartphone,
-} from "lucide-react-native";
-import React, { useState } from "react";
+} from 'lucide-react-native';
+import React, { useState } from 'react';
 import {
   SafeAreaView,
   ScrollView,
   Text,
   TouchableOpacity,
   View,
-} from "react-native";
+} from 'react-native';
 
 // Mock bill data - in production this would come from Supabase
 const mockBillDetails = {
-  "1": {
-    id: "1",
-    title: "Maintenance Bill - March 2024",
-    billNumber: "MB-2024-03-001",
+  '1': {
+    id: '1',
+    title: 'Maintenance Bill - March 2024',
+    billNumber: 'MB-2024-03-001',
     amount: 5250,
     gstAmount: 945,
     totalAmount: 6195,
-    dueDate: "2024-03-31",
-    issueDate: "2024-03-01",
-    status: "overdue",
-    flatNumber: "A-201",
-    societyName: "Green Valley Apartments",
+    dueDate: '2024-03-31',
+    issueDate: '2024-03-01',
+    status: 'overdue',
+    flatNumber: 'A-201',
+    societyName: 'Green Valley Apartments',
     items: [
       {
-        id: "1",
-        description: "Security Charges",
+        id: '1',
+        description: 'Security Charges',
         amount: 2000,
-        category: "security",
+        category: 'security',
       },
       {
-        id: "2",
-        description: "Housekeeping",
+        id: '2',
+        description: 'Housekeeping',
         amount: 1500,
-        category: "cleaning",
+        category: 'cleaning',
       },
       {
-        id: "3",
-        description: "Lift Maintenance",
+        id: '3',
+        description: 'Lift Maintenance',
         amount: 800,
-        category: "maintenance",
+        category: 'maintenance',
       },
       {
-        id: "4",
-        description: "Common Area Electricity",
+        id: '4',
+        description: 'Common Area Electricity',
         amount: 950,
-        category: "utilities",
+        category: 'utilities',
       },
     ],
-    paymentMethods: ["card", "upi", "netbanking", "wallet"],
+    paymentMethods: ['card', 'upi', 'netbanking', 'wallet'],
     lateFee: 186, // 3% late fee
     gracePeriod: 7,
     remindersSent: 3,
-    lastReminderDate: "2024-04-05",
+    lastReminderDate: '2024-04-05',
     previousBalance: 0,
     waterUsage: undefined, // Maintenance bills don't have water usage
     notes:
-      "This bill includes charges for common area maintenance and utilities for March 2024.",
+      'This bill includes charges for common area maintenance and utilities for March 2024.',
   },
-  "2": {
-    id: "2",
-    title: "Water Bill - March 2024",
-    billNumber: "WB-2024-03-001",
+  '2': {
+    id: '2',
+    title: 'Water Bill - March 2024',
+    billNumber: 'WB-2024-03-001',
     amount: 750,
     gstAmount: 135,
     totalAmount: 885,
-    dueDate: "2024-04-05",
-    issueDate: "2024-03-20",
-    status: "pending",
-    flatNumber: "A-201",
-    societyName: "Green Valley Apartments",
+    dueDate: '2024-04-05',
+    issueDate: '2024-03-20',
+    status: 'pending',
+    flatNumber: 'A-201',
+    societyName: 'Green Valley Apartments',
     items: [
       {
-        id: "1",
-        description: "Water Consumption (450 units)",
+        id: '1',
+        description: 'Water Consumption (450 units)',
         amount: 600,
-        category: "utilities",
+        category: 'utilities',
       },
       {
-        id: "2",
-        description: "Water Tank Cleaning",
+        id: '2',
+        description: 'Water Tank Cleaning',
         amount: 150,
-        category: "maintenance",
+        category: 'maintenance',
       },
     ],
-    paymentMethods: ["card", "upi", "netbanking"],
+    paymentMethods: ['card', 'upi', 'netbanking'],
     lateFee: 0,
     gracePeriod: 7,
     remindersSent: 1,
-    lastReminderDate: "2024-04-01",
+    lastReminderDate: '2024-04-01',
     previousBalance: 0,
     waterUsage: {
       currentReading: 1450,
@@ -112,28 +112,28 @@ const mockBillDetails = {
       rate: 1.33,
     },
     notes:
-      "Water bill based on actual meter reading. Next reading due on April 20th.",
+      'Water bill based on actual meter reading. Next reading due on April 20th.',
   },
 };
 
 // Payment gateway configurations
 const paymentGateways = {
   razorpay: {
-    name: "Razorpay",
-    logo: "💳",
-    methods: ["card", "upi", "netbanking", "wallet"],
+    name: 'Razorpay',
+    logo: '💳',
+    methods: ['card', 'upi', 'netbanking', 'wallet'],
     charges: 1.95, // 1.95% + GST
   },
   justpay: {
-    name: "JustPay",
-    logo: "📱",
-    methods: ["upi", "wallet"],
+    name: 'JustPay',
+    logo: '📱',
+    methods: ['upi', 'wallet'],
     charges: 0.5, // 0.5% for UPI
   },
   payu: {
-    name: "PayU",
-    logo: "🏦",
-    methods: ["card", "netbanking", "emi"],
+    name: 'PayU',
+    logo: '🏦',
+    methods: ['card', 'netbanking', 'emi'],
     charges: 2.0, // 2% + GST
   },
 };
@@ -151,17 +151,17 @@ const PaymentMethodCard: React.FC<PaymentMethodCardProps> = ({
 }) => {
   const getMethodIcon = () => {
     switch (method) {
-      case "card":
+      case 'card':
         return <CreditCard size={20} color="#6366f1" />;
-      case "upi":
+      case 'upi':
         return <Smartphone size={20} color="#6366f1" />;
-      case "netbanking":
+      case 'netbanking':
         return <Building size={20} color="#6366f1" />;
-      case "wallet":
+      case 'wallet':
         return <DollarSign size={20} color="#6366f1" />;
-      case "qr":
+      case 'qr':
         return <QrCode size={20} color="#6366f1" />;
-      case "emi":
+      case 'emi':
         return <Calendar size={20} color="#6366f1" />;
       default:
         return <CreditCard size={20} color="#6366f1" />;
@@ -170,18 +170,18 @@ const PaymentMethodCard: React.FC<PaymentMethodCardProps> = ({
 
   const getMethodName = () => {
     switch (method) {
-      case "card":
-        return "Credit/Debit Card";
-      case "upi":
-        return "UPI";
-      case "netbanking":
-        return "Net Banking";
-      case "wallet":
-        return "Wallet";
-      case "qr":
-        return "QR Code";
-      case "emi":
-        return "EMI";
+      case 'card':
+        return 'Credit/Debit Card';
+      case 'upi':
+        return 'UPI';
+      case 'netbanking':
+        return 'Net Banking';
+      case 'wallet':
+        return 'Wallet';
+      case 'qr':
+        return 'QR Code';
+      case 'emi':
+        return 'EMI';
       default:
         return method;
     }
@@ -193,8 +193,7 @@ const PaymentMethodCard: React.FC<PaymentMethodCardProps> = ({
     <TouchableOpacity
       onPress={onSelect}
       className="bg-surface rounded-xl p-4 border border-divider mb-3"
-      activeOpacity={0.7}
-    >
+      activeOpacity={0.7}>
       <View className="flex-row items-center justify-between">
         <View className="flex-row items-center flex-1">
           <View className="bg-primary/10 rounded-full w-10 h-10 items-center justify-center mr-3">
@@ -243,37 +242,37 @@ export default function BillDetail() {
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case "paid":
-        return "text-success";
-      case "pending":
-        return "text-warning";
-      case "overdue":
-        return "text-error";
+      case 'paid':
+        return 'text-success';
+      case 'pending':
+        return 'text-warning';
+      case 'overdue':
+        return 'text-error';
       default:
-        return "text-text-secondary";
+        return 'text-text-secondary';
     }
   };
 
   const getStatusBgColor = (status: string) => {
     switch (status) {
-      case "paid":
-        return "bg-success/20";
-      case "pending":
-        return "bg-warning/20";
-      case "overdue":
-        return "bg-error/20";
+      case 'paid':
+        return 'bg-success/20';
+      case 'pending':
+        return 'bg-warning/20';
+      case 'overdue':
+        return 'bg-error/20';
       default:
-        return "bg-text-secondary/20";
+        return 'bg-text-secondary/20';
     }
   };
 
   const getStatusIcon = (status: string) => {
     switch (status) {
-      case "paid":
+      case 'paid':
         return <CheckCircle size={16} color="#4CAF50" />;
-      case "pending":
+      case 'pending':
         return <Calendar size={16} color="#FF9800" />;
-      case "overdue":
+      case 'overdue':
         return <AlertCircle size={16} color="#D32F2F" />;
       default:
         return <Calendar size={16} color="#757575" />;
@@ -282,110 +281,110 @@ export default function BillDetail() {
 
   const getCategoryIcon = (category: string) => {
     const icons = {
-      security: "🔒",
-      cleaning: "🧹",
-      maintenance: "🔧",
-      utilities: "⚡",
-      water: "💧",
+      security: '🔒',
+      cleaning: '🧹',
+      maintenance: '🔧',
+      utilities: '⚡',
+      water: '💧',
     };
-    return icons[category as keyof typeof icons] || "📋";
+    return icons[category as keyof typeof icons] || '📋';
   };
 
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString("en-IN", {
-      day: "numeric",
-      month: "long",
-      year: "numeric",
+    return new Date(dateString).toLocaleDateString('en-IN', {
+      day: 'numeric',
+      month: 'long',
+      year: 'numeric',
     });
   };
 
   const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat("en-IN", {
-      style: "currency",
-      currency: "INR",
+    return new Intl.NumberFormat('en-IN', {
+      style: 'currency',
+      currency: 'INR',
     }).format(amount);
   };
 
   const calculateTotalWithLateFee = () => {
-    return bill.totalAmount + (bill.status === "overdue" ? bill.lateFee : 0);
+    return bill.totalAmount + (bill.status === 'overdue' ? bill.lateFee : 0);
   };
 
   const handlePaymentMethodSelect = (method: string, gateway: string) => {
     setSelectedPaymentMethod({ method, gateway });
 
     showConfirmAlert(
-      "Payment Method Selected",
+      'Payment Method Selected',
       `You selected ${method} via ${
         paymentGateways[gateway as keyof typeof paymentGateways].name
       }. This would integrate with the actual payment gateway.`,
       () => handlePayment(method, gateway),
       undefined,
-      "Proceed to Pay",
-      "Cancel"
+      'Proceed to Pay',
+      'Cancel',
     );
   };
 
   const handlePayment = (method: string, gateway: string) => {
     // In production, this would integrate with actual payment gateways
     showAlert(
-      "Payment Processing",
+      'Payment Processing',
       `Processing payment of ${formatCurrency(
-        calculateTotalWithLateFee()
+        calculateTotalWithLateFee(),
       )} via ${method}...`,
       {
-        type: "info",
+        type: 'info',
         primaryAction: {
-          label: "OK",
+          label: 'OK',
           onPress: () => {
             showSuccessAlert(
-              "Payment Successful!",
-              "Your payment has been processed successfully.",
+              'Payment Successful!',
+              'Your payment has been processed successfully.',
               () => {
                 router.back();
-              }
+              },
             );
           },
         },
-      }
+      },
     );
   };
 
   const handleDownloadBill = () => {
     // In production, this would generate and download PDF
     showSuccessAlert(
-      "Download Started",
-      "Bill PDF download will start shortly."
+      'Download Started',
+      'Bill PDF download will start shortly.',
     );
   };
 
   const handleShareBill = () => {
     // In production, this would use React Native Share
     showAlert(
-      "Share Bill",
-      "Bill sharing functionality would be integrated here."
+      'Share Bill',
+      'Bill sharing functionality would be integrated here.',
     );
   };
 
   const handleSetupAutoPayment = () => {
     showConfirmAlert(
-      "Setup Auto Payment",
-      "Configure automatic payment for future bills?",
+      'Setup Auto Payment',
+      'Configure automatic payment for future bills?',
       () =>
         showAlert(
-          "Auto Payment",
-          "Auto payment setup functionality would be here."
+          'Auto Payment',
+          'Auto payment setup functionality would be here.',
         ),
       undefined,
-      "Setup",
-      "Cancel"
+      'Setup',
+      'Cancel',
     );
   };
 
   const daysOverdue =
-    bill.status === "overdue"
+    bill.status === 'overdue'
       ? Math.floor(
           (new Date().getTime() - new Date(bill.dueDate).getTime()) /
-            (1000 * 3600 * 24)
+            (1000 * 3600 * 24),
         )
       : 0;
 
@@ -415,8 +414,7 @@ export default function BillDetail() {
       <ScrollView
         className="flex-1"
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ paddingBottom: 100 }}
-      >
+        contentContainerStyle={{ paddingBottom: 100 }}>
         <View className="px-6 py-6 space-y-6">
           {/* Bill Header Card */}
           <View className="bg-surface rounded-xl p-6 border border-divider mb-4">
@@ -436,7 +434,7 @@ export default function BillDetail() {
                 <Text className="text-display-small font-bold text-text-primary">
                   {formatCurrency(bill.totalAmount)}
                 </Text>
-                {bill.status === "overdue" && (
+                {bill.status === 'overdue' && (
                   <Text className="text-body-medium text-error font-medium">
                     + {formatCurrency(bill.lateFee)} late fee
                   </Text>
@@ -448,19 +446,17 @@ export default function BillDetail() {
             <View className="flex-row items-center justify-between mb-4">
               <View
                 className={`flex-row items-center px-4 py-2 rounded-full ${getStatusBgColor(
-                  bill.status
-                )}`}
-              >
+                  bill.status,
+                )}`}>
                 {getStatusIcon(bill.status)}
                 <Text
                   className={`font-semibold text-body-large ml-2 capitalize ${getStatusColor(
-                    bill.status
-                  )}`}
-                >
+                    bill.status,
+                  )}`}>
                   {bill.status}
                 </Text>
               </View>
-              {bill.status === "overdue" && (
+              {bill.status === 'overdue' && (
                 <Text className="text-error text-body-medium font-medium">
                   {daysOverdue} days overdue
                 </Text>
@@ -478,11 +474,10 @@ export default function BillDetail() {
                 </View>
                 <Text
                   className={`text-body-large font-semibold ${
-                    bill.status === "overdue"
-                      ? "text-error"
-                      : "text-text-primary"
-                  }`}
-                >
+                    bill.status === 'overdue'
+                      ? 'text-error'
+                      : 'text-text-primary'
+                  }`}>
                   {formatDate(bill.dueDate)}
                 </Text>
               </View>
@@ -498,8 +493,7 @@ export default function BillDetail() {
               {bill.items.map((item) => (
                 <View
                   key={item.id}
-                  className="flex-row items-center justify-between py-2"
-                >
+                  className="flex-row items-center justify-between py-2">
                   <View className="flex-row items-center flex-1">
                     <Text className="text-lg mr-3">
                       {getCategoryIcon(item.category)}
@@ -532,7 +526,7 @@ export default function BillDetail() {
                   {formatCurrency(bill.gstAmount)}
                 </Text>
               </View>
-              {bill.status === "overdue" && (
+              {bill.status === 'overdue' && (
                 <View className="flex-row justify-between">
                   <Text className="text-body-large text-error">
                     Late Fee (3%)
@@ -639,7 +633,7 @@ export default function BillDetail() {
           )}
 
           {/* Payment Methods */}
-          {bill.status !== "paid" && showPaymentMethods && (
+          {bill.status !== 'paid' && showPaymentMethods && (
             <View className="bg-surface rounded-xl p-6 border border-divider">
               <Text className="text-headline-medium font-semibold text-text-primary mb-4">
                 Choose Payment Method
@@ -654,7 +648,7 @@ export default function BillDetail() {
                     method={method}
                     gateway="razorpay"
                     onSelect={() =>
-                      handlePaymentMethodSelect(method, "razorpay")
+                      handlePaymentMethodSelect(method, 'razorpay')
                     }
                   />
                 ))}
@@ -668,7 +662,7 @@ export default function BillDetail() {
                     method={method}
                     gateway="justpay"
                     onSelect={() =>
-                      handlePaymentMethodSelect(method, "justpay")
+                      handlePaymentMethodSelect(method, 'justpay')
                     }
                   />
                 ))}
@@ -681,7 +675,7 @@ export default function BillDetail() {
                     key={`payu-${method}`}
                     method={method}
                     gateway="payu"
-                    onSelect={() => handlePaymentMethodSelect(method, "payu")}
+                    onSelect={() => handlePaymentMethodSelect(method, 'payu')}
                   />
                 ))}
             </View>
@@ -690,30 +684,26 @@ export default function BillDetail() {
       </ScrollView>
 
       {/* Bottom Action Bar */}
-      {bill.status !== "paid" && (
+      {bill.status !== 'paid' && (
         <View className="bg-surface px-6 py-4 border-t border-divider">
           <View className="flex-row gap-3">
             <TouchableOpacity
               onPress={handleSetupAutoPayment}
-              className="flex-1 bg-surface border border-divider rounded-xl py-4 flex-row items-center justify-center min-h-[52px]"
-            >
+              className="flex-1 bg-surface border border-divider rounded-xl py-4 flex-row items-center justify-center min-h-[52px]">
               <Calendar size={16} color="#6366f1" />
               <Text
                 className="text-primary font-semibold ml-2"
-                numberOfLines={1}
-              >
+                numberOfLines={1}>
                 Auto Pay
               </Text>
             </TouchableOpacity>
             <TouchableOpacity
               onPress={() => setShowPaymentMethods(!showPaymentMethods)}
-              className="flex-[2] bg-primary rounded-xl py-4 flex-row items-center justify-center min-h-[52px]"
-            >
+              className="flex-[2] bg-primary rounded-xl py-4 flex-row items-center justify-center min-h-[52px]">
               <CreditCard size={16} color="white" />
               <Text
                 className="text-white font-semibold ml-2 flex-shrink"
-                numberOfLines={1}
-              >
+                numberOfLines={1}>
                 Pay {formatCurrency(calculateTotalWithLateFee())}
               </Text>
             </TouchableOpacity>

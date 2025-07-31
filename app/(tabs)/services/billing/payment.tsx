@@ -1,7 +1,21 @@
-import React, { useState, useEffect } from 'react';
-import { SafeAreaView, ScrollView, View, Text, TouchableOpacity } from 'react-native';
+import React, { useState } from 'react';
+import {
+  SafeAreaView,
+  ScrollView,
+  View,
+  Text,
+  TouchableOpacity,
+} from 'react-native';
 import { showErrorAlert } from '@/utils/alert';
-import { ArrowLeft, CreditCard, Smartphone, Building, Shield, CheckCircle, Gift } from 'lucide-react-native';
+import {
+  ArrowLeft,
+  CreditCard,
+  Smartphone,
+  Building,
+  Shield,
+  CheckCircle,
+  Gift,
+} from 'lucide-react-native';
 import { router, useLocalSearchParams } from 'expo-router';
 import { Button } from '../../../../components/ui/Button';
 import { Card } from '../../../../components/ui/Card';
@@ -24,14 +38,27 @@ export default function PaymentPage() {
     cashback: string;
     [key: string]: string;
   }>();
-  
-  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<PaymentMethod | null>(null);
+
+  const [selectedPaymentMethod, setSelectedPaymentMethod] =
+    useState<PaymentMethod | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
 
   const paymentMethods: PaymentMethod[] = [
-    { id: 'upi', name: 'UPI (GPay, PhonePe, Paytm)', icon: Smartphone, type: 'upi', popular: true, cashback: 'Extra 1%' },
+    {
+      id: 'upi',
+      name: 'UPI (GPay, PhonePe, Paytm)',
+      icon: Smartphone,
+      type: 'upi',
+      popular: true,
+      cashback: 'Extra 1%',
+    },
     { id: 'card', name: 'Credit/Debit Card', icon: CreditCard, type: 'card' },
-    { id: 'netbanking', name: 'Net Banking', icon: Building, type: 'netbanking' },
+    {
+      id: 'netbanking',
+      name: 'Net Banking',
+      icon: Building,
+      type: 'netbanking',
+    },
   ];
 
   const formatCurrency = (amount: number) => {
@@ -40,29 +67,44 @@ export default function PaymentPage() {
 
   const getServiceName = (service: string) => {
     switch (service) {
-      case 'mobile-recharge': return 'Mobile Recharge';
-      case 'broadband-recharge': return 'Broadband Recharge';
-      case 'cylinder-booking': return 'Gas Cylinder Booking';
-      case 'gas-recharge': return 'PNG Recharge';
-      case 'dishtv-recharge': return 'DTH Recharge';
-      default: return 'Service Payment';
+      case 'mobile-recharge':
+        return 'Mobile Recharge';
+      case 'broadband-recharge':
+        return 'Broadband Recharge';
+      case 'cylinder-booking':
+        return 'Gas Cylinder Booking';
+      case 'gas-recharge':
+        return 'PNG Recharge';
+      case 'dishtv-recharge':
+        return 'DTH Recharge';
+      default:
+        return 'Service Payment';
     }
   };
 
   const getServiceIcon = (service: string) => {
     switch (service) {
-      case 'mobile-recharge': return '📱';
-      case 'broadband-recharge': return '🌐';
-      case 'cylinder-booking': return '🔥';
-      case 'gas-recharge': return '⛽';
-      case 'dishtv-recharge': return '📺';
-      default: return '💳';
+      case 'mobile-recharge':
+        return '📱';
+      case 'broadband-recharge':
+        return '🌐';
+      case 'cylinder-booking':
+        return '🔥';
+      case 'gas-recharge':
+        return '⛽';
+      case 'dishtv-recharge':
+        return '📺';
+      default:
+        return '💳';
     }
   };
 
   const handlePayment = async () => {
     if (!selectedPaymentMethod) {
-      showErrorAlert('Select Payment Method', 'Please choose a payment method to continue');
+      showErrorAlert(
+        'Select Payment Method',
+        'Please choose a payment method to continue',
+      );
       return;
     }
 
@@ -71,7 +113,7 @@ export default function PaymentPage() {
     // Simulate payment processing
     setTimeout(() => {
       setIsProcessing(false);
-      
+
       // Navigate to success page with transaction details
       router.replace({
         pathname: '/(tabs)/services/billing/payment-success',
@@ -81,15 +123,17 @@ export default function PaymentPage() {
           provider: params.provider,
           paymentMethod: selectedPaymentMethod.name,
           transactionId: `TXN${Date.now()}`,
-          cashback: params.cashback || '0'
-        }
+          cashback: params.cashback || '0',
+        },
       });
     }, 3000);
   };
 
   const amount = parseInt(params.amount || '0');
   const cashbackAmount = parseInt(params.cashback || '0');
-  const totalSavings = cashbackAmount + (selectedPaymentMethod?.cashback ? Math.round(amount * 0.01) : 0);
+  const totalSavings =
+    cashbackAmount +
+    (selectedPaymentMethod?.cashback ? Math.round(amount * 0.01) : 0);
 
   return (
     <SafeAreaView className="flex-1 bg-background">
@@ -100,8 +144,7 @@ export default function PaymentPage() {
           size="sm"
           onPress={() => router.back()}
           className="mr-2 p-2"
-          disabled={isProcessing}
-        >
+          disabled={isProcessing}>
           <ArrowLeft size={20} color="#6366f1" />
         </Button>
         <Text className="text-text-primary text-headline-large font-semibold">
@@ -113,7 +156,9 @@ export default function PaymentPage() {
         {/* Transaction Summary */}
         <Card className="m-6">
           <View className="flex-row items-center mb-4">
-            <Text className="text-3xl mr-3">{getServiceIcon(params.service)}</Text>
+            <Text className="text-3xl mr-3">
+              {getServiceIcon(params.service)}
+            </Text>
             <View className="flex-1">
               <Text className="text-text-primary text-headline-medium font-semibold">
                 {getServiceName(params.service)}
@@ -126,12 +171,14 @@ export default function PaymentPage() {
 
           <View className="bg-background rounded-xl p-4">
             <View className="flex-row justify-between items-center mb-2">
-              <Text className="text-text-secondary text-body-medium">Amount</Text>
+              <Text className="text-text-secondary text-body-medium">
+                Amount
+              </Text>
               <Text className="text-text-primary text-display-small font-bold">
                 {formatCurrency(amount)}
               </Text>
             </View>
-            
+
             {cashbackAmount > 0 && (
               <View className="flex-row justify-between items-center">
                 <Text className="text-success text-body-medium">Cashback</Text>
@@ -148,7 +195,7 @@ export default function PaymentPage() {
           <Text className="text-text-primary text-headline-medium font-semibold mb-4">
             Choose Payment Method
           </Text>
-          
+
           <View className="space-y-3">
             {paymentMethods.map((method) => {
               const IconComponent = method.icon;
@@ -158,17 +205,20 @@ export default function PaymentPage() {
                   onPress={() => setSelectedPaymentMethod(method)}
                   disabled={isProcessing}
                   className={`bg-surface rounded-xl p-4 border ${
-                    selectedPaymentMethod?.id === method.id ? 'border-primary bg-primary/5' : 'border-divider'
-                  } ${isProcessing ? 'opacity-50' : ''}`}
-                >
+                    selectedPaymentMethod?.id === method.id
+                      ? 'border-primary bg-primary/5'
+                      : 'border-divider'
+                  } ${isProcessing ? 'opacity-50' : ''}`}>
                   {method.popular && (
                     <View className="absolute -top-2 left-4">
                       <View className="bg-success rounded-full px-3 py-1">
-                        <Text className="text-white text-label-large font-bold">POPULAR</Text>
+                        <Text className="text-white text-label-large font-bold">
+                          POPULAR
+                        </Text>
                       </View>
                     </View>
                   )}
-                  
+
                   <View className="flex-row items-center justify-between">
                     <View className="flex-row items-center flex-1">
                       <View className="w-12 h-12 rounded-full bg-primary/10 items-center justify-center mr-4">
@@ -203,8 +253,7 @@ export default function PaymentPage() {
             title="Your Savings"
             variant="success"
             size="sm"
-            className="mx-6 mb-6"
-          >
+            className="mx-6 mb-6">
             <View className="flex-row items-center justify-between">
               <View className="flex-row items-center">
                 <Gift size={16} color="#4CAF50" />
@@ -224,8 +273,7 @@ export default function PaymentPage() {
           title="Secure Payment"
           variant="info"
           size="sm"
-          className="mx-6 mb-8"
-        >
+          className="mx-6 mb-8">
           <View className="space-y-2">
             <View className="flex-row items-center">
               <Shield size={16} color="#6366f1" />
@@ -251,11 +299,10 @@ export default function PaymentPage() {
 
       {/* Pay Button */}
       <View className="px-6 py-4 bg-surface border-t border-divider">
-        <Button 
-          onPress={handlePayment} 
+        <Button
+          onPress={handlePayment}
           disabled={!selectedPaymentMethod || isProcessing}
-          className="flex-row items-center justify-center"
-        >
+          className="flex-row items-center justify-center">
           {isProcessing ? (
             <Text className="text-white font-semibold text-body-medium">
               Processing Payment...
@@ -269,7 +316,7 @@ export default function PaymentPage() {
             </>
           )}
         </Button>
-        
+
         {selectedPaymentMethod && (
           <Text className="text-text-secondary text-body-medium text-center mt-2">
             Paying via {selectedPaymentMethod.name}

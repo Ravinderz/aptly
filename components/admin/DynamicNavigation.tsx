@@ -1,11 +1,11 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, ScrollView } from 'react-native';
-import { 
-  Home, 
-  Users, 
-  DollarSign, 
-  Shield, 
-  Settings, 
+import {
+  Home,
+  Users,
+  DollarSign,
+  Shield,
+  Settings,
   BarChart3,
   Bell,
   FileText,
@@ -16,7 +16,7 @@ import {
   CreditCard,
   Eye,
   Vote,
-  Gavel
+  Gavel,
 } from 'lucide-react-native';
 import { useAdmin } from '@/contexts/AdminContext';
 import { AdminRole } from '@/types/admin';
@@ -50,7 +50,7 @@ const DynamicNavigation: React.FC<DynamicNavigationProps> = ({
   currentRoute,
   layout = 'grid',
   showCategories = true,
-  compactMode = false
+  compactMode = false,
 }) => {
   const { checkPermission, adminUser, currentMode } = useAdmin();
 
@@ -64,9 +64,9 @@ const DynamicNavigation: React.FC<DynamicNavigationProps> = ({
       requiredPermissions: [],
       category: 'primary',
       color: '#6366f1',
-      description: 'Main admin dashboard'
+      description: 'Main admin dashboard',
     },
-    
+
     // Resident Management
     {
       id: 'residents',
@@ -76,9 +76,9 @@ const DynamicNavigation: React.FC<DynamicNavigationProps> = ({
       requiredPermissions: [{ resource: 'residents', action: 'read' }],
       category: 'management',
       color: '#4CAF50',
-      description: 'Manage society residents'
+      description: 'Manage society residents',
     },
-    
+
     // Financial Management
     {
       id: 'billing',
@@ -88,7 +88,7 @@ const DynamicNavigation: React.FC<DynamicNavigationProps> = ({
       requiredPermissions: [{ resource: 'billing', action: 'read' }],
       category: 'management',
       color: '#2196F3',
-      description: 'Financial management'
+      description: 'Financial management',
     },
     {
       id: 'financial_reports',
@@ -99,7 +99,7 @@ const DynamicNavigation: React.FC<DynamicNavigationProps> = ({
       requiredRoles: ['financial_manager', 'community_manager', 'super_admin'],
       category: 'analytics',
       color: '#2196F3',
-      description: 'Financial analytics and reports'
+      description: 'Financial analytics and reports',
     },
     {
       id: 'payment_tracking',
@@ -110,9 +110,9 @@ const DynamicNavigation: React.FC<DynamicNavigationProps> = ({
       requiredRoles: ['financial_manager', 'community_manager', 'super_admin'],
       category: 'management',
       color: '#4CAF50',
-      description: 'Track and reconcile payments'
+      description: 'Track and reconcile payments',
     },
-    
+
     // Security & Visitor Management
     {
       id: 'visitors',
@@ -122,7 +122,7 @@ const DynamicNavigation: React.FC<DynamicNavigationProps> = ({
       requiredPermissions: [{ resource: 'visitors', action: 'read' }],
       category: 'management',
       color: '#FF9800',
-      description: 'Visitor management and security'
+      description: 'Visitor management and security',
     },
     {
       id: 'security_incidents',
@@ -134,7 +134,7 @@ const DynamicNavigation: React.FC<DynamicNavigationProps> = ({
       category: 'management',
       color: '#F44336',
       description: 'Security incident management',
-      badge: 2
+      badge: 2,
     },
     {
       id: 'access_logs',
@@ -145,9 +145,9 @@ const DynamicNavigation: React.FC<DynamicNavigationProps> = ({
       requiredRoles: ['security_admin', 'community_manager', 'super_admin'],
       category: 'analytics',
       color: '#9C27B0',
-      description: 'View access and activity logs'
+      description: 'View access and activity logs',
     },
-    
+
     // Maintenance Management
     {
       id: 'maintenance',
@@ -157,9 +157,9 @@ const DynamicNavigation: React.FC<DynamicNavigationProps> = ({
       requiredPermissions: [{ resource: 'maintenance', action: 'read' }],
       category: 'management',
       color: '#607D8B',
-      description: 'Maintenance request management'
+      description: 'Maintenance request management',
     },
-    
+
     // Communication & Notices
     {
       id: 'notices',
@@ -169,9 +169,9 @@ const DynamicNavigation: React.FC<DynamicNavigationProps> = ({
       requiredPermissions: [{ resource: 'notices', action: 'create' }],
       category: 'management',
       color: '#FF5722',
-      description: 'Society notices and announcements'
+      description: 'Society notices and announcements',
     },
-    
+
     // Analytics & Reports
     {
       id: 'analytics',
@@ -181,7 +181,7 @@ const DynamicNavigation: React.FC<DynamicNavigationProps> = ({
       requiredPermissions: [{ resource: 'analytics', action: 'read' }],
       category: 'analytics',
       color: '#3F51B5',
-      description: 'Society performance analytics'
+      description: 'Society performance analytics',
     },
     {
       id: 'audit_logs',
@@ -192,9 +192,9 @@ const DynamicNavigation: React.FC<DynamicNavigationProps> = ({
       requiredRoles: ['community_manager', 'super_admin'],
       category: 'analytics',
       color: '#795548',
-      description: 'System audit and activity logs'
+      description: 'System audit and activity logs',
     },
-    
+
     // Team Management
     {
       id: 'team_management',
@@ -205,9 +205,9 @@ const DynamicNavigation: React.FC<DynamicNavigationProps> = ({
       requiredRoles: ['community_manager', 'super_admin'],
       category: 'management',
       color: '#8BC34A',
-      description: 'Manage admin team and roles'
+      description: 'Manage admin team and roles',
     },
-    
+
     // Governance & Voting
     {
       id: 'voting',
@@ -218,7 +218,7 @@ const DynamicNavigation: React.FC<DynamicNavigationProps> = ({
       requiredRoles: ['community_manager', 'super_admin'],
       category: 'governance',
       color: '#E91E63',
-      description: 'Democratic voting and governance'
+      description: 'Democratic voting and governance',
     },
     {
       id: 'policies',
@@ -229,9 +229,9 @@ const DynamicNavigation: React.FC<DynamicNavigationProps> = ({
       requiredRoles: ['community_manager', 'super_admin'],
       category: 'governance',
       color: '#9C27B0',
-      description: 'Society policies and regulations'
+      description: 'Society policies and regulations',
     },
-    
+
     // Multi-Society (Super Admin only)
     {
       id: 'multi_society',
@@ -242,9 +242,9 @@ const DynamicNavigation: React.FC<DynamicNavigationProps> = ({
       requiredRoles: ['super_admin'],
       category: 'management',
       color: '#FF9800',
-      description: 'Multi-society management'
+      description: 'Multi-society management',
     },
-    
+
     // System Settings
     {
       id: 'settings',
@@ -254,8 +254,8 @@ const DynamicNavigation: React.FC<DynamicNavigationProps> = ({
       requiredPermissions: [{ resource: 'settings', action: 'read' }],
       category: 'management',
       color: '#607D8B',
-      description: 'System and society settings'
-    }
+      description: 'System and society settings',
+    },
   ];
 
   // Filter navigation items based on permissions and roles
@@ -264,7 +264,7 @@ const DynamicNavigation: React.FC<DynamicNavigationProps> = ({
       return [];
     }
 
-    return allNavigationItems.filter(item => {
+    return allNavigationItems.filter((item) => {
       // Check role requirements
       if (item.requiredRoles && item.requiredRoles.length > 0) {
         const hasRequiredRole = item.requiredRoles.includes(adminUser.role);
@@ -273,8 +273,8 @@ const DynamicNavigation: React.FC<DynamicNavigationProps> = ({
 
       // Check permission requirements
       if (item.requiredPermissions.length > 0) {
-        const hasAllPermissions = item.requiredPermissions.every(({ resource, action }) =>
-          checkPermission(resource, action)
+        const hasAllPermissions = item.requiredPermissions.every(
+          ({ resource, action }) => checkPermission(resource, action),
         );
         if (!hasAllPermissions) return false;
       }
@@ -286,37 +286,50 @@ const DynamicNavigation: React.FC<DynamicNavigationProps> = ({
   const accessibleItems = getAccessibleItems();
 
   // Group items by category
-  const groupedItems = accessibleItems.reduce((groups, item) => {
-    const category = item.category;
-    if (!groups[category]) {
-      groups[category] = [];
-    }
-    groups[category].push(item);
-    return groups;
-  }, {} as Record<string, NavigationItem[]>);
+  const groupedItems = accessibleItems.reduce(
+    (groups, item) => {
+      const category = item.category;
+      if (!groups[category]) {
+        groups[category] = [];
+      }
+      groups[category].push(item);
+      return groups;
+    },
+    {} as Record<string, NavigationItem[]>,
+  );
 
   const getCategoryTitle = (category: string) => {
     switch (category) {
-      case 'primary': return 'Dashboard';
-      case 'management': return 'Management';
-      case 'analytics': return 'Analytics & Reports';
-      case 'governance': return 'Governance';
-      default: return category.charAt(0).toUpperCase() + category.slice(1);
+      case 'primary':
+        return 'Dashboard';
+      case 'management':
+        return 'Management';
+      case 'analytics':
+        return 'Analytics & Reports';
+      case 'governance':
+        return 'Governance';
+      default:
+        return category.charAt(0).toUpperCase() + category.slice(1);
     }
   };
 
   const getCategoryOrder = (category: string) => {
     switch (category) {
-      case 'primary': return 0;
-      case 'management': return 1;
-      case 'analytics': return 2;
-      case 'governance': return 3;
-      default: return 999;
+      case 'primary':
+        return 0;
+      case 'management':
+        return 1;
+      case 'analytics':
+        return 2;
+      case 'governance':
+        return 3;
+      default:
+        return 999;
     }
   };
 
-  const sortedCategories = Object.keys(groupedItems).sort((a, b) => 
-    getCategoryOrder(a) - getCategoryOrder(b)
+  const sortedCategories = Object.keys(groupedItems).sort(
+    (a, b) => getCategoryOrder(a) - getCategoryOrder(b),
   );
 
   const renderNavigationItem = (item: NavigationItem) => {
@@ -329,26 +342,27 @@ const DynamicNavigation: React.FC<DynamicNavigationProps> = ({
           key={item.id}
           onPress={() => onNavigate(item.route)}
           className={`flex-row items-center p-4 mb-2 rounded-xl border ${
-            isActive 
-              ? 'bg-primary/10 border-primary' 
+            isActive
+              ? 'bg-primary/10 border-primary'
               : 'bg-surface border-divider'
           }`}
-          activeOpacity={0.7}
-        >
-          <View className={`w-10 h-10 rounded-lg items-center justify-center mr-3 ${
-            isActive ? 'bg-primary' : 'bg-background'
-          }`}>
-            <Icon 
-              size={20} 
-              color={isActive ? 'white' : (item.color || '#6366f1')} 
+          activeOpacity={0.7}>
+          <View
+            className={`w-10 h-10 rounded-lg items-center justify-center mr-3 ${
+              isActive ? 'bg-primary' : 'bg-background'
+            }`}>
+            <Icon
+              size={20}
+              color={isActive ? 'white' : item.color || '#6366f1'}
             />
           </View>
-          
+
           <View className="flex-1">
             <View className="flex-row items-center">
-              <Text className={`text-body-large font-semibold ${
-                isActive ? 'text-primary' : 'text-text-primary'
-              }`}>
+              <Text
+                className={`text-body-large font-semibold ${
+                  isActive ? 'text-primary' : 'text-text-primary'
+                }`}>
                 {item.title}
               </Text>
               {item.badge && (
@@ -377,18 +391,18 @@ const DynamicNavigation: React.FC<DynamicNavigationProps> = ({
         className={`p-4 rounded-xl border items-center ${
           compactMode ? 'min-h-[80px]' : 'min-h-[100px]'
         } ${
-          isActive 
-            ? 'bg-primary/10 border-primary' 
+          isActive
+            ? 'bg-primary/10 border-primary'
             : 'bg-surface border-divider'
         }`}
-        activeOpacity={0.7}
-      >
-        <View className={`w-10 h-10 rounded-lg items-center justify-center mb-2 ${
-          isActive ? 'bg-primary' : 'bg-background'
-        }`}>
-          <Icon 
-            size={20} 
-            color={isActive ? 'white' : (item.color || '#6366f1')} 
+        activeOpacity={0.7}>
+        <View
+          className={`w-10 h-10 rounded-lg items-center justify-center mb-2 ${
+            isActive ? 'bg-primary' : 'bg-background'
+          }`}>
+          <Icon
+            size={20}
+            color={isActive ? 'white' : item.color || '#6366f1'}
           />
           {item.badge && (
             <View className="absolute -top-1 -right-1 bg-red-500 rounded-full w-4 h-4 items-center justify-center">
@@ -398,10 +412,12 @@ const DynamicNavigation: React.FC<DynamicNavigationProps> = ({
             </View>
           )}
         </View>
-        
-        <Text className={`text-label-large font-medium text-center ${
-          isActive ? 'text-primary' : 'text-text-primary'
-        }`} numberOfLines={compactMode ? 1 : 2}>
+
+        <Text
+          className={`text-label-large font-medium text-center ${
+            isActive ? 'text-primary' : 'text-text-primary'
+          }`}
+          numberOfLines={compactMode ? 1 : 2}>
           {item.title}
         </Text>
       </TouchableOpacity>
@@ -423,28 +439,23 @@ const DynamicNavigation: React.FC<DynamicNavigationProps> = ({
   }
 
   return (
-    <ScrollView 
-      className="flex-1"
-      showsVerticalScrollIndicator={false}
-    >
+    <ScrollView className="flex-1" showsVerticalScrollIndicator={false}>
       {showCategories ? (
         <View className="p-6">
-          {sortedCategories.map(category => (
+          {sortedCategories.map((category) => (
             <View key={category} className="mb-6">
               <Text className="text-headline-medium font-semibold text-text-primary mb-4">
                 {getCategoryTitle(category)}
               </Text>
-              
-              <View className={
-                layout === 'grid' 
-                  ? `flex-row flex-wrap -mx-2`
-                  : 'space-y-2'
-              }>
-                {groupedItems[category].map(item => (
-                  <View 
-                    key={item.id} 
-                    className={layout === 'grid' ? 'w-1/2 px-2 mb-4' : ''}
-                  >
+
+              <View
+                className={
+                  layout === 'grid' ? `flex-row flex-wrap -mx-2` : 'space-y-2'
+                }>
+                {groupedItems[category].map((item) => (
+                  <View
+                    key={item.id}
+                    className={layout === 'grid' ? 'w-1/2 px-2 mb-4' : ''}>
                     {renderNavigationItem(item)}
                   </View>
                 ))}
@@ -453,16 +464,14 @@ const DynamicNavigation: React.FC<DynamicNavigationProps> = ({
           ))}
         </View>
       ) : (
-        <View className={`p-6 ${
-          layout === 'grid' 
-            ? 'flex-row flex-wrap -mx-2'
-            : 'space-y-2'
-        }`}>
-          {accessibleItems.map(item => (
-            <View 
-              key={item.id} 
-              className={layout === 'grid' ? 'w-1/2 px-2 mb-4' : ''}
-            >
+        <View
+          className={`p-6 ${
+            layout === 'grid' ? 'flex-row flex-wrap -mx-2' : 'space-y-2'
+          }`}>
+          {accessibleItems.map((item) => (
+            <View
+              key={item.id}
+              className={layout === 'grid' ? 'w-1/2 px-2 mb-4' : ''}>
               {renderNavigationItem(item)}
             </View>
           ))}

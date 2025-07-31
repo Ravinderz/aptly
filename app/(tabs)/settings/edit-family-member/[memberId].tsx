@@ -1,12 +1,12 @@
-import { showErrorAlert, showSuccessAlert } from "@/utils/alert";
+import { showErrorAlert, showSuccessAlert } from '@/utils/alert';
 import {
   validateAadharNumber,
   validateIndianPhoneNumber,
   validateName,
-} from "@/utils/validation";
-import { safeGoBack } from "@/utils/navigation";
-import { router, useLocalSearchParams } from "expo-router";
-import React, { useEffect, useState } from "react";
+} from '@/utils/validation';
+import { safeGoBack } from '@/utils/navigation';
+import { router, useLocalSearchParams } from 'expo-router';
+import React, { useEffect, useState } from 'react';
 import {
   KeyboardAvoidingView,
   Platform,
@@ -16,12 +16,12 @@ import {
   TextInput,
   TouchableOpacity,
   View,
-} from "react-native";
+} from 'react-native';
 
 // UI Components
-import { Button } from "@/components/ui/Button";
-import { Card } from "@/components/ui/Card";
-import StackHeader from "@/components/ui/headers/StackHeader";
+import { Button } from '@/components/ui/Button';
+import { Card } from '@/components/ui/Card';
+import StackHeader from '@/components/ui/headers/StackHeader';
 
 interface FamilyMember {
   id: string;
@@ -44,64 +44,64 @@ interface FamilyMemberForm {
 
 // Mock data - in real app this would come from API/database
 const getMockMembers = (): Record<string, FamilyMember> => ({
-  "1": {
-    id: "1",
-    name: "Priya Kumar",
-    relationship: "Wife",
+  '1': {
+    id: '1',
+    name: 'Priya Kumar',
+    relationship: 'Wife',
     age: 32,
-    phoneNumber: "+91 98765 43211",
-    occupation: "Teacher",
-    aadharNumber: "2345 6789 0123",
+    phoneNumber: '+91 98765 43211',
+    occupation: 'Teacher',
+    aadharNumber: '2345 6789 0123',
   },
-  "2": {
-    id: "2",
-    name: "Arjun Kumar",
-    relationship: "Son",
+  '2': {
+    id: '2',
+    name: 'Arjun Kumar',
+    relationship: 'Son',
     age: 8,
-    occupation: "Student",
-    phoneNumber: "",
-    aadharNumber: "",
+    occupation: 'Student',
+    phoneNumber: '',
+    aadharNumber: '',
   },
-  "3": {
-    id: "3",
-    name: "Kavya Kumar",
-    relationship: "Daughter",
+  '3': {
+    id: '3',
+    name: 'Kavya Kumar',
+    relationship: 'Daughter',
     age: 5,
-    occupation: "Student",
-    phoneNumber: "",
-    aadharNumber: "",
+    occupation: 'Student',
+    phoneNumber: '',
+    aadharNumber: '',
   },
 });
 
 const relationships = [
-  "Wife",
-  "Husband",
-  "Son",
-  "Daughter",
-  "Father",
-  "Mother",
-  "Brother",
-  "Sister",
-  "Grandfather",
-  "Grandmother",
-  "Uncle",
-  "Aunt",
-  "Cousin",
-  "Other",
+  'Wife',
+  'Husband',
+  'Son',
+  'Daughter',
+  'Father',
+  'Mother',
+  'Brother',
+  'Sister',
+  'Grandfather',
+  'Grandmother',
+  'Uncle',
+  'Aunt',
+  'Cousin',
+  'Other',
 ];
 
 const commonOccupations = [
-  "Student",
-  "Teacher",
-  "Doctor",
-  "Engineer",
-  "Business",
-  "Government Service",
-  "Private Job",
-  "Homemaker",
-  "Retired",
-  "Self Employed",
-  "Other",
+  'Student',
+  'Teacher',
+  'Doctor',
+  'Engineer',
+  'Business',
+  'Government Service',
+  'Private Job',
+  'Homemaker',
+  'Retired',
+  'Self Employed',
+  'Other',
 ];
 
 export default function EditFamilyMemberPage() {
@@ -125,16 +125,16 @@ export default function EditFamilyMemberPage() {
           name: member.name,
           relationship: member.relationship,
           age: member.age.toString(),
-          phoneNumber: member.phoneNumber || "",
-          occupation: member.occupation || "",
-          aadharNumber: member.aadharNumber || "",
+          phoneNumber: member.phoneNumber || '',
+          occupation: member.occupation || '',
+          aadharNumber: member.aadharNumber || '',
         });
       } else {
-        showErrorAlert("Error", "Invalid family member data");
+        showErrorAlert('Error', 'Invalid family member data');
         safeGoBack();
       }
     } else {
-      showErrorAlert("Error", "Family member not found");
+      showErrorAlert('Error', 'Family member not found');
       safeGoBack();
     }
   }, [memberId]);
@@ -147,20 +147,20 @@ export default function EditFamilyMemberPage() {
     // Name validation
     const nameValidation = validateName(form.name);
     if (!nameValidation.isValid) {
-      newErrors.name = nameValidation.error || "Invalid name";
+      newErrors.name = nameValidation.error || 'Invalid name';
     }
 
     // Relationship validation
     if (!form.relationship) {
-      newErrors.relationship = "Please select a relationship";
+      newErrors.relationship = 'Please select a relationship';
     }
 
     // Age validation
     const age = parseInt(form.age);
     if (!form.age.trim()) {
-      newErrors.age = "Age is required";
+      newErrors.age = 'Age is required';
     } else if (isNaN(age) || age < 0 || age > 120) {
-      newErrors.age = "Please enter a valid age (0-120)";
+      newErrors.age = 'Please enter a valid age (0-120)';
     }
 
     // Phone number validation (optional)
@@ -168,7 +168,7 @@ export default function EditFamilyMemberPage() {
       form.phoneNumber.trim() &&
       !validateIndianPhoneNumber(form.phoneNumber)
     ) {
-      newErrors.phoneNumber = "Please enter a valid Indian mobile number";
+      newErrors.phoneNumber = 'Please enter a valid Indian mobile number';
     }
 
     // Aadhar validation (optional)
@@ -176,7 +176,7 @@ export default function EditFamilyMemberPage() {
       const aadharValidation = validateAadharNumber(form.aadharNumber);
       if (!aadharValidation.isValid) {
         newErrors.aadharNumber =
-          aadharValidation.error || "Invalid Aadhar number";
+          aadharValidation.error || 'Invalid Aadhar number';
       }
     }
 
@@ -203,20 +203,20 @@ export default function EditFamilyMemberPage() {
         aadharNumber: form.aadharNumber.trim() || undefined,
       };
 
-      console.log("Updating family member:", updatedMember);
+      console.log('Updating family member:', updatedMember);
 
       // Simulate API call
       await new Promise((resolve) => setTimeout(resolve, 1500));
 
       showSuccessAlert(
-        "Member Updated",
-        "Family member has been updated successfully"
+        'Member Updated',
+        'Family member has been updated successfully',
       );
       safeGoBack();
     } catch (error) {
       showErrorAlert(
-        "Error",
-        "Failed to update family member. Please try again."
+        'Error',
+        'Failed to update family member. Please try again.',
       );
     } finally {
       setIsSaving(false);
@@ -230,7 +230,7 @@ export default function EditFamilyMemberPage() {
 
     // Clear error when user starts typing
     if (errors[field]) {
-      setErrors((prev) => ({ ...prev, [field]: "" }));
+      setErrors((prev) => ({ ...prev, [field]: '' }));
     }
   };
 
@@ -240,9 +240,9 @@ export default function EditFamilyMemberPage() {
     onChangeText: (text: string) => void,
     placeholder: string,
     error?: string,
-    keyboardType: "default" | "phone-pad" | "numeric" = "default",
+    keyboardType: 'default' | 'phone-pad' | 'numeric' = 'default',
     required = false,
-    multiline = false
+    multiline = false,
   ) => (
     <View className="mb-4">
       <Text className="text-body-medium font-medium text-text-primary mb-2">
@@ -250,15 +250,15 @@ export default function EditFamilyMemberPage() {
       </Text>
       <TextInput
         className={`bg-background rounded-lg p-3 text-text-primary border ${
-          error ? "border-error" : "border-divider"
-        } ${multiline ? "min-h-[80px]" : ""}`}
+          error ? 'border-error' : 'border-divider'
+        } ${multiline ? 'min-h-[80px]' : ''}`}
         placeholder={placeholder}
         placeholderTextColor="#757575"
         value={value}
         onChangeText={onChangeText}
         keyboardType={keyboardType}
         multiline={multiline}
-        textAlignVertical={multiline ? "top" : "center"}
+        textAlignVertical={multiline ? 'top' : 'center'}
         editable={!isSaving}
       />
       {error && (
@@ -286,15 +286,13 @@ export default function EditFamilyMemberPage() {
 
       <KeyboardAvoidingView
         className="flex-1"
-        behavior={Platform.OS === "ios" ? "padding" : "height"}
-        keyboardVerticalOffset={Platform.OS === "ios" ? 90 : 0}
-      >
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        keyboardVerticalOffset={Platform.OS === 'ios' ? 90 : 0}>
         <ScrollView
           className="flex-1"
           showsVerticalScrollIndicator={false}
           contentContainerStyle={{ padding: 16, paddingBottom: 100 }}
-          keyboardShouldPersistTaps="handled"
-        >
+          keyboardShouldPersistTaps="handled">
           {/* Basic Information */}
           <Card className="mb-4">
             <View className="p-4">
@@ -303,13 +301,13 @@ export default function EditFamilyMemberPage() {
               </Text>
 
               {renderFormField(
-                "Full Name",
+                'Full Name',
                 form.name,
-                (text) => updateForm("name", text),
-                "Enter full name",
+                (text) => updateForm('name', text),
+                'Enter full name',
                 errors.name,
-                "default",
-                true
+                'default',
+                true,
               )}
 
               {/* Relationship Selection */}
@@ -317,30 +315,30 @@ export default function EditFamilyMemberPage() {
                 <Text className="text-body-medium font-medium text-text-primary mb-2">
                   Relationship <Text className="text-error">*</Text>
                 </Text>
-                <ScrollView 
-                  horizontal 
+                <ScrollView
+                  horizontal
                   showsHorizontalScrollIndicator={false}
-                  contentContainerStyle={{ paddingHorizontal: 4, paddingVertical: 2 }}
-                >
+                  contentContainerStyle={{
+                    paddingHorizontal: 4,
+                    paddingVertical: 2,
+                  }}>
                   <View className="flex-row gap-3">
                     {relationships.map((relationship) => (
                       <TouchableOpacity
                         key={relationship}
-                        onPress={() => updateForm("relationship", relationship)}
+                        onPress={() => updateForm('relationship', relationship)}
                         className={`px-4 py-2 rounded-full border min-w-[80px] flex-shrink-0 ${
                           form.relationship === relationship
-                            ? "border-primary bg-primary/10"
-                            : "border-divider bg-background"
-                        }`}
-                      >
+                            ? 'border-primary bg-primary/10'
+                            : 'border-divider bg-background'
+                        }`}>
                         <Text
                           className={`text-body-small font-medium text-center ${
                             form.relationship === relationship
-                              ? "text-primary"
-                              : "text-text-secondary"
+                              ? 'text-primary'
+                              : 'text-text-secondary'
                           }`}
-                          numberOfLines={1}
-                        >
+                          numberOfLines={1}>
                           {relationship}
                         </Text>
                       </TouchableOpacity>
@@ -355,13 +353,13 @@ export default function EditFamilyMemberPage() {
               </View>
 
               {renderFormField(
-                "Age",
+                'Age',
                 form.age,
-                (text) => updateForm("age", text.replace(/[^0-9]/g, "")),
-                "Enter age",
+                (text) => updateForm('age', text.replace(/[^0-9]/g, '')),
+                'Enter age',
                 errors.age,
-                "numeric",
-                true
+                'numeric',
+                true,
               )}
             </View>
           </Card>
@@ -374,13 +372,13 @@ export default function EditFamilyMemberPage() {
               </Text>
 
               {renderFormField(
-                "Phone Number",
+                'Phone Number',
                 form.phoneNumber,
                 (text) =>
-                  updateForm("phoneNumber", text.replace(/[^0-9+\-\s()]/g, "")),
-                "Enter phone number (optional)",
+                  updateForm('phoneNumber', text.replace(/[^0-9+\-\s()]/g, '')),
+                'Enter phone number (optional)',
                 errors.phoneNumber,
-                "phone-pad"
+                'phone-pad',
               )}
             </View>
           </Card>
@@ -402,20 +400,18 @@ export default function EditFamilyMemberPage() {
                     {commonOccupations.map((occupation) => (
                       <TouchableOpacity
                         key={occupation}
-                        onPress={() => updateForm("occupation", occupation)}
+                        onPress={() => updateForm('occupation', occupation)}
                         className={`px-3 py-2 rounded-full border ${
                           form.occupation === occupation
-                            ? "border-primary bg-primary/10"
-                            : "border-divider bg-background"
-                        }`}
-                      >
+                            ? 'border-primary bg-primary/10'
+                            : 'border-divider bg-background'
+                        }`}>
                         <Text
                           className={`text-body-small font-medium ${
                             form.occupation === occupation
-                              ? "text-primary"
-                              : "text-text-secondary"
-                          }`}
-                        >
+                              ? 'text-primary'
+                              : 'text-text-secondary'
+                          }`}>
                           {occupation}
                         </Text>
                       </TouchableOpacity>
@@ -425,46 +421,41 @@ export default function EditFamilyMemberPage() {
               </View>
 
               {/* Custom occupation input */}
-              {form.occupation === "Other" &&
+              {form.occupation === 'Other' &&
                 renderFormField(
-                  "Custom Occupation",
-                  form.occupation === "Other" ? "" : form.occupation,
-                  (text) => updateForm("occupation", text),
-                  "Enter occupation",
+                  'Custom Occupation',
+                  form.occupation === 'Other' ? '' : form.occupation,
+                  (text) => updateForm('occupation', text),
+                  'Enter occupation',
                   undefined,
-                  "default"
+                  'default',
                 )}
 
               {renderFormField(
-                "Aadhar Number",
+                'Aadhar Number',
                 form.aadharNumber,
                 (text) =>
                   updateForm(
-                    "aadharNumber",
-                    text.replace(/[^0-9\s]/g, "").slice(0, 14)
+                    'aadharNumber',
+                    text.replace(/[^0-9\s]/g, '').slice(0, 14),
                   ),
-                "Enter Aadhar number (optional)",
+                'Enter Aadhar number (optional)',
                 errors.aadharNumber,
-                "numeric"
+                'numeric',
               )}
             </View>
           </Card>
 
           {/* Action Buttons */}
           <View className="space-y-3">
-            <Button
-              variant="primary"
-              onPress={handleSave}
-              disabled={isSaving}
-            >
-              {isSaving ? "Updating Member..." : "Update Family Member"}
+            <Button variant="primary" onPress={handleSave} disabled={isSaving}>
+              {isSaving ? 'Updating Member...' : 'Update Family Member'}
             </Button>
 
             <Button
               variant="secondary"
               onPress={() => safeGoBack()}
-              disabled={isSaving}
-            >
+              disabled={isSaving}>
               Cancel
             </Button>
           </View>
@@ -475,9 +466,9 @@ export default function EditFamilyMemberPage() {
               ✏️ Editing Family Member
             </Text>
             <Text className="text-text-secondary text-body-small leading-5">
-              • Changes will be reflected across all family features{"\n"}•
-              Phone numbers help with visitor pre-approval{"\n"}• Aadhar numbers
-              are kept secure and private{"\n"}• Age updates help with
+              • Changes will be reflected across all family features{'\n'}•
+              Phone numbers help with visitor pre-approval{'\n'}• Aadhar numbers
+              are kept secure and private{'\n'}• Age updates help with
               age-specific services
             </Text>
           </Card>

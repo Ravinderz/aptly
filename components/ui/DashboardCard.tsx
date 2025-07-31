@@ -37,10 +37,9 @@ export const DashboardCard: React.FC<DashboardCardProps> = ({
         'shadow-sm shadow-black/5',
         onPress && 'active:bg-background',
         variant === 'compact' && 'p-3',
-        className
+        className,
       )}
-      activeOpacity={0.7}
-    >
+      activeOpacity={0.7}>
       <View className="flex-row items-start justify-between">
         <View className="flex-1">
           <View className="flex-row items-center mb-2">
@@ -49,42 +48,41 @@ export const DashboardCard: React.FC<DashboardCardProps> = ({
                 {icon}
               </View>
             )}
-            <Text className={cn(
-              'font-medium text-text-secondary',
-              variant === 'compact' ? 'text-xs' : 'text-sm'
-            )}>
+            <Text
+              className={cn(
+                'font-medium text-text-secondary',
+                variant === 'compact' ? 'text-xs' : 'text-sm',
+              )}>
               {title}
             </Text>
           </View>
-          
-          <Text className={cn(
-            'font-bold text-text-primary mb-1',
-            variant === 'compact' ? 'text-lg' : 'text-2xl'
-          )}>
+
+          <Text
+            className={cn(
+              'font-bold text-text-primary mb-1',
+              variant === 'compact' ? 'text-lg' : 'text-2xl',
+            )}>
             {value}
           </Text>
-          
+
           {subtitle && (
-            <Text className="text-text-secondary text-xs">
-              {subtitle}
-            </Text>
+            <Text className="text-text-secondary text-xs">{subtitle}</Text>
           )}
-          
+
           {trend && (
             <View className="flex-row items-center mt-1">
-              <Text className={cn(
-                'text-xs font-medium',
-                trend.isPositive ? 'text-secondary' : 'text-error'
-              )}>
+              <Text
+                className={cn(
+                  'text-xs font-medium',
+                  trend.isPositive ? 'text-secondary' : 'text-error',
+                )}>
                 {trend.isPositive ? '↗' : '↘'} {trend.value}
               </Text>
             </View>
           )}
         </View>
-        
-        {onPress && (
-          <ChevronRight size={16} color="#757575" />
-        )}
+
+        {onPress && <ChevronRight size={16} color="#757575" />}
       </View>
     </Wrapper>
   );

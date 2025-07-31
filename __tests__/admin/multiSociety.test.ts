@@ -30,7 +30,7 @@ describe('Multi-Society Management', () => {
           assignedBy: 'super_admin',
           assignedAt: '2024-01-01T00:00:00Z',
           isActive: true,
-          permissions: []
+          permissions: [],
         },
         {
           societyId: 'society_2',
@@ -39,14 +39,14 @@ describe('Multi-Society Management', () => {
           assignedBy: 'community_manager',
           assignedAt: '2024-01-15T00:00:00Z',
           isActive: true,
-          permissions: []
-        }
+          permissions: [],
+        },
       ],
       isActive: true,
       createdAt: '2024-01-01T00:00:00Z',
       lastLoginAt: '2024-01-20T10:00:00Z',
       permissions: [],
-      emergencyContact: true
+      emergencyContact: true,
     };
 
     mockSocieties = [
@@ -65,8 +65,8 @@ describe('Multi-Society Management', () => {
           gstEnabled: true,
           emergencyContacts: [],
           policies: [],
-          features: []
-        }
+          features: [],
+        },
       },
       {
         id: 'society_2',
@@ -83,9 +83,9 @@ describe('Multi-Society Management', () => {
           gstEnabled: true,
           emergencyContacts: [],
           policies: [],
-          features: []
-        }
-      }
+          features: [],
+        },
+      },
     ];
 
     // Reset mocks
@@ -104,7 +104,7 @@ describe('Multi-Society Management', () => {
       canSwitchMode: jest.fn(),
       adminSession: null,
       refreshPermissions: jest.fn(),
-      logout: jest.fn()
+      logout: jest.fn(),
     });
 
     mockUseSociety.mockReturnValue({
@@ -123,7 +123,7 @@ describe('Multi-Society Management', () => {
       crossSocietyQuery: jest.fn(),
       filterNotificationsForSociety: jest.fn(),
       lastSwitchTime: null,
-      switchHistory: []
+      switchHistory: [],
     });
   });
 
@@ -134,16 +134,18 @@ describe('Multi-Society Management', () => {
   describe('Society Access Validation', () => {
     it('should validate admin has access to assigned societies', () => {
       const { validateSocietyAccess } = mockUseSociety();
-      
+
       mockUseSociety.mockReturnValue({
         ...mockUseSociety(),
         validateSocietyAccess: jest.fn((societyId: string) => {
-          return mockAdminUser.societies.some(s => s.societyId === societyId && s.isActive);
-        })
+          return mockAdminUser.societies.some(
+            (s) => s.societyId === societyId && s.isActive,
+          );
+        }),
       });
 
       const { validateSocietyAccess: mockValidate } = mockUseSociety();
-      
+
       expect(mockValidate('society_1')).toBe(true);
       expect(mockValidate('society_2')).toBe(true);
       expect(mockValidate('society_3')).toBe(false);
@@ -155,21 +157,23 @@ describe('Multi-Society Management', () => {
         societies: [
           {
             ...mockAdminUser.societies[0],
-            isActive: false
-          }
-        ]
+            isActive: false,
+          },
+        ],
       };
 
       mockUseAdmin.mockReturnValue({
         ...mockUseAdmin(),
-        adminUser: inactiveAdminUser
+        adminUser: inactiveAdminUser,
       });
 
       mockUseSociety.mockReturnValue({
         ...mockUseSociety(),
         validateSocietyAccess: jest.fn((societyId: string) => {
-          return inactiveAdminUser.societies.some(s => s.societyId === societyId && s.isActive);
-        })
+          return inactiveAdminUser.societies.some(
+            (s) => s.societyId === societyId && s.isActive,
+          );
+        }),
       });
 
       const { validateSocietyAccess } = mockUseSociety();
@@ -180,14 +184,14 @@ describe('Multi-Society Management', () => {
   describe('Society Switching', () => {
     it('should successfully switch between accessible societies', async () => {
       const mockSwitchSociety = jest.fn().mockResolvedValue(undefined);
-      
+
       mockUseSociety.mockReturnValue({
         ...mockUseSociety(),
-        switchSociety: mockSwitchSociety
+        switchSociety: mockSwitchSociety,
       });
 
       const { switchSociety } = mockUseSociety();
-      
+
       await act(async () => {
         await switchSociety('society_2');
       });
@@ -196,16 +200,20 @@ describe('Multi-Society Management', () => {
     });
 
     it('should reject switching to inaccessible society', async () => {
-      const mockSwitchSociety = jest.fn().mockRejectedValue(new Error('Access denied to society'));
-      
+      const mockSwitchSociety = jest
+        .fn()
+        .mockRejectedValue(new Error('Access denied to society'));
+
       mockUseSociety.mockReturnValue({
         ...mockUseSociety(),
-        switchSociety: mockSwitchSociety
+        switchSociety: mockSwitchSociety,
       });
 
       const { switchSociety } = mockUseSociety();
-      
-      await expect(switchSociety('society_999')).rejects.toThrow('Access denied to society');
+
+      await expect(switchSociety('society_999')).rejects.toThrow(
+        'Access denied to society',
+      );
     });
 
     it('should track society switch history', async () => {
@@ -213,22 +221,22 @@ describe('Multi-Society Management', () => {
         {
           fromSocietyId: null,
           toSocietyId: 'society_1',
-          timestamp: new Date('2024-01-20T10:00:00Z')
+          timestamp: new Date('2024-01-20T10:00:00Z'),
         },
         {
           fromSocietyId: 'society_1',
           toSocietyId: 'society_2',
-          timestamp: new Date('2024-01-20T11:00:00Z')
-        }
+          timestamp: new Date('2024-01-20T11:00:00Z'),
+        },
       ];
 
       mockUseSociety.mockReturnValue({
         ...mockUseSociety(),
-        switchHistory: mockSwitchHistory
+        switchHistory: mockSwitchHistory,
       });
 
       const { switchHistory } = mockUseSociety();
-      
+
       expect(switchHistory).toHaveLength(2);
       expect(switchHistory[1].toSocietyId).toBe('society_2');
     });
@@ -238,7 +246,7 @@ describe('Multi-Society Management', () => {
     it('should maintain separate data for each society', () => {
       const mockSocietyData = new Map([
         ['society_1', { residents: 95, bills: 120 }],
-        ['society_2', { residents: 72, bills: 80 }]
+        ['society_2', { residents: 72, bills: 80 }],
       ]);
 
       mockUseSociety.mockReturnValue({
@@ -247,11 +255,11 @@ describe('Multi-Society Management', () => {
         getSocietyData: jest.fn((societyId: string, key: string) => {
           const data = mockSocietyData.get(societyId);
           return data?.[key];
-        })
+        }),
       });
 
       const { getSocietyData } = mockUseSociety();
-      
+
       expect(getSocietyData('society_1', 'residents')).toBe(95);
       expect(getSocietyData('society_2', 'residents')).toBe(72);
       expect(getSocietyData('society_1', 'bills')).toBe(120);
@@ -260,14 +268,14 @@ describe('Multi-Society Management', () => {
 
     it('should clear society data on logout', () => {
       const mockClearSocietyData = jest.fn();
-      
+
       mockUseSociety.mockReturnValue({
         ...mockUseSociety(),
-        clearSocietyData: mockClearSocietyData
+        clearSocietyData: mockClearSocietyData,
       });
 
       const { clearSocietyData } = mockUseSociety();
-      
+
       act(() => {
         clearSocietyData('society_1');
       });
@@ -283,29 +291,33 @@ describe('Multi-Society Management', () => {
         societies: ['society_1', 'society_2'],
         results: [
           { societyId: 'society_1', success: true, message: 'Bills generated' },
-          { societyId: 'society_2', success: true, message: 'Bills generated' }
-        ]
+          { societyId: 'society_2', success: true, message: 'Bills generated' },
+        ],
       });
 
       mockUseSociety.mockReturnValue({
         ...mockUseSociety(),
-        bulkOperation: mockBulkOperation
+        bulkOperation: mockBulkOperation,
       });
 
       const { bulkOperation } = mockUseSociety();
-      
-      const result = await bulkOperation('generate_bills', {
-        amount: 2500,
-        dueDate: '2024-02-01'
-      }, ['society_1', 'society_2']);
+
+      const result = await bulkOperation(
+        'generate_bills',
+        {
+          amount: 2500,
+          dueDate: '2024-02-01',
+        },
+        ['society_1', 'society_2'],
+      );
 
       expect(mockBulkOperation).toHaveBeenCalledWith(
         'generate_bills',
         { amount: 2500, dueDate: '2024-02-01' },
-        ['society_1', 'society_2']
+        ['society_1', 'society_2'],
       );
       expect(result.results).toHaveLength(2);
-      expect(result.results.every(r => r.success)).toBe(true);
+      expect(result.results.every((r) => r.success)).toBe(true);
     });
 
     it('should handle partial failures in bulk operations', async () => {
@@ -313,24 +325,32 @@ describe('Multi-Society Management', () => {
         operation: 'approve_visitors',
         societies: ['society_1', 'society_2'],
         results: [
-          { societyId: 'society_1', success: true, message: 'Visitors approved' },
-          { societyId: 'society_2', success: false, message: 'Permission denied' }
-        ]
+          {
+            societyId: 'society_1',
+            success: true,
+            message: 'Visitors approved',
+          },
+          {
+            societyId: 'society_2',
+            success: false,
+            message: 'Permission denied',
+          },
+        ],
       });
 
       mockUseSociety.mockReturnValue({
         ...mockUseSociety(),
-        bulkOperation: mockBulkOperation
+        bulkOperation: mockBulkOperation,
       });
 
       const { bulkOperation } = mockUseSociety();
-      
+
       const result = await bulkOperation('approve_visitors', {
-        visitorIds: ['v1', 'v2', 'v3']
+        visitorIds: ['v1', 'v2', 'v3'],
       });
 
-      expect(result.results.filter(r => r.success)).toHaveLength(1);
-      expect(result.results.filter(r => !r.success)).toHaveLength(1);
+      expect(result.results.filter((r) => r.success)).toHaveLength(1);
+      expect(result.results.filter((r) => !r.success)).toHaveLength(1);
     });
   });
 
@@ -341,23 +361,23 @@ describe('Multi-Society Management', () => {
         societies: ['society_1', 'society_2'],
         results: {
           society_1: { totalRevenue: 500000, pendingAmount: 50000 },
-          society_2: { totalRevenue: 300000, pendingAmount: 30000 }
-        }
+          society_2: { totalRevenue: 300000, pendingAmount: 30000 },
+        },
       });
 
       mockUseSociety.mockReturnValue({
         ...mockUseSociety(),
-        crossSocietyQuery: mockCrossSocietyQuery
+        crossSocietyQuery: mockCrossSocietyQuery,
       });
 
       const { crossSocietyQuery } = mockUseSociety();
-      
+
       const result = await crossSocietyQuery('financial_summary', {
-        timeframe: 'monthly'
+        timeframe: 'monthly',
       });
 
       expect(mockCrossSocietyQuery).toHaveBeenCalledWith('financial_summary', {
-        timeframe: 'monthly'
+        timeframe: 'monthly',
       });
       expect(Object.keys(result.results)).toEqual(['society_1', 'society_2']);
     });
@@ -368,28 +388,41 @@ describe('Multi-Society Management', () => {
       const mockNotifications = [
         { id: '1', societyId: 'society_1', message: 'Society 1 notification' },
         { id: '2', societyId: 'society_2', message: 'Society 2 notification' },
-        { id: '3', affectedSocieties: ['society_1'], message: 'Multi-society notification' },
-        { id: '4', message: 'Global notification' }
+        {
+          id: '3',
+          affectedSocieties: ['society_1'],
+          message: 'Multi-society notification',
+        },
+        { id: '4', message: 'Global notification' },
       ];
 
-      const mockFilterNotifications = jest.fn((notifications: any[], societyId: string) => {
-        return notifications.filter(notification => {
-          if (!notification.societyId) return true; // Global notifications
-          if (notification.societyId === societyId) return true; // Society-specific
-          if (notification.affectedSocieties?.includes(societyId)) return true; // Multi-society
-          return false;
-        });
-      });
+      const mockFilterNotifications = jest.fn(
+        (notifications: any[], societyId: string) => {
+          return notifications.filter((notification) => {
+            if (!notification.societyId) return true; // Global notifications
+            if (notification.societyId === societyId) return true; // Society-specific
+            if (notification.affectedSocieties?.includes(societyId))
+              return true; // Multi-society
+            return false;
+          });
+        },
+      );
 
       mockUseSociety.mockReturnValue({
         ...mockUseSociety(),
-        filterNotificationsForSociety: mockFilterNotifications
+        filterNotificationsForSociety: mockFilterNotifications,
       });
 
       const { filterNotificationsForSociety } = mockUseSociety();
-      
-      const society1Notifications = filterNotificationsForSociety(mockNotifications, 'society_1');
-      const society2Notifications = filterNotificationsForSociety(mockNotifications, 'society_2');
+
+      const society1Notifications = filterNotificationsForSociety(
+        mockNotifications,
+        'society_1',
+      );
+      const society2Notifications = filterNotificationsForSociety(
+        mockNotifications,
+        'society_2',
+      );
 
       expect(society1Notifications).toHaveLength(3); // society_1, multi-society, global
       expect(society2Notifications).toHaveLength(2); // society_2, global
@@ -404,18 +437,21 @@ describe('Multi-Society Management', () => {
       mockUseSociety.mockReturnValue({
         ...mockUseSociety(),
         setSocietyData: mockSetSocietyData,
-        getSocietyData: mockGetSocietyData
+        getSocietyData: mockGetSocietyData,
       });
 
       const { setSocietyData, getSocietyData } = mockUseSociety();
-      
+
       // First call should cache the data
-      setSocietyData('society_1', 'residents', { count: 95, lastUpdated: Date.now() });
-      
+      setSocietyData('society_1', 'residents', {
+        count: 95,
+        lastUpdated: Date.now(),
+      });
+
       expect(mockSetSocietyData).toHaveBeenCalledWith(
         'society_1',
         'residents',
-        { count: 95, lastUpdated: expect.any(Number) }
+        { count: 95, lastUpdated: expect.any(Number) },
       );
 
       // Second call should retrieve from cache
@@ -424,17 +460,18 @@ describe('Multi-Society Management', () => {
     });
 
     it('should handle concurrent society switches gracefully', async () => {
-      const mockSwitchSociety = jest.fn()
+      const mockSwitchSociety = jest
+        .fn()
         .mockResolvedValueOnce(undefined) // First switch succeeds
         .mockRejectedValueOnce(new Error('Switch in progress')); // Second switch fails
 
       mockUseSociety.mockReturnValue({
         ...mockUseSociety(),
-        switchSociety: mockSwitchSociety
+        switchSociety: mockSwitchSociety,
       });
 
       const { switchSociety } = mockUseSociety();
-      
+
       // Simulate concurrent switches
       const promise1 = switchSociety('society_1');
       const promise2 = switchSociety('society_2');
@@ -446,16 +483,20 @@ describe('Multi-Society Management', () => {
 
   describe('Error Handling', () => {
     it('should handle network failures gracefully', async () => {
-      const mockBulkOperation = jest.fn().mockRejectedValue(new Error('Network error'));
+      const mockBulkOperation = jest
+        .fn()
+        .mockRejectedValue(new Error('Network error'));
 
       mockUseSociety.mockReturnValue({
         ...mockUseSociety(),
-        bulkOperation: mockBulkOperation
+        bulkOperation: mockBulkOperation,
       });
 
       const { bulkOperation } = mockUseSociety();
-      
-      await expect(bulkOperation('sync_data', {})).rejects.toThrow('Network error');
+
+      await expect(bulkOperation('sync_data', {})).rejects.toThrow(
+        'Network error',
+      );
     });
 
     it('should validate society context before operations', () => {
@@ -463,11 +504,11 @@ describe('Multi-Society Management', () => {
 
       mockUseSociety.mockReturnValue({
         ...mockUseSociety(),
-        validateSocietyAccess: mockValidateSocietyAccess
+        validateSocietyAccess: mockValidateSocietyAccess,
       });
 
       const { validateSocietyAccess } = mockUseSociety();
-      
+
       expect(validateSocietyAccess('invalid_society')).toBe(false);
       expect(mockValidateSocietyAccess).toHaveBeenCalledWith('invalid_society');
     });

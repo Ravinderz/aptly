@@ -3,12 +3,12 @@ import { render, screen } from '@testing-library/react-native';
 import { useAdmin } from '@/contexts/AdminContext';
 import { AdminRole, Permission, AdminUser } from '@/types/admin';
 import PermissionGate from '@/components/admin/PermissionGate';
-import { 
-  RoleBasedRenderer, 
-  RoleVariants, 
+import {
+  RoleBasedRenderer,
+  RoleVariants,
   SuperAdminOnly,
   CommunityManagerUp,
-  SubAdminOnly 
+  SubAdminOnly,
 } from '@/components/admin/RoleBasedRenderer';
 import React from 'react';
 import { Text } from 'react-native';
@@ -36,20 +36,20 @@ describe('Advanced RBAC Testing', () => {
           assignedBy: 'super_admin',
           assignedAt: '2024-01-01T00:00:00Z',
           isActive: true,
-          permissions: []
-        }
+          permissions: [],
+        },
       ],
       isActive: true,
       createdAt: '2024-01-01T00:00:00Z',
       lastLoginAt: '2024-01-20T10:00:00Z',
       permissions: [],
-      emergencyContact: true
+      emergencyContact: true,
     };
 
     basePermissions = [
       { id: '1', resource: 'residents', action: 'read', scope: 'society' },
       { id: '2', resource: 'billing', action: 'create', scope: 'society' },
-      { id: '3', resource: 'visitors', action: 'approve', scope: 'society' }
+      { id: '3', resource: 'visitors', action: 'approve', scope: 'society' },
     ];
 
     // Default mock setup
@@ -72,8 +72,8 @@ describe('Advanced RBAC Testing', () => {
           gstEnabled: true,
           emergencyContacts: [],
           policies: [],
-          features: []
-        }
+          features: [],
+        },
       },
       availableSocieties: [],
       permissions: basePermissions,
@@ -85,7 +85,7 @@ describe('Advanced RBAC Testing', () => {
       canSwitchMode: jest.fn(),
       adminSession: null,
       refreshPermissions: jest.fn(),
-      logout: jest.fn()
+      logout: jest.fn(),
     });
   });
 
@@ -99,30 +99,34 @@ describe('Advanced RBAC Testing', () => {
         const mockCheckPermission = jest.fn().mockReturnValue(true);
         mockUseAdmin.mockReturnValue({
           ...mockUseAdmin(),
-          checkPermission: mockCheckPermission
+          checkPermission: mockCheckPermission,
         });
 
         render(
           <PermissionGate resource="residents" action="read">
             <Text>Protected Content</Text>
-          </PermissionGate>
+          </PermissionGate>,
         );
 
         expect(screen.getByText('Protected Content')).toBeTruthy();
-        expect(mockCheckPermission).toHaveBeenCalledWith('residents', 'read', undefined);
+        expect(mockCheckPermission).toHaveBeenCalledWith(
+          'residents',
+          'read',
+          undefined,
+        );
       });
 
       it('should not render children when user lacks permission', () => {
         const mockCheckPermission = jest.fn().mockReturnValue(false);
         mockUseAdmin.mockReturnValue({
           ...mockUseAdmin(),
-          checkPermission: mockCheckPermission
+          checkPermission: mockCheckPermission,
         });
 
         render(
           <PermissionGate resource="billing" action="delete">
             <Text>Protected Content</Text>
-          </PermissionGate>
+          </PermissionGate>,
         );
 
         expect(screen.queryByText('Protected Content')).toBeNull();
@@ -132,17 +136,16 @@ describe('Advanced RBAC Testing', () => {
         const mockCheckPermission = jest.fn().mockReturnValue(false);
         mockUseAdmin.mockReturnValue({
           ...mockUseAdmin(),
-          checkPermission: mockCheckPermission
+          checkPermission: mockCheckPermission,
         });
 
         render(
-          <PermissionGate 
-            resource="visitors" 
+          <PermissionGate
+            resource="visitors"
             action="bulk_actions"
-            fallback={<Text>Access Denied</Text>}
-          >
+            fallback={<Text>Access Denied</Text>}>
             <Text>Protected Content</Text>
-          </PermissionGate>
+          </PermissionGate>,
         );
 
         expect(screen.getByText('Access Denied')).toBeTruthy();
@@ -151,38 +154,56 @@ describe('Advanced RBAC Testing', () => {
 
       it('should respect society-scoped permissions', () => {
         const mockCheckPermission = jest.fn((resource, action, societyId) => {
-          return societyId === 'society_1' && resource === 'billing' && action === 'read';
+          return (
+            societyId === 'society_1' &&
+            resource === 'billing' &&
+            action === 'read'
+          );
         });
-        
+
         mockUseAdmin.mockReturnValue({
           ...mockUseAdmin(),
-          checkPermission: mockCheckPermission
+          checkPermission: mockCheckPermission,
         });
 
         render(
-          <PermissionGate resource="billing" action="read" societyId="society_1">
+          <PermissionGate
+            resource="billing"
+            action="read"
+            societyId="society_1">
             <Text>Society 1 Billing</Text>
-          </PermissionGate>
+          </PermissionGate>,
         );
 
         expect(screen.getByText('Society 1 Billing')).toBeTruthy();
-        expect(mockCheckPermission).toHaveBeenCalledWith('billing', 'read', 'society_1');
+        expect(mockCheckPermission).toHaveBeenCalledWith(
+          'billing',
+          'read',
+          'society_1',
+        );
       });
 
       it('should deny access for different society without permission', () => {
         const mockCheckPermission = jest.fn((resource, action, societyId) => {
-          return societyId === 'society_1' && resource === 'billing' && action === 'read';
+          return (
+            societyId === 'society_1' &&
+            resource === 'billing' &&
+            action === 'read'
+          );
         });
-        
+
         mockUseAdmin.mockReturnValue({
           ...mockUseAdmin(),
-          checkPermission: mockCheckPermission
+          checkPermission: mockCheckPermission,
         });
 
         render(
-          <PermissionGate resource="billing" action="read" societyId="society_2">
+          <PermissionGate
+            resource="billing"
+            action="read"
+            societyId="society_2">
             <Text>Society 2 Billing</Text>
-          </PermissionGate>
+          </PermissionGate>,
         );
 
         expect(screen.queryByText('Society 2 Billing')).toBeNull();
@@ -193,7 +214,7 @@ describe('Advanced RBAC Testing', () => {
       it('should handle wildcard permissions for super admin', () => {
         const superAdminUser = {
           ...baseAdminUser,
-          role: 'super_admin' as AdminRole
+          role: 'super_admin' as AdminRole,
         };
 
         const mockCheckPermission = jest.fn((resource, action) => {
@@ -203,26 +224,27 @@ describe('Advanced RBAC Testing', () => {
         mockUseAdmin.mockReturnValue({
           ...mockUseAdmin(),
           adminUser: superAdminUser,
-          checkPermission: mockCheckPermission
+          checkPermission: mockCheckPermission,
         });
 
         render(
           <PermissionGate resource="*" action="*">
             <Text>Super Admin Content</Text>
-          </PermissionGate>
+          </PermissionGate>,
         );
 
         expect(screen.getByText('Super Admin Content')).toBeTruthy();
       });
 
       it('should handle nested permission checks', () => {
-        const mockCheckPermission = jest.fn()
-          .mockReturnValueOnce(true)  // Outer permission
+        const mockCheckPermission = jest
+          .fn()
+          .mockReturnValueOnce(true) // Outer permission
           .mockReturnValueOnce(false); // Inner permission
 
         mockUseAdmin.mockReturnValue({
           ...mockUseAdmin(),
-          checkPermission: mockCheckPermission
+          checkPermission: mockCheckPermission,
         });
 
         render(
@@ -231,7 +253,7 @@ describe('Advanced RBAC Testing', () => {
             <PermissionGate resource="residents" action="delete">
               <Text>Inner Content</Text>
             </PermissionGate>
-          </PermissionGate>
+          </PermissionGate>,
         );
 
         expect(screen.getByText('Outer Content')).toBeTruthy();
@@ -246,7 +268,7 @@ describe('Advanced RBAC Testing', () => {
         render(
           <RoleBasedRenderer roles={['community_manager', 'super_admin']}>
             <Text>Community Manager Content</Text>
-          </RoleBasedRenderer>
+          </RoleBasedRenderer>,
         );
 
         expect(screen.getByText('Community Manager Content')).toBeTruthy();
@@ -256,7 +278,7 @@ describe('Advanced RBAC Testing', () => {
         render(
           <RoleBasedRenderer roles={['financial_manager', 'security_admin']}>
             <Text>Sub Admin Content</Text>
-          </RoleBasedRenderer>
+          </RoleBasedRenderer>,
         );
 
         expect(screen.queryByText('Sub Admin Content')).toBeNull();
@@ -264,12 +286,11 @@ describe('Advanced RBAC Testing', () => {
 
       it('should work with exclude mode', () => {
         render(
-          <RoleBasedRenderer 
-            roles={['financial_manager', 'security_admin']} 
-            mode="exclude"
-          >
+          <RoleBasedRenderer
+            roles={['financial_manager', 'security_admin']}
+            mode="exclude">
             <Text>Non Sub Admin Content</Text>
-          </RoleBasedRenderer>
+          </RoleBasedRenderer>,
         );
 
         expect(screen.getByText('Non Sub Admin Content')).toBeTruthy();
@@ -278,10 +299,13 @@ describe('Advanced RBAC Testing', () => {
 
     describe('RoleVariants Component', () => {
       it('should render role-specific content', () => {
-        const adminUser = { ...baseAdminUser, role: 'financial_manager' as AdminRole };
+        const adminUser = {
+          ...baseAdminUser,
+          role: 'financial_manager' as AdminRole,
+        };
         mockUseAdmin.mockReturnValue({
           ...mockUseAdmin(),
-          adminUser
+          adminUser,
         });
 
         render(
@@ -290,7 +314,7 @@ describe('Advanced RBAC Testing', () => {
             community_manager={<Text>Community Manager View</Text>}
             financial_manager={<Text>Financial Manager View</Text>}
             default={<Text>Default View</Text>}
-          />
+          />,
         );
 
         expect(screen.getByText('Financial Manager View')).toBeTruthy();
@@ -300,10 +324,13 @@ describe('Advanced RBAC Testing', () => {
       });
 
       it('should fallback to default when role not specified', () => {
-        const adminUser = { ...baseAdminUser, role: 'maintenance_admin' as AdminRole };
+        const adminUser = {
+          ...baseAdminUser,
+          role: 'maintenance_admin' as AdminRole,
+        };
         mockUseAdmin.mockReturnValue({
           ...mockUseAdmin(),
-          adminUser
+          adminUser,
         });
 
         render(
@@ -311,7 +338,7 @@ describe('Advanced RBAC Testing', () => {
             super_admin={<Text>Super Admin View</Text>}
             community_manager={<Text>Community Manager View</Text>}
             default={<Text>Default View</Text>}
-          />
+          />,
         );
 
         expect(screen.getByText('Default View')).toBeTruthy();
@@ -320,16 +347,19 @@ describe('Advanced RBAC Testing', () => {
 
     describe('Convenience Role Components', () => {
       it('should render SuperAdminOnly for super admin', () => {
-        const adminUser = { ...baseAdminUser, role: 'super_admin' as AdminRole };
+        const adminUser = {
+          ...baseAdminUser,
+          role: 'super_admin' as AdminRole,
+        };
         mockUseAdmin.mockReturnValue({
           ...mockUseAdmin(),
-          adminUser
+          adminUser,
         });
 
         render(
           <SuperAdminOnly>
             <Text>Super Admin Only Content</Text>
-          </SuperAdminOnly>
+          </SuperAdminOnly>,
         );
 
         expect(screen.getByText('Super Admin Only Content')).toBeTruthy();
@@ -339,7 +369,7 @@ describe('Advanced RBAC Testing', () => {
         render(
           <SuperAdminOnly>
             <Text>Super Admin Only Content</Text>
-          </SuperAdminOnly>
+          </SuperAdminOnly>,
         );
 
         expect(screen.queryByText('Super Admin Only Content')).toBeNull();
@@ -349,23 +379,26 @@ describe('Advanced RBAC Testing', () => {
         render(
           <CommunityManagerUp>
             <Text>Senior Admin Content</Text>
-          </CommunityManagerUp>
+          </CommunityManagerUp>,
         );
 
         expect(screen.getByText('Senior Admin Content')).toBeTruthy();
       });
 
       it('should render SubAdminOnly for sub-admin roles', () => {
-        const adminUser = { ...baseAdminUser, role: 'security_admin' as AdminRole };
+        const adminUser = {
+          ...baseAdminUser,
+          role: 'security_admin' as AdminRole,
+        };
         mockUseAdmin.mockReturnValue({
           ...mockUseAdmin(),
-          adminUser
+          adminUser,
         });
 
         render(
           <SubAdminOnly>
             <Text>Sub Admin Content</Text>
-          </SubAdminOnly>
+          </SubAdminOnly>,
         );
 
         expect(screen.getByText('Sub Admin Content')).toBeTruthy();
@@ -375,11 +408,13 @@ describe('Advanced RBAC Testing', () => {
 
   describe('Role Hierarchy and Escalation', () => {
     it('should provide correct escalation path for sub-admins', () => {
-      const mockGetEscalationPath = jest.fn().mockReturnValue(['community_manager', 'super_admin']);
-      
+      const mockGetEscalationPath = jest
+        .fn()
+        .mockReturnValue(['community_manager', 'super_admin']);
+
       mockUseAdmin.mockReturnValue({
         ...mockUseAdmin(),
-        getEscalationPath: mockGetEscalationPath
+        getEscalationPath: mockGetEscalationPath,
       });
 
       const { getEscalationPath } = mockUseAdmin();
@@ -390,13 +425,16 @@ describe('Advanced RBAC Testing', () => {
     });
 
     it('should have no escalation path for super admin', () => {
-      const superAdminUser = { ...baseAdminUser, role: 'super_admin' as AdminRole };
+      const superAdminUser = {
+        ...baseAdminUser,
+        role: 'super_admin' as AdminRole,
+      };
       const mockGetEscalationPath = jest.fn().mockReturnValue([]);
-      
+
       mockUseAdmin.mockReturnValue({
         ...mockUseAdmin(),
         adminUser: superAdminUser,
-        getEscalationPath: mockGetEscalationPath
+        getEscalationPath: mockGetEscalationPath,
       });
 
       const { getEscalationPath } = mockUseAdmin();
@@ -416,7 +454,7 @@ describe('Advanced RBAC Testing', () => {
             assignedBy: 'super_admin',
             assignedAt: '2024-01-01T00:00:00Z',
             isActive: true,
-            permissions: []
+            permissions: [],
           },
           {
             societyId: 'society_2',
@@ -425,14 +463,14 @@ describe('Advanced RBAC Testing', () => {
             assignedBy: 'community_manager',
             assignedAt: '2024-01-15T00:00:00Z',
             isActive: true,
-            permissions: []
-          }
-        ]
+            permissions: [],
+          },
+        ],
       };
 
       mockUseAdmin.mockReturnValue({
         ...mockUseAdmin(),
-        adminUser: multiSocietyUser
+        adminUser: multiSocietyUser,
       });
 
       // In society_1, user is community_manager (higher role)
@@ -447,13 +485,13 @@ describe('Advanced RBAC Testing', () => {
       mockUseAdmin.mockReturnValue({
         ...mockUseAdmin(),
         currentMode: 'resident',
-        isAdmin: false
+        isAdmin: false,
       });
 
       render(
         <PermissionGate resource="residents" action="read">
           <Text>Admin Content</Text>
-        </PermissionGate>
+        </PermissionGate>,
       );
 
       expect(screen.queryByText('Admin Content')).toBeNull();
@@ -463,13 +501,13 @@ describe('Advanced RBAC Testing', () => {
       mockUseAdmin.mockReturnValue({
         ...mockUseAdmin(),
         adminUser: null,
-        isAdmin: false
+        isAdmin: false,
       });
 
       render(
         <RoleBasedRenderer roles={['community_manager']}>
           <Text>Role Content</Text>
-        </RoleBasedRenderer>
+        </RoleBasedRenderer>,
       );
 
       expect(screen.queryByText('Role Content')).toBeNull();
@@ -479,7 +517,7 @@ describe('Advanced RBAC Testing', () => {
       const inactiveUser = { ...baseAdminUser, isActive: false };
       mockUseAdmin.mockReturnValue({
         ...mockUseAdmin(),
-        adminUser: inactiveUser
+        adminUser: inactiveUser,
       });
 
       // Note: This test assumes PermissionGate checks user.isActive
@@ -487,10 +525,10 @@ describe('Advanced RBAC Testing', () => {
       render(
         <PermissionGate resource="residents" action="read">
           <Text>Admin Content</Text>
-        </PermissionGate>
+        </PermissionGate>,
       );
 
-      // Should still render if context allows it, 
+      // Should still render if context allows it,
       // but in production this would be handled by the context
       expect(screen.getByText('Admin Content')).toBeTruthy();
     });
@@ -500,13 +538,13 @@ describe('Advanced RBAC Testing', () => {
     it('should handle undefined permissions gracefully', () => {
       mockUseAdmin.mockReturnValue({
         ...mockUseAdmin(),
-        permissions: []
+        permissions: [],
       });
 
       render(
         <PermissionGate resource="unknown" action="unknown">
           <Text>Unknown Permission Content</Text>
-        </PermissionGate>
+        </PermissionGate>,
       );
 
       expect(screen.queryByText('Unknown Permission Content')).toBeNull();
@@ -515,33 +553,34 @@ describe('Advanced RBAC Testing', () => {
     it('should handle malformed role data', () => {
       const malformedUser = {
         ...baseAdminUser,
-        role: 'invalid_role' as AdminRole
+        role: 'invalid_role' as AdminRole,
       };
 
       mockUseAdmin.mockReturnValue({
         ...mockUseAdmin(),
-        adminUser: malformedUser
+        adminUser: malformedUser,
       });
 
       render(
         <RoleVariants
           community_manager={<Text>CM Content</Text>}
           default={<Text>Default Content</Text>}
-        />
+        />,
       );
 
       expect(screen.getByText('Default Content')).toBeTruthy();
     });
 
     it('should handle concurrent permission checks', () => {
-      const mockCheckPermission = jest.fn()
+      const mockCheckPermission = jest
+        .fn()
         .mockReturnValueOnce(true)
         .mockReturnValueOnce(false)
         .mockReturnValueOnce(true);
 
       mockUseAdmin.mockReturnValue({
         ...mockUseAdmin(),
-        checkPermission: mockCheckPermission
+        checkPermission: mockCheckPermission,
       });
 
       render(
@@ -555,7 +594,7 @@ describe('Advanced RBAC Testing', () => {
           <PermissionGate resource="visitors" action="approve">
             <Text>Visitor Approve</Text>
           </PermissionGate>
-        </>
+        </>,
       );
 
       expect(screen.getByText('Billing Read')).toBeTruthy();
@@ -566,7 +605,7 @@ describe('Advanced RBAC Testing', () => {
   });
 
   describe('Performance and Optimization', () => {
-    it('should not re-render when permissions haven\'t changed', () => {
+    it("should not re-render when permissions haven't changed", () => {
       const mockCheckPermission = jest.fn().mockReturnValue(true);
       let renderCount = 0;
 
@@ -580,7 +619,7 @@ describe('Advanced RBAC Testing', () => {
       };
 
       const { rerender } = render(<TestComponent />);
-      
+
       // Re-render with same permission state
       rerender(<TestComponent />);
 
@@ -590,10 +629,10 @@ describe('Advanced RBAC Testing', () => {
 
     it('should cache permission check results appropriately', () => {
       const mockCheckPermission = jest.fn().mockReturnValue(true);
-      
+
       mockUseAdmin.mockReturnValue({
         ...mockUseAdmin(),
-        checkPermission: mockCheckPermission
+        checkPermission: mockCheckPermission,
       });
 
       render(
@@ -604,12 +643,16 @@ describe('Advanced RBAC Testing', () => {
           <PermissionGate resource="residents" action="read">
             <Text>Content 2</Text>
           </PermissionGate>
-        </>
+        </>,
       );
 
       // Each PermissionGate should call checkPermission independently
       expect(mockCheckPermission).toHaveBeenCalledTimes(2);
-      expect(mockCheckPermission).toHaveBeenCalledWith('residents', 'read', undefined);
+      expect(mockCheckPermission).toHaveBeenCalledWith(
+        'residents',
+        'read',
+        undefined,
+      );
     });
   });
 });

@@ -16,7 +16,13 @@ export interface Vehicle {
 export interface Document {
   id: string;
   name: string;
-  type: 'aadhar' | 'pan' | 'passport' | 'driving_license' | 'property_papers' | 'other';
+  type:
+    | 'aadhar'
+    | 'pan'
+    | 'passport'
+    | 'driving_license'
+    | 'property_papers'
+    | 'other';
   description?: string;
   fileUri: string;
   mimeType: string;
@@ -116,7 +122,14 @@ export interface MaintenanceRequest {
   id: string;
   title: string;
   description: string;
-  category: 'plumbing' | 'electrical' | 'civil' | 'appliance' | 'painting' | 'cleaning' | 'other';
+  category:
+    | 'plumbing'
+    | 'electrical'
+    | 'civil'
+    | 'appliance'
+    | 'painting'
+    | 'cleaning'
+    | 'other';
   priority: 'low' | 'medium' | 'high';
   status: 'pending' | 'approved' | 'in_progress' | 'completed' | 'cancelled';
   type: 'individual' | 'common_area';

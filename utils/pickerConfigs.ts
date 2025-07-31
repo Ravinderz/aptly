@@ -1,4 +1,9 @@
-import { DatePickerConfig, TimePickerConfig, DatePreset, TimePreset } from '@/types/pickers';
+import {
+  DatePickerConfig,
+  TimePickerConfig,
+  DatePreset,
+  TimePreset,
+} from '@/types/pickers';
 import { addDays, getNextWeekend } from './dateUtils';
 import { Calendar, Clock, Sun, Sunset, Moon } from 'lucide-react-native';
 
@@ -18,8 +23,8 @@ export const visitorDateConfig: DatePickerConfig = {
     {
       label: 'This Weekend',
       value: getNextWeekend(),
-    }
-  ]
+    },
+  ],
 };
 
 export const visitorTimeConfig: TimePickerConfig = {
@@ -27,25 +32,25 @@ export const visitorTimeConfig: TimePickerConfig = {
   interval: 15,
   restrictedHours: {
     start: '06:00 AM',
-    end: '10:00 PM'
+    end: '10:00 PM',
   },
   presets: [
     {
       label: 'Morning',
       value: '09:00 AM',
-      period: 'morning'
+      period: 'morning',
     },
     {
-      label: 'Afternoon', 
+      label: 'Afternoon',
       value: '02:00 PM',
-      period: 'afternoon'
+      period: 'afternoon',
     },
     {
       label: 'Evening',
       value: '06:00 PM',
-      period: 'evening'
-    }
-  ]
+      period: 'evening',
+    },
+  ],
 };
 
 // Admin configuration (extended permissions)
@@ -68,8 +73,8 @@ export const adminDateConfig: DatePickerConfig = {
     {
       label: 'Next Month',
       value: addDays(new Date(), 30),
-    }
-  ]
+    },
+  ],
 };
 
 export const adminTimeConfig: TimePickerConfig = {
@@ -77,48 +82,50 @@ export const adminTimeConfig: TimePickerConfig = {
   interval: 15,
   restrictedHours: {
     start: '00:00 AM',
-    end: '11:59 PM'
+    end: '11:59 PM',
   }, // 24/7 access for admins
   presets: [
     {
       label: 'Early Morning',
       value: '06:00 AM',
-      period: 'morning'
+      period: 'morning',
     },
     {
       label: 'Morning',
       value: '09:00 AM',
-      period: 'morning'
+      period: 'morning',
     },
     {
-      label: 'Afternoon', 
+      label: 'Afternoon',
       value: '02:00 PM',
-      period: 'afternoon'
+      period: 'afternoon',
     },
     {
       label: 'Evening',
       value: '06:00 PM',
-      period: 'evening'
+      period: 'evening',
     },
     {
       label: 'Late Evening',
       value: '10:00 PM',
-      period: 'evening'
-    }
-  ]
+      period: 'evening',
+    },
+  ],
 };
 
 // Utility function to get configuration based on user role
-export const getDateTimeConfig = (userRole: 'resident' | 'admin' = 'resident') => {
+export const getDateTimeConfig = (
+  userRole: 'resident' | 'admin' = 'resident',
+) => {
   if (userRole === 'admin') {
     return {
       dateConfig: adminDateConfig,
-      timeConfig: adminTimeConfig
+      timeConfig: adminTimeConfig,
     };
   }
-  
+
   return {
     dateConfig: visitorDateConfig,
-    timeConfig: visitorTimeConfig
+    timeConfig: visitorTimeConfig,
   };
 };

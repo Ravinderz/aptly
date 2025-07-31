@@ -10,5 +10,5 @@ export type {
   DatePickerConfig,
   TimePickerConfig,
   DatePreset,
-  TimePreset
+  TimePreset,
 } from '@/types/pickers';

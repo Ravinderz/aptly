@@ -11,10 +11,10 @@ import {
   Sprout,
   Wrench,
   Zap,
-} from "lucide-react-native";
-import React from "react";
-import { Text, View } from "react-native";
-import { cn } from "@/utils/cn";
+} from 'lucide-react-native';
+import React from 'react';
+import { Text, View } from 'react-native';
+import { cn } from '@/utils/cn';
 
 // Define props interface
 interface ServiceTileProps {
@@ -46,10 +46,9 @@ const ServiceTile: React.FC<ServiceTileProps> = ({ iconName, serviceName }) => {
     <View>
       <View
         className={cn(
-          "p-6 rounded-xl items-center justify-center bg-surface border border-divider",
-          "shadow-sm shadow-black/5"
-        )}
-      >
+          'p-6 rounded-xl items-center justify-center bg-surface border border-divider',
+          'shadow-sm shadow-black/5',
+        )}>
         <View className="flex items-center justify-center bg-primary/10 rounded-full p-4">
           {IconMap[iconName as keyof typeof IconMap]}
         </View>

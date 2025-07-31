@@ -1,15 +1,15 @@
 import React from 'react';
 import { View, Text, TouchableOpacity } from 'react-native';
-import { 
-  TrendingUp, 
-  TrendingDown, 
+import {
+  TrendingUp,
+  TrendingDown,
   Minus,
   ChevronRight,
   Users,
   DollarSign,
   Bell,
   AlertCircle,
-  CheckCircle
+  CheckCircle,
 } from 'lucide-react-native';
 import { adminTheme, adminStyles } from '@/utils/adminTheme';
 
@@ -34,11 +34,11 @@ export const StatWidget: React.FC<StatWidgetProps> = ({
   trend,
   icon,
   color = adminTheme.primary,
-  onPress
+  onPress,
 }) => {
   const getTrendIcon = () => {
     if (!trend) return null;
-    
+
     switch (trend.direction) {
       case 'up':
         return <TrendingUp size={16} color={adminTheme.success} />;
@@ -51,7 +51,7 @@ export const StatWidget: React.FC<StatWidgetProps> = ({
 
   const getTrendColor = () => {
     if (!trend) return adminTheme.textTertiary;
-    
+
     switch (trend.direction) {
       case 'up':
         return adminTheme.success;
@@ -68,48 +68,63 @@ export const StatWidget: React.FC<StatWidgetProps> = ({
     <Component
       style={[adminStyles.adminCard, { flex: 1, minWidth: '47%' }]}
       onPress={onPress}
-      activeOpacity={onPress ? 0.8 : 1}
-    >
-      <View style={{ flexDirection: 'row', alignItems: 'flex-start', justifyContent: 'space-between' }}>
+      activeOpacity={onPress ? 0.8 : 1}>
+      <View
+        style={{
+          flexDirection: 'row',
+          alignItems: 'flex-start',
+          justifyContent: 'space-between',
+        }}>
         <View style={{ flex: 1 }}>
-          <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 4 }}>
-            {icon && (
-              <View style={{ marginRight: 8 }}>
-                {icon}
-              </View>
-            )}
-            <Text style={[adminStyles.adminCaption, { flex: 1 }]}>
-              {title}
-            </Text>
+          <View
+            style={{
+              flexDirection: 'row',
+              alignItems: 'center',
+              marginBottom: 4,
+            }}>
+            {icon && <View style={{ marginRight: 8 }}>{icon}</View>}
+            <Text style={[adminStyles.adminCaption, { flex: 1 }]}>{title}</Text>
           </View>
-          
+
           <Text style={[adminStyles.adminHeading, { fontSize: 24, color }]}>
             {value}
           </Text>
-          
+
           {subtitle && (
-            <Text style={[adminStyles.adminCaption, { color: adminTheme.textTertiary, marginTop: 2 }]}>
+            <Text
+              style={[
+                adminStyles.adminCaption,
+                { color: adminTheme.textTertiary, marginTop: 2 },
+              ]}>
               {subtitle}
             </Text>
           )}
-          
+
           {trend && (
-            <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 4 }}>
+            <View
+              style={{
+                flexDirection: 'row',
+                alignItems: 'center',
+                marginTop: 4,
+              }}>
               {getTrendIcon()}
-              <Text style={[adminStyles.adminCaption, { 
-                color: getTrendColor(),
-                marginLeft: 4,
-                fontWeight: '600'
-              }]}>
-                {trend.percentage > 0 ? '+' : ''}{trend.percentage}%
+              <Text
+                style={[
+                  adminStyles.adminCaption,
+                  {
+                    color: getTrendColor(),
+                    marginLeft: 4,
+                    fontWeight: '600',
+                  },
+                ]}>
+                {trend.percentage > 0 ? '+' : ''}
+                {trend.percentage}%
               </Text>
             </View>
           )}
         </View>
-        
-        {onPress && (
-          <ChevronRight size={16} color={adminTheme.textTertiary} />
-        )}
+
+        {onPress && <ChevronRight size={16} color={adminTheme.textTertiary} />}
       </View>
     </Component>
   );
@@ -137,7 +152,7 @@ export const ProgressWidget: React.FC<ProgressWidgetProps> = ({
   color = adminTheme.primary,
   showDetails = false,
   details = [],
-  onPress
+  onPress,
 }) => {
   const percentage = total > 0 ? (completed / total) * 100 : 0;
   const Component = onPress ? TouchableOpacity : View;
@@ -146,38 +161,49 @@ export const ProgressWidget: React.FC<ProgressWidgetProps> = ({
     <Component
       style={adminStyles.adminCard}
       onPress={onPress}
-      activeOpacity={onPress ? 0.8 : 1}
-    >
-      <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
-        <Text style={adminStyles.adminSubheading}>
-          {title}
-        </Text>
-        <Text style={[adminStyles.adminBody, { color: adminTheme.textSecondary }]}>
+      activeOpacity={onPress ? 0.8 : 1}>
+      <View
+        style={{
+          flexDirection: 'row',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          marginBottom: 16,
+        }}>
+        <Text style={adminStyles.adminSubheading}>{title}</Text>
+        <Text
+          style={[adminStyles.adminBody, { color: adminTheme.textSecondary }]}>
           {completed}/{total}
         </Text>
       </View>
-      
+
       {/* Progress bar */}
-      <View style={{ 
-        backgroundColor: adminTheme.surfaceElevated,
-        height: 8,
-        borderRadius: 4,
-        overflow: 'hidden',
-        marginBottom: showDetails ? 16 : 0
-      }}>
-        <View style={{
-          backgroundColor: color,
-          height: '100%',
-          width: `${Math.min(percentage, 100)}%`
-        }} />
+      <View
+        style={{
+          backgroundColor: adminTheme.surfaceElevated,
+          height: 8,
+          borderRadius: 4,
+          overflow: 'hidden',
+          marginBottom: showDetails ? 16 : 0,
+        }}>
+        <View
+          style={{
+            backgroundColor: color,
+            height: '100%',
+            width: `${Math.min(percentage, 100)}%`,
+          }}
+        />
       </View>
-      
+
       {/* Details breakdown */}
       {showDetails && details.length > 0 && (
         <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
           {details.map((detail, index) => (
             <View key={index} style={{ alignItems: 'center', flex: 1 }}>
-              <Text style={[adminStyles.adminHeading, { color: detail.color, fontSize: 16 }]}>
+              <Text
+                style={[
+                  adminStyles.adminHeading,
+                  { color: detail.color, fontSize: 16 },
+                ]}>
                 {detail.value}
               </Text>
               <Text style={[adminStyles.adminCaption, { textAlign: 'center' }]}>
@@ -187,7 +213,7 @@ export const ProgressWidget: React.FC<ProgressWidgetProps> = ({
           ))}
         </View>
       )}
-      
+
       {onPress && (
         <View style={{ position: 'absolute', top: 16, right: 16 }}>
           <ChevronRight size={16} color={adminTheme.textTertiary} />
@@ -213,70 +239,76 @@ export const QuickActionWidget: React.FC<QuickActionProps> = ({
   onPress,
   color = adminTheme.primary,
   subtitle,
-  badge
+  badge,
 }) => {
   return (
     <TouchableOpacity
       style={[
         adminStyles.adminCard,
-        { 
+        {
           backgroundColor: color,
           flex: 1,
           minWidth: '47%',
           paddingVertical: 20,
-          position: 'relative'
-        }
+          position: 'relative',
+        },
       ]}
       onPress={onPress}
-      activeOpacity={0.8}
-    >
+      activeOpacity={0.8}>
       {/* Badge */}
       {badge !== undefined && badge > 0 && (
-        <View style={{
-          position: 'absolute',
-          top: 12,
-          right: 12,
-          backgroundColor: adminTheme.error,
-          borderRadius: 12,
-          minWidth: 24,
-          height: 24,
-          justifyContent: 'center',
-          alignItems: 'center',
-          paddingHorizontal: 8
-        }}>
-          <Text style={[adminStyles.adminCaption, { 
-            color: adminTheme.textInverse,
-            fontWeight: '700',
-            fontSize: 12
-          }]}>
+        <View
+          style={{
+            position: 'absolute',
+            top: 12,
+            right: 12,
+            backgroundColor: adminTheme.error,
+            borderRadius: 12,
+            minWidth: 24,
+            height: 24,
+            justifyContent: 'center',
+            alignItems: 'center',
+            paddingHorizontal: 8,
+          }}>
+          <Text
+            style={[
+              adminStyles.adminCaption,
+              {
+                color: adminTheme.textInverse,
+                fontWeight: '700',
+                fontSize: 12,
+              },
+            ]}>
             {badge > 99 ? '99+' : badge}
           </Text>
         </View>
       )}
-      
+
       <View style={{ alignItems: 'center' }}>
         {icon}
-        <Text style={[
-          adminStyles.adminLabel,
-          { 
-            color: adminTheme.textOnPrimary,
-            marginTop: 8,
-            textAlign: 'center',
-            fontWeight: '600'
-          }
-        ]}>
+        <Text
+          style={[
+            adminStyles.adminLabel,
+            {
+              color: adminTheme.textOnPrimary,
+              marginTop: 8,
+              textAlign: 'center',
+              fontWeight: '600',
+            },
+          ]}>
           {title}
         </Text>
         {subtitle && (
-          <Text style={[
-            adminStyles.adminCaption,
-            { 
-              color: adminTheme.textOnPrimary,
-              opacity: 0.8,
-              marginTop: 2,
-              textAlign: 'center'
-            }
-          ]}>
+          <Text
+            style={[
+              adminStyles.adminCaption,
+              {
+                color: adminTheme.textOnPrimary,
+                opacity: 0.8,
+                marginTop: 2,
+                textAlign: 'center',
+              },
+            ]}>
             {subtitle}
           </Text>
         )}
@@ -301,7 +333,7 @@ export const AlertWidget: React.FC<AlertWidgetProps> = ({
   message,
   timestamp,
   onPress,
-  onDismiss
+  onDismiss,
 }) => {
   const getAlertColor = () => {
     switch (type) {
@@ -318,7 +350,7 @@ export const AlertWidget: React.FC<AlertWidgetProps> = ({
 
   const getAlertIcon = () => {
     const color = getAlertColor();
-    
+
     switch (type) {
       case 'emergency':
       case 'warning':
@@ -336,22 +368,24 @@ export const AlertWidget: React.FC<AlertWidgetProps> = ({
     <Component
       style={[
         adminStyles.adminCard,
-        { 
+        {
           borderLeftWidth: 4,
           borderLeftColor: getAlertColor(),
-          backgroundColor: type === 'emergency' ? adminTheme.error + '08' : adminTheme.surface
-        }
+          backgroundColor:
+            type === 'emergency' ? adminTheme.error + '08' : adminTheme.surface,
+        },
       ]}
       onPress={onPress}
-      activeOpacity={onPress ? 0.8 : 1}
-    >
+      activeOpacity={onPress ? 0.8 : 1}>
       <View style={{ flexDirection: 'row', alignItems: 'flex-start' }}>
-        <View style={{ marginRight: 12 }}>
-          {getAlertIcon()}
-        </View>
-        
+        <View style={{ marginRight: 12 }}>{getAlertIcon()}</View>
+
         <View style={{ flex: 1 }}>
-          <Text style={[adminStyles.adminLabel, { color: getAlertColor(), fontWeight: '700' }]}>
+          <Text
+            style={[
+              adminStyles.adminLabel,
+              { color: getAlertColor(), fontWeight: '700' },
+            ]}>
             {title}
           </Text>
           <Text style={[adminStyles.adminBody, { marginTop: 4 }]}>
@@ -363,14 +397,17 @@ export const AlertWidget: React.FC<AlertWidgetProps> = ({
             </Text>
           )}
         </View>
-        
+
         {onDismiss && (
           <TouchableOpacity
             style={{ padding: 4 }}
             onPress={onDismiss}
-            hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
-          >
-            <Text style={[adminStyles.adminCaption, { color: adminTheme.textTertiary }]}>
+            hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
+            <Text
+              style={[
+                adminStyles.adminCaption,
+                { color: adminTheme.textTertiary },
+              ]}>
               ×
             </Text>
           </TouchableOpacity>
@@ -394,7 +431,7 @@ interface SummaryCardProps {
 export const SummaryCard: React.FC<SummaryCardProps> = ({
   title,
   metrics,
-  onPress
+  onPress,
 }) => {
   const Component = onPress ? TouchableOpacity : View;
 
@@ -402,27 +439,29 @@ export const SummaryCard: React.FC<SummaryCardProps> = ({
     <Component
       style={adminStyles.adminCard}
       onPress={onPress}
-      activeOpacity={onPress ? 0.8 : 1}
-    >
-      <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
-        <Text style={adminStyles.adminSubheading}>
-          {title}
-        </Text>
-        {onPress && (
-          <ChevronRight size={16} color={adminTheme.textTertiary} />
-        )}
+      activeOpacity={onPress ? 0.8 : 1}>
+      <View
+        style={{
+          flexDirection: 'row',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          marginBottom: 16,
+        }}>
+        <Text style={adminStyles.adminSubheading}>{title}</Text>
+        {onPress && <ChevronRight size={16} color={adminTheme.textTertiary} />}
       </View>
-      
+
       <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 16 }}>
         {metrics.map((metric, index) => (
           <View key={index} style={{ alignItems: 'center', minWidth: 60 }}>
-            <Text style={[
-              adminStyles.adminHeading, 
-              { 
-                fontSize: 20,
-                color: metric.color || adminTheme.textPrimary
-              }
-            ]}>
+            <Text
+              style={[
+                adminStyles.adminHeading,
+                {
+                  fontSize: 20,
+                  color: metric.color || adminTheme.textPrimary,
+                },
+              ]}>
               {metric.value}
             </Text>
             <Text style={[adminStyles.adminCaption, { textAlign: 'center' }]}>
@@ -455,40 +494,58 @@ export const MultiSocietyComparison: React.FC<MultiSocietyComparisonProps> = ({
   societies,
   unit = '',
   showTrend = true,
-  onSocietyPress
+  onSocietyPress,
 }) => {
-  const maxValue = Math.max(...societies.map(s => s.value));
-  
+  const maxValue = Math.max(...societies.map((s) => s.value));
+
   return (
     <View style={adminStyles.adminCard}>
       <Text style={[adminStyles.adminSubheading, { marginBottom: 16 }]}>
         {title}
       </Text>
-      
+
       <View style={{ gap: 12 }}>
         {societies.map((society) => {
-          const percentage = maxValue > 0 ? (society.value / maxValue) * 100 : 0;
+          const percentage =
+            maxValue > 0 ? (society.value / maxValue) * 100 : 0;
           const Component = onSocietyPress ? TouchableOpacity : View;
-          
+
           return (
             <Component
               key={society.id}
               onPress={() => onSocietyPress?.(society.id)}
-              activeOpacity={onSocietyPress ? 0.7 : 1}
-            >
-              <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
-                <Text style={[adminStyles.adminBody, { flex: 1 }]} numberOfLines={1}>
+              activeOpacity={onSocietyPress ? 0.7 : 1}>
+              <View
+                style={{
+                  flexDirection: 'row',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  marginBottom: 4,
+                }}>
+                <Text
+                  style={[adminStyles.adminBody, { flex: 1 }]}
+                  numberOfLines={1}>
                   {society.name}
                 </Text>
                 <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                  <Text style={[adminStyles.adminLabel, { 
-                    color: society.color || adminTheme.textPrimary,
-                    fontWeight: '600' 
-                  }]}>
-                    {society.value}{unit}
+                  <Text
+                    style={[
+                      adminStyles.adminLabel,
+                      {
+                        color: society.color || adminTheme.textPrimary,
+                        fontWeight: '600',
+                      },
+                    ]}>
+                    {society.value}
+                    {unit}
                   </Text>
                   {showTrend && society.change !== undefined && (
-                    <View style={{ flexDirection: 'row', alignItems: 'center', marginLeft: 8 }}>
+                    <View
+                      style={{
+                        flexDirection: 'row',
+                        alignItems: 'center',
+                        marginLeft: 8,
+                      }}>
                       {society.change > 0 ? (
                         <TrendingUp size={12} color={adminTheme.success} />
                       ) : society.change < 0 ? (
@@ -496,31 +553,43 @@ export const MultiSocietyComparison: React.FC<MultiSocietyComparisonProps> = ({
                       ) : (
                         <Minus size={12} color={adminTheme.slate} />
                       )}
-                      <Text style={[adminStyles.adminCaption, { 
-                        color: society.change > 0 ? adminTheme.success : 
-                               society.change < 0 ? adminTheme.error : adminTheme.slate,
-                        marginLeft: 2,
-                        fontSize: 11
-                      }]}>
-                        {society.change > 0 ? '+' : ''}{society.change}%
+                      <Text
+                        style={[
+                          adminStyles.adminCaption,
+                          {
+                            color:
+                              society.change > 0
+                                ? adminTheme.success
+                                : society.change < 0
+                                  ? adminTheme.error
+                                  : adminTheme.slate,
+                            marginLeft: 2,
+                            fontSize: 11,
+                          },
+                        ]}>
+                        {society.change > 0 ? '+' : ''}
+                        {society.change}%
                       </Text>
                     </View>
                   )}
                 </View>
               </View>
-              
+
               {/* Progress bar */}
-              <View style={{
-                backgroundColor: adminTheme.surfaceElevated,
-                height: 6,
-                borderRadius: 3,
-                overflow: 'hidden'
-              }}>
-                <View style={{
-                  backgroundColor: society.color || adminTheme.primary,
-                  height: '100%',
-                  width: `${Math.min(percentage, 100)}%`
-                }} />
+              <View
+                style={{
+                  backgroundColor: adminTheme.surfaceElevated,
+                  height: 6,
+                  borderRadius: 3,
+                  overflow: 'hidden',
+                }}>
+                <View
+                  style={{
+                    backgroundColor: society.color || adminTheme.primary,
+                    height: '100%',
+                    width: `${Math.min(percentage, 100)}%`,
+                  }}
+                />
               </View>
             </Component>
           );
@@ -546,61 +615,108 @@ interface SocietySelectorWidgetProps {
 export const SocietySelectorWidget: React.FC<SocietySelectorWidgetProps> = ({
   currentSociety,
   availableSocieties,
-  onSwitchPress
+  onSwitchPress,
 }) => {
-  const occupancyRate = currentSociety.totalUsers > 0 
-    ? (currentSociety.activeUsers / currentSociety.totalUsers) * 100 
-    : 0;
+  const occupancyRate =
+    currentSociety.totalUsers > 0
+      ? (currentSociety.activeUsers / currentSociety.totalUsers) * 100
+      : 0;
 
   return (
-    <TouchableOpacity style={adminStyles.adminCard} onPress={onSwitchPress} activeOpacity={0.8}>
-      <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 12 }}>
+    <TouchableOpacity
+      style={adminStyles.adminCard}
+      onPress={onSwitchPress}
+      activeOpacity={0.8}>
+      <View
+        style={{
+          flexDirection: 'row',
+          justifyContent: 'space-between',
+          alignItems: 'flex-start',
+          marginBottom: 12,
+        }}>
         <View style={{ flex: 1 }}>
-          <Text style={[adminStyles.adminCaption, { color: adminTheme.textSecondary }]}>
+          <Text
+            style={[
+              adminStyles.adminCaption,
+              { color: adminTheme.textSecondary },
+            ]}>
             Current Society
           </Text>
           <Text style={[adminStyles.adminSubheading, { marginBottom: 4 }]}>
             {currentSociety.name}
           </Text>
-          <Text style={[adminStyles.adminCaption, { color: adminTheme.textTertiary }]}>
+          <Text
+            style={[
+              adminStyles.adminCaption,
+              { color: adminTheme.textTertiary },
+            ]}>
             {currentSociety.code}
           </Text>
         </View>
-        
+
         <View style={{ alignItems: 'flex-end' }}>
-          <Text style={[adminStyles.adminCaption, { color: adminTheme.textSecondary }]}>
+          <Text
+            style={[
+              adminStyles.adminCaption,
+              { color: adminTheme.textSecondary },
+            ]}>
             Available: {availableSocieties}
           </Text>
-          <ChevronRight size={16} color={adminTheme.textTertiary} style={{ marginTop: 4 }} />
+          <ChevronRight
+            size={16}
+            color={adminTheme.textTertiary}
+            style={{ marginTop: 4 }}
+          />
         </View>
       </View>
-      
-      <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-        <Text style={[adminStyles.adminBody, { color: adminTheme.textSecondary }]}>
+
+      <View
+        style={{
+          flexDirection: 'row',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+        }}>
+        <Text
+          style={[adminStyles.adminBody, { color: adminTheme.textSecondary }]}>
           Occupancy Rate
         </Text>
-        <Text style={[adminStyles.adminLabel, { 
-          color: occupancyRate > 80 ? adminTheme.success : 
-                 occupancyRate > 60 ? adminTheme.warning : adminTheme.error,
-          fontWeight: '600'
-        }]}>
+        <Text
+          style={[
+            adminStyles.adminLabel,
+            {
+              color:
+                occupancyRate > 80
+                  ? adminTheme.success
+                  : occupancyRate > 60
+                    ? adminTheme.warning
+                    : adminTheme.error,
+              fontWeight: '600',
+            },
+          ]}>
           {occupancyRate.toFixed(1)}%
         </Text>
       </View>
-      
-      <View style={{
-        backgroundColor: adminTheme.surfaceElevated,
-        height: 6,
-        borderRadius: 3,
-        overflow: 'hidden',
-        marginTop: 8
-      }}>
-        <View style={{
-          backgroundColor: occupancyRate > 80 ? adminTheme.success : 
-                           occupancyRate > 60 ? adminTheme.warning : adminTheme.error,
-          height: '100%',
-          width: `${Math.min(occupancyRate, 100)}%`
-        }} />
+
+      <View
+        style={{
+          backgroundColor: adminTheme.surfaceElevated,
+          height: 6,
+          borderRadius: 3,
+          overflow: 'hidden',
+          marginTop: 8,
+        }}>
+        <View
+          style={{
+            backgroundColor:
+              occupancyRate > 80
+                ? adminTheme.success
+                : occupancyRate > 60
+                  ? adminTheme.warning
+                  : adminTheme.error,
+            height: '100%',
+            width: `${Math.min(occupancyRate, 100)}%`,
+          }}
+        />
       </View>
     </TouchableOpacity>
   );
@@ -621,14 +737,18 @@ interface CrossSocietyAlertProps {
 
 export const CrossSocietyAlert: React.FC<CrossSocietyAlertProps> = ({
   alerts,
-  onViewAll
+  onViewAll,
 }) => {
   const getSeverityColor = (severity: string) => {
     switch (severity) {
-      case 'critical': return adminTheme.error;
-      case 'high': return adminTheme.warning;
-      case 'medium': return adminTheme.info;
-      default: return adminTheme.textSecondary;
+      case 'critical':
+        return adminTheme.error;
+      case 'high':
+        return adminTheme.warning;
+      case 'medium':
+        return adminTheme.info;
+      default:
+        return adminTheme.textSecondary;
     }
   };
 
@@ -637,18 +757,26 @@ export const CrossSocietyAlert: React.FC<CrossSocietyAlertProps> = ({
       <View style={adminStyles.adminCard}>
         <View style={{ alignItems: 'center', padding: 16 }}>
           <CheckCircle size={32} color={adminTheme.success} />
-          <Text style={[adminStyles.adminLabel, { 
-            color: adminTheme.success, 
-            marginTop: 8,
-            textAlign: 'center'
-          }]}>
+          <Text
+            style={[
+              adminStyles.adminLabel,
+              {
+                color: adminTheme.success,
+                marginTop: 8,
+                textAlign: 'center',
+              },
+            ]}>
             All Systems Normal
           </Text>
-          <Text style={[adminStyles.adminCaption, { 
-            color: adminTheme.textSecondary,
-            textAlign: 'center',
-            marginTop: 4
-          }]}>
+          <Text
+            style={[
+              adminStyles.adminCaption,
+              {
+                color: adminTheme.textSecondary,
+                textAlign: 'center',
+                marginTop: 4,
+              },
+            ]}>
             No cross-society alerts
           </Text>
         </View>
@@ -658,41 +786,58 @@ export const CrossSocietyAlert: React.FC<CrossSocietyAlertProps> = ({
 
   return (
     <View style={adminStyles.adminCard}>
-      <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
-        <Text style={adminStyles.adminSubheading}>
-          Platform Alerts
-        </Text>
+      <View
+        style={{
+          flexDirection: 'row',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          marginBottom: 16,
+        }}>
+        <Text style={adminStyles.adminSubheading}>Platform Alerts</Text>
         {onViewAll && (
           <TouchableOpacity onPress={onViewAll}>
-            <Text style={[adminStyles.adminCaption, { color: adminTheme.primary }]}>
+            <Text
+              style={[adminStyles.adminCaption, { color: adminTheme.primary }]}>
               View All
             </Text>
           </TouchableOpacity>
         )}
       </View>
-      
+
       <View style={{ gap: 12 }}>
         {alerts.slice(0, 3).map((alert) => (
-          <View key={alert.id} style={{
-            flexDirection: 'row',
-            alignItems: 'flex-start',
-            padding: 12,
-            backgroundColor: adminTheme.surfaceElevated,
-            borderRadius: 8,
-            borderLeftWidth: 3,
-            borderLeftColor: getSeverityColor(alert.severity)
-          }}>
-            <AlertCircle size={16} color={getSeverityColor(alert.severity)} style={{ marginRight: 8, marginTop: 2 }} />
-            
+          <View
+            key={alert.id}
+            style={{
+              flexDirection: 'row',
+              alignItems: 'flex-start',
+              padding: 12,
+              backgroundColor: adminTheme.surfaceElevated,
+              borderRadius: 8,
+              borderLeftWidth: 3,
+              borderLeftColor: getSeverityColor(alert.severity),
+            }}>
+            <AlertCircle
+              size={16}
+              color={getSeverityColor(alert.severity)}
+              style={{ marginRight: 8, marginTop: 2 }}
+            />
+
             <View style={{ flex: 1 }}>
               <Text style={[adminStyles.adminLabel, { fontWeight: '600' }]}>
                 {alert.title}
               </Text>
-              <Text style={[adminStyles.adminCaption, { 
-                color: adminTheme.textSecondary,
-                marginTop: 2
-              }]}>
-                Affects {alert.affectedSocieties} {alert.affectedSocieties === 1 ? 'society' : 'societies'} • {alert.severity.toUpperCase()}
+              <Text
+                style={[
+                  adminStyles.adminCaption,
+                  {
+                    color: adminTheme.textSecondary,
+                    marginTop: 2,
+                  },
+                ]}>
+                Affects {alert.affectedSocieties}{' '}
+                {alert.affectedSocieties === 1 ? 'society' : 'societies'} •{' '}
+                {alert.severity.toUpperCase()}
               </Text>
             </View>
           </View>
@@ -722,12 +867,9 @@ interface MultiSocietyPerformanceProps {
   onDetailPress?: () => void;
 }
 
-export const MultiSocietyPerformance: React.FC<MultiSocietyPerformanceProps> = ({
-  title,
-  metrics,
-  timeframe,
-  onDetailPress
-}) => {
+export const MultiSocietyPerformance: React.FC<
+  MultiSocietyPerformanceProps
+> = ({ title, metrics, timeframe, onDetailPress }) => {
   const formatValue = (value: number, type: string, unit?: string) => {
     switch (type) {
       case 'percentage':
@@ -743,12 +885,20 @@ export const MultiSocietyPerformance: React.FC<MultiSocietyPerformanceProps> = (
 
   return (
     <View style={adminStyles.adminCard}>
-      <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+      <View
+        style={{
+          flexDirection: 'row',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          marginBottom: 16,
+        }}>
         <View>
-          <Text style={adminStyles.adminSubheading}>
-            {title}
-          </Text>
-          <Text style={[adminStyles.adminCaption, { color: adminTheme.textSecondary }]}>
+          <Text style={adminStyles.adminSubheading}>{title}</Text>
+          <Text
+            style={[
+              adminStyles.adminCaption,
+              { color: adminTheme.textSecondary },
+            ]}>
             {timeframe}
           </Text>
         </View>
@@ -758,46 +908,76 @@ export const MultiSocietyPerformance: React.FC<MultiSocietyPerformanceProps> = (
           </TouchableOpacity>
         )}
       </View>
-      
+
       <View style={{ gap: 16 }}>
         {metrics.map((metric, index) => (
           <View key={index}>
-            <Text style={[adminStyles.adminLabel, { 
-              color: adminTheme.textSecondary,
-              marginBottom: 8
-            }]}>
+            <Text
+              style={[
+                adminStyles.adminLabel,
+                {
+                  color: adminTheme.textSecondary,
+                  marginBottom: 8,
+                },
+              ]}>
               {metric.label}
             </Text>
-            
+
             <View style={{ gap: 6 }}>
               {metric.societies.map((society) => {
-                const achievement = society.target 
-                  ? (society.value / society.target) * 100 
+                const achievement = society.target
+                  ? (society.value / society.target) * 100
                   : 100;
-                
+
                 return (
-                  <View key={society.id} style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <Text style={[adminStyles.adminBody, { flex: 1 }]} numberOfLines={1}>
+                  <View
+                    key={society.id}
+                    style={{
+                      flexDirection: 'row',
+                      justifyContent: 'space-between',
+                      alignItems: 'center',
+                    }}>
+                    <Text
+                      style={[adminStyles.adminBody, { flex: 1 }]}
+                      numberOfLines={1}>
                       {society.name}
                     </Text>
-                    
-                    <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                      <Text style={[adminStyles.adminLabel, { 
-                        color: achievement >= 100 ? adminTheme.success : 
-                               achievement >= 80 ? adminTheme.warning : adminTheme.error,
-                        fontWeight: '600',
-                        minWidth: 60,
-                        textAlign: 'right'
-                      }]}>
+
+                    <View
+                      style={{ flexDirection: 'row', alignItems: 'center' }}>
+                      <Text
+                        style={[
+                          adminStyles.adminLabel,
+                          {
+                            color:
+                              achievement >= 100
+                                ? adminTheme.success
+                                : achievement >= 80
+                                  ? adminTheme.warning
+                                  : adminTheme.error,
+                            fontWeight: '600',
+                            minWidth: 60,
+                            textAlign: 'right',
+                          },
+                        ]}>
                         {formatValue(society.value, metric.type, metric.unit)}
                       </Text>
-                      
+
                       {society.target && (
-                        <Text style={[adminStyles.adminCaption, { 
-                          color: adminTheme.textTertiary,
-                          marginLeft: 4
-                        }]}>
-                          / {formatValue(society.target, metric.type, metric.unit)}
+                        <Text
+                          style={[
+                            adminStyles.adminCaption,
+                            {
+                              color: adminTheme.textTertiary,
+                              marginLeft: 4,
+                            },
+                          ]}>
+                          /{' '}
+                          {formatValue(
+                            society.target,
+                            metric.type,
+                            metric.unit,
+                          )}
                         </Text>
                       )}
                     </View>
@@ -821,5 +1001,5 @@ export default {
   MultiSocietyComparison,
   SocietySelectorWidget,
   CrossSocietyAlert,
-  MultiSocietyPerformance
+  MultiSocietyPerformance,
 };

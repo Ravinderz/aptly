@@ -1,7 +1,7 @@
-import { Button } from "@/components/ui/Button";
-import { Card } from "@/components/ui/Card";
-import { showAlert, showDeleteConfirmAlert } from "@/utils/alert";
-import { useRouter } from "expo-router";
+import { Button } from '@/components/ui/Button';
+import { Card } from '@/components/ui/Card';
+import { showAlert, showDeleteConfirmAlert } from '@/utils/alert';
+import { useRouter } from 'expo-router';
 import {
   ArrowLeft,
   Building2,
@@ -12,8 +12,8 @@ import {
   Plus,
   Smartphone,
   Trash2,
-} from "lucide-react-native";
-import React, { useState } from "react";
+} from 'lucide-react-native';
+import React, { useState } from 'react';
 import {
   SafeAreaView,
   ScrollView,
@@ -22,11 +22,11 @@ import {
   TextInput,
   TouchableOpacity,
   View,
-} from "react-native";
+} from 'react-native';
 
 interface PaymentMethod {
   id: string;
-  type: "card" | "bank" | "upi" | "wallet";
+  type: 'card' | 'bank' | 'upi' | 'wallet';
   name: string;
   details: string;
   isDefault: boolean;
@@ -44,65 +44,65 @@ interface BillingSettings {
     gstin?: string;
     businessName?: string;
   };
-  downloadFormat: "pdf" | "excel";
-  currency: "INR";
+  downloadFormat: 'pdf' | 'excel';
+  currency: 'INR';
 }
 
-export default function BillingSettings() {
+export default function BillingSettingsPage() {
   const router = useRouter();
 
   const [paymentMethods, setPaymentMethods] = useState<PaymentMethod[]>([
     {
-      id: "1",
-      type: "card",
-      name: "HDFC Credit Card",
-      details: "**** **** **** 1234",
+      id: '1',
+      type: 'card',
+      name: 'HDFC Credit Card',
+      details: '**** **** **** 1234',
       isDefault: true,
-      lastUsed: "2024-03-02",
+      lastUsed: '2024-03-02',
     },
     {
-      id: "2",
-      type: "upi",
-      name: "PhonePe",
-      details: "priya.kumar@ybl",
+      id: '2',
+      type: 'upi',
+      name: 'PhonePe',
+      details: 'priya.kumar@ybl',
       isDefault: false,
-      lastUsed: "2024-02-25",
+      lastUsed: '2024-02-25',
     },
     {
-      id: "3",
-      type: "bank",
-      name: "HDFC Savings",
-      details: "****1234 - Auto Debit",
+      id: '3',
+      type: 'bank',
+      name: 'HDFC Savings',
+      details: '****1234 - Auto Debit',
       isDefault: false,
     },
   ]);
 
   const [settings, setSettings] = useState<BillingSettings>({
     autoPayEnabled: true,
-    defaultPaymentMethod: "1",
+    defaultPaymentMethod: '1',
     autoPayDay: 2,
     reminderEnabled: true,
     reminderDays: 3,
     gstDetails: {
       registered: false,
-      gstin: "",
-      businessName: "",
+      gstin: '',
+      businessName: '',
     },
-    downloadFormat: "pdf",
-    currency: "INR",
+    downloadFormat: 'pdf',
+    currency: 'INR',
   });
 
   const [editingGST, setEditingGST] = useState(false);
 
   const getPaymentMethodIcon = (type: string) => {
     switch (type) {
-      case "card":
+      case 'card':
         return <CreditCard size={20} className="text-primary" />;
-      case "upi":
+      case 'upi':
         return <Smartphone size={20} className="text-warning" />;
-      case "bank":
+      case 'bank':
         return <Building2 size={20} className="text-secondary" />;
-      case "wallet":
+      case 'wallet':
         return <Smartphone size={20} className="text-primary" />;
       default:
         return <CreditCard size={20} className="text-primary" />;
@@ -114,10 +114,10 @@ export default function BillingSettings() {
       prev.map((method) => ({
         ...method,
         isDefault: method.id === methodId,
-      }))
+      })),
     );
     setSettings((prev) => ({ ...prev, defaultPaymentMethod: methodId }));
-    showAlert("Default Payment Method", "Payment method updated successfully");
+    showAlert('Default Payment Method', 'Payment method updated successfully');
   };
 
   const handleDeletePaymentMethod = (methodId: string) => {
@@ -126,25 +126,25 @@ export default function BillingSettings() {
 
     if (method.isDefault) {
       showAlert(
-        "Cannot Delete",
-        "Cannot delete the default payment method. Please set another method as default first."
+        'Cannot Delete',
+        'Cannot delete the default payment method. Please set another method as default first.',
       );
       return;
     }
 
     showDeleteConfirmAlert(
-      "Delete Payment Method",
+      'Delete Payment Method',
       `Are you sure you want to delete ${method.name}?`,
       () => {
         setPaymentMethods((prev) => prev.filter((m) => m.id !== methodId));
-      }
+      },
     );
   };
 
   const handleAddPaymentMethod = () => {
     showAlert(
-      "Add Payment Method",
-      "This feature would integrate with payment gateways to add new payment methods."
+      'Add Payment Method',
+      'This feature would integrate with payment gateways to add new payment methods.',
     );
   };
 
@@ -155,8 +155,8 @@ export default function BillingSettings() {
   const handleSaveGSTDetails = () => {
     setEditingGST(false);
     showAlert(
-      "GST Details Saved",
-      "Your GST information has been updated successfully"
+      'GST Details Saved',
+      'Your GST information has been updated successfully',
     );
   };
 
@@ -180,8 +180,7 @@ export default function BillingSettings() {
       <ScrollView
         className="flex-1"
         contentContainerStyle={{ padding: 20, paddingBottom: 40 }}
-        showsVerticalScrollIndicator={false}
-      >
+        showsVerticalScrollIndicator={false}>
         <View className="space-y-6">
           {/* Auto Pay Settings */}
           <Card className="mb-4">
@@ -197,9 +196,9 @@ export default function BillingSettings() {
               <Switch
                 value={settings.autoPayEnabled}
                 onValueChange={(value) =>
-                  updateSetting("autoPayEnabled", value)
+                  updateSetting('autoPayEnabled', value)
                 }
-                trackColor={{ false: "#E0E0E0", true: "#6366f1" }}
+                trackColor={{ false: '#E0E0E0', true: '#6366f1' }}
                 thumbColor="#FFFFFF"
               />
             </View>
@@ -217,20 +216,18 @@ export default function BillingSettings() {
                     {[1, 2, 3, 5, 7].map((days) => (
                       <TouchableOpacity
                         key={days}
-                        onPress={() => updateSetting("autoPayDay", days)}
+                        onPress={() => updateSetting('autoPayDay', days)}
                         className={`px-4 py-2 rounded-lg border ${
                           settings.autoPayDay === days
-                            ? "bg-primary border-primary"
-                            : "bg-background border-divider"
-                        }`}
-                      >
+                            ? 'bg-primary border-primary'
+                            : 'bg-background border-divider'
+                        }`}>
                         <Text
                           className={`font-medium ${
                             settings.autoPayDay === days
-                              ? "text-white"
-                              : "text-text-secondary"
-                          }`}
-                        >
+                              ? 'text-white'
+                              : 'text-text-secondary'
+                          }`}>
                           {days}d
                         </Text>
                       </TouchableOpacity>
@@ -249,8 +246,7 @@ export default function BillingSettings() {
               </Text>
               <TouchableOpacity
                 onPress={handleAddPaymentMethod}
-                className="bg-primary rounded-full p-2"
-              >
+                className="bg-primary rounded-full p-2">
                 <Plus size={16} color="white" />
               </TouchableOpacity>
             </View>
@@ -259,8 +255,7 @@ export default function BillingSettings() {
               {paymentMethods.map((method) => (
                 <View
                   key={method.id}
-                  className="bg-background rounded-xl p-4 mb-2 border border-divider"
-                >
+                  className="bg-background rounded-xl p-4 mb-2 border border-divider">
                   <View className="flex-row items-center justify-between mb-2">
                     <View className="flex-row items-center flex-1">
                       <View className="mr-3">
@@ -284,9 +279,9 @@ export default function BillingSettings() {
                         </Text>
                         {method.lastUsed && (
                           <Text className="text-text-secondary text-xs">
-                            Last used:{" "}
+                            Last used:{' '}
                             {new Date(method.lastUsed).toLocaleDateString(
-                              "en-IN"
+                              'en-IN',
                             )}
                           </Text>
                         )}
@@ -299,19 +294,17 @@ export default function BillingSettings() {
                           onPress={() =>
                             handleSetDefaultPaymentMethod(method.id)
                           }
-                          className="p-2 rounded-full bg-primary/10"
-                        >
+                          className="p-2 rounded-full bg-primary/10">
                           <Check size={14} color="#6366f1" />
                         </TouchableOpacity>
                       )}
                       <TouchableOpacity
                         onPress={() => handleDeletePaymentMethod(method.id)}
                         className="p-2 rounded-full bg-error/10"
-                        disabled={method.isDefault}
-                      >
+                        disabled={method.isDefault}>
                         <Trash2
                           size={14}
-                          color={method.isDefault ? "#CCCCCC" : "#D32F2F"}
+                          color={method.isDefault ? '#CCCCCC' : '#D32F2F'}
                         />
                       </TouchableOpacity>
                     </View>
@@ -329,8 +322,7 @@ export default function BillingSettings() {
               </Text>
               <TouchableOpacity
                 onPress={() => setEditingGST(!editingGST)}
-                className="p-2 rounded-full bg-primary/10"
-              >
+                className="p-2 rounded-full bg-primary/10">
                 <Edit3 size={16} color="#6366f1" />
               </TouchableOpacity>
             </View>
@@ -343,12 +335,12 @@ export default function BillingSettings() {
                 <Switch
                   value={settings.gstDetails.registered}
                   onValueChange={(value) =>
-                    updateSetting("gstDetails", {
+                    updateSetting('gstDetails', {
                       ...settings.gstDetails,
                       registered: value,
                     })
                   }
-                  trackColor={{ false: "#E0E0E0", true: "#6366f1" }}
+                  trackColor={{ false: '#E0E0E0', true: '#6366f1' }}
                   thumbColor="#FFFFFF"
                 />
               </View>
@@ -365,7 +357,7 @@ export default function BillingSettings() {
                         placeholder="Enter GSTIN (15 characters)"
                         value={settings.gstDetails.gstin}
                         onChangeText={(text) =>
-                          updateSetting("gstDetails", {
+                          updateSetting('gstDetails', {
                             ...settings.gstDetails,
                             gstin: text.toUpperCase(),
                           })
@@ -375,7 +367,7 @@ export default function BillingSettings() {
                       />
                     ) : (
                       <Text className="text-text-secondary">
-                        {settings.gstDetails.gstin || "Not provided"}
+                        {settings.gstDetails.gstin || 'Not provided'}
                       </Text>
                     )}
                   </View>
@@ -390,7 +382,7 @@ export default function BillingSettings() {
                         placeholder="Enter registered business name"
                         value={settings.gstDetails.businessName}
                         onChangeText={(text) =>
-                          updateSetting("gstDetails", {
+                          updateSetting('gstDetails', {
                             ...settings.gstDetails,
                             businessName: text,
                           })
@@ -398,7 +390,7 @@ export default function BillingSettings() {
                       />
                     ) : (
                       <Text className="text-text-secondary">
-                        {settings.gstDetails.businessName || "Not provided"}
+                        {settings.gstDetails.businessName || 'Not provided'}
                       </Text>
                     )}
                   </View>
@@ -427,35 +419,33 @@ export default function BillingSettings() {
                 <View className="flex-row gap-3">
                   {[
                     {
-                      key: "pdf",
-                      label: "PDF",
+                      key: 'pdf',
+                      label: 'PDF',
                       icon: <Download size={16} color="#D32F2F" />,
                     },
                     {
-                      key: "excel",
-                      label: "Excel",
+                      key: 'excel',
+                      label: 'Excel',
                       icon: <Download size={16} color="#4CAF50" />,
                     },
                   ].map((format) => (
                     <TouchableOpacity
                       key={format.key}
                       onPress={() =>
-                        updateSetting("downloadFormat", format.key)
+                        updateSetting('downloadFormat', format.key)
                       }
                       className={`flex-1 flex-row items-center justify-center py-3 rounded-lg border ${
                         settings.downloadFormat === format.key
-                          ? "bg-primary border-primary"
-                          : "bg-background border-divider"
-                      }`}
-                    >
+                          ? 'bg-primary border-primary'
+                          : 'bg-background border-divider'
+                      }`}>
                       <View className="mr-2">{format.icon}</View>
                       <Text
                         className={`font-medium ${
                           settings.downloadFormat === format.key
-                            ? "text-white"
-                            : "text-text-secondary"
-                        }`}
-                      >
+                            ? 'text-white'
+                            : 'text-text-secondary'
+                        }`}>
                         {format.label}
                       </Text>
                     </TouchableOpacity>
@@ -485,11 +475,11 @@ export default function BillingSettings() {
                   value={true}
                   onValueChange={(value) =>
                     showAlert(
-                      "Security",
-                      "Biometric authentication settings would be managed here"
+                      'Security',
+                      'Biometric authentication settings would be managed here',
                     )
                   }
-                  trackColor={{ false: "#E0E0E0", true: "#6366f1" }}
+                  trackColor={{ false: '#E0E0E0', true: '#6366f1' }}
                   thumbColor="#FFFFFF"
                 />
               </View>
@@ -505,7 +495,7 @@ export default function BillingSettings() {
                 </View>
                 <Switch
                   value={true}
-                  trackColor={{ false: "#E0E0E0", true: "#6366f1" }}
+                  trackColor={{ false: '#E0E0E0', true: '#6366f1' }}
                   thumbColor="#FFFFFF"
                 />
               </View>
@@ -519,11 +509,10 @@ export default function BillingSettings() {
               className="mb-3"
               onPress={() => {
                 showAlert(
-                  "Settings Reset",
-                  "All billing settings have been reset to defaults"
+                  'Settings Reset',
+                  'All billing settings have been reset to defaults',
                 );
-              }}
-            >
+              }}>
               Reset All Settings
             </Button>
 
@@ -532,17 +521,16 @@ export default function BillingSettings() {
               className="border-error"
               onPress={() => {
                 showDeleteConfirmAlert(
-                  "Clear Payment History",
-                  "This will permanently delete all payment history. This action cannot be undone.",
+                  'Clear Payment History',
+                  'This will permanently delete all payment history. This action cannot be undone.',
                   () => {
                     showAlert(
-                      "Data Cleared",
-                      "Payment history has been cleared"
+                      'Data Cleared',
+                      'Payment history has been cleared',
                     );
-                  }
+                  },
                 );
-              }}
-            >
+              }}>
               <Text className="text-error font-medium">
                 Clear Payment History
               </Text>

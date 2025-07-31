@@ -1,28 +1,43 @@
-import { useRouter, useLocalSearchParams } from "expo-router";
-import React, { useState, useEffect } from "react";
-import { SafeAreaView, Text, TextInput, TouchableOpacity, View, KeyboardAvoidingView, Platform } from "react-native";
-import { Button } from "@/components/ui/Button";
-import { ResponsiveContainer, ResponsiveCard, ResponsiveRow, ResponsiveText } from "@/components/ui/ResponsiveContainer";
-import { WithFeatureFlag } from "@/contexts/FeatureFlagContext";
-import LucideIcons from "@/components/ui/LucideIcons";
-import AuthService from "@/services/auth.service";
-import BiometricService from "@/services/biometric.service";
-import { useAuth } from "@/contexts/AuthContext";
-import { showErrorAlert } from "@/utils/alert";
-import { responsive, responsiveClasses, layoutUtils } from "@/utils/responsive";
+import { useRouter, useLocalSearchParams } from 'expo-router';
+import React, { useState, useEffect } from 'react';
+import {
+  SafeAreaView,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+  KeyboardAvoidingView,
+  Platform,
+} from 'react-native';
+import { Button } from '@/components/ui/Button';
+import {
+  ResponsiveContainer,
+  ResponsiveCard,
+  ResponsiveRow,
+  ResponsiveText,
+} from '@/components/ui/ResponsiveContainer';
+import { WithFeatureFlag } from '@/contexts/FeatureFlagContext';
+import LucideIcons from '@/components/ui/LucideIcons';
+import AuthService from '@/services/auth.service';
+import BiometricService from '@/services/biometric.service';
+import { useAuth } from '@/contexts/AuthContext';
+import { showErrorAlert } from '@/utils/alert';
+import { responsive, responsiveClasses, layoutUtils } from '@/utils/responsive';
 
 export default function PhoneRegistration() {
   const router = useRouter();
   const { mode } = useLocalSearchParams<{ mode?: string }>();
   const { authenticateWithBiometrics } = useAuth();
-  const isSignIn = mode === "signin";
-  const [phoneNumber, setPhoneNumber] = useState("");
-  const [societyCode, setSocietyCode] = useState("");
+  const isSignIn = mode === 'signin';
+  const [phoneNumber, setPhoneNumber] = useState('');
+  const [societyCode, setSocietyCode] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [isBiometricLoading, setIsBiometricLoading] = useState(false);
   const [showBiometricOption, setShowBiometricOption] = useState(false);
-  const [biometricType, setBiometricType] = useState<string>("");
-  const [errors, setErrors] = useState<{phone?: string; society?: string}>({});
+  const [biometricType, setBiometricType] = useState<string>('');
+  const [errors, setErrors] = useState<{ phone?: string; society?: string }>(
+    {},
+  );
 
   useEffect(() => {
     checkBiometricAvailability();
@@ -30,35 +45,41 @@ export default function PhoneRegistration() {
 
   const checkBiometricAvailability = async () => {
     if (!isSignIn) return; // Only show for sign in
-    
+
     const biometricConfig = await BiometricService.checkBiometricSupport();
     const isEnabled = await BiometricService.isBiometricEnabled();
-    
-    if (biometricConfig.hasHardware && biometricConfig.isEnrolled && isEnabled) {
+
+    if (
+      biometricConfig.hasHardware &&
+      biometricConfig.isEnrolled &&
+      isEnabled
+    ) {
       setShowBiometricOption(true);
-      setBiometricType(BiometricService.getBiometricTypeName(biometricConfig.supportedTypes));
+      setBiometricType(
+        BiometricService.getBiometricTypeName(biometricConfig.supportedTypes),
+      );
     }
   };
 
   const handleBiometricLogin = async () => {
     setIsBiometricLoading(true);
-    
+
     try {
       const success = await authenticateWithBiometrics();
-      
+
       if (success) {
-        router.replace("/(tabs)");
+        router.replace('/(tabs)');
       } else {
         showErrorAlert(
-          "Authentication Failed", 
-          "Biometric authentication failed. Please try again or use your phone number."
+          'Authentication Failed',
+          'Biometric authentication failed. Please try again or use your phone number.',
         );
       }
     } catch (error) {
-      console.error("Biometric login error:", error);
+      console.error('Biometric login error:', error);
       showErrorAlert(
-        "Error", 
-        "An error occurred during biometric authentication. Please try again."
+        'Error',
+        'An error occurred during biometric authentication. Please try again.',
       );
     } finally {
       setIsBiometricLoading(false);
@@ -68,61 +89,61 @@ export default function PhoneRegistration() {
   // Indian phone number validation
   const validatePhoneNumber = (phone: string): boolean => {
     // Remove any spaces, dashes, or special characters
-    const cleanPhone = phone.replace(/[\s\-\(\)]/g, "");
-    
+    const cleanPhone = phone.replace(/[\s\-\(\)]/g, '');
+
     // Check if it's a valid Indian mobile number
     // Indian mobile numbers: 10 digits starting with 6, 7, 8, or 9
     const indianMobileRegex = /^[6-9]\d{9}$/;
-    
+
     // If it starts with +91, remove it
-    if (cleanPhone.startsWith("+91")) {
+    if (cleanPhone.startsWith('+91')) {
       return indianMobileRegex.test(cleanPhone.substring(3));
     }
-    
+
     // If it starts with 91, remove it
-    if (cleanPhone.startsWith("91") && cleanPhone.length === 12) {
+    if (cleanPhone.startsWith('91') && cleanPhone.length === 12) {
       return indianMobileRegex.test(cleanPhone.substring(2));
     }
-    
+
     // If it's 10 digits, check directly
     return indianMobileRegex.test(cleanPhone);
   };
 
   const formatPhoneNumber = (phone: string): string => {
     // Remove any existing formatting
-    const cleanPhone = phone.replace(/[\s\-\(\)]/g, "");
-    
+    const cleanPhone = phone.replace(/[\s\-\(\)]/g, '');
+
     // Remove +91 or 91 prefix if present
     let number = cleanPhone;
-    if (cleanPhone.startsWith("+91")) {
+    if (cleanPhone.startsWith('+91')) {
       number = cleanPhone.substring(3);
-    } else if (cleanPhone.startsWith("91") && cleanPhone.length === 12) {
+    } else if (cleanPhone.startsWith('91') && cleanPhone.length === 12) {
       number = cleanPhone.substring(2);
     }
-    
+
     // Add formatting: XXX XXX XXXX
     if (number.length >= 6) {
       return `${number.substring(0, 3)} ${number.substring(3, 6)} ${number.substring(6, 10)}`;
     } else if (number.length >= 3) {
       return `${number.substring(0, 3)} ${number.substring(3)}`;
     }
-    
+
     return number;
   };
 
   const getFullPhoneNumber = (phone: string): string => {
-    const cleanPhone = phone.replace(/[\s\-\(\)]/g, "");
-    
+    const cleanPhone = phone.replace(/[\s\-\(\)]/g, '');
+
     // If already has country code, return as is
-    if (cleanPhone.startsWith("+91")) {
+    if (cleanPhone.startsWith('+91')) {
       return cleanPhone;
     }
-    
+
     // If starts with 91, add +
-    if (cleanPhone.startsWith("91") && cleanPhone.length === 12) {
+    if (cleanPhone.startsWith('91') && cleanPhone.length === 12) {
       return `+${cleanPhone}`;
     }
-    
+
     // Add +91 prefix for Indian numbers
     return `+91${cleanPhone}`;
   };
@@ -135,14 +156,14 @@ export default function PhoneRegistration() {
 
   const handlePhoneChange = (text: string) => {
     // Only allow numbers, spaces, +, -, (, )
-    const cleanText = text.replace(/[^0-9\s\-\(\)\+]/g, "");
-    
+    const cleanText = text.replace(/[^0-9\s\-\(\)\+]/g, '');
+
     // Check if this is a deletion operation
     const isDeletion = cleanText.length < phoneNumber.length;
-    
+
     if (isDeletion) {
       // For deletion, allow backspace without reformatting
-      const numbersOnly = cleanText.replace(/[^\d]/g, "");
+      const numbersOnly = cleanText.replace(/[^\d]/g, '');
       if (numbersOnly.length <= 10) {
         setPhoneNumber(formatPhoneNumber(numbersOnly));
       }
@@ -152,63 +173,66 @@ export default function PhoneRegistration() {
         setPhoneNumber(formatPhoneNumber(cleanText));
       }
     }
-    
+
     // Clear phone error when user starts typing
     if (errors.phone) {
-      setErrors(prev => ({ ...prev, phone: undefined }));
+      setErrors((prev) => ({ ...prev, phone: undefined }));
     }
   };
 
   const handleSocietyCodeChange = (text: string) => {
     // Convert to uppercase and limit to 8 characters
-    const upperText = text.toUpperCase().replace(/[^A-Z0-9]/g, "");
+    const upperText = text.toUpperCase().replace(/[^A-Z0-9]/g, '');
     if (upperText.length <= 8) {
       setSocietyCode(upperText);
     }
-    
+
     // Clear society error when user starts typing
     if (errors.society) {
-      setErrors(prev => ({ ...prev, society: undefined }));
+      setErrors((prev) => ({ ...prev, society: undefined }));
     }
   };
 
   const handleSubmit = async () => {
-    const newErrors: {phone?: string; society?: string} = {};
-    
+    const newErrors: { phone?: string; society?: string } = {};
+
     // Validate phone number
     if (!phoneNumber.trim()) {
-      newErrors.phone = "Phone number is required";
+      newErrors.phone = 'Phone number is required';
     } else if (!validatePhoneNumber(phoneNumber)) {
-      newErrors.phone = "Please enter a valid Indian mobile number";
+      newErrors.phone = 'Please enter a valid Indian mobile number';
     }
-    
+
     // Validate society code
     if (!societyCode.trim()) {
-      newErrors.society = "Society code is required";
+      newErrors.society = 'Society code is required';
     } else if (!validateSocietyCode(societyCode)) {
-      newErrors.society = "Society code should be 6-8 alphanumeric characters";
+      newErrors.society = 'Society code should be 6-8 alphanumeric characters';
     }
-    
+
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
       return;
     }
-    
+
     setIsLoading(true);
-    
+
     try {
       const fullPhoneNumber = getFullPhoneNumber(phoneNumber);
-      
-      const result = await AuthService.registerPhone(fullPhoneNumber, societyCode);
-      
+
+      const result = await AuthService.registerPhone(
+        fullPhoneNumber,
+        societyCode,
+      );
+
       if (result.success) {
         // Navigate to OTP verification
         router.push({
-          pathname: "/auth/otp-verification",
+          pathname: '/auth/otp-verification',
           params: {
             phoneNumber: fullPhoneNumber,
-            societyCode: societyCode
-          }
+            societyCode: societyCode,
+          },
         });
       } else {
         // Show specific error from auth service
@@ -217,13 +241,15 @@ export default function PhoneRegistration() {
         } else if (result.error?.includes('society')) {
           setErrors({ society: result.error });
         } else {
-          showErrorAlert("Error", result.error || "Failed to send OTP. Please try again.");
+          showErrorAlert(
+            'Error',
+            result.error || 'Failed to send OTP. Please try again.',
+          );
         }
       }
-      
     } catch (error) {
       console.error('Phone registration error:', error);
-      showErrorAlert("Error", "Failed to send OTP. Please try again.");
+      showErrorAlert('Error', 'Failed to send OTP. Please try again.');
     } finally {
       setIsLoading(false);
     }
@@ -231,49 +257,59 @@ export default function PhoneRegistration() {
 
   return (
     <SafeAreaView className="flex-1 bg-background">
-      <KeyboardAvoidingView 
-        className="flex-1" 
-        behavior={Platform.OS === "ios" ? "padding" : "height"}
-      >
+      <KeyboardAvoidingView
+        className="flex-1"
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
         {/* Header */}
         <View className="flex-row items-center px-4 py-4">
           <TouchableOpacity onPress={() => router.back()} className="mr-4">
             <LucideIcons name="arrow-left" size={24} color="#212121" />
           </TouchableOpacity>
-          <Text className="text-xl font-bold text-text-primary">{isSignIn ? "Sign In" : "Sign Up"}</Text>
+          <Text className="text-xl font-bold text-text-primary">
+            {isSignIn ? 'Sign In' : 'Sign Up'}
+          </Text>
         </View>
 
-        <ResponsiveContainer 
-          type="scroll" 
-          padding="lg" 
-          keyboardAware={true} 
-          preventOverflow={true}
-        >
+        <ResponsiveContainer
+          type="scroll"
+          padding="lg"
+          keyboardAware={true}
+          preventOverflow={true}>
           {/* Welcome Section */}
           <View className="items-center mb-8">
-            <View 
+            <View
               className="bg-primary/10 rounded-full items-center justify-center mb-4"
-              style={{ 
-                width: responsive.spacing(64), 
-                height: responsive.spacing(64) 
-              }}
-            >
-              <LucideIcons name="call-outline" size={responsive.spacing(32)} color="#6366f1" />
+              style={{
+                width: responsive.spacing(64),
+                height: responsive.spacing(64),
+              }}>
+              <LucideIcons
+                name="call-outline"
+                size={responsive.spacing(32)}
+                color="#6366f1"
+              />
             </View>
-            <ResponsiveText variant="display" size="small" className="font-bold mb-2 text-center">
+            <ResponsiveText
+              variant="display"
+              size="small"
+              className="font-bold mb-2 text-center">
               Welcome to Aptly
             </ResponsiveText>
-            <ResponsiveText variant="body" size="medium" className="text-text-secondary text-center">
-              {isSignIn 
-                ? "Enter your registered mobile number and society code to sign in"
-                : "Enter your mobile number and society code to get started with your housing society management"
-              }
+            <ResponsiveText
+              variant="body"
+              size="medium"
+              className="text-text-secondary text-center">
+              {isSignIn
+                ? 'Enter your registered mobile number and society code to sign in'
+                : 'Enter your mobile number and society code to get started with your housing society management'}
             </ResponsiveText>
           </View>
 
           {/* Phone Number Input */}
           <View className="mb-6">
-            <Text className="text-text-primary font-semibold mb-3">Mobile Number</Text>
+            <Text className="text-text-primary font-semibold mb-3">
+              Mobile Number
+            </Text>
             <View className="flex-row items-center bg-surface rounded-xl border border-divider px-4 py-4">
               <Text className="text-text-primary font-medium mr-3">🇮🇳 +91</Text>
               <View className="h-6 w-px bg-divider mr-3" />
@@ -292,16 +328,17 @@ export default function PhoneRegistration() {
               <Text className="text-error text-sm mt-2">{errors.phone}</Text>
             )}
             <Text className="text-text-secondary text-xs mt-2">
-              {isSignIn 
+              {isSignIn
                 ? "We'll send an OTP to your registered number"
-                : "We'll send an OTP to verify your number"
-              }
+                : "We'll send an OTP to verify your number"}
             </Text>
           </View>
 
           {/* Society Code Input */}
           <View className="mb-8">
-            <Text className="text-text-primary font-semibold mb-3">Society Code</Text>
+            <Text className="text-text-primary font-semibold mb-3">
+              Society Code
+            </Text>
             <View className="flex-row items-center bg-surface rounded-xl border border-divider px-4 py-4">
               <LucideIcons name="shield-outline" size={20} color="#6366f1" />
               <TextInput
@@ -318,10 +355,9 @@ export default function PhoneRegistration() {
               <Text className="text-error text-sm mt-2">{errors.society}</Text>
             )}
             <Text className="text-text-secondary text-xs mt-2">
-              {isSignIn 
-                ? "Enter your society code to verify your account"
-                : "Get your society code from your housing society management"
-              }
+              {isSignIn
+                ? 'Enter your society code to verify your account'
+                : 'Get your society code from your housing society management'}
             </Text>
           </View>
 
@@ -330,45 +366,43 @@ export default function PhoneRegistration() {
             onPress={handleSubmit}
             loading={isLoading}
             disabled={isLoading}
-            className="mb-6"
-          >
+            className="mb-6">
             Send OTP
           </Button>
 
           {/* Biometric Login Option */}
           <WithFeatureFlag feature="biometric_auth">
             {showBiometricOption && (
-            <View className="mb-6">
-              <View className="flex-row items-center mb-4">
-                <View className="flex-1 h-px bg-divider" />
-                <Text className="text-text-secondary text-sm mx-4">or</Text>
-                <View className="flex-1 h-px bg-divider" />
-              </View>
-              
-              <TouchableOpacity
-                onPress={handleBiometricLogin}
-                disabled={isBiometricLoading}
-                className="bg-surface border border-primary/20 rounded-xl p-4 flex-row items-center justify-center"
-                activeOpacity={0.8}
-              >
-                <View className="bg-primary/10 rounded-full w-10 h-10 items-center justify-center mr-3">
-                  <LucideIcons name="fingerprint" size={20} color="#6366f1" />
+              <View className="mb-6">
+                <View className="flex-row items-center mb-4">
+                  <View className="flex-1 h-px bg-divider" />
+                  <Text className="text-text-secondary text-sm mx-4">or</Text>
+                  <View className="flex-1 h-px bg-divider" />
                 </View>
-                <View className="flex-1">
-                  <Text className="text-text-primary font-semibold">
-                    Sign in with {biometricType}
-                  </Text>
-                  <Text className="text-text-secondary text-sm">
-                    Quick and secure access to your account
-                  </Text>
-                </View>
-                {isBiometricLoading && (
-                  <View className="ml-3">
-                    <Text className="text-primary text-sm">Loading...</Text>
+
+                <TouchableOpacity
+                  onPress={handleBiometricLogin}
+                  disabled={isBiometricLoading}
+                  className="bg-surface border border-primary/20 rounded-xl p-4 flex-row items-center justify-center"
+                  activeOpacity={0.8}>
+                  <View className="bg-primary/10 rounded-full w-10 h-10 items-center justify-center mr-3">
+                    <LucideIcons name="fingerprint" size={20} color="#6366f1" />
                   </View>
-                )}
-              </TouchableOpacity>
-            </View>
+                  <View className="flex-1">
+                    <Text className="text-text-primary font-semibold">
+                      Sign in with {biometricType}
+                    </Text>
+                    <Text className="text-text-secondary text-sm">
+                      Quick and secure access to your account
+                    </Text>
+                  </View>
+                  {isBiometricLoading && (
+                    <View className="ml-3">
+                      <Text className="text-primary text-sm">Loading...</Text>
+                    </View>
+                  )}
+                </TouchableOpacity>
+              </View>
             )}
           </WithFeatureFlag>
 
@@ -376,8 +410,9 @@ export default function PhoneRegistration() {
           <View className="bg-primary/5 rounded-xl p-4 mt-4">
             <Text className="text-primary font-semibold mb-2">Need Help?</Text>
             <Text className="text-text-secondary text-sm leading-5">
-              Contact your society manager or housing committee to get your society code. 
-              Make sure you're using the mobile number registered with your society.
+              Contact your society manager or housing committee to get your
+              society code. Make sure you're using the mobile number registered
+              with your society.
             </Text>
           </View>
         </ResponsiveContainer>

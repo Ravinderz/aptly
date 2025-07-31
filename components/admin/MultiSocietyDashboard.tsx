@@ -1,16 +1,22 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, RefreshControl } from 'react-native';
-import { 
-  Building2, 
-  TrendingUp, 
-  AlertTriangle, 
-  Users, 
+import {
+  View,
+  Text,
+  ScrollView,
+  TouchableOpacity,
+  RefreshControl,
+} from 'react-native';
+import {
+  Building2,
+  TrendingUp,
+  AlertTriangle,
+  Users,
   DollarSign,
   Activity,
   Shield,
   Settings,
   BarChart3,
-  Clock
+  Clock,
 } from 'lucide-react-native';
 import { useAdmin } from '@/contexts/AdminContext';
 import { Society, AdminRole } from '@/types/admin';
@@ -40,16 +46,18 @@ interface CrossSocietyAlert {
 }
 
 const MultiSocietyDashboard: React.FC = () => {
-  const { 
-    adminUser, 
-    activeSociety, 
-    availableSocieties, 
+  const {
+    adminUser,
+    activeSociety,
+    availableSocieties,
     currentMode,
-    checkPermission 
+    checkPermission,
   } = useAdmin();
-  
+
   const [societyStats, setSocietyStats] = useState<MultiSocietyStats[]>([]);
-  const [crossSocietyAlerts, setCrossSocietyAlerts] = useState<CrossSocietyAlert[]>([]);
+  const [crossSocietyAlerts, setCrossSocietyAlerts] = useState<
+    CrossSocietyAlert[]
+  >([]);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [viewMode, setViewMode] = useState<'current' | 'all'>('current');
 
@@ -61,7 +69,7 @@ const MultiSocietyDashboard: React.FC = () => {
     try {
       // Load stats for all accessible societies
       const stats = await Promise.all(
-        availableSocieties.map(society => loadSocietyStats(society.id))
+        availableSocieties.map((society) => loadSocietyStats(society.id)),
       );
       setSocietyStats(stats);
 
@@ -75,11 +83,13 @@ const MultiSocietyDashboard: React.FC = () => {
     }
   };
 
-  const loadSocietyStats = async (societyId: string): Promise<MultiSocietyStats> => {
+  const loadSocietyStats = async (
+    societyId: string,
+  ): Promise<MultiSocietyStats> => {
     // Mock implementation - replace with actual API call
     return new Promise((resolve) => {
       setTimeout(() => {
-        const society = availableSocieties.find(s => s.id === societyId);
+        const society = availableSocieties.find((s) => s.id === societyId);
         resolve({
           societyId,
           societyName: society?.name || 'Unknown Society',
@@ -88,7 +98,9 @@ const MultiSocietyDashboard: React.FC = () => {
           monthlyRevenue: Math.floor(Math.random() * 500000) + 100000,
           activeMaintenance: Math.floor(Math.random() * 5),
           pendingVisitors: Math.floor(Math.random() * 15),
-          lastActivity: new Date(Date.now() - Math.random() * 86400000).toISOString()
+          lastActivity: new Date(
+            Date.now() - Math.random() * 86400000,
+          ).toISOString(),
         });
       }, 200);
     });
@@ -104,21 +116,23 @@ const MultiSocietyDashboard: React.FC = () => {
             type: 'billing',
             severity: 'high',
             title: 'Payment Gateway Issue',
-            message: 'Multiple societies experiencing payment processing delays',
+            message:
+              'Multiple societies experiencing payment processing delays',
             affectedSocieties: ['society_1', 'society_2'],
             createdAt: new Date().toISOString(),
-            actionRequired: true
+            actionRequired: true,
           },
           {
             id: '2',
             type: 'system',
             severity: 'medium',
             title: 'System Maintenance Scheduled',
-            message: 'Scheduled maintenance will affect all societies on weekend',
-            affectedSocieties: availableSocieties.map(s => s.id),
+            message:
+              'Scheduled maintenance will affect all societies on weekend',
+            affectedSocieties: availableSocieties.map((s) => s.id),
             createdAt: new Date().toISOString(),
-            actionRequired: false
-          }
+            actionRequired: false,
+          },
         ]);
       }, 300);
     });
@@ -132,44 +146,44 @@ const MultiSocietyDashboard: React.FC = () => {
 
   const getQuickActions = () => {
     const actions = [];
-    
+
     if (checkPermission('billing', 'create')) {
       actions.push({
         id: 'bulk_billing',
         title: 'Bulk Billing',
         icon: DollarSign,
         color: '#4CAF50',
-        onPress: () => console.log('Navigate to bulk billing')
+        onPress: () => console.log('Navigate to bulk billing'),
       });
     }
-    
+
     if (checkPermission('visitors', 'bulk_actions')) {
       actions.push({
         id: 'visitor_management',
         title: 'Visitor Oversight',
         icon: Shield,
         color: '#FF9800',
-        onPress: () => console.log('Navigate to visitor oversight')
+        onPress: () => console.log('Navigate to visitor oversight'),
       });
     }
-    
+
     if (checkPermission('analytics', 'read')) {
       actions.push({
         id: 'cross_society_analytics',
         title: 'Analytics',
         icon: BarChart3,
         color: '#2196F3',
-        onPress: () => console.log('Navigate to analytics')
+        onPress: () => console.log('Navigate to analytics'),
       });
     }
-    
+
     if (adminUser?.role === 'super_admin') {
       actions.push({
         id: 'platform_settings',
         title: 'Platform Settings',
         icon: Settings,
         color: '#9C27B0',
-        onPress: () => console.log('Navigate to platform settings')
+        onPress: () => console.log('Navigate to platform settings'),
       });
     }
 
@@ -183,7 +197,7 @@ const MultiSocietyDashboard: React.FC = () => {
   const formatTimeAgo = (timestamp: string) => {
     const diff = Date.now() - new Date(timestamp).getTime();
     const hours = Math.floor(diff / (1000 * 60 * 60));
-    
+
     if (hours < 1) return 'Just now';
     if (hours < 24) return `${hours}h ago`;
     return `${Math.floor(hours / 24)}d ago`;
@@ -193,29 +207,33 @@ const MultiSocietyDashboard: React.FC = () => {
     return null;
   }
 
-  const currentSocietyStats = societyStats.find(s => s.societyId === activeSociety?.id);
-  const totalStats = societyStats.reduce((acc, curr) => ({
-    totalResidents: acc.totalResidents + curr.totalResidents,
-    pendingApprovals: acc.pendingApprovals + curr.pendingApprovals,
-    monthlyRevenue: acc.monthlyRevenue + curr.monthlyRevenue,
-    activeMaintenance: acc.activeMaintenance + curr.activeMaintenance,
-    pendingVisitors: acc.pendingVisitors + curr.pendingVisitors
-  }), {
-    totalResidents: 0,
-    pendingApprovals: 0,
-    monthlyRevenue: 0,
-    activeMaintenance: 0,
-    pendingVisitors: 0
-  });
+  const currentSocietyStats = societyStats.find(
+    (s) => s.societyId === activeSociety?.id,
+  );
+  const totalStats = societyStats.reduce(
+    (acc, curr) => ({
+      totalResidents: acc.totalResidents + curr.totalResidents,
+      pendingApprovals: acc.pendingApprovals + curr.pendingApprovals,
+      monthlyRevenue: acc.monthlyRevenue + curr.monthlyRevenue,
+      activeMaintenance: acc.activeMaintenance + curr.activeMaintenance,
+      pendingVisitors: acc.pendingVisitors + curr.pendingVisitors,
+    }),
+    {
+      totalResidents: 0,
+      pendingApprovals: 0,
+      monthlyRevenue: 0,
+      activeMaintenance: 0,
+      pendingVisitors: 0,
+    },
+  );
 
   return (
-    <ScrollView 
+    <ScrollView
       className="flex-1 bg-background"
       showsVerticalScrollIndicator={false}
       refreshControl={
         <RefreshControl refreshing={isRefreshing} onRefresh={handleRefresh} />
-      }
-    >
+      }>
       {/* Header with Society Selector */}
       <View className="p-6 bg-surface border-b border-divider">
         <View className="flex-row items-center justify-between mb-4">
@@ -224,12 +242,13 @@ const MultiSocietyDashboard: React.FC = () => {
               Multi-Society Dashboard
             </Text>
             <Text className="text-body-medium text-text-secondary">
-              Managing {availableSocieties.length} {availableSocieties.length === 1 ? 'society' : 'societies'}
+              Managing {availableSocieties.length}{' '}
+              {availableSocieties.length === 1 ? 'society' : 'societies'}
             </Text>
           </View>
           <Building2 size={24} className="text-primary" />
         </View>
-        
+
         <SocietySelector compact={false} showStats={true} />
       </View>
 
@@ -240,24 +259,24 @@ const MultiSocietyDashboard: React.FC = () => {
             onPress={() => setViewMode('current')}
             className={`flex-1 py-3 rounded-lg ${
               viewMode === 'current' ? 'bg-primary' : 'bg-transparent'
-            }`}
-          >
-            <Text className={`text-center font-medium ${
-              viewMode === 'current' ? 'text-white' : 'text-text-secondary'
             }`}>
+            <Text
+              className={`text-center font-medium ${
+                viewMode === 'current' ? 'text-white' : 'text-text-secondary'
+              }`}>
               Current Society
             </Text>
           </TouchableOpacity>
-          
+
           <TouchableOpacity
             onPress={() => setViewMode('all')}
             className={`flex-1 py-3 rounded-lg ${
               viewMode === 'all' ? 'bg-primary' : 'bg-transparent'
-            }`}
-          >
-            <Text className={`text-center font-medium ${
-              viewMode === 'all' ? 'text-white' : 'text-text-secondary'
             }`}>
+            <Text
+              className={`text-center font-medium ${
+                viewMode === 'all' ? 'text-white' : 'text-text-secondary'
+              }`}>
               All Societies
             </Text>
           </TouchableOpacity>
@@ -267,9 +286,11 @@ const MultiSocietyDashboard: React.FC = () => {
       {/* Stats Overview */}
       <View className="p-6">
         <Text className="text-headline-medium font-semibold text-text-primary mb-4">
-          {viewMode === 'current' ? 'Current Society Stats' : 'Aggregated Stats'}
+          {viewMode === 'current'
+            ? 'Current Society Stats'
+            : 'Aggregated Stats'}
         </Text>
-        
+
         <View className="flex-row flex-wrap -mx-2">
           {viewMode === 'current' && currentSocietyStats ? (
             <>
@@ -359,7 +380,7 @@ const MultiSocietyDashboard: React.FC = () => {
           <Text className="text-headline-medium font-semibold text-text-primary mb-4">
             Platform Alerts
           </Text>
-          
+
           <View className="space-y-3">
             {crossSocietyAlerts.map((alert) => (
               <AlertWidget
@@ -382,10 +403,12 @@ const MultiSocietyDashboard: React.FC = () => {
           <Text className="text-headline-medium font-semibold text-text-primary mb-4">
             Society Overview
           </Text>
-          
+
           <View className="space-y-3">
             {societyStats.map((stats) => (
-              <View key={stats.societyId} className="bg-surface rounded-xl p-4 border border-divider">
+              <View
+                key={stats.societyId}
+                className="bg-surface rounded-xl p-4 border border-divider">
                 <View className="flex-row items-center justify-between mb-3">
                   <Text className="text-body-large font-semibold text-text-primary">
                     {stats.societyName}
@@ -394,22 +417,28 @@ const MultiSocietyDashboard: React.FC = () => {
                     {formatTimeAgo(stats.lastActivity)}
                   </Text>
                 </View>
-                
+
                 <View className="flex-row flex-wrap">
                   <View className="w-1/3 pr-2">
-                    <Text className="text-label-large text-text-secondary">Residents</Text>
+                    <Text className="text-label-large text-text-secondary">
+                      Residents
+                    </Text>
                     <Text className="text-body-large font-semibold text-text-primary">
                       {stats.totalResidents}
                     </Text>
                   </View>
                   <View className="w-1/3 px-1">
-                    <Text className="text-label-large text-text-secondary">Pending</Text>
+                    <Text className="text-label-large text-text-secondary">
+                      Pending
+                    </Text>
                     <Text className="text-body-large font-semibold text-orange-600">
                       {stats.pendingApprovals}
                     </Text>
                   </View>
                   <View className="w-1/3 pl-2">
-                    <Text className="text-label-large text-text-secondary">Revenue</Text>
+                    <Text className="text-label-large text-text-secondary">
+                      Revenue
+                    </Text>
                     <Text className="text-body-large font-semibold text-green-600">
                       {formatCurrency(stats.monthlyRevenue)}
                     </Text>
@@ -426,7 +455,7 @@ const MultiSocietyDashboard: React.FC = () => {
         <Text className="text-headline-medium font-semibold text-text-primary mb-4">
           Quick Actions
         </Text>
-        
+
         <View className="flex-row flex-wrap -mx-2">
           {getQuickActions().map((action) => (
             <View key={action.id} className="w-1/2 px-2 mb-4">

@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { 
-  SafeAreaView, 
-  ScrollView, 
-  View, 
-  Text, 
+import {
+  SafeAreaView,
+  ScrollView,
+  View,
+  Text,
   TouchableOpacity,
   Switch,
-  Alert
+  Alert,
 } from 'react-native';
 import { router } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -29,7 +29,7 @@ const defaultPreferences = {
   loginNotifications: true,
   deviceTrust: true,
   sessionTimeout: 30, // minutes
-  encryptBackup: true
+  encryptBackup: true,
 };
 
 export default function SecuritySettingsPage() {
@@ -47,13 +47,22 @@ export default function SecuritySettingsPage() {
     try {
       const hasHardware = await LocalAuthentication.hasHardwareAsync();
       const isEnrolled = await LocalAuthentication.isEnrolledAsync();
-      const supportedTypes = await LocalAuthentication.supportedAuthenticationTypesAsync();
-      
+      const supportedTypes =
+        await LocalAuthentication.supportedAuthenticationTypesAsync();
+
       setBiometricAvailable(hasHardware && isEnrolled);
-      
-      if (supportedTypes.includes(LocalAuthentication.AuthenticationType.FACIAL_RECOGNITION)) {
+
+      if (
+        supportedTypes.includes(
+          LocalAuthentication.AuthenticationType.FACIAL_RECOGNITION,
+        )
+      ) {
         setBiometricType('Face ID');
-      } else if (supportedTypes.includes(LocalAuthentication.AuthenticationType.FINGERPRINT)) {
+      } else if (
+        supportedTypes.includes(
+          LocalAuthentication.AuthenticationType.FINGERPRINT,
+        )
+      ) {
         setBiometricType('Fingerprint');
       } else {
         setBiometricType('Biometric Authentication');
@@ -77,8 +86,14 @@ export default function SecuritySettingsPage() {
   const handleSavePreferences = async () => {
     try {
       setIsSaving(true);
-      await AsyncStorage.setItem('security_preferences', JSON.stringify(preferences));
-      await AsyncStorage.setItem('security_last_updated', new Date().toISOString());
+      await AsyncStorage.setItem(
+        'security_preferences',
+        JSON.stringify(preferences),
+      );
+      await AsyncStorage.setItem(
+        'security_last_updated',
+        new Date().toISOString(),
+      );
       showSuccessAlert('Success', 'Security preferences updated successfully');
     } catch (error) {
       showErrorAlert('Error', 'Failed to update security preferences');
@@ -93,17 +108,17 @@ export default function SecuritySettingsPage() {
         const result = await LocalAuthentication.authenticateAsync({
           promptMessage: `Enable ${biometricType} for Aptly`,
           cancelLabel: 'Cancel',
-          fallbackLabel: 'Use Password'
+          fallbackLabel: 'Use Password',
         });
-        
+
         if (result.success) {
-          setPreferences(prev => ({ ...prev, biometricLogin: enabled }));
+          setPreferences((prev) => ({ ...prev, biometricLogin: enabled }));
         }
       } catch (error) {
         showErrorAlert('Error', 'Failed to enable biometric authentication');
       }
     } else {
-      setPreferences(prev => ({ ...prev, biometricLogin: enabled }));
+      setPreferences((prev) => ({ ...prev, biometricLogin: enabled }));
     }
   };
 
@@ -118,10 +133,13 @@ export default function SecuritySettingsPage() {
           style: 'destructive',
           onPress: () => {
             setPreferences(defaultPreferences);
-            showSuccessAlert('Reset Complete', 'Security settings have been reset to defaults');
-          }
-        }
-      ]
+            showSuccessAlert(
+              'Reset Complete',
+              'Security settings have been reset to defaults',
+            );
+          },
+        },
+      ],
     );
   };
 
@@ -131,7 +149,7 @@ export default function SecuritySettingsPage() {
         <Text className="text-headline-small font-semibold text-text-primary mb-4">
           Authentication
         </Text>
-        
+
         <View className="space-y-4">
           {/* Biometric Login */}
           {biometricAvailable && (
@@ -165,7 +183,9 @@ export default function SecuritySettingsPage() {
             </View>
             <Switch
               value={preferences.appLock}
-              onValueChange={(enabled) => setPreferences(prev => ({ ...prev, appLock: enabled }))}
+              onValueChange={(enabled) =>
+                setPreferences((prev) => ({ ...prev, appLock: enabled }))
+              }
               trackColor={{ false: '#D1D5DB', true: '#6366f1' }}
               thumbColor={preferences.appLock ? '#FFFFFF' : '#757575'}
             />
@@ -183,7 +203,9 @@ export default function SecuritySettingsPage() {
             </View>
             <Switch
               value={preferences.twoFactorAuth}
-              onValueChange={(enabled) => setPreferences(prev => ({ ...prev, twoFactorAuth: enabled }))}
+              onValueChange={(enabled) =>
+                setPreferences((prev) => ({ ...prev, twoFactorAuth: enabled }))
+              }
               trackColor={{ false: '#D1D5DB', true: '#6366f1' }}
               thumbColor={preferences.twoFactorAuth ? '#FFFFFF' : '#757575'}
             />
@@ -199,7 +221,7 @@ export default function SecuritySettingsPage() {
         <Text className="text-headline-small font-semibold text-text-primary mb-4">
           Privacy & Security
         </Text>
-        
+
         <View className="space-y-4">
           {/* Login Notifications */}
           <View className="flex-row items-center justify-between">
@@ -213,9 +235,16 @@ export default function SecuritySettingsPage() {
             </View>
             <Switch
               value={preferences.loginNotifications}
-              onValueChange={(enabled) => setPreferences(prev => ({ ...prev, loginNotifications: enabled }))}
+              onValueChange={(enabled) =>
+                setPreferences((prev) => ({
+                  ...prev,
+                  loginNotifications: enabled,
+                }))
+              }
               trackColor={{ false: '#D1D5DB', true: '#6366f1' }}
-              thumbColor={preferences.loginNotifications ? '#FFFFFF' : '#757575'}
+              thumbColor={
+                preferences.loginNotifications ? '#FFFFFF' : '#757575'
+              }
             />
           </View>
 
@@ -231,7 +260,9 @@ export default function SecuritySettingsPage() {
             </View>
             <Switch
               value={preferences.deviceTrust}
-              onValueChange={(enabled) => setPreferences(prev => ({ ...prev, deviceTrust: enabled }))}
+              onValueChange={(enabled) =>
+                setPreferences((prev) => ({ ...prev, deviceTrust: enabled }))
+              }
               trackColor={{ false: '#D1D5DB', true: '#6366f1' }}
               thumbColor={preferences.deviceTrust ? '#FFFFFF' : '#757575'}
             />
@@ -249,7 +280,9 @@ export default function SecuritySettingsPage() {
             </View>
             <Switch
               value={preferences.encryptBackup}
-              onValueChange={(enabled) => setPreferences(prev => ({ ...prev, encryptBackup: enabled }))}
+              onValueChange={(enabled) =>
+                setPreferences((prev) => ({ ...prev, encryptBackup: enabled }))
+              }
               trackColor={{ false: '#D1D5DB', true: '#6366f1' }}
               thumbColor={preferences.encryptBackup ? '#FFFFFF' : '#757575'}
             />
@@ -265,12 +298,13 @@ export default function SecuritySettingsPage() {
         <Text className="text-headline-small font-semibold text-text-primary mb-4">
           Security Actions
         </Text>
-        
+
         <View className="space-y-4">
           <TouchableOpacity
             className="flex-row items-center justify-between py-2"
-            onPress={() => {/* Navigate to active sessions */}}
-          >
+            onPress={() => {
+              /* Navigate to active sessions */
+            }}>
             <View className="flex-1">
               <Text className="text-body-medium font-medium text-text-primary">
                 Active Sessions
@@ -284,8 +318,9 @@ export default function SecuritySettingsPage() {
 
           <TouchableOpacity
             className="flex-row items-center justify-between py-2"
-            onPress={() => {/* Navigate to login history */}}
-          >
+            onPress={() => {
+              /* Navigate to login history */
+            }}>
             <View className="flex-1">
               <Text className="text-body-medium font-medium text-text-primary">
                 Login History
@@ -299,8 +334,9 @@ export default function SecuritySettingsPage() {
 
           <TouchableOpacity
             className="flex-row items-center justify-between py-2"
-            onPress={() => {/* Change password */}}
-          >
+            onPress={() => {
+              /* Change password */
+            }}>
             <View className="flex-1">
               <Text className="text-body-medium font-medium text-text-primary">
                 Change Password
@@ -318,16 +354,12 @@ export default function SecuritySettingsPage() {
 
   return (
     <SafeAreaView className="flex-1 bg-background">
-      <StackHeader
-        title="Security Settings"
-        onBackPress={() => safeGoBack()}
-      />
+      <StackHeader title="Security Settings" onBackPress={() => safeGoBack()} />
 
-      <ScrollView 
-        className="flex-1" 
+      <ScrollView
+        className="flex-1"
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ padding: 16, paddingBottom: 100 }}
-      >
+        contentContainerStyle={{ padding: 16, paddingBottom: 100 }}>
         {renderAuthenticationSettings()}
         {renderPrivacySettings()}
         {renderSecurityActions()}
@@ -337,15 +369,11 @@ export default function SecuritySettingsPage() {
           <Button
             variant="primary"
             onPress={handleSavePreferences}
-            disabled={isSaving}
-          >
-            {isSaving ? "Saving..." : "Save Security Settings"}
+            disabled={isSaving}>
+            {isSaving ? 'Saving...' : 'Save Security Settings'}
           </Button>
-          
-          <Button
-            variant="destructive"
-            onPress={handleResetSecurity}
-          >
+
+          <Button variant="destructive" onPress={handleResetSecurity}>
             Reset to Defaults
           </Button>
         </View>

@@ -2,12 +2,12 @@ import {
   BottomSheetModal,
   BottomSheetModalProvider,
   BottomSheetView,
-} from "@gorhom/bottom-sheet";
-import { Image } from "expo-image";
-import { CircleX, Download, Share2 } from "lucide-react-native";
-import React, { useCallback } from "react";
-import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
-import { GestureHandlerRootView } from "react-native-gesture-handler";
+} from '@gorhom/bottom-sheet';
+import { Image } from 'expo-image';
+import { CircleX, Download, Share2 } from 'lucide-react-native';
+import React, { useCallback } from 'react';
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 interface AptlyBottomSheetModalProps {
   ref: React.RefObject<BottomSheetModal>;
@@ -16,7 +16,7 @@ interface AptlyBottomSheetModalProps {
 const AptlyBottomSheetModal = ({ ref }: AptlyBottomSheetModalProps) => {
   // ref
   const handleSheetChanges = useCallback((index: number) => {
-    console.log("handleSheetChanges", index);
+    console.log('handleSheetChanges', index);
   }, []);
 
   // renders
@@ -28,8 +28,7 @@ const AptlyBottomSheetModal = ({ ref }: AptlyBottomSheetModalProps) => {
           onChange={handleSheetChanges}
           stackBehavior="push"
           containerStyle={{ zIndex: 2 }}
-          snapPoints={["90%"]}
-        >
+          snapPoints={['90%']}>
           <BottomSheetView style={styles.contentContainer}>
             <View className="w-full px-4">
               <View className="flex flex-row justify-between items-center pb-3 ">
@@ -51,7 +50,7 @@ const AptlyBottomSheetModal = ({ ref }: AptlyBottomSheetModalProps) => {
               <View className="flex items-center justify-center">
                 <Image
                   style={{ width: 250, height: 250 }}
-                  source={require("../../../assets/images/QR_Code.png")}
+                  source={require('../../../assets/images/QR_Code.png')}
                   contentFit="cover"
                   transition={1000}
                 />
@@ -95,12 +94,12 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 24,
-    justifyContent: "center",
-    backgroundColor: "grey",
+    justifyContent: 'center',
+    backgroundColor: 'grey',
   },
   contentContainer: {
     flex: 1,
-    alignItems: "center",
+    alignItems: 'center',
   },
 });
 

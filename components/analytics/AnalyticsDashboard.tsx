@@ -1,16 +1,22 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, Dimensions } from 'react-native';
+import {
+  View,
+  Text,
+  ScrollView,
+  TouchableOpacity,
+  Dimensions,
+} from 'react-native';
 import LucideIcons from '../ui/LucideIcons';
 import { router } from 'expo-router';
 
 // Types
-import type { 
+import type {
   SocietyAnalytics,
   PerformanceInsight,
   AnalyticsRecommendation,
   TrendAnalysis,
   DataPoint,
-  ReportPeriod
+  ReportPeriod,
 } from '../../types/analytics';
 
 // UI Components
@@ -23,7 +29,10 @@ const isSmallScreen = screenWidth < 380 || screenHeight < 700;
 
 interface AnalyticsDashboardProps {
   societyAnalytics: SocietyAnalytics;
-  onGenerateReport: (period: ReportPeriod, categories: string[]) => Promise<void>;
+  onGenerateReport: (
+    period: ReportPeriod,
+    categories: string[],
+  ) => Promise<void>;
   onImplementRecommendation: (recommendationId: string) => Promise<void>;
   currentUserId: string;
   userRole: 'resident' | 'committee_member' | 'admin';
@@ -34,32 +43,60 @@ export const AnalyticsDashboard: React.FC<AnalyticsDashboardProps> = ({
   onGenerateReport,
   onImplementRecommendation,
   currentUserId,
-  userRole
+  userRole,
 }) => {
-  const [activeTab, setActiveTab] = useState<'overview' | 'operational' | 'financial' | 'community' | 'insights'>('overview');
-  const [selectedPeriod, setSelectedPeriod] = useState<'daily' | 'weekly' | 'monthly' | 'quarterly'>('monthly');
+  const [activeTab, setActiveTab] = useState<
+    'overview' | 'operational' | 'financial' | 'community' | 'insights'
+  >('overview');
+  const [selectedPeriod, setSelectedPeriod] = useState<
+    'daily' | 'weekly' | 'monthly' | 'quarterly'
+  >('monthly');
   const [selectedMetric, setSelectedMetric] = useState<string | null>(null);
 
-  const canViewDetailedAnalytics = userRole === 'admin' || userRole === 'committee_member';
+  const canViewDetailedAnalytics =
+    userRole === 'admin' || userRole === 'committee_member';
   const canImplementRecommendations = userRole === 'admin';
 
-  const { kpis, operationalMetrics, financialAnalytics, communityMetrics, performanceInsights, recommendations } = societyAnalytics;
+  const {
+    kpis,
+    operationalMetrics,
+    financialAnalytics,
+    communityMetrics,
+    performanceInsights,
+    recommendations,
+  } = societyAnalytics;
 
   // Calculate health score
   const overallHealthScore = useMemo(() => {
     const scores = [
-      kpis.residentSatisfactionScore / 5 * 100,
+      (kpis.residentSatisfactionScore / 5) * 100,
       kpis.billCollectionRate,
       kpis.complaintResolutionRate,
       kpis.activeResidentPercentage,
-      (5 - kpis.emergencyResponseTime / 10) * 20 // Convert to 0-100 scale
+      (5 - kpis.emergencyResponseTime / 10) * 20, // Convert to 0-100 scale
     ];
     return scores.reduce((sum, score) => sum + score, 0) / scores.length;
   }, [kpis]);
 
-  const renderKPICard = (title: string, value: number, unit: string, trend: 'up' | 'down' | 'stable', target?: number) => {
-    const trendColor = trend === 'up' ? 'text-success' : trend === 'down' ? 'text-error' : 'text-text-secondary';
-    const trendIcon = trend === 'up' ? 'trending-up' : trend === 'down' ? 'trending-down' : 'analytics-outline';
+  const renderKPICard = (
+    title: string,
+    value: number,
+    unit: string,
+    trend: 'up' | 'down' | 'stable',
+    target?: number,
+  ) => {
+    const trendColor =
+      trend === 'up'
+        ? 'text-success'
+        : trend === 'down'
+          ? 'text-error'
+          : 'text-text-secondary';
+    const trendIcon =
+      trend === 'up'
+        ? 'trending-up'
+        : trend === 'down'
+          ? 'trending-down'
+          : 'analytics-outline';
     const isOnTarget = target ? value >= target : true;
 
     return (
@@ -68,20 +105,35 @@ export const AnalyticsDashboard: React.FC<AnalyticsDashboardProps> = ({
           <View className="flex-row items-start justify-between mb-2">
             <View className="flex-1">
               <Text className="text-display-medium font-bold text-text-primary">
-                {typeof value === 'number' ? value.toFixed(1) : value}{unit}
+                {typeof value === 'number' ? value.toFixed(1) : value}
+                {unit}
               </Text>
               <Text className="text-body-small text-text-secondary">
                 {title}
               </Text>
             </View>
-            <LucideIcons name={trendIcon as any} size={20} color={trendColor === 'text-success' ? '#4CAF50' : trendColor === 'text-error' ? '#D32F2F' : '#757575'} />
+            <LucideIcons
+              name={trendIcon as any}
+              size={20}
+              color={
+                trendColor === 'text-success'
+                  ? '#4CAF50'
+                  : trendColor === 'text-error'
+                    ? '#D32F2F'
+                    : '#757575'
+              }
+            />
           </View>
-          
+
           {target && (
             <View className="flex-row items-center">
-              <View className={`w-2 h-2 rounded-full mr-2 ${isOnTarget ? 'bg-success' : 'bg-warning'}`} />
-              <Text className={`text-label-small ${isOnTarget ? 'text-success' : 'text-warning'}`}>
-                Target: {target}{unit} {isOnTarget ? '✓' : ''}
+              <View
+                className={`w-2 h-2 rounded-full mr-2 ${isOnTarget ? 'bg-success' : 'bg-warning'}`}
+              />
+              <Text
+                className={`text-label-small ${isOnTarget ? 'text-success' : 'text-warning'}`}>
+                Target: {target}
+                {unit} {isOnTarget ? '✓' : ''}
               </Text>
             </View>
           )}
@@ -99,40 +151,57 @@ export const AnalyticsDashboard: React.FC<AnalyticsDashboardProps> = ({
             <Text className="text-headline-small font-semibold text-text-primary mb-3">
               Society Health Score
             </Text>
-            
+
             <View className="items-center mb-4">
-              <View className={`w-24 h-24 rounded-full items-center justify-center ${
-                overallHealthScore >= 80 ? 'bg-success/10' : 
-                overallHealthScore >= 60 ? 'bg-warning/10' : 'bg-error/10'
-              }`}>
-                <Text className={`text-display-large font-bold ${
-                  overallHealthScore >= 80 ? 'text-success' : 
-                  overallHealthScore >= 60 ? 'text-warning' : 'text-error'
+              <View
+                className={`w-24 h-24 rounded-full items-center justify-center ${
+                  overallHealthScore >= 80
+                    ? 'bg-success/10'
+                    : overallHealthScore >= 60
+                      ? 'bg-warning/10'
+                      : 'bg-error/10'
                 }`}>
+                <Text
+                  className={`text-display-large font-bold ${
+                    overallHealthScore >= 80
+                      ? 'text-success'
+                      : overallHealthScore >= 60
+                        ? 'text-warning'
+                        : 'text-error'
+                  }`}>
                   {overallHealthScore.toFixed(0)}
                 </Text>
               </View>
               <Text className="text-body-medium text-text-secondary mt-2">
-                {overallHealthScore >= 80 ? 'Excellent' : 
-                 overallHealthScore >= 60 ? 'Good' : 'Needs Attention'}
+                {overallHealthScore >= 80
+                  ? 'Excellent'
+                  : overallHealthScore >= 60
+                    ? 'Good'
+                    : 'Needs Attention'}
               </Text>
             </View>
-            
+
             <View className="space-y-2">
               <View className="flex-row items-center justify-between">
-                <Text className="text-body-small text-text-secondary">Resident Satisfaction</Text>
+                <Text className="text-body-small text-text-secondary">
+                  Resident Satisfaction
+                </Text>
                 <Text className="text-body-small font-medium text-text-primary">
                   {kpis.residentSatisfactionScore.toFixed(1)}/5
                 </Text>
               </View>
               <View className="flex-row items-center justify-between">
-                <Text className="text-body-small text-text-secondary">Collection Efficiency</Text>
+                <Text className="text-body-small text-text-secondary">
+                  Collection Efficiency
+                </Text>
                 <Text className="text-body-small font-medium text-text-primary">
                   {kpis.billCollectionRate.toFixed(1)}%
                 </Text>
               </View>
               <View className="flex-row items-center justify-between">
-                <Text className="text-body-small text-text-secondary">Active Participation</Text>
+                <Text className="text-body-small text-text-secondary">
+                  Active Participation
+                </Text>
                 <Text className="text-body-small font-medium text-text-primary">
                   {kpis.activeResidentPercentage.toFixed(1)}%
                 </Text>
@@ -147,36 +216,36 @@ export const AnalyticsDashboard: React.FC<AnalyticsDashboardProps> = ({
         <Text className="text-headline-small font-semibold text-text-primary mb-3">
           Key Performance Indicators
         </Text>
-        
+
         <ScrollView horizontal showsHorizontalScrollIndicator={false}>
           <View className="flex-row gap-2">
             {renderKPICard(
-              'Resident Satisfaction', 
-              kpis.residentSatisfactionScore, 
-              '/5', 
+              'Resident Satisfaction',
+              kpis.residentSatisfactionScore,
+              '/5',
               'up',
-              4.0
+              4.0,
             )}
             {renderKPICard(
-              'Collection Rate', 
-              kpis.billCollectionRate, 
-              '%', 
+              'Collection Rate',
+              kpis.billCollectionRate,
+              '%',
               kpis.billCollectionRate >= 85 ? 'up' : 'down',
-              85
+              85,
             )}
             {renderKPICard(
-              'Response Time', 
-              kpis.maintenanceResponseTime, 
-              'h', 
+              'Response Time',
+              kpis.maintenanceResponseTime,
+              'h',
               'down',
-              24
+              24,
             )}
             {renderKPICard(
-              'Occupancy Rate', 
-              kpis.occupancyRate, 
-              '%', 
+              'Occupancy Rate',
+              kpis.occupancyRate,
+              '%',
               'stable',
-              90
+              90,
             )}
           </View>
         </ScrollView>
@@ -187,7 +256,7 @@ export const AnalyticsDashboard: React.FC<AnalyticsDashboardProps> = ({
         <Text className="text-headline-small font-semibold text-text-primary mb-3">
           Quick Insights
         </Text>
-        
+
         {performanceInsights.slice(0, 3).map((insight) => (
           <Card key={insight.id} className="mb-3">
             <View className="p-4">
@@ -200,28 +269,35 @@ export const AnalyticsDashboard: React.FC<AnalyticsDashboardProps> = ({
                     {insight.description}
                   </Text>
                 </View>
-                
-                <View className={`px-2 py-1 rounded-full ${getImpactStyle(insight.impact).bg}`}>
-                  <Text className={`text-label-small font-medium ${getImpactStyle(insight.impact).text}`}>
+
+                <View
+                  className={`px-2 py-1 rounded-full ${getImpactStyle(insight.impact).bg}`}>
+                  <Text
+                    className={`text-label-small font-medium ${getImpactStyle(insight.impact).text}`}>
                     {insight.impact.toUpperCase()}
                   </Text>
                 </View>
               </View>
-              
+
               <View className="flex-row items-center justify-between">
                 <View className="flex-row items-center">
-                  <LucideIcons 
-                    name={getTrendIcon(insight.trend) as any} 
-                    size={16} 
-                    color={getTrendColor(insight.trend)} 
+                  <LucideIcons
+                    name={getTrendIcon(insight.trend) as any}
+                    size={16}
+                    color={getTrendColor(insight.trend)}
                   />
                   <Text className="text-body-small text-text-secondary ml-2">
                     Confidence: {(insight.confidence * 100).toFixed(0)}%
                   </Text>
                 </View>
-                
-                <TouchableOpacity onPress={() => router.push(`/analytics/insights/${insight.id}`)}>
-                  <Text className="text-body-small text-primary">View Details</Text>
+
+                <TouchableOpacity
+                  onPress={() =>
+                    router.push(`/analytics/insights/${insight.id}`)
+                  }>
+                  <Text className="text-body-small text-primary">
+                    View Details
+                  </Text>
                 </TouchableOpacity>
               </View>
             </View>
@@ -234,9 +310,11 @@ export const AnalyticsDashboard: React.FC<AnalyticsDashboardProps> = ({
         <Text className="text-headline-small font-semibold text-text-primary mb-3">
           Priority Recommendations
         </Text>
-        
+
         {recommendations
-          .filter(rec => rec.priority === 'critical' || rec.priority === 'high')
+          .filter(
+            (rec) => rec.priority === 'critical' || rec.priority === 'high',
+          )
           .slice(0, 2)
           .map((recommendation) => (
             <Card key={recommendation.id} className="mb-3">
@@ -244,8 +322,10 @@ export const AnalyticsDashboard: React.FC<AnalyticsDashboardProps> = ({
                 <View className="flex-row items-start justify-between mb-2">
                   <View className="flex-1 mr-3">
                     <View className="flex-row items-center mb-1">
-                      <View className={`px-2 py-1 rounded-full mr-2 ${getPriorityStyle(recommendation.priority).bg}`}>
-                        <Text className={`text-label-small font-medium ${getPriorityStyle(recommendation.priority).text}`}>
+                      <View
+                        className={`px-2 py-1 rounded-full mr-2 ${getPriorityStyle(recommendation.priority).bg}`}>
+                        <Text
+                          className={`text-label-small font-medium ${getPriorityStyle(recommendation.priority).text}`}>
                           {recommendation.priority.toUpperCase()}
                         </Text>
                       </View>
@@ -261,14 +341,13 @@ export const AnalyticsDashboard: React.FC<AnalyticsDashboardProps> = ({
                     </Text>
                   </View>
                 </View>
-                
+
                 {canImplementRecommendations && (
                   <Button
                     variant="primary"
                     size="sm"
                     onPress={() => onImplementRecommendation(recommendation.id)}
-                    className="self-start"
-                  >
+                    className="self-start">
                     Implement
                   </Button>
                 )}
@@ -282,36 +361,44 @@ export const AnalyticsDashboard: React.FC<AnalyticsDashboardProps> = ({
         <Text className="text-headline-small font-semibold text-text-primary mb-3">
           Recent Trends
         </Text>
-        
+
         <Card>
           <View className="p-4">
             <View className="space-y-3">
               <View className="flex-row items-center justify-between">
                 <View className="flex-row items-center">
                   <View className="w-3 h-3 bg-success rounded-full mr-3" />
-                  <Text className="text-body-medium text-text-primary">Community Engagement</Text>
+                  <Text className="text-body-medium text-text-primary">
+                    Community Engagement
+                  </Text>
                 </View>
                 <View className="flex-row items-center">
                   <LucideIcons name="trending-up" size={16} color="#4CAF50" />
-                  <Text className="text-body-small text-success ml-1">+12%</Text>
+                  <Text className="text-body-small text-success ml-1">
+                    +12%
+                  </Text>
                 </View>
               </View>
-              
+
               <View className="flex-row items-center justify-between">
                 <View className="flex-row items-center">
                   <View className="w-3 h-3 bg-primary rounded-full mr-3" />
-                  <Text className="text-body-medium text-text-primary">Digital Adoption</Text>
+                  <Text className="text-body-medium text-text-primary">
+                    Digital Adoption
+                  </Text>
                 </View>
                 <View className="flex-row items-center">
                   <LucideIcons name="trending-up" size={16} color="#4CAF50" />
                   <Text className="text-body-small text-success ml-1">+8%</Text>
                 </View>
               </View>
-              
+
               <View className="flex-row items-center justify-between">
                 <View className="flex-row items-center">
                   <View className="w-3 h-3 bg-warning rounded-full mr-3" />
-                  <Text className="text-body-medium text-text-primary">Maintenance Costs</Text>
+                  <Text className="text-body-medium text-text-primary">
+                    Maintenance Costs
+                  </Text>
                 </View>
                 <View className="flex-row items-center">
                   <LucideIcons name="trending-down" size={16} color="#D32F2F" />
@@ -333,51 +420,74 @@ export const AnalyticsDashboard: React.FC<AnalyticsDashboardProps> = ({
           <Text className="text-headline-small font-semibold text-text-primary mb-4">
             Maintenance Performance
           </Text>
-          
+
           <View className="grid grid-cols-2 gap-3 mb-4">
             <View className="bg-surface-secondary p-3 rounded-lg">
               <Text className="text-display-small font-bold text-primary">
                 {operationalMetrics.maintenance.totalRequests}
               </Text>
-              <Text className="text-body-small text-text-secondary">Total Requests</Text>
+              <Text className="text-body-small text-text-secondary">
+                Total Requests
+              </Text>
             </View>
-            
+
             <View className="bg-surface-secondary p-3 rounded-lg">
               <Text className="text-display-small font-bold text-success">
-                {((operationalMetrics.maintenance.completedRequests / operationalMetrics.maintenance.totalRequests) * 100).toFixed(1)}%
+                {(
+                  (operationalMetrics.maintenance.completedRequests /
+                    operationalMetrics.maintenance.totalRequests) *
+                  100
+                ).toFixed(1)}
+                %
               </Text>
-              <Text className="text-body-small text-text-secondary">Completion Rate</Text>
+              <Text className="text-body-small text-text-secondary">
+                Completion Rate
+              </Text>
             </View>
-            
+
             <View className="bg-surface-secondary p-3 rounded-lg">
               <Text className="text-display-small font-bold text-warning">
                 {operationalMetrics.maintenance.averageResolutionTime}h
               </Text>
-              <Text className="text-body-small text-text-secondary">Avg Resolution</Text>
+              <Text className="text-body-small text-text-secondary">
+                Avg Resolution
+              </Text>
             </View>
-            
+
             <View className="bg-surface-secondary p-3 rounded-lg">
               <Text className="text-display-small font-bold text-text-primary">
-                {operationalMetrics.maintenance.residentSatisfactionRating.toFixed(1)}
+                {operationalMetrics.maintenance.residentSatisfactionRating.toFixed(
+                  1,
+                )}
               </Text>
-              <Text className="text-body-small text-text-secondary">Satisfaction</Text>
+              <Text className="text-body-small text-text-secondary">
+                Satisfaction
+              </Text>
             </View>
           </View>
-          
+
           {/* Request Categories */}
           <View>
             <Text className="text-body-medium font-semibold text-text-primary mb-2">
               Requests by Category
             </Text>
-            {Object.entries(operationalMetrics.maintenance.requestsByCategory).map(([category, count]) => {
-              const percentage = (count / operationalMetrics.maintenance.totalRequests) * 100;
+            {Object.entries(
+              operationalMetrics.maintenance.requestsByCategory,
+            ).map(([category, count]) => {
+              const percentage =
+                (count / operationalMetrics.maintenance.totalRequests) * 100;
               return (
-                <View key={category} className="flex-row items-center justify-between py-1">
-                  <Text className="text-body-small text-text-secondary">{formatCategory(category)}</Text>
+                <View
+                  key={category}
+                  className="flex-row items-center justify-between py-1">
+                  <Text className="text-body-small text-text-secondary">
+                    {formatCategory(category)}
+                  </Text>
                   <View className="flex-row items-center">
-                    <View className={`${isSmallScreen ? 'w-12' : 'w-16'} h-1 bg-surface-secondary rounded-full mr-2 overflow-hidden`}>
-                      <View 
-                        className="h-full bg-primary rounded-full" 
+                    <View
+                      className={`${isSmallScreen ? 'w-12' : 'w-16'} h-1 bg-surface-secondary rounded-full mr-2 overflow-hidden`}>
+                      <View
+                        className="h-full bg-primary rounded-full"
                         style={{ width: `${Math.min(percentage, 100)}%` }}
                       />
                     </View>
@@ -398,33 +508,47 @@ export const AnalyticsDashboard: React.FC<AnalyticsDashboardProps> = ({
           <Text className="text-headline-small font-semibold text-text-primary mb-4">
             Visitor Management
           </Text>
-          
+
           <View className="space-y-3">
             <View className="flex-row items-center justify-between">
-              <Text className="text-body-medium text-text-secondary">Total Visitors</Text>
+              <Text className="text-body-medium text-text-secondary">
+                Total Visitors
+              </Text>
               <Text className="text-body-large font-semibold text-text-primary">
                 {operationalMetrics.visitorManagement.totalVisitors}
               </Text>
             </View>
-            
+
             <View className="flex-row items-center justify-between">
-              <Text className="text-body-medium text-text-secondary">Approval Rate</Text>
+              <Text className="text-body-medium text-text-secondary">
+                Approval Rate
+              </Text>
               <Text className="text-body-large font-semibold text-success">
                 {operationalMetrics.visitorManagement.approvalRate.toFixed(1)}%
               </Text>
             </View>
-            
+
             <View className="flex-row items-center justify-between">
-              <Text className="text-body-medium text-text-secondary">Avg Approval Time</Text>
+              <Text className="text-body-medium text-text-secondary">
+                Avg Approval Time
+              </Text>
               <Text className="text-body-large font-semibold text-text-primary">
-                {operationalMetrics.visitorManagement.averageApprovalTime.toFixed(1)}m
+                {operationalMetrics.visitorManagement.averageApprovalTime.toFixed(
+                  1,
+                )}
+                m
               </Text>
             </View>
-            
+
             <View className="flex-row items-center justify-between">
-              <Text className="text-body-medium text-text-secondary">QR Usage Rate</Text>
+              <Text className="text-body-medium text-text-secondary">
+                QR Usage Rate
+              </Text>
               <Text className="text-body-large font-semibold text-primary">
-                {operationalMetrics.visitorManagement.qrCodeUsageRate.toFixed(1)}%
+                {operationalMetrics.visitorManagement.qrCodeUsageRate.toFixed(
+                  1,
+                )}
+                %
               </Text>
             </View>
           </View>
@@ -437,28 +561,38 @@ export const AnalyticsDashboard: React.FC<AnalyticsDashboardProps> = ({
           <Text className="text-headline-small font-semibold text-text-primary mb-4">
             Amenity Utilization
           </Text>
-          
+
           <View className="space-y-3">
             <View className="flex-row items-center justify-between">
-              <Text className="text-body-medium text-text-secondary">Booking Rate</Text>
+              <Text className="text-body-medium text-text-secondary">
+                Booking Rate
+              </Text>
               <Text className="text-body-large font-semibold text-text-primary">
                 {operationalMetrics.amenityUtilization.bookingRate.toFixed(1)}%
               </Text>
             </View>
-            
+
             <View className="flex-row items-center justify-between">
-              <Text className="text-body-medium text-text-secondary">No-Show Rate</Text>
-              <Text className={`text-body-large font-semibold ${
-                operationalMetrics.amenityUtilization.noShowRate > 10 ? 'text-error' : 'text-warning'
-              }`}>
+              <Text className="text-body-medium text-text-secondary">
+                No-Show Rate
+              </Text>
+              <Text
+                className={`text-body-large font-semibold ${
+                  operationalMetrics.amenityUtilization.noShowRate > 10
+                    ? 'text-error'
+                    : 'text-warning'
+                }`}>
                 {operationalMetrics.amenityUtilization.noShowRate.toFixed(1)}%
               </Text>
             </View>
-            
+
             <View className="flex-row items-center justify-between">
-              <Text className="text-body-medium text-text-secondary">Revenue Generated</Text>
+              <Text className="text-body-medium text-text-secondary">
+                Revenue Generated
+              </Text>
               <Text className="text-body-large font-semibold text-success">
-                ₹{operationalMetrics.amenityUtilization.revenueGenerated.toLocaleString()}
+                ₹
+                {operationalMetrics.amenityUtilization.revenueGenerated.toLocaleString()}
               </Text>
             </View>
           </View>
@@ -475,34 +609,51 @@ export const AnalyticsDashboard: React.FC<AnalyticsDashboardProps> = ({
           <Text className="text-headline-small font-semibold text-text-primary mb-4">
             Collection Performance
           </Text>
-          
+
           <View className="grid grid-cols-2 gap-3">
             <View className="bg-success/10 p-3 rounded-lg">
               <Text className="text-display-small font-bold text-success">
-                ₹{(financialAnalytics.collections.totalCollected / 100000).toFixed(1)}L
+                ₹
+                {(
+                  financialAnalytics.collections.totalCollected / 100000
+                ).toFixed(1)}
+                L
               </Text>
-              <Text className="text-body-small text-text-secondary">Total Collected</Text>
+              <Text className="text-body-small text-text-secondary">
+                Total Collected
+              </Text>
             </View>
-            
+
             <View className="bg-warning/10 p-3 rounded-lg">
               <Text className="text-display-small font-bold text-warning">
-                ₹{(financialAnalytics.collections.outstandingAmount / 100000).toFixed(1)}L
+                ₹
+                {(
+                  financialAnalytics.collections.outstandingAmount / 100000
+                ).toFixed(1)}
+                L
               </Text>
-              <Text className="text-body-small text-text-secondary">Outstanding</Text>
+              <Text className="text-body-small text-text-secondary">
+                Outstanding
+              </Text>
             </View>
-            
+
             <View className="bg-primary/10 p-3 rounded-lg">
               <Text className="text-display-small font-bold text-primary">
-                {financialAnalytics.collections.collectionEfficiency.toFixed(1)}%
+                {financialAnalytics.collections.collectionEfficiency.toFixed(1)}
+                %
               </Text>
-              <Text className="text-body-small text-text-secondary">Efficiency</Text>
+              <Text className="text-body-small text-text-secondary">
+                Efficiency
+              </Text>
             </View>
-            
+
             <View className="bg-surface-secondary p-3 rounded-lg">
               <Text className="text-display-small font-bold text-text-primary">
                 {financialAnalytics.collections.paymentMethodBreakdown.length}
               </Text>
-              <Text className="text-body-small text-text-secondary">Payment Methods</Text>
+              <Text className="text-body-small text-text-secondary">
+                Payment Methods
+              </Text>
             </View>
           </View>
         </View>
@@ -514,42 +665,56 @@ export const AnalyticsDashboard: React.FC<AnalyticsDashboardProps> = ({
           <Text className="text-headline-small font-semibold text-text-primary mb-4">
             Expense Analysis
           </Text>
-          
-          {financialAnalytics.expenses.expenseByCategory.slice(0, 5).map((expense) => (
-            <View key={expense.category} className="flex-row items-center justify-between py-2">
-              <View className="flex-1">
-                <Text className="text-body-medium text-text-primary">{expense.category}</Text>
-                <View className="flex-row items-center mt-1">
-                  <View className={`${isSmallScreen ? 'w-16' : 'w-20'} h-1 bg-surface-secondary rounded-full mr-2 overflow-hidden`}>
-                    <View 
-                      className="h-full bg-primary rounded-full" 
-                      style={{ width: `${Math.min(expense.percentage, 100)}%` }}
-                    />
+
+          {financialAnalytics.expenses.expenseByCategory
+            .slice(0, 5)
+            .map((expense) => (
+              <View
+                key={expense.category}
+                className="flex-row items-center justify-between py-2">
+                <View className="flex-1">
+                  <Text className="text-body-medium text-text-primary">
+                    {expense.category}
+                  </Text>
+                  <View className="flex-row items-center mt-1">
+                    <View
+                      className={`${isSmallScreen ? 'w-16' : 'w-20'} h-1 bg-surface-secondary rounded-full mr-2 overflow-hidden`}>
+                      <View
+                        className="h-full bg-primary rounded-full"
+                        style={{
+                          width: `${Math.min(expense.percentage, 100)}%`,
+                        }}
+                      />
+                    </View>
+                    <Text className="text-body-small text-text-secondary">
+                      {expense.percentage.toFixed(1)}%
+                    </Text>
                   </View>
-                  <Text className="text-body-small text-text-secondary">
-                    {expense.percentage.toFixed(1)}%
+                </View>
+                <View className="items-end ml-3">
+                  <Text className="text-body-medium font-semibold text-text-primary">
+                    ₹{(expense.amount / 1000).toFixed(0)}K
                   </Text>
+                  <View className="flex-row items-center">
+                    <LucideIcons
+                      name={getTrendIcon(expense.trend) as any}
+                      size={12}
+                      color={getTrendColor(expense.trend)}
+                    />
+                    <Text
+                      className={`text-label-small ml-1 ${
+                        expense.trend === 'up' ? 'text-error' : 'text-success'
+                      }`}>
+                      {expense.trend === 'up'
+                        ? '+'
+                        : expense.trend === 'down'
+                          ? '-'
+                          : ''}
+                    </Text>
+                  </View>
                 </View>
               </View>
-              <View className="items-end ml-3">
-                <Text className="text-body-medium font-semibold text-text-primary">
-                  ₹{(expense.amount / 1000).toFixed(0)}K
-                </Text>
-                <View className="flex-row items-center">
-                  <LucideIcons 
-                    name={getTrendIcon(expense.trend) as any} 
-                    size={12} 
-                    color={getTrendColor(expense.trend)} 
-                  />
-                  <Text className={`text-label-small ml-1 ${
-                    expense.trend === 'up' ? 'text-error' : 'text-success'
-                  }`}>
-                    {expense.trend === 'up' ? '+' : expense.trend === 'down' ? '-' : ''}
-                  </Text>
-                </View>
-              </View>
-            </View>
-          ))}
+            ))}
         </View>
       </Card>
 
@@ -559,32 +724,55 @@ export const AnalyticsDashboard: React.FC<AnalyticsDashboardProps> = ({
           <Text className="text-headline-small font-semibold text-text-primary mb-4">
             Financial Health Indicators
           </Text>
-          
+
           <View className="space-y-3">
             <View className="flex-row items-center justify-between">
-              <Text className="text-body-medium text-text-secondary">Cash Flow Ratio</Text>
-              <Text className={`text-body-large font-semibold ${
-                financialAnalytics.healthIndicators.cashFlowRatio > 1 ? 'text-success' : 'text-warning'
-              }`}>
+              <Text className="text-body-medium text-text-secondary">
+                Cash Flow Ratio
+              </Text>
+              <Text
+                className={`text-body-large font-semibold ${
+                  financialAnalytics.healthIndicators.cashFlowRatio > 1
+                    ? 'text-success'
+                    : 'text-warning'
+                }`}>
                 {financialAnalytics.healthIndicators.cashFlowRatio.toFixed(2)}
               </Text>
             </View>
-            
+
             <View className="flex-row items-center justify-between">
-              <Text className="text-body-medium text-text-secondary">Emergency Fund Ratio</Text>
-              <Text className={`text-body-large font-semibold ${
-                financialAnalytics.healthIndicators.emergencyFundRatio > 0.2 ? 'text-success' : 'text-warning'
-              }`}>
-                {(financialAnalytics.healthIndicators.emergencyFundRatio * 100).toFixed(1)}%
+              <Text className="text-body-medium text-text-secondary">
+                Emergency Fund Ratio
+              </Text>
+              <Text
+                className={`text-body-large font-semibold ${
+                  financialAnalytics.healthIndicators.emergencyFundRatio > 0.2
+                    ? 'text-success'
+                    : 'text-warning'
+                }`}>
+                {(
+                  financialAnalytics.healthIndicators.emergencyFundRatio * 100
+                ).toFixed(1)}
+                %
               </Text>
             </View>
-            
+
             <View className="flex-row items-center justify-between">
-              <Text className="text-body-medium text-text-secondary">Collection Consistency</Text>
-              <Text className={`text-body-large font-semibold ${
-                financialAnalytics.healthIndicators.collectionConsistency > 0.8 ? 'text-success' : 'text-warning'
-              }`}>
-                {(financialAnalytics.healthIndicators.collectionConsistency * 100).toFixed(1)}%
+              <Text className="text-body-medium text-text-secondary">
+                Collection Consistency
+              </Text>
+              <Text
+                className={`text-body-large font-semibold ${
+                  financialAnalytics.healthIndicators.collectionConsistency >
+                  0.8
+                    ? 'text-success'
+                    : 'text-warning'
+                }`}>
+                {(
+                  financialAnalytics.healthIndicators.collectionConsistency *
+                  100
+                ).toFixed(1)}
+                %
               </Text>
             </View>
           </View>
@@ -601,46 +789,58 @@ export const AnalyticsDashboard: React.FC<AnalyticsDashboardProps> = ({
           <Text className="text-headline-small font-semibold text-text-primary mb-4">
             Community Engagement
           </Text>
-          
+
           <View className="grid grid-cols-2 gap-3 mb-4">
             <View className="bg-primary/10 p-3 rounded-lg">
               <Text className="text-display-small font-bold text-primary">
                 {communityMetrics.engagement.dailyActiveUsers}
               </Text>
-              <Text className="text-body-small text-text-secondary">Daily Active</Text>
+              <Text className="text-body-small text-text-secondary">
+                Daily Active
+              </Text>
             </View>
-            
+
             <View className="bg-success/10 p-3 rounded-lg">
               <Text className="text-display-small font-bold text-success">
                 {communityMetrics.engagement.engagementRate.toFixed(1)}%
               </Text>
-              <Text className="text-body-small text-text-secondary">Engagement Rate</Text>
+              <Text className="text-body-small text-text-secondary">
+                Engagement Rate
+              </Text>
             </View>
-            
+
             <View className="bg-warning/10 p-3 rounded-lg">
               <Text className="text-display-small font-bold text-warning">
                 {communityMetrics.communication.postsPerUser.toFixed(1)}
               </Text>
-              <Text className="text-body-small text-text-secondary">Posts per User</Text>
+              <Text className="text-body-small text-text-secondary">
+                Posts per User
+              </Text>
             </View>
-            
+
             <View className="bg-surface-secondary p-3 rounded-lg">
               <Text className="text-display-small font-bold text-text-primary">
                 {(communityMetrics.engagement.sessionDuration / 60).toFixed(0)}m
               </Text>
-              <Text className="text-body-small text-text-secondary">Avg Session</Text>
+              <Text className="text-body-small text-text-secondary">
+                Avg Session
+              </Text>
             </View>
           </View>
-          
+
           <View className="space-y-2">
             <View className="flex-row items-center justify-between">
-              <Text className="text-body-small text-text-secondary">Weekly Active Users</Text>
+              <Text className="text-body-small text-text-secondary">
+                Weekly Active Users
+              </Text>
               <Text className="text-body-small font-medium text-text-primary">
                 {communityMetrics.engagement.weeklyActiveUsers}
               </Text>
             </View>
             <View className="flex-row items-center justify-between">
-              <Text className="text-body-small text-text-secondary">Monthly Active Users</Text>
+              <Text className="text-body-small text-text-secondary">
+                Monthly Active Users
+              </Text>
               <Text className="text-body-small font-medium text-text-primary">
                 {communityMetrics.engagement.monthlyActiveUsers}
               </Text>
@@ -655,33 +855,44 @@ export const AnalyticsDashboard: React.FC<AnalyticsDashboardProps> = ({
           <Text className="text-headline-small font-semibold text-text-primary mb-4">
             Communication Patterns
           </Text>
-          
+
           <View className="space-y-3">
             <View className="flex-row items-center justify-between">
-              <Text className="text-body-medium text-text-secondary">Comments per Post</Text>
+              <Text className="text-body-medium text-text-secondary">
+                Comments per Post
+              </Text>
               <Text className="text-body-large font-semibold text-text-primary">
                 {communityMetrics.communication.commentsPerPost.toFixed(1)}
               </Text>
             </View>
-            
+
             <View className="flex-row items-center justify-between">
-              <Text className="text-body-medium text-text-secondary">Likes per Post</Text>
+              <Text className="text-body-medium text-text-secondary">
+                Likes per Post
+              </Text>
               <Text className="text-body-large font-semibold text-text-primary">
                 {communityMetrics.communication.likesPerPost.toFixed(1)}
               </Text>
             </View>
-            
+
             <View className="flex-row items-center justify-between">
-              <Text className="text-body-medium text-text-secondary">Mentions per User</Text>
+              <Text className="text-body-medium text-text-secondary">
+                Mentions per User
+              </Text>
               <Text className="text-body-large font-semibold text-text-primary">
                 {communityMetrics.communication.mentionsPerUser.toFixed(1)}
               </Text>
             </View>
-            
+
             <View className="flex-row items-center justify-between">
-              <Text className="text-body-medium text-text-secondary">Response Rate</Text>
+              <Text className="text-body-medium text-text-secondary">
+                Response Rate
+              </Text>
               <Text className="text-body-large font-semibold text-success">
-                {(communityMetrics.communication.responsiveness * 100).toFixed(1)}%
+                {(communityMetrics.communication.responsiveness * 100).toFixed(
+                  1,
+                )}
+                %
               </Text>
             </View>
           </View>
@@ -694,49 +905,73 @@ export const AnalyticsDashboard: React.FC<AnalyticsDashboardProps> = ({
           <Text className="text-headline-small font-semibold text-text-primary mb-4">
             Community Health Indicators
           </Text>
-          
+
           <View className="space-y-3">
             <View className="flex-row items-center justify-between">
-              <Text className="text-body-medium text-text-secondary">Cooperation Index</Text>
+              <Text className="text-body-medium text-text-secondary">
+                Cooperation Index
+              </Text>
               <View className="flex-row items-center">
-                <View className={`${isSmallScreen ? 'w-12' : 'w-16'} h-2 bg-surface-secondary rounded-full mr-2 overflow-hidden`}>
-                  <View 
-                    className="h-full bg-success rounded-full" 
-                    style={{ width: `${Math.min(communityMetrics.communityHealth.cooperationIndex * 100, 100)}%` }}
+                <View
+                  className={`${isSmallScreen ? 'w-12' : 'w-16'} h-2 bg-surface-secondary rounded-full mr-2 overflow-hidden`}>
+                  <View
+                    className="h-full bg-success rounded-full"
+                    style={{
+                      width: `${Math.min(communityMetrics.communityHealth.cooperationIndex * 100, 100)}%`,
+                    }}
                   />
                 </View>
                 <Text className="text-body-small font-medium text-text-primary">
-                  {(communityMetrics.communityHealth.cooperationIndex * 100).toFixed(0)}%
+                  {(
+                    communityMetrics.communityHealth.cooperationIndex * 100
+                  ).toFixed(0)}
+                  %
                 </Text>
               </View>
             </View>
-            
+
             <View className="flex-row items-center justify-between">
-              <Text className="text-body-medium text-text-secondary">Wellbeing Index</Text>
+              <Text className="text-body-medium text-text-secondary">
+                Wellbeing Index
+              </Text>
               <View className="flex-row items-center">
-                <View className={`${isSmallScreen ? 'w-12' : 'w-16'} h-2 bg-surface-secondary rounded-full mr-2 overflow-hidden`}>
-                  <View 
-                    className="h-full bg-primary rounded-full" 
-                    style={{ width: `${Math.min(communityMetrics.communityHealth.wellbeingIndex * 100, 100)}%` }}
+                <View
+                  className={`${isSmallScreen ? 'w-12' : 'w-16'} h-2 bg-surface-secondary rounded-full mr-2 overflow-hidden`}>
+                  <View
+                    className="h-full bg-primary rounded-full"
+                    style={{
+                      width: `${Math.min(communityMetrics.communityHealth.wellbeingIndex * 100, 100)}%`,
+                    }}
                   />
                 </View>
                 <Text className="text-body-small font-medium text-text-primary">
-                  {(communityMetrics.communityHealth.wellbeingIndex * 100).toFixed(0)}%
+                  {(
+                    communityMetrics.communityHealth.wellbeingIndex * 100
+                  ).toFixed(0)}
+                  %
                 </Text>
               </View>
             </View>
-            
+
             <View className="flex-row items-center justify-between">
-              <Text className="text-body-medium text-text-secondary">Inclusion Score</Text>
+              <Text className="text-body-medium text-text-secondary">
+                Inclusion Score
+              </Text>
               <View className="flex-row items-center">
-                <View className={`${isSmallScreen ? 'w-12' : 'w-16'} h-2 bg-surface-secondary rounded-full mr-2 overflow-hidden`}>
-                  <View 
-                    className="h-full bg-warning rounded-full" 
-                    style={{ width: `${Math.min(communityMetrics.communityHealth.inclusionScore * 100, 100)}%` }}
+                <View
+                  className={`${isSmallScreen ? 'w-12' : 'w-16'} h-2 bg-surface-secondary rounded-full mr-2 overflow-hidden`}>
+                  <View
+                    className="h-full bg-warning rounded-full"
+                    style={{
+                      width: `${Math.min(communityMetrics.communityHealth.inclusionScore * 100, 100)}%`,
+                    }}
                   />
                 </View>
                 <Text className="text-body-small font-medium text-text-primary">
-                  {(communityMetrics.communityHealth.inclusionScore * 100).toFixed(0)}%
+                  {(
+                    communityMetrics.communityHealth.inclusionScore * 100
+                  ).toFixed(0)}
+                  %
                 </Text>
               </View>
             </View>
@@ -753,58 +988,64 @@ export const AnalyticsDashboard: React.FC<AnalyticsDashboardProps> = ({
         <Text className="text-headline-small font-semibold text-text-primary mb-3">
           Performance Insights
         </Text>
-        
+
         {performanceInsights.map((insight) => (
           <Card key={insight.id} className="mb-3">
             <View className="p-4">
               <View className="flex-row items-start justify-between mb-2">
                 <View className="flex-1 mr-3">
                   <View className="flex-row items-center mb-1">
-                    <View className={`px-2 py-1 rounded-full mr-2 ${getCategoryStyle(insight.category).bg}`}>
-                      <Text className={`text-label-small font-medium ${getCategoryStyle(insight.category).text}`}>
+                    <View
+                      className={`px-2 py-1 rounded-full mr-2 ${getCategoryStyle(insight.category).bg}`}>
+                      <Text
+                        className={`text-label-small font-medium ${getCategoryStyle(insight.category).text}`}>
                         {insight.category.toUpperCase()}
                       </Text>
                     </View>
-                    <View className={`px-2 py-1 rounded-full ${getImpactStyle(insight.impact).bg}`}>
-                      <Text className={`text-label-small font-medium ${getImpactStyle(insight.impact).text}`}>
+                    <View
+                      className={`px-2 py-1 rounded-full ${getImpactStyle(insight.impact).bg}`}>
+                      <Text
+                        className={`text-label-small font-medium ${getImpactStyle(insight.impact).text}`}>
                         {insight.impact.toUpperCase()}
                       </Text>
                     </View>
                   </View>
-                  
+
                   <Text className="text-body-large font-semibold text-text-primary mb-1">
                     {insight.title}
                   </Text>
                   <Text className="text-body-medium text-text-secondary mb-2">
                     {insight.description}
                   </Text>
-                  
+
                   {insight.recommendations.length > 0 && (
                     <View>
                       <Text className="text-body-small font-medium text-text-primary mb-1">
                         Recommendations:
                       </Text>
                       {insight.recommendations.slice(0, 2).map((rec, index) => (
-                        <Text key={index} className="text-body-small text-text-secondary">
+                        <Text
+                          key={index}
+                          className="text-body-small text-text-secondary">
                           • {rec}
                         </Text>
                       ))}
                     </View>
                   )}
                 </View>
-                
+
                 <View className="items-end">
                   <View className="flex-row items-center mb-1">
-                    <LucideIcons 
-                      name={getTrendIcon(insight.trend) as any} 
-                      size={16} 
-                      color={getTrendColor(insight.trend)} 
+                    <LucideIcons
+                      name={getTrendIcon(insight.trend) as any}
+                      size={16}
+                      color={getTrendColor(insight.trend)}
                     />
                     <Text className="text-body-small text-text-secondary ml-1">
                       {(insight.confidence * 100).toFixed(0)}%
                     </Text>
                   </View>
-                  
+
                   {insight.estimatedImprovement > 0 && (
                     <Text className="text-body-small text-success">
                       +{insight.estimatedImprovement.toFixed(1)}%
@@ -822,25 +1063,29 @@ export const AnalyticsDashboard: React.FC<AnalyticsDashboardProps> = ({
         <Text className="text-headline-small font-semibold text-text-primary mb-3">
           Action Recommendations
         </Text>
-        
+
         {recommendations.map((recommendation) => (
           <Card key={recommendation.id} className="mb-3">
             <View className="p-4">
               <View className="flex-row items-start justify-between mb-3">
                 <View className="flex-1 mr-3">
                   <View className="flex-row items-center mb-2">
-                    <View className={`px-2 py-1 rounded-full mr-2 ${getPriorityStyle(recommendation.priority).bg}`}>
-                      <Text className={`text-label-small font-medium ${getPriorityStyle(recommendation.priority).text}`}>
+                    <View
+                      className={`px-2 py-1 rounded-full mr-2 ${getPriorityStyle(recommendation.priority).bg}`}>
+                      <Text
+                        className={`text-label-small font-medium ${getPriorityStyle(recommendation.priority).text}`}>
                         {recommendation.priority.toUpperCase()}
                       </Text>
                     </View>
-                    <View className={`px-2 py-1 rounded-full ${getTypeStyle(recommendation.type).bg}`}>
-                      <Text className={`text-label-small font-medium ${getTypeStyle(recommendation.type).text}`}>
+                    <View
+                      className={`px-2 py-1 rounded-full ${getTypeStyle(recommendation.type).bg}`}>
+                      <Text
+                        className={`text-label-small font-medium ${getTypeStyle(recommendation.type).text}`}>
                         {recommendation.type.replace('_', ' ').toUpperCase()}
                       </Text>
                     </View>
                   </View>
-                  
+
                   <Text className="text-body-large font-semibold text-text-primary mb-1">
                     {recommendation.title}
                   </Text>
@@ -850,32 +1095,38 @@ export const AnalyticsDashboard: React.FC<AnalyticsDashboardProps> = ({
                   <Text className="text-body-small text-success mb-2">
                     Expected: {recommendation.expectedBenefit}
                   </Text>
-                  
+
                   <View className="flex-row items-center">
-                    <LucideIcons name="time-outline" size={14} color="#757575" />
+                    <LucideIcons
+                      name="time-outline"
+                      size={14}
+                      color="#757575"
+                    />
                     <Text className="text-body-small text-text-secondary ml-1">
                       {recommendation.timeframe}
                     </Text>
                   </View>
                 </View>
               </View>
-              
+
               {canImplementRecommendations && (
                 <View className="flex-row gap-2">
                   <Button
                     variant="secondary"
                     size="sm"
-                    onPress={() => router.push(`/analytics/recommendations/${recommendation.id}`)}
-                    className="flex-1"
-                  >
+                    onPress={() =>
+                      router.push(
+                        `/analytics/recommendations/${recommendation.id}`,
+                      )
+                    }
+                    className="flex-1">
                     View Details
                   </Button>
                   <Button
                     variant="primary"
                     size="sm"
                     onPress={() => onImplementRecommendation(recommendation.id)}
-                    className="flex-1"
-                  >
+                    className="flex-1">
                     Implement
                   </Button>
                 </View>
@@ -895,8 +1146,8 @@ export const AnalyticsDashboard: React.FC<AnalyticsDashboardProps> = ({
           Limited Access
         </Text>
         <Text className="text-body-medium text-text-secondary text-center">
-          You can only view overview analytics.
-          Contact your administrator for detailed access.
+          You can only view overview analytics. Contact your administrator for
+          detailed access.
         </Text>
       </View>
     );
@@ -921,24 +1172,24 @@ export const AnalyticsDashboard: React.FC<AnalyticsDashboardProps> = ({
           { key: 'operational', label: 'Operations', icon: 'settings-outline' },
           { key: 'financial', label: 'Financial', icon: 'card-outline' },
           { key: 'community', label: 'Community', icon: 'people-outline' },
-          { key: 'insights', label: 'Insights', icon: 'bulb-outline' }
+          { key: 'insights', label: 'Insights', icon: 'bulb-outline' },
         ].map((tab) => (
           <TouchableOpacity
             key={tab.key}
             onPress={() => setActiveTab(tab.key as any)}
             className={`flex-1 p-3 border-b-2 ${
               activeTab === tab.key ? 'border-primary' : 'border-transparent'
-            }`}
-          >
+            }`}>
             <View className="items-center">
-              <LucideIcons 
-                name={tab.icon as any} 
-                size={18} 
-                color={activeTab === tab.key ? '#6366f1' : '#757575'} 
+              <LucideIcons
+                name={tab.icon as any}
+                size={18}
+                color={activeTab === tab.key ? '#6366f1' : '#757575'}
               />
-              <Text className={`text-label-small font-medium mt-1 ${
-                activeTab === tab.key ? 'text-primary' : 'text-text-secondary'
-              }`}>
+              <Text
+                className={`text-label-small font-medium mt-1 ${
+                  activeTab === tab.key ? 'text-primary' : 'text-text-secondary'
+                }`}>
                 {tab.label}
               </Text>
             </View>
@@ -964,7 +1215,7 @@ const getImpactStyle = (impact: string) => {
     critical: { bg: 'bg-red-50', text: 'text-red-700' },
     high: { bg: 'bg-orange-50', text: 'text-orange-700' },
     medium: { bg: 'bg-yellow-50', text: 'text-yellow-700' },
-    low: { bg: 'bg-green-50', text: 'text-green-700' }
+    low: { bg: 'bg-green-50', text: 'text-green-700' },
   };
   return styles[impact as keyof typeof styles] || styles.medium;
 };
@@ -975,7 +1226,7 @@ const getPriorityStyle = (priority: string) => {
     high: { bg: 'bg-orange-50', text: 'text-orange-700' },
     medium: { bg: 'bg-yellow-50', text: 'text-yellow-700' },
     low: { bg: 'bg-green-50', text: 'text-green-700' },
-    optional: { bg: 'bg-gray-50', text: 'text-gray-700' }
+    optional: { bg: 'bg-gray-50', text: 'text-gray-700' },
   };
   return styles[priority as keyof typeof styles] || styles.medium;
 };
@@ -986,7 +1237,7 @@ const getCategoryStyle = (category: string) => {
     financial: { bg: 'bg-green-50', text: 'text-green-700' },
     operational: { bg: 'bg-orange-50', text: 'text-orange-700' },
     community: { bg: 'bg-purple-50', text: 'text-purple-700' },
-    governance: { bg: 'bg-indigo-50', text: 'text-indigo-700' }
+    governance: { bg: 'bg-indigo-50', text: 'text-indigo-700' },
   };
   return styles[category as keyof typeof styles] || styles.performance;
 };
@@ -997,7 +1248,7 @@ const getTypeStyle = (type: string) => {
     cost_saving: { bg: 'bg-emerald-50', text: 'text-emerald-700' },
     engagement: { bg: 'bg-pink-50', text: 'text-pink-700' },
     efficiency: { bg: 'bg-violet-50', text: 'text-violet-700' },
-    compliance: { bg: 'bg-slate-50', text: 'text-slate-700' }
+    compliance: { bg: 'bg-slate-50', text: 'text-slate-700' },
   };
   return styles[type as keyof typeof styles] || styles.optimization;
 };
@@ -1007,23 +1258,23 @@ const getTrendIcon = (trend: string) => {
     up: 'trending-up',
     down: 'trending-down',
     stable: 'analytics-outline',
-    volatile: 'pulse-outline'
+    volatile: 'pulse-outline',
   };
   return icons[trend as keyof typeof icons] || 'analytics-outline';
 };
 
 const getTrendColor = (trend: string) => {
   const colors = {
-    up: '#4CAF50',    // secondary (success)
-    down: '#D32F2F',  // error
+    up: '#4CAF50', // secondary (success)
+    down: '#D32F2F', // error
     stable: '#757575', // text-secondary
-    volatile: '#FF9800' // warning
+    volatile: '#FF9800', // warning
   };
   return colors[trend as keyof typeof colors] || '#757575';
 };
 
 const formatCategory = (category: string): string => {
-  return category.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+  return category.replace(/_/g, ' ').replace(/\b\w/g, (l) => l.toUpperCase());
 };
 
 export default AnalyticsDashboard;

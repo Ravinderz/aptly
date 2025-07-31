@@ -2,15 +2,19 @@ import React, { useState } from 'react';
 import { View, Text, ScrollView, TouchableOpacity } from 'react-native';
 import LucideIcons from '@/components/ui/LucideIcons';
 import { router } from 'expo-router';
-import { showConfirmAlert, showSuccessAlert, showErrorAlert } from '@/utils/alert';
+import {
+  showConfirmAlert,
+  showSuccessAlert,
+  showErrorAlert,
+} from '@/utils/alert';
 
 // Types
-import type { 
-  SuccessionPlan, 
-  DeputyAssignment, 
+import type {
+  SuccessionPlan,
+  DeputyAssignment,
   HandoverTask,
   SuccessionStatus,
-  TriggerType 
+  TriggerType,
 } from '@/types/governance';
 
 // UI Components
@@ -45,19 +49,27 @@ export const SuccessionManagement: React.FC<SuccessionManagementProps> = ({
   onTriggerSuccession,
   onCompleteTask,
   currentUserId,
-  userRole
+  userRole,
 }) => {
-  const [activeTab, setActiveTab] = useState<'overview' | 'deputies' | 'tasks' | 'history'>('overview');
+  const [activeTab, setActiveTab] = useState<
+    'overview' | 'deputies' | 'tasks' | 'history'
+  >('overview');
   const [, setSelectedDeputy] = useState<DeputyAssignment | null>(null);
   const [isProcessingTask, setIsProcessingTask] = useState<string | null>(null);
 
   const isCurrentCM = currentUserId === currentCM.id;
-  const isCommitteeOrAdmin = userRole === 'committee_member' || userRole === 'admin';
+  const isCommitteeOrAdmin =
+    userRole === 'committee_member' || userRole === 'admin';
   const canManageSuccession = isCurrentCM || isCommitteeOrAdmin;
 
-  const activeTriggers = successionPlan?.triggers.filter(t => t.isActive) || [];
-  const pendingTasks = successionPlan?.handoverTasks.filter(t => t.status === 'pending' || t.status === 'in_progress') || [];
-  const completedTasks = successionPlan?.handoverTasks.filter(t => t.status === 'completed') || [];
+  const activeTriggers =
+    successionPlan?.triggers.filter((t) => t.isActive) || [];
+  const pendingTasks =
+    successionPlan?.handoverTasks.filter(
+      (t) => t.status === 'pending' || t.status === 'in_progress',
+    ) || [];
+  const completedTasks =
+    successionPlan?.handoverTasks.filter((t) => t.status === 'completed') || [];
 
   const handleTriggerSuccession = async (reason: string) => {
     if (!successionPlan) return;
@@ -76,7 +88,7 @@ export const SuccessionManagement: React.FC<SuccessionManagementProps> = ({
       undefined,
       'Continue',
       'Cancel',
-      true
+      true,
     );
   };
 
@@ -100,9 +112,9 @@ export const SuccessionManagement: React.FC<SuccessionManagementProps> = ({
           <Text className="text-headline-small font-semibold text-text-primary mb-4">
             Current Community Manager
           </Text>
-          
+
           <View className="flex-row items-center mb-4">
-            <UserAvatar 
+            <UserAvatar
               name={currentCM.name}
               imageUrl={currentCM.profileImage}
               size={56}
@@ -118,7 +130,8 @@ export const SuccessionManagement: React.FC<SuccessionManagementProps> = ({
                 <LucideIcons name="calendar" size={14} color="#757575" />
                 <Text className="text-body-small text-text-secondary ml-1">
                   Term: {new Date(currentCM.termStart).toLocaleDateString()}
-                  {currentCM.termEnd && ` - ${new Date(currentCM.termEnd).toLocaleDateString()}`}
+                  {currentCM.termEnd &&
+                    ` - ${new Date(currentCM.termEnd).toLocaleDateString()}`}
                 </Text>
               </View>
             </View>
@@ -130,13 +143,17 @@ export const SuccessionManagement: React.FC<SuccessionManagementProps> = ({
               <Text className="text-body-medium font-medium text-text-primary">
                 Succession Plan Status
               </Text>
-              <View className={`px-2 py-1 rounded-full ${getSuccessionStatusStyle(successionPlan?.status || 'active').bg}`}>
-                <Text className={`text-label-small font-medium ${getSuccessionStatusStyle(successionPlan?.status || 'active').text}`}>
-                  {successionPlan ? successionPlan.status.toUpperCase() : 'NOT SET'}
+              <View
+                className={`px-2 py-1 rounded-full ${getSuccessionStatusStyle(successionPlan?.status || 'active').bg}`}>
+                <Text
+                  className={`text-label-small font-medium ${getSuccessionStatusStyle(successionPlan?.status || 'active').text}`}>
+                  {successionPlan
+                    ? successionPlan.status.toUpperCase()
+                    : 'NOT SET'}
                 </Text>
               </View>
             </View>
-            
+
             {!successionPlan && canManageSuccession && (
               <View className="mt-3">
                 <AlertCard
@@ -148,8 +165,7 @@ export const SuccessionManagement: React.FC<SuccessionManagementProps> = ({
                   variant="primary"
                   size="md"
                   onPress={() => router.push('/governance/succession/create')}
-                  className="mt-3"
-                >
+                  className="mt-3">
                   Create Succession Plan
                 </Button>
               </View>
@@ -165,9 +181,11 @@ export const SuccessionManagement: React.FC<SuccessionManagementProps> = ({
             <Text className="text-headline-small font-semibold text-text-primary mb-3">
               Active Succession Triggers
             </Text>
-            
+
             {activeTriggers.map((trigger, index) => (
-              <View key={index} className="flex-row items-center justify-between py-2">
+              <View
+                key={index}
+                className="flex-row items-center justify-between py-2">
                 <View className="flex-1">
                   <Text className="text-body-medium font-medium text-text-primary">
                     {formatTriggerType(trigger.type)}
@@ -181,14 +199,15 @@ export const SuccessionManagement: React.FC<SuccessionManagementProps> = ({
                 </View>
               </View>
             ))}
-            
+
             {canManageSuccession && (
               <Button
                 variant="secondary"
                 size="md"
-                onPress={() => handleTriggerSuccession('Manual succession initiated')}
-                className="mt-3"
-              >
+                onPress={() =>
+                  handleTriggerSuccession('Manual succession initiated')
+                }
+                className="mt-3">
                 Trigger Manual Succession
               </Button>
             )}
@@ -202,14 +221,14 @@ export const SuccessionManagement: React.FC<SuccessionManagementProps> = ({
           <Card className="flex-1">
             <View className="p-3 items-center">
               <Text className="text-display-small font-bold text-primary">
-                {successionPlan.deputies.filter(d => d.isActive).length}
+                {successionPlan.deputies.filter((d) => d.isActive).length}
               </Text>
               <Text className="text-body-small text-text-secondary text-center">
                 Active Deputies
               </Text>
             </View>
           </Card>
-          
+
           <Card className="flex-1">
             <View className="p-3 items-center">
               <Text className="text-display-small font-bold text-warning">
@@ -220,7 +239,7 @@ export const SuccessionManagement: React.FC<SuccessionManagementProps> = ({
               </Text>
             </View>
           </Card>
-          
+
           <Card className="flex-1">
             <View className="p-3 items-center">
               <Text className="text-display-small font-bold text-success">
@@ -249,8 +268,10 @@ export const SuccessionManagement: React.FC<SuccessionManagementProps> = ({
                     {deputy.userId}
                   </Text>
                   <View className="flex-row items-center mt-1">
-                    <View className={`px-2 py-1 rounded-full ${getDeputyRoleStyle(deputy.role).bg}`}>
-                      <Text className={`text-label-small font-medium ${getDeputyRoleStyle(deputy.role).text}`}>
+                    <View
+                      className={`px-2 py-1 rounded-full ${getDeputyRoleStyle(deputy.role).bg}`}>
+                      <Text
+                        className={`text-label-small font-medium ${getDeputyRoleStyle(deputy.role).text}`}>
                         {formatDeputyRole(deputy.role)}
                       </Text>
                     </View>
@@ -265,8 +286,10 @@ export const SuccessionManagement: React.FC<SuccessionManagementProps> = ({
                   </View>
                 </View>
               </View>
-              
-              <View className={`w-3 h-3 rounded-full ${deputy.isActive ? 'bg-success' : 'bg-gray-400'}`} />
+
+              <View
+                className={`w-3 h-3 rounded-full ${deputy.isActive ? 'bg-success' : 'bg-gray-400'}`}
+              />
             </View>
 
             {/* Responsibilities */}
@@ -276,8 +299,12 @@ export const SuccessionManagement: React.FC<SuccessionManagementProps> = ({
               </Text>
               <View className="flex-row flex-wrap gap-1">
                 {deputy.responsibilities.map((resp, index) => (
-                  <View key={index} className="bg-surface-secondary px-2 py-1 rounded-full">
-                    <Text className="text-label-small text-text-secondary">{resp}</Text>
+                  <View
+                    key={index}
+                    className="bg-surface-secondary px-2 py-1 rounded-full">
+                    <Text className="text-label-small text-text-secondary">
+                      {resp}
+                    </Text>
                   </View>
                 ))}
               </View>
@@ -291,11 +318,12 @@ export const SuccessionManagement: React.FC<SuccessionManagementProps> = ({
                   Assigned: {new Date(deputy.assignedAt).toLocaleDateString()}
                 </Text>
               </View>
-              <TouchableOpacity 
+              <TouchableOpacity
                 onPress={() => setSelectedDeputy(deputy)}
-                className="flex-row items-center"
-              >
-                <Text className="text-body-small text-primary mr-1">Details</Text>
+                className="flex-row items-center">
+                <Text className="text-body-small text-primary mr-1">
+                  Details
+                </Text>
                 <LucideIcons name="chevron-right" size={14} color="#6366f1" />
               </TouchableOpacity>
             </View>
@@ -315,8 +343,7 @@ export const SuccessionManagement: React.FC<SuccessionManagementProps> = ({
               variant="primary"
               size="md"
               onPress={() => router.push('/governance/succession/deputies')}
-              className="mt-4"
-            >
+              className="mt-4">
               Assign Deputy
             </Button>
           )}
@@ -333,7 +360,7 @@ export const SuccessionManagement: React.FC<SuccessionManagementProps> = ({
           <Text className="text-headline-small font-semibold text-text-primary mb-3">
             Pending Tasks ({pendingTasks.length})
           </Text>
-          
+
           {pendingTasks.map((task) => (
             <Card key={task.id} className="mb-3">
               <View className="p-4">
@@ -345,24 +372,30 @@ export const SuccessionManagement: React.FC<SuccessionManagementProps> = ({
                     <Text className="text-body-medium text-text-secondary mb-2">
                       {task.description}
                     </Text>
-                    
+
                     <View className="flex-row items-center gap-3">
-                      <View className={`px-2 py-1 rounded-full ${getCategoryStyle(task.category).bg}`}>
-                        <Text className={`text-label-small font-medium ${getCategoryStyle(task.category).text}`}>
+                      <View
+                        className={`px-2 py-1 rounded-full ${getCategoryStyle(task.category).bg}`}>
+                        <Text
+                          className={`text-label-small font-medium ${getCategoryStyle(task.category).text}`}>
                           {formatCategory(task.category)}
                         </Text>
                       </View>
-                      
-                      <View className={`px-2 py-1 rounded-full ${getPriorityStyle(task.priority).bg}`}>
-                        <Text className={`text-label-small font-medium ${getPriorityStyle(task.priority).text}`}>
+
+                      <View
+                        className={`px-2 py-1 rounded-full ${getPriorityStyle(task.priority).bg}`}>
+                        <Text
+                          className={`text-label-small font-medium ${getPriorityStyle(task.priority).text}`}>
                           {task.priority.toUpperCase()}
                         </Text>
                       </View>
                     </View>
                   </View>
-                  
-                  <View className={`px-2 py-1 rounded-full ${getTaskStatusStyle(task.status).bg}`}>
-                    <Text className={`text-label-small font-medium ${getTaskStatusStyle(task.status).text}`}>
+
+                  <View
+                    className={`px-2 py-1 rounded-full ${getTaskStatusStyle(task.status).bg}`}>
+                    <Text
+                      className={`text-label-small font-medium ${getTaskStatusStyle(task.status).text}`}>
                       {task.status.toUpperCase()}
                     </Text>
                   </View>
@@ -375,15 +408,16 @@ export const SuccessionManagement: React.FC<SuccessionManagementProps> = ({
                       Due: {new Date(task.dueDate).toLocaleDateString()}
                     </Text>
                   </View>
-                  
+
                   {task.assignedTo === currentUserId && (
                     <Button
                       variant="success"
                       size="sm"
                       onPress={() => handleCompleteTask(task)}
-                      disabled={isProcessingTask === task.id}
-                    >
-                      {isProcessingTask === task.id ? "Completing..." : "Mark Complete"}
+                      disabled={isProcessingTask === task.id}>
+                      {isProcessingTask === task.id
+                        ? 'Completing...'
+                        : 'Mark Complete'}
                     </Button>
                   )}
                 </View>
@@ -399,7 +433,7 @@ export const SuccessionManagement: React.FC<SuccessionManagementProps> = ({
           <Text className="text-headline-small font-semibold text-text-primary mb-3">
             Completed Tasks ({completedTasks.length})
           </Text>
-          
+
           {completedTasks.map((task) => (
             <Card key={task.id} className="mb-3 opacity-75">
               <View className="p-4">
@@ -408,13 +442,19 @@ export const SuccessionManagement: React.FC<SuccessionManagementProps> = ({
                     {task.title}
                   </Text>
                   <View className="flex-row items-center">
-                    <LucideIcons name="check-circle" size={16} color="#4CAF50" />
+                    <LucideIcons
+                      name="check-circle"
+                      size={16}
+                      color="#4CAF50"
+                    />
                     <Text className="text-body-small text-success ml-1">
-                      {task.completedAt ? new Date(task.completedAt).toLocaleDateString() : 'Completed'}
+                      {task.completedAt
+                        ? new Date(task.completedAt).toLocaleDateString()
+                        : 'Completed'}
                     </Text>
                   </View>
                 </View>
-                
+
                 <Text className="text-body-small text-text-secondary">
                   Completed by: {task.completedBy || 'Unknown'}
                 </Text>
@@ -451,11 +491,11 @@ export const SuccessionManagement: React.FC<SuccessionManagementProps> = ({
                 {new Date(entry.timestamp).toLocaleDateString()}
               </Text>
             </View>
-            
+
             <Text className="text-body-small text-text-secondary">
               By: {entry.userId}
             </Text>
-            
+
             {entry.details && Object.keys(entry.details).length > 0 && (
               <View className="mt-2 p-2 bg-surface-secondary rounded">
                 <Text className="text-body-small text-text-secondary">
@@ -507,24 +547,24 @@ export const SuccessionManagement: React.FC<SuccessionManagementProps> = ({
           { key: 'overview', label: 'Overview', icon: 'home' },
           { key: 'deputies', label: 'Deputies', icon: 'users' },
           { key: 'tasks', label: 'Tasks', icon: 'list' },
-          { key: 'history', label: 'History', icon: 'clock' }
+          { key: 'history', label: 'History', icon: 'clock' },
         ].map((tab) => (
           <TouchableOpacity
             key={tab.key}
             onPress={() => setActiveTab(tab.key as any)}
             className={`flex-1 p-4 border-b-2 ${
               activeTab === tab.key ? 'border-primary' : 'border-transparent'
-            }`}
-          >
+            }`}>
             <View className="items-center">
-              <LucideIcons 
-                name={tab.icon as any} 
-                size={20} 
-                color={activeTab === tab.key ? '#6366f1' : '#757575'} 
+              <LucideIcons
+                name={tab.icon as any}
+                size={20}
+                color={activeTab === tab.key ? '#6366f1' : '#757575'}
               />
-              <Text className={`text-body-small font-medium mt-1 ${
-                activeTab === tab.key ? 'text-primary' : 'text-text-secondary'
-              }`}>
+              <Text
+                className={`text-body-small font-medium mt-1 ${
+                  activeTab === tab.key ? 'text-primary' : 'text-text-secondary'
+                }`}>
                 {tab.label}
               </Text>
             </View>
@@ -550,7 +590,7 @@ const getSuccessionStatusStyle = (status: SuccessionStatus) => {
     triggered: { bg: 'bg-orange-50', text: 'text-orange-700' },
     in_transition: { bg: 'bg-yellow-50', text: 'text-yellow-700' },
     completed: { bg: 'bg-blue-50', text: 'text-blue-700' },
-    cancelled: { bg: 'bg-gray-50', text: 'text-gray-700' }
+    cancelled: { bg: 'bg-gray-50', text: 'text-gray-700' },
   };
   return styles[status] || { bg: 'bg-gray-50', text: 'text-gray-700' };
 };
@@ -560,7 +600,7 @@ const getDeputyRoleStyle = (role: string) => {
     primary_deputy: { bg: 'bg-blue-50', text: 'text-blue-700' },
     secondary_deputy: { bg: 'bg-green-50', text: 'text-green-700' },
     emergency_deputy: { bg: 'bg-red-50', text: 'text-red-700' },
-    specialized_deputy: { bg: 'bg-purple-50', text: 'text-purple-700' }
+    specialized_deputy: { bg: 'bg-purple-50', text: 'text-purple-700' },
   };
   return styles[role as keyof typeof styles] || styles.specialized_deputy;
 };
@@ -572,7 +612,7 @@ const getCategoryStyle = (category: string) => {
     operational: { bg: 'bg-orange-50', text: 'text-orange-700' },
     administrative: { bg: 'bg-purple-50', text: 'text-purple-700' },
     technical: { bg: 'bg-cyan-50', text: 'text-cyan-700' },
-    relationships: { bg: 'bg-pink-50', text: 'text-pink-700' }
+    relationships: { bg: 'bg-pink-50', text: 'text-pink-700' },
   };
   return styles[category as keyof typeof styles] || styles.operational;
 };
@@ -582,7 +622,7 @@ const getPriorityStyle = (priority: string) => {
     critical: { bg: 'bg-red-50', text: 'text-red-700' },
     high: { bg: 'bg-orange-50', text: 'text-orange-700' },
     medium: { bg: 'bg-yellow-50', text: 'text-yellow-700' },
-    low: { bg: 'bg-green-50', text: 'text-green-700' }
+    low: { bg: 'bg-green-50', text: 'text-green-700' },
   };
   return styles[priority as keyof typeof styles] || styles.medium;
 };
@@ -593,23 +633,23 @@ const getTaskStatusStyle = (status: string) => {
     in_progress: { bg: 'bg-blue-50', text: 'text-blue-700' },
     completed: { bg: 'bg-green-50', text: 'text-green-700' },
     blocked: { bg: 'bg-red-50', text: 'text-red-700' },
-    deferred: { bg: 'bg-yellow-50', text: 'text-yellow-700' }
+    deferred: { bg: 'bg-yellow-50', text: 'text-yellow-700' },
   };
   return styles[status as keyof typeof styles] || styles.pending;
 };
 
 const formatTriggerType = (type: TriggerType): string => {
-  return type.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+  return type.replace(/_/g, ' ').replace(/\b\w/g, (l) => l.toUpperCase());
 };
 
 const formatDeputyRole = (role: string): string => {
-  return role.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+  return role.replace(/_/g, ' ').replace(/\b\w/g, (l) => l.toUpperCase());
 };
 
 const formatCategory = (category: string): string => {
-  return category.replace(/\b\w/g, l => l.toUpperCase());
+  return category.replace(/\b\w/g, (l) => l.toUpperCase());
 };
 
 const formatAuditAction = (action: string): string => {
-  return action.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+  return action.replace(/_/g, ' ').replace(/\b\w/g, (l) => l.toUpperCase());
 };

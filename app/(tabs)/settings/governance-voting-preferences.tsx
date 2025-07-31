@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { 
-  SafeAreaView, 
-  ScrollView, 
-  View, 
-  Text, 
+import {
+  SafeAreaView,
+  ScrollView,
+  View,
+  Text,
   TouchableOpacity,
-  Switch
+  Switch,
 } from 'react-native';
 import { router } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -32,11 +32,12 @@ const defaultPreferences: VotingPreferences = {
   autoReminder: false,
   reminderHours: 24,
   publicProfile: false,
-  showVotingHistory: true
+  showVotingHistory: true,
 };
 
 export default function VotingPreferencesPage() {
-  const [preferences, setPreferences] = useState<VotingPreferences>(defaultPreferences);
+  const [preferences, setPreferences] =
+    useState<VotingPreferences>(defaultPreferences);
   const [isSaving, setIsSaving] = useState(false);
 
   useEffect(() => {
@@ -57,7 +58,10 @@ export default function VotingPreferencesPage() {
   const savePreferences = async () => {
     try {
       setIsSaving(true);
-      await AsyncStorage.setItem('voting_preferences', JSON.stringify(preferences));
+      await AsyncStorage.setItem(
+        'voting_preferences',
+        JSON.stringify(preferences),
+      );
       showSuccessAlert('Success', 'Voting preferences updated successfully');
     } catch (error) {
       showErrorAlert('Error', 'Failed to save preferences');
@@ -67,7 +71,7 @@ export default function VotingPreferencesPage() {
   };
 
   const handleToggle = (key: keyof VotingPreferences, value: boolean) => {
-    setPreferences(prev => ({ ...prev, [key]: value }));
+    setPreferences((prev) => ({ ...prev, [key]: value }));
   };
 
   const reminderOptions = [
@@ -75,7 +79,7 @@ export default function VotingPreferencesPage() {
     { value: 6, label: '6 hours before' },
     { value: 24, label: '1 day before' },
     { value: 48, label: '2 days before' },
-    { value: 72, label: '3 days before' }
+    { value: 72, label: '3 days before' },
   ];
 
   return (
@@ -85,18 +89,17 @@ export default function VotingPreferencesPage() {
         onBackPress={() => safeGoBack()}
       />
 
-      <ScrollView 
-        className="flex-1" 
+      <ScrollView
+        className="flex-1"
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ padding: 16, paddingBottom: 100 }}
-      >
+        contentContainerStyle={{ padding: 16, paddingBottom: 100 }}>
         {/* Privacy Settings */}
         <Card className="mb-4">
           <View className="p-4">
             <Text className="text-headline-small font-semibold text-text-primary mb-4">
               Privacy Settings
             </Text>
-            
+
             <View className="space-y-4">
               <View className="flex-row items-center justify-between">
                 <View className="flex-1 mr-4">
@@ -109,9 +112,13 @@ export default function VotingPreferencesPage() {
                 </View>
                 <Switch
                   value={preferences.anonymousVoting}
-                  onValueChange={(value) => handleToggle('anonymousVoting', value)}
+                  onValueChange={(value) =>
+                    handleToggle('anonymousVoting', value)
+                  }
                   trackColor={{ false: '#D1D5DB', true: '#6366f1' }}
-                  thumbColor={preferences.anonymousVoting ? '#FFFFFF' : '#757575'}
+                  thumbColor={
+                    preferences.anonymousVoting ? '#FFFFFF' : '#757575'
+                  }
                 />
               </View>
 
@@ -126,7 +133,9 @@ export default function VotingPreferencesPage() {
                 </View>
                 <Switch
                   value={preferences.publicProfile}
-                  onValueChange={(value) => handleToggle('publicProfile', value)}
+                  onValueChange={(value) =>
+                    handleToggle('publicProfile', value)
+                  }
                   trackColor={{ false: '#D1D5DB', true: '#6366f1' }}
                   thumbColor={preferences.publicProfile ? '#FFFFFF' : '#757575'}
                 />
@@ -143,9 +152,13 @@ export default function VotingPreferencesPage() {
                 </View>
                 <Switch
                   value={preferences.showVotingHistory}
-                  onValueChange={(value) => handleToggle('showVotingHistory', value)}
+                  onValueChange={(value) =>
+                    handleToggle('showVotingHistory', value)
+                  }
                   trackColor={{ false: '#D1D5DB', true: '#6366f1' }}
-                  thumbColor={preferences.showVotingHistory ? '#FFFFFF' : '#757575'}
+                  thumbColor={
+                    preferences.showVotingHistory ? '#FFFFFF' : '#757575'
+                  }
                 />
               </View>
             </View>
@@ -158,7 +171,7 @@ export default function VotingPreferencesPage() {
             <Text className="text-headline-small font-semibold text-text-primary mb-4">
               Reminder Settings
             </Text>
-            
+
             <View className="space-y-4">
               <View className="flex-row items-center justify-between">
                 <View className="flex-1 mr-4">
@@ -171,9 +184,13 @@ export default function VotingPreferencesPage() {
                 </View>
                 <Switch
                   value={preferences.reminderNotifications}
-                  onValueChange={(value) => handleToggle('reminderNotifications', value)}
+                  onValueChange={(value) =>
+                    handleToggle('reminderNotifications', value)
+                  }
                   trackColor={{ false: '#D1D5DB', true: '#6366f1' }}
-                  thumbColor={preferences.reminderNotifications ? '#FFFFFF' : '#757575'}
+                  thumbColor={
+                    preferences.reminderNotifications ? '#FFFFFF' : '#757575'
+                  }
                 />
               </View>
 
@@ -190,9 +207,13 @@ export default function VotingPreferencesPage() {
                     </View>
                     <Switch
                       value={preferences.autoReminder}
-                      onValueChange={(value) => handleToggle('autoReminder', value)}
+                      onValueChange={(value) =>
+                        handleToggle('autoReminder', value)
+                      }
                       trackColor={{ false: '#D1D5DB', true: '#6366f1' }}
-                      thumbColor={preferences.autoReminder ? '#FFFFFF' : '#757575'}
+                      thumbColor={
+                        preferences.autoReminder ? '#FFFFFF' : '#757575'
+                      }
                     />
                   </View>
 
@@ -205,16 +226,23 @@ export default function VotingPreferencesPage() {
                         {reminderOptions.map((option) => (
                           <TouchableOpacity
                             key={option.value}
-                            onPress={() => setPreferences(prev => ({ ...prev, reminderHours: option.value }))}
+                            onPress={() =>
+                              setPreferences((prev) => ({
+                                ...prev,
+                                reminderHours: option.value,
+                              }))
+                            }
                             className={`p-3 rounded-lg border ${
                               preferences.reminderHours === option.value
                                 ? 'border-primary bg-primary/10'
                                 : 'border-divider bg-background'
-                            }`}
-                          >
-                            <Text className={`text-body-medium ${
-                              preferences.reminderHours === option.value ? 'text-primary font-medium' : 'text-text-primary'
                             }`}>
+                            <Text
+                              className={`text-body-medium ${
+                                preferences.reminderHours === option.value
+                                  ? 'text-primary font-medium'
+                                  : 'text-text-primary'
+                              }`}>
                               {option.label}
                             </Text>
                           </TouchableOpacity>
@@ -234,17 +262,15 @@ export default function VotingPreferencesPage() {
             🗳️ Voting Privacy
           </Text>
           <Text className="text-text-secondary text-body-small leading-5">
-            Your privacy is important. Anonymous voting ensures your choices remain confidential while still allowing for transparent results and participation tracking.
+            Your privacy is important. Anonymous voting ensures your choices
+            remain confidential while still allowing for transparent results and
+            participation tracking.
           </Text>
         </Card>
 
         {/* Save Button */}
-        <Button
-          variant="primary"
-          onPress={savePreferences}
-          disabled={isSaving}
-        >
-          {isSaving ? "Saving..." : "Save Preferences"}
+        <Button variant="primary" onPress={savePreferences} disabled={isSaving}>
+          {isSaving ? 'Saving...' : 'Save Preferences'}
         </Button>
       </ScrollView>
     </SafeAreaView>

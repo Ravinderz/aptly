@@ -40,7 +40,7 @@ export const Input = forwardRef<TextInput, InputProps>(
       containerClassName,
       ...props
     },
-    ref
+    ref,
   ) => {
     return (
       <View className={cn('w-full', containerClassName)}>
@@ -49,14 +49,14 @@ export const Input = forwardRef<TextInput, InputProps>(
             {label}
           </Text>
         )}
-        
+
         <View className="relative">
           {leftIcon && (
             <View className="absolute left-3 top-1/2 -translate-y-1/2 z-10">
               {leftIcon}
             </View>
           )}
-          
+
           <TextInput
             ref={ref}
             className={cn(
@@ -66,32 +66,31 @@ export const Input = forwardRef<TextInput, InputProps>(
               leftIcon && 'pl-10',
               rightIcon && 'pr-10',
               error && 'border-error',
-              className
+              className,
             )}
             placeholderTextColor="rgb(var(--color-text-secondary))"
             {...props}
           />
-          
+
           {rightIcon && (
             <View className="absolute right-3 top-1/2 -translate-y-1/2 z-10">
               {rightIcon}
             </View>
           )}
         </View>
-        
+
         {(error || helperText) && (
-          <Text 
+          <Text
             className={cn(
               'text-label-small mt-1',
-              error ? 'text-error' : 'text-text-secondary'
-            )}
-          >
+              error ? 'text-error' : 'text-text-secondary',
+            )}>
             {error || helperText}
           </Text>
         )}
       </View>
     );
-  }
+  },
 );
 
 Input.displayName = 'Input';

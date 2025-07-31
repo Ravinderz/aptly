@@ -13,30 +13,30 @@ export interface AuditEntry {
   action: AuditAction;
   resource: AuditResource;
   resourceId?: string;
-  
+
   // Event details
   timestamp: string;
   ipAddress: string;
   userAgent: string;
   deviceInfo: DeviceInfo;
   location?: GeolocationInfo;
-  
+
   // Action context
   context: AuditContext;
   previousState?: Record<string, any>;
   newState?: Record<string, any>;
   changes?: ChangeLog[];
-  
+
   // Classification
   severity: AuditSeverity;
   category: AuditCategory;
   tags: string[];
-  
+
   // Compliance and retention
   retentionPolicy: RetentionPolicy;
   complianceLevel: ComplianceLevel;
   isPersonalData: boolean;
-  
+
   // Additional metadata
   metadata: Record<string, any>;
   correlationId?: string;
@@ -44,39 +44,96 @@ export interface AuditEntry {
   childAuditIds: string[];
 }
 
-export type AuditAction = 
+export type AuditAction =
   // Authentication actions
-  | 'login' | 'logout' | 'failed_login' | 'password_change' | 'account_locked'
+  | 'login'
+  | 'logout'
+  | 'failed_login'
+  | 'password_change'
+  | 'account_locked'
   // Data actions
-  | 'create' | 'read' | 'update' | 'delete' | 'bulk_update' | 'bulk_delete'
+  | 'create'
+  | 'read'
+  | 'update'
+  | 'delete'
+  | 'bulk_update'
+  | 'bulk_delete'
   // Administrative actions
-  | 'role_change' | 'permission_grant' | 'permission_revoke' | 'user_activation' | 'user_deactivation'
+  | 'role_change'
+  | 'permission_grant'
+  | 'permission_revoke'
+  | 'user_activation'
+  | 'user_deactivation'
   // Governance actions
-  | 'vote_cast' | 'campaign_create' | 'emergency_declare' | 'policy_propose' | 'succession_trigger'
+  | 'vote_cast'
+  | 'campaign_create'
+  | 'emergency_declare'
+  | 'policy_propose'
+  | 'succession_trigger'
   // System actions
-  | 'export_data' | 'import_data' | 'backup_create' | 'system_config' | 'maintenance_mode'
+  | 'export_data'
+  | 'import_data'
+  | 'backup_create'
+  | 'system_config'
+  | 'maintenance_mode'
   // Financial actions
-  | 'payment_process' | 'bill_generate' | 'expense_approve' | 'budget_allocate'
+  | 'payment_process'
+  | 'bill_generate'
+  | 'expense_approve'
+  | 'budget_allocate'
   // Security actions
-  | 'access_denied' | 'suspicious_activity' | 'data_breach_detected' | 'security_policy_change';
+  | 'access_denied'
+  | 'suspicious_activity'
+  | 'data_breach_detected'
+  | 'security_policy_change';
 
-export type AuditResource = 
-  | 'user' | 'society' | 'resident' | 'visitor' | 'maintenance_request' | 'bill' | 'payment'
-  | 'notice' | 'community_post' | 'voting_campaign' | 'emergency_alert' | 'policy_proposal'
-  | 'vendor' | 'amenity' | 'vehicle' | 'document' | 'notification' | 'system_config'
-  | 'audit_log' | 'report' | 'backup' | 'session' | 'api_key';
+export type AuditResource =
+  | 'user'
+  | 'society'
+  | 'resident'
+  | 'visitor'
+  | 'maintenance_request'
+  | 'bill'
+  | 'payment'
+  | 'notice'
+  | 'community_post'
+  | 'voting_campaign'
+  | 'emergency_alert'
+  | 'policy_proposal'
+  | 'vendor'
+  | 'amenity'
+  | 'vehicle'
+  | 'document'
+  | 'notification'
+  | 'system_config'
+  | 'audit_log'
+  | 'report'
+  | 'backup'
+  | 'session'
+  | 'api_key';
 
-export type AuditSeverity = 
-  | 'critical'    // Security incidents, data breaches, system failures
-  | 'high'        // Administrative actions, financial operations, governance actions
-  | 'medium'      // Data modifications, user management, configuration changes
-  | 'low'         // Read operations, routine activities, informational events
-  | 'info';       // System events, performance metrics, debug information
+export type AuditSeverity =
+  | 'critical' // Security incidents, data breaches, system failures
+  | 'high' // Administrative actions, financial operations, governance actions
+  | 'medium' // Data modifications, user management, configuration changes
+  | 'low' // Read operations, routine activities, informational events
+  | 'info'; // System events, performance metrics, debug information
 
-export type AuditCategory = 
-  | 'security' | 'authentication' | 'authorization' | 'data_privacy' | 'financial'
-  | 'governance' | 'administrative' | 'operational' | 'performance' | 'compliance'
-  | 'user_activity' | 'system_event' | 'integration' | 'maintenance';
+export type AuditCategory =
+  | 'security'
+  | 'authentication'
+  | 'authorization'
+  | 'data_privacy'
+  | 'financial'
+  | 'governance'
+  | 'administrative'
+  | 'operational'
+  | 'performance'
+  | 'compliance'
+  | 'user_activity'
+  | 'system_event'
+  | 'integration'
+  | 'maintenance';
 
 export interface AuditContext {
   feature: string;
@@ -122,8 +179,20 @@ export interface ChangeLog {
   changeReason?: string;
 }
 
-export type RetentionPolicy = '7_days' | '30_days' | '90_days' | '1_year' | '3_years' | '7_years' | 'permanent';
-export type ComplianceLevel = 'public' | 'internal' | 'confidential' | 'restricted' | 'top_secret';
+export type RetentionPolicy =
+  | '7_days'
+  | '30_days'
+  | '90_days'
+  | '1_year'
+  | '3_years'
+  | '7_years'
+  | 'permanent';
+export type ComplianceLevel =
+  | 'public'
+  | 'internal'
+  | 'confidential'
+  | 'restricted'
+  | 'top_secret';
 
 // ===============================
 // ANALYTICS TYPES
@@ -134,28 +203,28 @@ export interface SocietyAnalytics {
   societyName: string;
   reportPeriod: ReportPeriod;
   generatedAt: string;
-  
+
   // Key Performance Indicators
   kpis: SocietyKPIs;
-  
+
   // Operational metrics
   operationalMetrics: OperationalMetrics;
-  
+
   // Financial analytics
   financialAnalytics: FinancialAnalytics;
-  
+
   // Governance metrics
   governanceMetrics: GovernanceMetrics;
-  
+
   // Community engagement
   communityMetrics: CommunityMetrics;
-  
+
   // Performance insights
   performanceInsights: PerformanceInsight[];
-  
+
   // Recommendations
   recommendations: AnalyticsRecommendation[];
-  
+
   // Trends and predictions
   trends: TrendAnalysis[];
   predictions: PredictiveAnalysis[];
@@ -173,22 +242,22 @@ export interface SocietyKPIs {
   residentSatisfactionScore: number;
   npsScore: number; // Net Promoter Score
   complaintResolutionRate: number;
-  
+
   // Operational efficiency
   maintenanceResponseTime: number; // hours
   billCollectionRate: number; // percentage
   occupancyRate: number; // percentage
-  
+
   // Financial health
   monthlyCollectionEfficiency: number;
   outstandingDuesPercentage: number;
   operationalCostPerUnit: number;
-  
+
   // Community engagement
   activeResidentPercentage: number;
   eventParticipationRate: number;
   digitalAdoptionRate: number;
-  
+
   // Safety and security
   emergencyResponseTime: number; // minutes
   securityIncidentRate: number; // per month
@@ -205,7 +274,7 @@ export interface OperationalMetrics {
     residentSatisfactionRating: number;
     costPerRequest: number;
   };
-  
+
   // Visitor management
   visitorManagement: {
     totalVisitors: number;
@@ -215,7 +284,7 @@ export interface OperationalMetrics {
     securityIncidents: number;
     peakVisitorHours: TimeSlot[];
   };
-  
+
   // Amenity utilization
   amenityUtilization: {
     bookingRate: number; // percentage of capacity used
@@ -224,7 +293,7 @@ export interface OperationalMetrics {
     mostPopularAmenities: AmenityUsage[];
     revenueGenerated: number;
   };
-  
+
   // Communication effectiveness
   communication: {
     noticeReadRate: number;
@@ -243,7 +312,7 @@ export interface FinancialAnalytics {
     collectionTrend: DataPoint[];
     paymentMethodBreakdown: PaymentMethodStats[];
   };
-  
+
   // Expense tracking
   expenses: {
     totalExpenses: number;
@@ -252,7 +321,7 @@ export interface FinancialAnalytics {
     costPerSqFt: number;
     expenseTrend: DataPoint[];
   };
-  
+
   // Revenue optimization
   revenue: {
     utilityBillCommissions: number;
@@ -261,7 +330,7 @@ export interface FinancialAnalytics {
     otherRevenues: number;
     revenueGrowthRate: number;
   };
-  
+
   // Financial health indicators
   healthIndicators: {
     cashFlowRatio: number;
@@ -279,7 +348,7 @@ export interface GovernanceMetrics {
     meetingAttendance: number;
     feedbackResponseRate: number;
   };
-  
+
   // Leadership effectiveness
   leadership: {
     decisionMakingSpeed: number; // days
@@ -287,7 +356,7 @@ export interface GovernanceMetrics {
     residentApprovalRating: number;
     transparencyScore: number;
   };
-  
+
   // Compliance tracking
   compliance: {
     policyComplianceRate: number;
@@ -295,7 +364,7 @@ export interface GovernanceMetrics {
     auditFindings: AuditFinding[];
     correctionTime: number; // days
   };
-  
+
   // Emergency preparedness
   emergencyPreparedness: {
     responseReadiness: number;
@@ -315,7 +384,7 @@ export interface CommunityMetrics {
     engagementRate: number;
     sessionDuration: number;
   };
-  
+
   // Communication patterns
   communication: {
     postsPerUser: number;
@@ -324,7 +393,7 @@ export interface CommunityMetrics {
     mentionsPerUser: number;
     responsiveness: number;
   };
-  
+
   // Community health
   communityHealth: {
     conflictResolutionRate: number;
@@ -333,7 +402,7 @@ export interface CommunityMetrics {
     inclusionScore: number;
     wellbeingIndex: number;
   };
-  
+
   // Event participation
   events: {
     eventAttendance: number;
@@ -404,38 +473,38 @@ export interface NotificationTemplate {
   name: string;
   category: NotificationCategory;
   type: NotificationType;
-  
+
   // Template content
   subject: string;
   content: string;
   htmlContent?: string;
-  
+
   // Localization
   translations: Record<string, NotificationTranslation>;
-  
+
   // Personalization
   variables: TemplateVariable[];
   conditionalContent: ConditionalContent[];
-  
+
   // Delivery settings
   channels: NotificationChannel[];
   priority: NotificationPriority;
   deliveryStrategy: DeliveryStrategy;
-  
+
   // Scheduling and timing
   schedulingRules: SchedulingRule[];
   respectDND: boolean;
   timeZoneAware: boolean;
-  
+
   // Compliance and retention
   retentionPolicy: RetentionPolicy;
   requiresConsent: boolean;
   gdprCompliant: boolean;
-  
+
   // Analytics tracking
   trackingEnabled: boolean;
   customEvents: string[];
-  
+
   isActive: boolean;
   createdAt: string;
   updatedAt: string;
@@ -446,30 +515,30 @@ export interface NotificationCampaign {
   name: string;
   description: string;
   templateId: string;
-  
+
   // Audience targeting
   audience: AudienceSegment;
   recipientCount: number;
-  
+
   // Scheduling
   scheduledAt?: string;
   timeZone: string;
   deliveryWindow: DeliveryWindow;
-  
+
   // A/B testing
   isABTest: boolean;
   testVariants?: TestVariant[];
   winnerCriteria?: WinnerCriteria;
-  
+
   // Status and tracking
   status: CampaignStatus;
   deliveryStats: DeliveryStats;
   engagementMetrics: EngagementMetrics;
-  
+
   // Budget and limits
   budget?: CampaignBudget;
   rateLimits: RateLimit[];
-  
+
   createdBy: string;
   createdAt: string;
   updatedAt: string;
@@ -477,7 +546,7 @@ export interface NotificationCampaign {
 
 export interface NotificationPreference {
   userId: string;
-  
+
   // Channel preferences
   channels: {
     push: ChannelPreference;
@@ -486,53 +555,53 @@ export interface NotificationPreference {
     inApp: ChannelPreference;
     whatsapp: ChannelPreference;
   };
-  
+
   // Category preferences
   categories: Record<NotificationCategory, CategoryPreference>;
-  
+
   // Timing preferences
   quietHours: QuietHours;
   timeZone: string;
   preferredLanguage: string;
-  
+
   // Frequency controls
   frequencyLimits: FrequencyLimit[];
   digestSettings: DigestSettings;
-  
+
   // Privacy settings
   dataProcessingConsent: boolean;
   marketingConsent: boolean;
   analyticsConsent: boolean;
-  
+
   lastUpdated: string;
 }
 
 export interface IntelligentDelivery {
   userId: string;
-  
+
   // User behavior patterns
   activityPattern: ActivityPattern;
   engagementHistory: EngagementHistory;
   deviceUsagePattern: DeviceUsagePattern;
-  
+
   // Optimal delivery timing
   optimalDeliveryTimes: OptimalTime[];
   timeZonePreference: string;
-  
+
   // Channel effectiveness
   channelPreference: ChannelEffectiveness[];
   contentPreference: ContentPreference;
-  
+
   // Predictive insights
   churnRisk: number; // 0-1
   engagementScore: number; // 0-1
   lifetimeValue: number;
-  
+
   // Personalization data
   interests: string[];
   topics: TopicRelevance[];
   demographicData: DemographicData;
-  
+
   lastAnalyzed: string;
 }
 
@@ -542,26 +611,26 @@ export interface IntelligentDelivery {
 
 export interface PerformanceMetrics {
   timestamp: string;
-  
+
   // Application performance
   application: {
     responseTime: number; // ms
     throughput: number; // requests per second
     errorRate: number; // percentage
     crashRate: number; // percentage
-    
+
     // Mobile specific
     appLaunchTime: number; // ms
     batteryUsage: number; // mAh per session
     memoryUsage: number; // MB
     cpuUsage: number; // percentage
-    
+
     // Network performance
     networkLatency: number; // ms
     dataUsage: number; // KB per session
     offlineCapability: number; // percentage
   };
-  
+
   // Database performance
   database: {
     queryTime: number; // average ms
@@ -570,7 +639,7 @@ export interface PerformanceMetrics {
     cacheHitRatio: number; // percentage
     indexEfficiency: number; // percentage
   };
-  
+
   // API performance
   api: {
     averageResponseTime: number; // ms
@@ -579,7 +648,7 @@ export interface PerformanceMetrics {
     rateLimitHits: number; // count
     concurrentUsers: number;
   };
-  
+
   // User experience metrics
   userExperience: {
     satisfactionScore: number; // 1-5
@@ -594,7 +663,7 @@ export interface SystemHealth {
   overall: HealthStatus;
   components: ComponentHealth[];
   dependencies: DependencyHealth[];
-  
+
   // Resource utilization
   resources: {
     cpu: ResourceMetric;
@@ -602,17 +671,17 @@ export interface SystemHealth {
     storage: ResourceMetric;
     network: ResourceMetric;
   };
-  
+
   // Alerts and incidents
   activeAlerts: Alert[];
   recentIncidents: Incident[];
-  
+
   // Availability metrics
   uptime: number; // percentage
   lastDowntime: string;
   mtbf: number; // mean time between failures (hours)
   mttr: number; // mean time to recovery (minutes)
-  
+
   lastUpdated: string;
 }
 
@@ -620,26 +689,26 @@ export interface OptimizationRecommendation {
   id: string;
   category: OptimizationCategory;
   priority: OptimizationPriority;
-  
+
   title: string;
   description: string;
   currentState: string;
   proposedSolution: string;
-  
+
   impact: {
     performanceImprovement: number; // percentage
     costSavings: number; // amount
     userExperienceScore: number; // 1-10
     implementationComplexity: number; // 1-10
   };
-  
+
   implementationPlan: ImplementationStep[];
   estimatedTimeline: string;
   requiredResources: string[];
-  
+
   measurableOutcomes: OutcomeMetric[];
   rollbackPlan: string;
-  
+
   createdAt: string;
   status: RecommendationStatus;
 }
@@ -648,24 +717,72 @@ export interface OptimizationRecommendation {
 // SUPPORTING TYPES
 // ===============================
 
-export type InsightCategory = 'performance' | 'financial' | 'operational' | 'community' | 'governance';
+export type InsightCategory =
+  | 'performance'
+  | 'financial'
+  | 'operational'
+  | 'community'
+  | 'governance';
 export type ImpactLevel = 'low' | 'medium' | 'high' | 'critical';
 export type TrendDirection = 'up' | 'down' | 'stable' | 'volatile';
 export type EffortLevel = 'low' | 'medium' | 'high';
 
-export type RecommendationType = 'optimization' | 'cost_saving' | 'engagement' | 'efficiency' | 'compliance';
-export type RecommendationPriority = 'critical' | 'high' | 'medium' | 'low' | 'optional';
+export type RecommendationType =
+  | 'optimization'
+  | 'cost_saving'
+  | 'engagement'
+  | 'efficiency'
+  | 'compliance';
+export type RecommendationPriority =
+  | 'critical'
+  | 'high'
+  | 'medium'
+  | 'low'
+  | 'optional';
 
-export type NotificationCategory = 'maintenance' | 'billing' | 'visitor' | 'emergency' | 'community' | 'governance' | 'system';
-export type NotificationType = 'transactional' | 'promotional' | 'informational' | 'reminder' | 'alert';
-export type NotificationChannel = 'push' | 'email' | 'sms' | 'in_app' | 'whatsapp';
+export type NotificationCategory =
+  | 'maintenance'
+  | 'billing'
+  | 'visitor'
+  | 'emergency'
+  | 'community'
+  | 'governance'
+  | 'system';
+export type NotificationType =
+  | 'transactional'
+  | 'promotional'
+  | 'informational'
+  | 'reminder'
+  | 'alert';
+export type NotificationChannel =
+  | 'push'
+  | 'email'
+  | 'sms'
+  | 'in_app'
+  | 'whatsapp';
 export type NotificationPriority = 'critical' | 'high' | 'normal' | 'low';
 
-export type CampaignStatus = 'draft' | 'scheduled' | 'running' | 'paused' | 'completed' | 'cancelled';
+export type CampaignStatus =
+  | 'draft'
+  | 'scheduled'
+  | 'running'
+  | 'paused'
+  | 'completed'
+  | 'cancelled';
 export type HealthStatus = 'healthy' | 'warning' | 'critical' | 'unknown';
-export type OptimizationCategory = 'performance' | 'cost' | 'security' | 'user_experience' | 'scalability';
+export type OptimizationCategory =
+  | 'performance'
+  | 'cost'
+  | 'security'
+  | 'user_experience'
+  | 'scalability';
 export type OptimizationPriority = 'critical' | 'high' | 'medium' | 'low';
-export type RecommendationStatus = 'pending' | 'approved' | 'in_progress' | 'completed' | 'rejected';
+export type RecommendationStatus =
+  | 'pending'
+  | 'approved'
+  | 'in_progress'
+  | 'completed'
+  | 'rejected';
 
 // ===============================
 // INTERFACE DEFINITIONS
@@ -874,7 +991,12 @@ export type AnomalySeverity = 'low' | 'medium' | 'high' | 'critical';
 
 export interface GenerateReportRequest {
   societyId: string;
-  reportType: 'society_analytics' | 'financial' | 'operational' | 'governance' | 'community';
+  reportType:
+    | 'society_analytics'
+    | 'financial'
+    | 'operational'
+    | 'governance'
+    | 'community';
   period: ReportPeriod;
   includeRecommendations: boolean;
   includePredictions: boolean;
@@ -956,7 +1078,14 @@ export interface AudienceSegment {
 
 export interface SegmentCriteria {
   field: string;
-  operator: 'equals' | 'not_equals' | 'contains' | 'in' | 'not_in' | 'greater_than' | 'less_than';
+  operator:
+    | 'equals'
+    | 'not_equals'
+    | 'contains'
+    | 'in'
+    | 'not_in'
+    | 'greater_than'
+    | 'less_than';
   value: any;
   logicalOperator?: 'AND' | 'OR';
 }

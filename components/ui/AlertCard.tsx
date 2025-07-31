@@ -5,8 +5,8 @@ import {
   Info,
   Trash2,
   X,
-} from "lucide-react-native";
-import React, { useEffect } from "react";
+} from 'lucide-react-native';
+import React, { useEffect } from 'react';
 import {
   ActivityIndicator,
   Animated,
@@ -15,18 +15,18 @@ import {
   Text,
   TouchableOpacity,
   View,
-} from "react-native";
+} from 'react-native';
 
 export interface AlertCardProps {
   visible: boolean;
   onClose: () => void;
-  type?: "success" | "error" | "warning" | "info";
+  type?: 'success' | 'error' | 'warning' | 'info';
   title: string;
   message?: string;
   primaryAction?: {
     label: string;
     onPress: () => void;
-    variant?: "primary" | "destructive";
+    variant?: 'primary' | 'destructive';
     loading?: boolean;
   };
   secondaryAction?: {
@@ -37,43 +37,43 @@ export interface AlertCardProps {
   persistent?: boolean;
 }
 
-const { width: screenWidth } = Dimensions.get("window");
+const { width: screenWidth } = Dimensions.get('window');
 
 const typeConfig = {
   success: {
     icon: CheckCircle,
-    iconColor: "#4CAF50",
-    backgroundColor: "bg-success/10",
-    borderColor: "border-success/30",
-    titleColor: "text-success",
+    iconColor: '#4CAF50',
+    backgroundColor: 'bg-success/10',
+    borderColor: 'border-success/30',
+    titleColor: 'text-success',
   },
   error: {
     icon: AlertCircle,
-    iconColor: "#F44336",
-    backgroundColor: "bg-error/10",
-    borderColor: "border-error/30",
-    titleColor: "text-error",
+    iconColor: '#F44336',
+    backgroundColor: 'bg-error/10',
+    borderColor: 'border-error/30',
+    titleColor: 'text-error',
   },
   warning: {
     icon: AlertTriangle,
-    iconColor: "#FF9800",
-    backgroundColor: "bg-warning/10",
-    borderColor: "border-warning/30",
-    titleColor: "text-warning",
+    iconColor: '#FF9800',
+    backgroundColor: 'bg-warning/10',
+    borderColor: 'border-warning/30',
+    titleColor: 'text-warning',
   },
   info: {
     icon: Info,
-    iconColor: "#2196F3",
-    backgroundColor: "bg-primary/10",
-    borderColor: "border-primary/30",
-    titleColor: "text-primary",
+    iconColor: '#2196F3',
+    backgroundColor: 'bg-primary/10',
+    borderColor: 'border-primary/30',
+    titleColor: 'text-primary',
   },
 };
 
 export const AlertCard: React.FC<AlertCardProps> = ({
   visible,
   onClose,
-  type = "info",
+  type = 'info',
   title,
   message,
   primaryAction,
@@ -146,12 +146,10 @@ export const AlertCard: React.FC<AlertCardProps> = ({
       transparent
       visible={visible}
       animationType="none"
-      onRequestClose={persistent ? undefined : onClose}
-    >
+      onRequestClose={persistent ? undefined : onClose}>
       <Animated.View
         className="flex-1 bg-black/50 items-center justify-center px-6"
-        style={{ opacity: opacityValue }}
-      >
+        style={{ opacity: opacityValue }}>
         <TouchableOpacity
           className="absolute inset-0"
           onPress={handleBackdropPress}
@@ -163,15 +161,15 @@ export const AlertCard: React.FC<AlertCardProps> = ({
           style={{
             transform: [{ scale: scaleValue }],
             maxWidth: screenWidth - 48,
-          }}
-        >
+          }}>
           {/* Header */}
           <View className="flex-row items-start justify-between mb-4">
             <View className="flex-row items-center flex-1">
               <View className="mr-3">
                 <Icon size={24} color={config.iconColor} />
               </View>
-              <Text className={`text-headline-medium font-bold flex-1 ${config.titleColor}`}>
+              <Text
+                className={`text-headline-medium font-bold flex-1 ${config.titleColor}`}>
                 {title}
               </Text>
             </View>
@@ -180,8 +178,7 @@ export const AlertCard: React.FC<AlertCardProps> = ({
               <TouchableOpacity
                 onPress={onClose}
                 className="ml-2 p-1"
-                hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
-              >
+                hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
                 <X size={20} color="#757575" />
               </TouchableOpacity>
             )}
@@ -200,8 +197,7 @@ export const AlertCard: React.FC<AlertCardProps> = ({
               {secondaryAction && (
                 <TouchableOpacity
                   onPress={handleSecondaryAction}
-                  className="flex-1 bg-transparent border border-divider rounded-xl py-3 px-4"
-                >
+                  className="flex-1 bg-transparent border border-divider rounded-xl py-3 px-4">
                   <Text className="text-text-primary font-semibold text-center">
                     {secondaryAction.label}
                   </Text>
@@ -213,11 +209,10 @@ export const AlertCard: React.FC<AlertCardProps> = ({
                   onPress={handlePrimaryAction}
                   disabled={primaryAction.loading}
                   className={`flex-1 rounded-xl py-3 px-4 ${
-                    primaryAction.variant === "destructive"
-                      ? "bg-error"
-                      : "bg-primary"
-                  } ${primaryAction.loading ? "opacity-70" : ""}`}
-                >
+                    primaryAction.variant === 'destructive'
+                      ? 'bg-error'
+                      : 'bg-primary'
+                  } ${primaryAction.loading ? 'opacity-70' : ''}`}>
                   <View className="flex-row items-center justify-center">
                     {primaryAction.loading && (
                       <ActivityIndicator
@@ -226,13 +221,13 @@ export const AlertCard: React.FC<AlertCardProps> = ({
                         className="mr-2"
                       />
                     )}
-                    {primaryAction.variant === "destructive" &&
+                    {primaryAction.variant === 'destructive' &&
                       !primaryAction.loading && (
                         <Trash2 size={16} color="white" className="mr-2" />
                       )}
                     <Text className="text-white font-semibold text-center">
                       {primaryAction.loading
-                        ? "Loading..."
+                        ? 'Loading...'
                         : primaryAction.label}
                     </Text>
                   </View>
@@ -249,10 +244,10 @@ export const AlertCard: React.FC<AlertCardProps> = ({
 // Convenience hook for using alerts
 export const useAlert = () => {
   const [alertConfig, setAlertConfig] = React.useState<AlertCardProps | null>(
-    null
+    null,
   );
 
-  const showAlert = (config: Omit<AlertCardProps, "visible" | "onClose">) => {
+  const showAlert = (config: Omit<AlertCardProps, 'visible' | 'onClose'>) => {
     setAlertConfig({
       ...config,
       visible: true,

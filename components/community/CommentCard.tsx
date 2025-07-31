@@ -1,11 +1,11 @@
-import MentionText from "@/components/ui/MentionText";
-import UserAvatar from "@/components/ui/UserAvatar";
-import { Comment } from "@/types/community";
-import { showDeleteConfirmAlert } from "@/utils/alert";
-import { formatTimeAgo } from "@/utils/community";
-import { MessageCircle, Trash2 } from "lucide-react-native";
-import React, { useState } from "react";
-import { ActivityIndicator, Text, TouchableOpacity, View } from "react-native";
+import MentionText from '@/components/ui/MentionText';
+import UserAvatar from '@/components/ui/UserAvatar';
+import { Comment } from '@/types/community';
+import { showDeleteConfirmAlert } from '@/utils/alert';
+import { formatTimeAgo } from '@/utils/community';
+import { MessageCircle, Trash2 } from 'lucide-react-native';
+import React, { useState } from 'react';
+import { ActivityIndicator, Text, TouchableOpacity, View } from 'react-native';
 
 interface CommentCardProps {
   comment: Comment;
@@ -24,17 +24,17 @@ const CommentCard: React.FC<CommentCardProps> = ({
 
   const handleDelete = () => {
     showDeleteConfirmAlert(
-      "Delete Comment",
-      "Are you sure you want to delete this comment?",
+      'Delete Comment',
+      'Are you sure you want to delete this comment?',
       async () => {
         try {
           setDeleting(true);
           await onDelete(comment.id);
         } catch (error) {
-          console.error("Error deleting comment:", error);
+          console.error('Error deleting comment:', error);
           setDeleting(false);
         }
-      }
+      },
     );
   };
 
@@ -45,9 +45,8 @@ const CommentCard: React.FC<CommentCardProps> = ({
   return (
     <View
       className={`mb-4 ${
-        isNested ? "ml-8 border-l-2 border-divider pl-4" : ""
-      }`}
-    >
+        isNested ? 'ml-8 border-l-2 border-divider pl-4' : ''
+      }`}>
       <View className="bg-surface rounded-2xl p-4 border border-divider">
         {/* Comment Header */}
         <View className="flex-row items-start justify-between mb-3">
@@ -72,8 +71,7 @@ const CommentCard: React.FC<CommentCardProps> = ({
             <TouchableOpacity
               onPress={handleDelete}
               disabled={deleting}
-              className="p-1 ml-2"
-            >
+              className="p-1 ml-2">
               {deleting ? (
                 <ActivityIndicator size="small" color="#D32F2F" />
               ) : (
@@ -88,9 +86,8 @@ const CommentCard: React.FC<CommentCardProps> = ({
           style={{
             fontSize: 14,
             lineHeight: 18,
-            color: "#212121",
-          }}
-        >
+            color: '#212121',
+          }}>
           {comment.content}
         </MentionText>
         <View className="mb-3" />
@@ -100,8 +97,7 @@ const CommentCard: React.FC<CommentCardProps> = ({
           <TouchableOpacity
             onPress={handleReply}
             className="flex-row items-center self-start py-1"
-            activeOpacity={0.7}
-          >
+            activeOpacity={0.7}>
             <MessageCircle size={14} color="#757575" />
             <Text className="text-text-secondary text-sm ml-2 font-medium">
               Reply

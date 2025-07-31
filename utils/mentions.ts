@@ -25,7 +25,7 @@ export const extractMentions = (text: string): Mention[] => {
       displayName: match[1], // In real app, this would be resolved from user data
       flatNumber: '', // Would be fetched from user data
       startIndex: match.index,
-      endIndex: match.index + match[0].length
+      endIndex: match.index + match[0].length,
     });
   }
 
@@ -35,13 +35,16 @@ export const extractMentions = (text: string): Mention[] => {
 /**
  * Replace mentions in text with styled components (for display)
  */
-export const formatTextWithMentions = (text: string): Array<{ text: string; isMention: boolean; username?: string }> => {
+export const formatTextWithMentions = (
+  text: string,
+): Array<{ text: string; isMention: boolean; username?: string }> => {
   const mentions = extractMentions(text);
   if (mentions.length === 0) {
     return [{ text, isMention: false }];
   }
 
-  const parts: Array<{ text: string; isMention: boolean; username?: string }> = [];
+  const parts: Array<{ text: string; isMention: boolean; username?: string }> =
+    [];
   let lastIndex = 0;
 
   mentions.forEach((mention) => {
@@ -49,7 +52,7 @@ export const formatTextWithMentions = (text: string): Array<{ text: string; isMe
     if (mention.startIndex > lastIndex) {
       parts.push({
         text: text.substring(lastIndex, mention.startIndex),
-        isMention: false
+        isMention: false,
       });
     }
 
@@ -57,7 +60,7 @@ export const formatTextWithMentions = (text: string): Array<{ text: string; isMe
     parts.push({
       text: `@${mention.username}`,
       isMention: true,
-      username: mention.username
+      username: mention.username,
     });
 
     lastIndex = mention.endIndex;
@@ -67,7 +70,7 @@ export const formatTextWithMentions = (text: string): Array<{ text: string; isMe
   if (lastIndex < text.length) {
     parts.push({
       text: text.substring(lastIndex),
-      isMention: false
+      isMention: false,
     });
   }
 
@@ -77,14 +80,18 @@ export const formatTextWithMentions = (text: string): Array<{ text: string; isMe
 /**
  * Get mention suggestions based on input
  */
-export const getMentionSuggestions = async (query: string, allUsers: User[]): Promise<User[]> => {
+export const getMentionSuggestions = async (
+  query: string,
+  allUsers: User[],
+): Promise<User[]> => {
   if (!query || query.length < 1) return [];
 
   const queryLower = query.toLowerCase();
   return allUsers
-    .filter(user => 
-      user.name.toLowerCase().includes(queryLower) ||
-      user.flatNumber.toLowerCase().includes(queryLower)
+    .filter(
+      (user) =>
+        user.name.toLowerCase().includes(queryLower) ||
+        user.flatNumber.toLowerCase().includes(queryLower),
     )
     .slice(0, 5); // Limit to 5 suggestions
 };
@@ -95,7 +102,7 @@ export const getMentionSuggestions = async (query: string, allUsers: User[]): Pr
 export const insertMention = (
   currentText: string,
   cursorPosition: number,
-  username: string
+  username: string,
 ): { newText: string; newCursorPosition: number } => {
   // Find the @ symbol before the cursor
   let atIndex = cursorPosition - 1;
@@ -108,10 +115,10 @@ export const insertMention = (
     const beforeAt = currentText.substring(0, atIndex);
     const afterCursor = currentText.substring(cursorPosition);
     const mention = `@${username} `;
-    
+
     const newText = beforeAt + mention + afterCursor;
     const newCursorPosition = atIndex + mention.length;
-    
+
     return { newText, newCursorPosition };
   }
 
@@ -119,17 +126,20 @@ export const insertMention = (
   const beforeCursor = currentText.substring(0, cursorPosition);
   const afterCursor = currentText.substring(cursorPosition);
   const mention = `@${username} `;
-  
+
   const newText = beforeCursor + mention + afterCursor;
   const newCursorPosition = cursorPosition + mention.length;
-  
+
   return { newText, newCursorPosition };
 };
 
 /**
  * Validate mentions in text (check if mentioned users exist)
  */
-export const validateMentions = async (text: string, allUsers: User[]): Promise<{
+export const validateMentions = async (
+  text: string,
+  allUsers: User[],
+): Promise<{
   validMentions: Mention[];
   invalidMentions: Mention[];
 }> => {
@@ -137,17 +147,20 @@ export const validateMentions = async (text: string, allUsers: User[]): Promise<
   const validMentions: Mention[] = [];
   const invalidMentions: Mention[] = [];
 
-  mentions.forEach(mention => {
-    const user = allUsers.find(u => 
-      u.name.toLowerCase().replace(/\s/g, '') === mention.username.toLowerCase() ||
-      u.flatNumber.toLowerCase().replace(/[^a-z0-9]/g, '') === mention.username.toLowerCase()
+  mentions.forEach((mention) => {
+    const user = allUsers.find(
+      (u) =>
+        u.name.toLowerCase().replace(/\s/g, '') ===
+          mention.username.toLowerCase() ||
+        u.flatNumber.toLowerCase().replace(/[^a-z0-9]/g, '') ===
+          mention.username.toLowerCase(),
     );
 
     if (user) {
       validMentions.push({
         ...mention,
         displayName: user.name,
-        flatNumber: user.flatNumber
+        flatNumber: user.flatNumber,
       });
     } else {
       invalidMentions.push(mention);

@@ -1,16 +1,16 @@
-import { Button } from "@/components/ui/Button";
-import LucideIcons from "@/components/ui/LucideIcons";
-import { useAuth } from "@/contexts/AuthContext";
-import BiometricService from "@/services/biometric.service";
-import { useRouter } from "expo-router";
-import React, { useEffect, useState } from "react";
+import { Button } from '@/components/ui/Button';
+import LucideIcons from '@/components/ui/LucideIcons';
+import { useAuth } from '@/contexts/AuthContext';
+import BiometricService from '@/services/biometric.service';
+import { useRouter } from 'expo-router';
+import React, { useEffect, useState } from 'react';
 import {
   Alert,
   SafeAreaView,
   Text,
   TouchableOpacity,
   View,
-} from "react-native";
+} from 'react-native';
 
 export default function BiometricSetup() {
   const router = useRouter();
@@ -34,7 +34,7 @@ export default function BiometricSetup() {
 
   const handleEnableBiometric = async () => {
     if (!user?.id) {
-      Alert.alert("Error", "User information not available");
+      Alert.alert('Error', 'User information not available');
       return;
     }
 
@@ -42,28 +42,28 @@ export default function BiometricSetup() {
 
     try {
       const success = await BiometricService.enableBiometricAuth(user.id);
-      
+
       if (success) {
         Alert.alert(
-          "Success!",
-          "Biometric authentication has been enabled for your account.",
+          'Success!',
+          'Biometric authentication has been enabled for your account.',
           [
             {
-              text: "Continue",
-              onPress: () => router.replace("/(tabs)"),
+              text: 'Continue',
+              onPress: () => router.replace('/(tabs)'),
             },
-          ]
+          ],
         );
       } else {
         Alert.alert(
-          "Setup Failed",
-          "Could not enable biometric authentication. Please try again."
+          'Setup Failed',
+          'Could not enable biometric authentication. Please try again.',
         );
       }
     } catch (error) {
       Alert.alert(
-        "Error",
-        "An error occurred while setting up biometric authentication."
+        'Error',
+        'An error occurred while setting up biometric authentication.',
       );
     } finally {
       setIsLoading(false);
@@ -71,12 +71,14 @@ export default function BiometricSetup() {
   };
 
   const handleSkip = () => {
-    router.replace("/(tabs)");
+    router.replace('/(tabs)');
   };
 
   const getBiometricIcon = () => {
-    const typeName = BiometricService.getBiometricTypeName(biometricConfig.supportedTypes);
-    return typeName.includes("Face") ? (
+    const typeName = BiometricService.getBiometricTypeName(
+      biometricConfig.supportedTypes,
+    );
+    return typeName.includes('Face') ? (
       <LucideIcons name="shield-outline" size={64} color="#6366f1" />
     ) : (
       <LucideIcons name="fingerprint" size={64} color="#6366f1" />
@@ -84,7 +86,9 @@ export default function BiometricSetup() {
   };
 
   const getBiometricTypeName = () => {
-    return BiometricService.getBiometricTypeName(biometricConfig.supportedTypes);
+    return BiometricService.getBiometricTypeName(
+      biometricConfig.supportedTypes,
+    );
   };
 
   if (!biometricConfig.hasHardware || !biometricConfig.isEnrolled) {
@@ -94,11 +98,11 @@ export default function BiometricSetup() {
           <View className="bg-error/10 rounded-full w-24 h-24 items-center justify-center mb-6">
             <LucideIcons name="close" size={48} color="#D32F2F" />
           </View>
-          
+
           <Text className="text-headline-large text-text-primary mb-4 text-center">
             Biometric Authentication Unavailable
           </Text>
-          
+
           <Text className="text-body-large text-text-secondary text-center mb-8 leading-6">
             {!biometricConfig.hasHardware
               ? "Your device doesn't support biometric authentication."
@@ -120,8 +124,7 @@ export default function BiometricSetup() {
         <TouchableOpacity
           onPress={handleSkip}
           className="bg-surface rounded-full p-3 shadow-sm"
-          activeOpacity={0.8}
-        >
+          activeOpacity={0.8}>
           <Text className="text-text-secondary font-semibold">Skip</Text>
         </TouchableOpacity>
       </View>
@@ -139,7 +142,8 @@ export default function BiometricSetup() {
 
         {/* Subtitle */}
         <Text className="text-body-large text-text-secondary text-center mb-8 leading-6">
-          Enable {getBiometricTypeName()} authentication for quick and secure access to your Aptly account.
+          Enable {getBiometricTypeName()} authentication for quick and secure
+          access to your Aptly account.
         </Text>
 
         {/* Benefits */}
@@ -147,7 +151,7 @@ export default function BiometricSetup() {
           <Text className="text-headline-medium text-text-primary mb-4">
             Why enable biometric login?
           </Text>
-          
+
           <View className="space-y-3">
             <View className="flex-row items-center">
               <View className="bg-success/10 rounded-full w-8 h-8 items-center justify-center mr-3">
@@ -157,7 +161,7 @@ export default function BiometricSetup() {
                 Enhanced security for your society data
               </Text>
             </View>
-            
+
             <View className="flex-row items-center">
               <View className="bg-primary/10 rounded-full w-8 h-8 items-center justify-center mr-3">
                 <LucideIcons name="fingerprint" size={16} color="#6366f1" />
@@ -171,21 +175,15 @@ export default function BiometricSetup() {
 
         {/* CTA Buttons */}
         <View className="w-full space-y-3">
-          <Button 
+          <Button
             onPress={handleEnableBiometric}
             loading={isLoading}
-            className="w-full"
-          >
+            className="w-full">
             Enable {getBiometricTypeName()}
           </Button>
-          
-          <TouchableOpacity
-            onPress={handleSkip}
-            className="items-center py-3"
-          >
-            <Text className="text-text-secondary">
-              Maybe later
-            </Text>
+
+          <TouchableOpacity onPress={handleSkip} className="items-center py-3">
+            <Text className="text-text-secondary">Maybe later</Text>
           </TouchableOpacity>
         </View>
       </View>

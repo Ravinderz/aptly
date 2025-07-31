@@ -1,15 +1,15 @@
 import React, { ReactNode, useState } from 'react';
 import { View, Text, ScrollView, TouchableOpacity } from 'react-native';
-import { 
-  Menu, 
-  Bell, 
-  Settings, 
-  LogOut, 
+import {
+  Menu,
+  Bell,
+  Settings,
+  LogOut,
   ChevronDown,
   Shield,
   Building2,
   AlertTriangle,
-  X
+  X,
 } from 'lucide-react-native';
 import { useAdmin } from '@/contexts/AdminContext';
 import { useSociety } from '@/contexts/SocietyContext';
@@ -48,16 +48,16 @@ const AdaptiveAdminLayout: React.FC<AdaptiveAdminLayoutProps> = ({
   showNotifications = true,
   showQuickActions = true,
   layout = 'default',
-  rightActions
+  rightActions,
 }) => {
-  const { 
-    adminUser, 
-    currentMode, 
-    switchToResidentMode, 
+  const {
+    adminUser,
+    currentMode,
+    switchToResidentMode,
     activeSociety,
-    checkPermission 
+    checkPermission,
   } = useAdmin();
-  
+
   const { currentSociety } = useSociety();
   const [showNotificationPanel, setShowNotificationPanel] = useState(false);
   const [showUserMenu, setShowUserMenu] = useState(false);
@@ -72,7 +72,7 @@ const AdaptiveAdminLayout: React.FC<AdaptiveAdminLayoutProps> = ({
       timestamp: new Date().toISOString(),
       read: false,
       urgent: false,
-      actionRequired: true
+      actionRequired: true,
     },
     {
       id: '2',
@@ -82,7 +82,7 @@ const AdaptiveAdminLayout: React.FC<AdaptiveAdminLayoutProps> = ({
       timestamp: new Date(Date.now() - 300000).toISOString(),
       read: false,
       urgent: true,
-      actionRequired: true
+      actionRequired: true,
     },
     {
       id: '3',
@@ -92,12 +92,12 @@ const AdaptiveAdminLayout: React.FC<AdaptiveAdminLayoutProps> = ({
       timestamp: new Date(Date.now() - 3600000).toISOString(),
       read: true,
       urgent: false,
-      actionRequired: false
-    }
+      actionRequired: false,
+    },
   ];
 
-  const unreadCount = notifications.filter(n => !n.read).length;
-  const urgentCount = notifications.filter(n => n.urgent && !n.read).length;
+  const unreadCount = notifications.filter((n) => !n.read).length;
+  const urgentCount = notifications.filter((n) => n.urgent && !n.read).length;
 
   const getLayoutClasses = () => {
     switch (layout) {
@@ -112,11 +112,16 @@ const AdaptiveAdminLayout: React.FC<AdaptiveAdminLayoutProps> = ({
 
   const getNotificationIcon = (type: string) => {
     switch (type) {
-      case 'emergency': return '🚨';
-      case 'approval': return '⏳';
-      case 'alert': return '⚠️';
-      case 'system': return 'ℹ️';
-      default: return '📢';
+      case 'emergency':
+        return '🚨';
+      case 'approval':
+        return '⏳';
+      case 'alert':
+        return '⚠️';
+      case 'system':
+        return 'ℹ️';
+      default:
+        return '📢';
     }
   };
 
@@ -124,7 +129,7 @@ const AdaptiveAdminLayout: React.FC<AdaptiveAdminLayoutProps> = ({
     const diff = Date.now() - new Date(timestamp).getTime();
     const minutes = Math.floor(diff / 60000);
     const hours = Math.floor(minutes / 60);
-    
+
     if (minutes < 1) return 'Just now';
     if (minutes < 60) return `${minutes}m ago`;
     if (hours < 24) return `${hours}h ago`;
@@ -160,7 +165,8 @@ const AdaptiveAdminLayout: React.FC<AdaptiveAdminLayoutProps> = ({
     <View className="flex-1 bg-background">
       {/* Admin Header */}
       <View className="bg-surface border-b border-divider">
-        <View className={`flex-row items-center justify-between py-4 ${getLayoutClasses()}`}>
+        <View
+          className={`flex-row items-center justify-between py-4 ${getLayoutClasses()}`}>
           {/* Left Section - Title and Society */}
           <View className="flex-1 mr-4">
             {title && (
@@ -173,7 +179,7 @@ const AdaptiveAdminLayout: React.FC<AdaptiveAdminLayoutProps> = ({
                 {subtitle}
               </Text>
             )}
-            
+
             {/* Society Context */}
             {activeSociety && (
               <View className="flex-row items-center mt-2">
@@ -189,7 +195,7 @@ const AdaptiveAdminLayout: React.FC<AdaptiveAdminLayoutProps> = ({
           {/* Right Section - Actions */}
           <View className="flex-row items-center space-x-3">
             {rightActions}
-            
+
             {/* Society Selector */}
             {showSocietySelector && (
               <PermissionGate resource="society" action="switch" renderEmpty>
@@ -201,13 +207,13 @@ const AdaptiveAdminLayout: React.FC<AdaptiveAdminLayoutProps> = ({
             {showNotifications && (
               <TouchableOpacity
                 onPress={() => setShowNotificationPanel(true)}
-                className="relative p-2"
-              >
+                className="relative p-2">
                 <Bell size={20} className="text-text-secondary" />
                 {unreadCount > 0 && (
-                  <View className={`absolute -top-1 -right-1 rounded-full w-5 h-5 items-center justify-center ${
-                    urgentCount > 0 ? 'bg-red-500' : 'bg-primary'
-                  }`}>
+                  <View
+                    className={`absolute -top-1 -right-1 rounded-full w-5 h-5 items-center justify-center ${
+                      urgentCount > 0 ? 'bg-red-500' : 'bg-primary'
+                    }`}>
                     <Text className="text-white text-xs font-bold">
                       {unreadCount > 9 ? '9+' : unreadCount}
                     </Text>
@@ -219,8 +225,7 @@ const AdaptiveAdminLayout: React.FC<AdaptiveAdminLayoutProps> = ({
             {/* User Menu */}
             <TouchableOpacity
               onPress={() => setShowUserMenu(!showUserMenu)}
-              className="flex-row items-center p-2"
-            >
+              className="flex-row items-center p-2">
               <View className="w-8 h-8 bg-primary rounded-full items-center justify-center mr-2">
                 <Text className="text-white font-bold text-sm">
                   {adminUser.name.charAt(0)}
@@ -248,18 +253,17 @@ const AdaptiveAdminLayout: React.FC<AdaptiveAdminLayoutProps> = ({
               {adminUser.email}
             </Text>
           </View>
-          
+
           <View className="py-2">
             <TouchableOpacity
               onPress={handleSwitchToResident}
-              className="flex-row items-center px-4 py-3"
-            >
+              className="flex-row items-center px-4 py-3">
               <Shield size={16} className="text-text-secondary mr-3" />
               <Text className="text-body-medium text-text-primary">
                 Switch to Resident Mode
               </Text>
             </TouchableOpacity>
-            
+
             <PermissionGate resource="settings" action="read" renderEmpty>
               <TouchableOpacity className="flex-row items-center px-4 py-3">
                 <Settings size={16} className="text-text-secondary mr-3" />
@@ -268,15 +272,12 @@ const AdaptiveAdminLayout: React.FC<AdaptiveAdminLayoutProps> = ({
                 </Text>
               </TouchableOpacity>
             </PermissionGate>
-            
+
             <TouchableOpacity
               onPress={handleLogout}
-              className="flex-row items-center px-4 py-3 border-t border-divider"
-            >
+              className="flex-row items-center px-4 py-3 border-t border-divider">
               <LogOut size={16} className="text-red-600 mr-3" />
-              <Text className="text-body-medium text-red-600">
-                Logout
-              </Text>
+              <Text className="text-body-medium text-red-600">Logout</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -293,15 +294,14 @@ const AdaptiveAdminLayout: React.FC<AdaptiveAdminLayoutProps> = ({
               <X size={20} className="text-text-secondary" />
             </TouchableOpacity>
           </View>
-          
+
           <ScrollView className="flex-1">
             {notifications.map((notification) => (
-              <View 
-                key={notification.id} 
+              <View
+                key={notification.id}
                 className={`p-4 border-b border-divider ${
                   !notification.read ? 'bg-primary/5' : ''
-                }`}
-              >
+                }`}>
                 <View className="flex-row items-start justify-between mb-2">
                   <View className="flex-row items-center flex-1">
                     <Text className="text-lg mr-2">
@@ -312,21 +312,23 @@ const AdaptiveAdminLayout: React.FC<AdaptiveAdminLayoutProps> = ({
                     </Text>
                     {notification.urgent && (
                       <View className="bg-red-100 rounded-full px-2 py-1">
-                        <Text className="text-red-600 text-xs font-bold">URGENT</Text>
+                        <Text className="text-red-600 text-xs font-bold">
+                          URGENT
+                        </Text>
                       </View>
                     )}
                   </View>
                 </View>
-                
+
                 <Text className="text-body-medium text-text-secondary mb-2">
                   {notification.message}
                 </Text>
-                
+
                 <View className="flex-row items-center justify-between">
                   <Text className="text-label-medium text-text-secondary">
                     {formatTimeAgo(notification.timestamp)}
                   </Text>
-                  
+
                   {notification.actionRequired && (
                     <TouchableOpacity className="bg-primary rounded-lg px-3 py-1">
                       <Text className="text-white text-label-medium font-medium">
@@ -342,9 +344,7 @@ const AdaptiveAdminLayout: React.FC<AdaptiveAdminLayoutProps> = ({
       )}
 
       {/* Main Content */}
-      <View className="flex-1">
-        {children}
-      </View>
+      <View className="flex-1">{children}</View>
 
       {/* Overlay for panels */}
       {(showNotificationPanel || showUserMenu) && (

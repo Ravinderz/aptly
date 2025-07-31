@@ -1,5 +1,10 @@
 import { jest } from '@jest/globals';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react-native';
+import {
+  render,
+  screen,
+  fireEvent,
+  waitFor,
+} from '@testing-library/react-native';
 import { useAdmin } from '@/contexts/AdminContext';
 import { useSociety } from '@/contexts/SocietyContext';
 import { AdminUser, Society, AdminRole } from '@/types/admin';
@@ -14,8 +19,8 @@ jest.mock('@/contexts/SocietyContext');
 jest.mock('@/components/ui/AlertCard', () => ({
   useAlert: () => ({
     showAlert: jest.fn(),
-    AlertComponent: null
-  })
+    AlertComponent: null,
+  }),
 }));
 
 const mockUseAdmin = useAdmin as jest.MockedFunction<typeof useAdmin>;
@@ -41,8 +46,8 @@ describe('Role-Specific Component Integration Tests', () => {
         gstEnabled: true,
         emergencyContacts: [],
         policies: [],
-        features: []
-      }
+        features: [],
+      },
     };
 
     baseAdminUser = {
@@ -51,20 +56,22 @@ describe('Role-Specific Component Integration Tests', () => {
       email: 'admin@test.com',
       phoneNumber: '+919876543210',
       role: 'community_manager',
-      societies: [{
-        societyId: 'society_1',
-        societyName: 'Test Society',
-        role: 'community_manager',
-        assignedBy: 'super_admin',
-        assignedAt: '2024-01-01T00:00:00Z',
-        isActive: true,
-        permissions: []
-      }],
+      societies: [
+        {
+          societyId: 'society_1',
+          societyName: 'Test Society',
+          role: 'community_manager',
+          assignedBy: 'super_admin',
+          assignedAt: '2024-01-01T00:00:00Z',
+          isActive: true,
+          permissions: [],
+        },
+      ],
       isActive: true,
       createdAt: '2024-01-01T00:00:00Z',
       lastLoginAt: '2024-01-20T10:00:00Z',
       permissions: [],
-      emergencyContact: true
+      emergencyContact: true,
     };
 
     // Default society context mock
@@ -84,7 +91,7 @@ describe('Role-Specific Component Integration Tests', () => {
       crossSocietyQuery: jest.fn(),
       filterNotificationsForSociety: jest.fn(),
       lastSwitchTime: null,
-      switchHistory: []
+      switchHistory: [],
     });
   });
 
@@ -96,7 +103,7 @@ describe('Role-Specific Component Integration Tests', () => {
     beforeEach(() => {
       const financialManagerUser = {
         ...baseAdminUser,
-        role: 'financial_manager' as AdminRole
+        role: 'financial_manager' as AdminRole,
       };
 
       mockUseAdmin.mockReturnValue({
@@ -108,20 +115,31 @@ describe('Role-Specific Component Integration Tests', () => {
         permissions: [
           { id: '1', resource: 'billing', action: 'read', scope: 'society' },
           { id: '2', resource: 'billing', action: 'create', scope: 'society' },
-          { id: '3', resource: 'billing', action: 'bulk_action', scope: 'society' }
+          {
+            id: '3',
+            resource: 'billing',
+            action: 'bulk_action',
+            scope: 'society',
+          },
         ],
         switchToAdminMode: jest.fn(),
         switchToResidentMode: jest.fn(),
         switchSociety: jest.fn(),
         checkPermission: jest.fn((resource, action) => {
-          const billingPermissions = ['read', 'create', 'bulk_action', 'update', 'export'];
+          const billingPermissions = [
+            'read',
+            'create',
+            'bulk_action',
+            'update',
+            'export',
+          ];
           return resource === 'billing' && billingPermissions.includes(action);
         }),
         getEscalationPath: jest.fn(),
         canSwitchMode: jest.fn(),
         adminSession: null,
         refreshPermissions: jest.fn(),
-        logout: jest.fn()
+        logout: jest.fn(),
       });
     });
 
@@ -130,7 +148,9 @@ describe('Role-Specific Component Integration Tests', () => {
 
       await waitFor(() => {
         expect(screen.getByText('Financial Management')).toBeTruthy();
-        expect(screen.getByText('Billing & Payment Control Center')).toBeTruthy();
+        expect(
+          screen.getByText('Billing & Payment Control Center'),
+        ).toBeTruthy();
       });
     });
 
@@ -147,12 +167,12 @@ describe('Role-Specific Component Integration Tests', () => {
     it('should handle bulk bill generation action', async () => {
       const mockBulkOperation = jest.fn().mockResolvedValue({
         societies: ['society_1'],
-        results: [{ societyId: 'society_1', success: true }]
+        results: [{ societyId: 'society_1', success: true }],
       });
 
       mockUseSociety.mockReturnValue({
         ...mockUseSociety(),
-        bulkOperation: mockBulkOperation
+        bulkOperation: mockBulkOperation,
       });
 
       render(<FinancialManager />);
@@ -162,32 +182,41 @@ describe('Role-Specific Component Integration Tests', () => {
         fireEvent.press(bulkBillButton);
       });
 
-      expect(mockBulkOperation).toHaveBeenCalledWith('generate_bills', expect.any(Object));
+      expect(mockBulkOperation).toHaveBeenCalledWith(
+        'generate_bills',
+        expect.any(Object),
+      );
     });
 
     it('should deny access to unauthorized users', () => {
       const unauthorizedUser = {
         ...baseAdminUser,
-        role: 'security_admin' as AdminRole
+        role: 'security_admin' as AdminRole,
       };
 
       mockUseAdmin.mockReturnValue({
         ...mockUseAdmin(),
         adminUser: unauthorizedUser,
-        checkPermission: jest.fn().mockReturnValue(false)
+        checkPermission: jest.fn().mockReturnValue(false),
       });
 
       render(<FinancialManager />);
 
       expect(screen.getByText('Access Restricted')).toBeTruthy();
-      expect(screen.getByText('You do not have permission to view financial management features.')).toBeTruthy();
+      expect(
+        screen.getByText(
+          'You do not have permission to view financial management features.',
+        ),
+      ).toBeTruthy();
     });
 
     it('should show society-specific financial data', async () => {
       render(<FinancialManager />);
 
       await waitFor(() => {
-        expect(screen.getByText('Test Society - Financial Overview')).toBeTruthy();
+        expect(
+          screen.getByText('Test Society - Financial Overview'),
+        ).toBeTruthy();
         expect(screen.getByText('Collection Rate')).toBeTruthy();
         expect(screen.getByText('Pending Amount')).toBeTruthy();
       });
@@ -204,7 +233,7 @@ describe('Role-Specific Component Integration Tests', () => {
             assignedBy: 'community_manager',
             assignedAt: '2024-01-01T00:00:00Z',
             isActive: true,
-            permissions: []
+            permissions: [],
           },
           {
             societyId: 'society_2',
@@ -213,15 +242,18 @@ describe('Role-Specific Component Integration Tests', () => {
             assignedBy: 'community_manager',
             assignedAt: '2024-01-15T00:00:00Z',
             isActive: true,
-            permissions: []
-          }
-        ]
+            permissions: [],
+          },
+        ],
       };
 
       mockUseAdmin.mockReturnValue({
         ...mockUseAdmin(),
         adminUser: multiSocietyUser,
-        availableSocieties: [mockSociety, { ...mockSociety, id: 'society_2', name: 'Society 2' }]
+        availableSocieties: [
+          mockSociety,
+          { ...mockSociety, id: 'society_2', name: 'Society 2' },
+        ],
       });
 
       render(<FinancialManager />);
@@ -236,7 +268,7 @@ describe('Role-Specific Component Integration Tests', () => {
     beforeEach(() => {
       const securityAdminUser = {
         ...baseAdminUser,
-        role: 'security_admin' as AdminRole
+        role: 'security_admin' as AdminRole,
       };
 
       mockUseAdmin.mockReturnValue({
@@ -247,8 +279,18 @@ describe('Role-Specific Component Integration Tests', () => {
         availableSocieties: [mockSociety],
         permissions: [
           { id: '1', resource: 'visitors', action: 'read', scope: 'society' },
-          { id: '2', resource: 'visitors', action: 'approve', scope: 'society' },
-          { id: '3', resource: 'visitors', action: 'bulk_actions', scope: 'society' }
+          {
+            id: '2',
+            resource: 'visitors',
+            action: 'approve',
+            scope: 'society',
+          },
+          {
+            id: '3',
+            resource: 'visitors',
+            action: 'bulk_actions',
+            scope: 'society',
+          },
         ],
         switchToAdminMode: jest.fn(),
         switchToResidentMode: jest.fn(),
@@ -261,7 +303,7 @@ describe('Role-Specific Component Integration Tests', () => {
         canSwitchMode: jest.fn(),
         adminSession: null,
         refreshPermissions: jest.fn(),
-        logout: jest.fn()
+        logout: jest.fn(),
       });
     });
 
@@ -270,7 +312,9 @@ describe('Role-Specific Component Integration Tests', () => {
 
       await waitFor(() => {
         expect(screen.getByText('Security Management')).toBeTruthy();
-        expect(screen.getByText('Visitor Security & Access Control')).toBeTruthy();
+        expect(
+          screen.getByText('Visitor Security & Access Control'),
+        ).toBeTruthy();
       });
     });
 
@@ -286,12 +330,12 @@ describe('Role-Specific Component Integration Tests', () => {
 
     it('should handle bulk visitor approval', async () => {
       const mockBulkOperation = jest.fn().mockResolvedValue({
-        results: [{ societyId: 'society_1', success: true }]
+        results: [{ societyId: 'society_1', success: true }],
       });
 
       mockUseSociety.mockReturnValue({
         ...mockUseSociety(),
-        bulkOperation: mockBulkOperation
+        bulkOperation: mockBulkOperation,
       });
 
       render(<SecurityAdmin />);
@@ -303,7 +347,7 @@ describe('Role-Specific Component Integration Tests', () => {
 
       expect(mockBulkOperation).toHaveBeenCalledWith(
         'bulk_approve_visitors',
-        expect.any(Object)
+        expect.any(Object),
       );
     });
 
@@ -321,7 +365,9 @@ describe('Role-Specific Component Integration Tests', () => {
       await waitFor(() => {
         // This would test incident resolution if incidents are present
         // Implementation depends on the actual incident data structure
-        expect(screen.getByText('Security Overview - Test Society')).toBeTruthy();
+        expect(
+          screen.getByText('Security Overview - Test Society'),
+        ).toBeTruthy();
       });
     });
 
@@ -331,10 +377,10 @@ describe('Role-Specific Component Integration Tests', () => {
       await waitFor(() => {
         const pendingFilter = screen.getByText('Pending');
         fireEvent.press(pendingFilter);
-        
+
         const approvedFilter = screen.getByText('Approved');
         fireEvent.press(approvedFilter);
-        
+
         const overdueFilter = screen.getByText('Overdue');
         fireEvent.press(overdueFilter);
       });
@@ -348,7 +394,7 @@ describe('Role-Specific Component Integration Tests', () => {
     it('should show navigation items based on user permissions', () => {
       const communityManagerUser = {
         ...baseAdminUser,
-        role: 'community_manager' as AdminRole
+        role: 'community_manager' as AdminRole,
       };
 
       mockUseAdmin.mockReturnValue({
@@ -356,19 +402,25 @@ describe('Role-Specific Component Integration Tests', () => {
         adminUser: communityManagerUser,
         checkPermission: jest.fn((resource, action) => {
           // Community manager has most permissions
-          const allowedResources = ['residents', 'billing', 'visitors', 'maintenance', 'notices'];
+          const allowedResources = [
+            'residents',
+            'billing',
+            'visitors',
+            'maintenance',
+            'notices',
+          ];
           return allowedResources.includes(resource);
-        })
+        }),
       });
 
       const mockNavigate = jest.fn();
 
       render(
-        <DynamicNavigation 
+        <DynamicNavigation
           onNavigate={mockNavigate}
           layout="grid"
           showCategories={true}
-        />
+        />,
       );
 
       expect(screen.getByText('Dashboard')).toBeTruthy();
@@ -380,7 +432,7 @@ describe('Role-Specific Component Integration Tests', () => {
     it('should hide restricted items for sub-admin roles', () => {
       const securityAdminUser = {
         ...baseAdminUser,
-        role: 'security_admin' as AdminRole
+        role: 'security_admin' as AdminRole,
       };
 
       mockUseAdmin.mockReturnValue({
@@ -389,17 +441,17 @@ describe('Role-Specific Component Integration Tests', () => {
         checkPermission: jest.fn((resource, action) => {
           // Security admin only has visitor permissions
           return resource === 'visitors';
-        })
+        }),
       });
 
       const mockNavigate = jest.fn();
 
       render(
-        <DynamicNavigation 
+        <DynamicNavigation
           onNavigate={mockNavigate}
           layout="grid"
           showCategories={true}
-        />
+        />,
       );
 
       expect(screen.getByText('Dashboard')).toBeTruthy();
@@ -411,23 +463,23 @@ describe('Role-Specific Component Integration Tests', () => {
     it('should show super admin exclusive features', () => {
       const superAdminUser = {
         ...baseAdminUser,
-        role: 'super_admin' as AdminRole
+        role: 'super_admin' as AdminRole,
       };
 
       mockUseAdmin.mockReturnValue({
         ...mockUseAdmin(),
         adminUser: superAdminUser,
-        checkPermission: jest.fn().mockReturnValue(true) // Super admin has all permissions
+        checkPermission: jest.fn().mockReturnValue(true), // Super admin has all permissions
       });
 
       const mockNavigate = jest.fn();
 
       render(
-        <DynamicNavigation 
+        <DynamicNavigation
           onNavigate={mockNavigate}
           layout="grid"
           showCategories={true}
-        />
+        />,
       );
 
       expect(screen.getByText('Multi-Society')).toBeTruthy();
@@ -440,15 +492,15 @@ describe('Role-Specific Component Integration Tests', () => {
 
       mockUseAdmin.mockReturnValue({
         ...mockUseAdmin(),
-        checkPermission: jest.fn().mockReturnValue(true)
+        checkPermission: jest.fn().mockReturnValue(true),
       });
 
       render(
-        <DynamicNavigation 
+        <DynamicNavigation
           onNavigate={mockNavigate}
           layout="grid"
           showCategories={true}
-        />
+        />,
       );
 
       const dashboardItem = screen.getByText('Dashboard');
@@ -460,17 +512,17 @@ describe('Role-Specific Component Integration Tests', () => {
     it('should group navigation items by categories', () => {
       mockUseAdmin.mockReturnValue({
         ...mockUseAdmin(),
-        checkPermission: jest.fn().mockReturnValue(true)
+        checkPermission: jest.fn().mockReturnValue(true),
       });
 
       const mockNavigate = jest.fn();
 
       render(
-        <DynamicNavigation 
+        <DynamicNavigation
           onNavigate={mockNavigate}
           layout="grid"
           showCategories={true}
-        />
+        />,
       );
 
       expect(screen.getByText('Dashboard')).toBeTruthy();
@@ -481,29 +533,29 @@ describe('Role-Specific Component Integration Tests', () => {
     it('should adapt layout based on props', () => {
       mockUseAdmin.mockReturnValue({
         ...mockUseAdmin(),
-        checkPermission: jest.fn().mockReturnValue(true)
+        checkPermission: jest.fn().mockReturnValue(true),
       });
 
       const mockNavigate = jest.fn();
 
       const { rerender } = render(
-        <DynamicNavigation 
+        <DynamicNavigation
           onNavigate={mockNavigate}
           layout="list"
           showCategories={false}
           compactMode={true}
-        />
+        />,
       );
 
       expect(screen.getByText('Dashboard')).toBeTruthy();
 
       rerender(
-        <DynamicNavigation 
+        <DynamicNavigation
           onNavigate={mockNavigate}
           layout="grid"
           showCategories={true}
           compactMode={false}
-        />
+        />,
       );
 
       expect(screen.getByText('Dashboard')).toBeTruthy();
@@ -522,7 +574,7 @@ describe('Role-Specific Component Integration Tests', () => {
             assignedBy: 'super_admin',
             assignedAt: '2024-01-01T00:00:00Z',
             isActive: true,
-            permissions: []
+            permissions: [],
           },
           {
             societyId: 'society_2',
@@ -531,21 +583,21 @@ describe('Role-Specific Component Integration Tests', () => {
             assignedBy: 'community_manager',
             assignedAt: '2024-01-15T00:00:00Z',
             isActive: true,
-            permissions: []
-          }
-        ]
+            permissions: [],
+          },
+        ],
       };
 
       const mockSwitchSociety = jest.fn();
-      
+
       mockUseAdmin.mockReturnValue({
         ...mockUseAdmin(),
         adminUser: multiRoleUser,
         switchSociety: mockSwitchSociety,
         availableSocieties: [
           mockSociety,
-          { ...mockSociety, id: 'society_2', name: 'Society 2' }
-        ]
+          { ...mockSociety, id: 'society_2', name: 'Society 2' },
+        ],
       });
 
       // This would test society switching affecting role-based permissions
@@ -567,17 +619,17 @@ describe('Role-Specific Component Integration Tests', () => {
 
       mockUseAdmin.mockReturnValue({
         ...mockUseAdmin(),
-        checkPermission: mockCheckPermission
+        checkPermission: mockCheckPermission,
       });
 
       const mockNavigate = jest.fn();
 
       render(
-        <DynamicNavigation 
+        <DynamicNavigation
           onNavigate={mockNavigate}
           layout="grid"
           showCategories={true}
-        />
+        />,
       );
 
       // Should show items based on inherited permissions
@@ -601,13 +653,19 @@ describe('Role-Specific Component Integration Tests', () => {
 
       mockUseAdmin.mockReturnValue({
         ...mockUseAdmin(),
-        getEscalationPath: mockGetEscalationPath
+        getEscalationPath: mockGetEscalationPath,
       });
 
       const { getEscalationPath } = mockUseAdmin();
-      
-      expect(getEscalationPath('billing_issue')).toEqual(['community_manager', 'super_admin']);
-      expect(getEscalationPath('security_incident')).toEqual(['community_manager', 'super_admin']);
+
+      expect(getEscalationPath('billing_issue')).toEqual([
+        'community_manager',
+        'super_admin',
+      ]);
+      expect(getEscalationPath('security_incident')).toEqual([
+        'community_manager',
+        'super_admin',
+      ]);
       expect(getEscalationPath('platform_issue')).toEqual(['super_admin']);
     });
   });

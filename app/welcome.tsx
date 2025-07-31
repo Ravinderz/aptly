@@ -1,17 +1,17 @@
-import { Button } from "@/components/ui/Button";
-import HighlightCard from "@/components/ui/HighlightCard";
-import LucideIcons from "@/components/ui/LucideIcons";
-import { useAuth } from "@/contexts/AuthContext";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import { useRouter } from "expo-router";
-import React from "react";
+import { Button } from '@/components/ui/Button';
+import HighlightCard from '@/components/ui/HighlightCard';
+import LucideIcons from '@/components/ui/LucideIcons';
+import { useAuth } from '@/contexts/AuthContext';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useRouter } from 'expo-router';
+import React from 'react';
 import {
   SafeAreaView,
   ScrollView,
   Text,
   TouchableOpacity,
   View,
-} from "react-native";
+} from 'react-native';
 
 export default function Welcome() {
   const router = useRouter();
@@ -21,14 +21,14 @@ export default function Welcome() {
     try {
       // Create mock user data for development
       const mockUserProfile = {
-        id: "dev-user-123",
-        name: "John Developer",
-        phone: "9876543210",
-        email: "john@aptly.app",
-        flatNumber: "A-101",
-        societyId: "dev-society-123",
-        societyName: "Green Valley Apartments",
-        role: "resident",
+        id: 'dev-user-123',
+        name: 'John Developer',
+        phone: '9876543210',
+        email: 'john@aptly.app',
+        flatNumber: 'A-101',
+        societyId: 'dev-society-123',
+        societyName: 'Green Valley Apartments',
+        role: 'resident',
         isVerified: true,
         avatar: null,
         createdAt: new Date().toISOString(),
@@ -36,46 +36,46 @@ export default function Welcome() {
       };
 
       const mockTokens = {
-        accessToken: "mock-access-token-123",
-        refreshToken: "mock-refresh-token-123",
+        accessToken: 'mock-access-token-123',
+        refreshToken: 'mock-refresh-token-123',
       };
 
       // Store mock data in AsyncStorage
       await AsyncStorage.multiSet([
-        ["auth_tokens", JSON.stringify(mockTokens)],
-        ["user_profile", JSON.stringify(mockUserProfile)],
+        ['auth_tokens', JSON.stringify(mockTokens)],
+        ['user_profile', JSON.stringify(mockUserProfile)],
       ]);
 
       // Update auth context
       login(mockUserProfile);
 
       // Navigate to home
-      router.replace("/(tabs)");
+      router.replace('/(tabs)');
     } catch (error) {
-      console.error("Error setting up dev mode:", error);
+      console.error('Error setting up dev mode:', error);
     }
   };
 
   const features = [
     {
       icon: <LucideIcons name="building" size={32} color="#6366f1" />,
-      title: "Digital Society Management",
-      description: "Manage your housing society digitally with ease",
+      title: 'Digital Society Management',
+      description: 'Manage your housing society digitally with ease',
     },
     {
       icon: <LucideIcons name="shield-outline" size={32} color="#6366f1" />,
-      title: "Secure & Private",
-      description: "Your data is protected with bank-level security",
+      title: 'Secure & Private',
+      description: 'Your data is protected with bank-level security',
     },
     {
       icon: <LucideIcons name="people" size={32} color="#6366f1" />,
-      title: "Community Connect",
-      description: "Stay connected with your society members",
+      title: 'Community Connect',
+      description: 'Stay connected with your society members',
     },
     {
       icon: <LucideIcons name="smartphone" size={32} color="#6366f1" />,
-      title: "Mobile First",
-      description: "Designed specifically for Indian mobile users",
+      title: 'Mobile First',
+      description: 'Designed specifically for Indian mobile users',
     },
   ];
 
@@ -88,8 +88,7 @@ export default function Welcome() {
           <TouchableOpacity
             onPress={handleDevSkip}
             className="bg-warning/90 rounded-full px-3 py-2 flex-row items-center shadow-sm"
-            activeOpacity={0.8}
-          >
+            activeOpacity={0.8}>
             <LucideIcons name="zap" size={16} color="white" />
             <Text className="text-white text-label-large font-bold ml-1">
               DEV SKIP
@@ -132,8 +131,7 @@ export default function Welcome() {
             {features.map((feature, index) => (
               <View
                 key={index}
-                className="bg-surface rounded-2xl p-6 border border-divider"
-              >
+                className="bg-surface rounded-2xl p-6 border border-divider">
                 <View className="flex-row items-center mb-3">
                   <View className="bg-primary/10 rounded-full w-16 h-16 items-center justify-center mr-4">
                     {feature.icon}
@@ -190,23 +188,21 @@ export default function Welcome() {
         {/* CTA Section */}
         <View className="px-6 pb-8">
           <Button
-            onPress={() => router.push("/auth/phone-registration")}
-            className="mb-4"
-          >
+            onPress={() => router.push('/auth/phone-registration')}
+            className="mb-4">
             Get Started
           </Button>
 
           <TouchableOpacity
             onPress={() =>
               router.push({
-                pathname: "/auth/phone-registration",
-                params: { mode: "signin" },
+                pathname: '/auth/phone-registration',
+                params: { mode: 'signin' },
               })
             }
-            className="items-center py-3"
-          >
+            className="items-center py-3">
             <Text className="text-text-secondary">
-              Already have an account?{" "}
+              Already have an account?{' '}
               <Text className="text-primary font-semibold">Sign In</Text>
             </Text>
           </TouchableOpacity>

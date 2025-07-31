@@ -1,18 +1,20 @@
 import React, { useState } from 'react';
-import { 
-  SafeAreaView, 
-  ScrollView, 
-  View, 
-  Text, 
+import {
+  SafeAreaView,
+  ScrollView,
+  View,
+  Text,
   TextInput,
   TouchableOpacity,
   KeyboardAvoidingView,
-  Platform
+  Platform,
 } from 'react-native';
-import { router } from 'expo-router';
+
 import LucideIcons from '@/components/ui/LucideIcons';
 import { showSuccessAlert, showErrorAlert } from '@/utils/alert';
-import { validateEmergencyContact, formatIndianPhoneNumber } from '@/utils/validation';
+import {
+  validateEmergencyContact,
+} from '@/utils/validation';
 import { safeGoBack } from '@/utils/navigation';
 
 // UI Components
@@ -30,8 +32,17 @@ interface EmergencyContactForm {
 }
 
 const relationships = [
-  'Spouse', 'Father', 'Mother', 'Son', 'Daughter', 
-  'Brother', 'Sister', 'Friend', 'Doctor', 'Neighbor', 'Other'
+  'Spouse',
+  'Father',
+  'Mother',
+  'Son',
+  'Daughter',
+  'Brother',
+  'Sister',
+  'Friend',
+  'Doctor',
+  'Neighbor',
+  'Other',
 ];
 
 export default function AddEmergencyContactPage() {
@@ -41,7 +52,7 @@ export default function AddEmergencyContactPage() {
     phoneNumber: '',
     alternatePhone: '',
     address: '',
-    isPrimary: false
+    isPrimary: false,
   });
   const [isSaving, setIsSaving] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -71,10 +82,12 @@ export default function AddEmergencyContactPage() {
     if (form.alternatePhone && form.alternatePhone.trim()) {
       const altPhoneValidation = validateEmergencyContact(form.alternatePhone);
       if (!altPhoneValidation.isValid) {
-        newErrors.alternatePhone = altPhoneValidation.error || 'Invalid alternate phone number';
+        newErrors.alternatePhone =
+          altPhoneValidation.error || 'Invalid alternate phone number';
       }
       if (form.alternatePhone === form.phoneNumber) {
-        newErrors.alternatePhone = 'Alternate phone must be different from primary phone';
+        newErrors.alternatePhone =
+          'Alternate phone must be different from primary phone';
       }
     }
 
@@ -89,28 +102,37 @@ export default function AddEmergencyContactPage() {
 
     try {
       setIsSaving(true);
-      
+
       // In a real app, this would save to API/database
       console.log('Saving emergency contact:', form);
-      
+
       // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      
-      showSuccessAlert('Contact Added', 'Emergency contact has been added successfully');
+      await new Promise((resolve) => setTimeout(resolve, 1500));
+
+      showSuccessAlert(
+        'Contact Added',
+        'Emergency contact has been added successfully',
+      );
       safeGoBack();
     } catch (error) {
-      showErrorAlert('Error', 'Failed to add emergency contact. Please try again.');
+      showErrorAlert(
+        'Error',
+        'Failed to add emergency contact. Please try again.',
+      );
     } finally {
       setIsSaving(false);
     }
   };
 
-  const updateForm = (field: keyof EmergencyContactForm, value: string | boolean) => {
-    setForm(prev => ({ ...prev, [field]: value }));
-    
+  const updateForm = (
+    field: keyof EmergencyContactForm,
+    value: string | boolean,
+  ) => {
+    setForm((prev) => ({ ...prev, [field]: value }));
+
     // Clear error when user starts typing
     if (errors[field]) {
-      setErrors(prev => ({ ...prev, [field]: '' }));
+      setErrors((prev) => ({ ...prev, [field]: '' }));
     }
   };
 
@@ -121,7 +143,7 @@ export default function AddEmergencyContactPage() {
     placeholder: string,
     error?: string,
     keyboardType: 'default' | 'phone-pad' = 'default',
-    required = false
+    required = false,
   ) => (
     <View className="mb-4">
       <Text className="text-body-medium font-medium text-text-primary mb-2">
@@ -139,9 +161,7 @@ export default function AddEmergencyContactPage() {
         editable={!isSaving}
       />
       {error && (
-        <Text className="text-error text-body-small mt-1">
-          {error}
-        </Text>
+        <Text className="text-error text-body-small mt-1">{error}</Text>
       )}
     </View>
   );
@@ -153,17 +173,15 @@ export default function AddEmergencyContactPage() {
         onBackPress={() => safeGoBack()}
       />
 
-      <KeyboardAvoidingView 
-        className="flex-1" 
+      <KeyboardAvoidingView
+        className="flex-1"
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        keyboardVerticalOffset={Platform.OS === 'ios' ? 90 : 0}
-      >
-        <ScrollView 
-          className="flex-1" 
+        keyboardVerticalOffset={Platform.OS === 'ios' ? 90 : 0}>
+        <ScrollView
+          className="flex-1"
           showsVerticalScrollIndicator={false}
           contentContainerStyle={{ padding: 16, paddingBottom: 100 }}
-          keyboardShouldPersistTaps="handled"
-        >
+          keyboardShouldPersistTaps="handled">
           <Card className="mb-4">
             <View className="p-4">
               <Text className="text-headline-small font-semibold text-text-primary mb-4">
@@ -177,7 +195,7 @@ export default function AddEmergencyContactPage() {
                 'Enter full name',
                 errors.name,
                 'default',
-                true
+                true,
               )}
 
               {/* Relationship Selection */}
@@ -194,11 +212,13 @@ export default function AddEmergencyContactPage() {
                         form.relationship === relationship
                           ? 'border-primary bg-primary/10'
                           : 'border-divider bg-background'
-                      }`}
-                    >
-                      <Text className={`text-body-small font-medium ${
-                        form.relationship === relationship ? 'text-primary' : 'text-text-secondary'
                       }`}>
+                      <Text
+                        className={`text-body-small font-medium ${
+                          form.relationship === relationship
+                            ? 'text-primary'
+                            : 'text-text-secondary'
+                        }`}>
                         {relationship}
                       </Text>
                     </TouchableOpacity>
@@ -214,20 +234,22 @@ export default function AddEmergencyContactPage() {
               {renderFormField(
                 'Phone Number',
                 form.phoneNumber,
-                (text) => updateForm('phoneNumber', text.replace(/[^0-9]/g, '')),
+                (text) =>
+                  updateForm('phoneNumber', text.replace(/[^0-9]/g, '')),
                 'Enter 10-digit mobile number',
                 errors.phoneNumber,
                 'phone-pad',
-                true
+                true,
               )}
 
               {renderFormField(
                 'Alternate Phone',
                 form.alternatePhone,
-                (text) => updateForm('alternatePhone', text.replace(/[^0-9]/g, '')),
+                (text) =>
+                  updateForm('alternatePhone', text.replace(/[^0-9]/g, '')),
                 'Enter alternate phone number (optional)',
                 errors.alternatePhone,
-                'phone-pad'
+                'phone-pad',
               )}
 
               {renderFormField(
@@ -235,7 +257,7 @@ export default function AddEmergencyContactPage() {
                 form.address,
                 (text) => updateForm('address', text),
                 'Enter address (optional)',
-                errors.address
+                errors.address,
               )}
             </View>
           </Card>
@@ -245,8 +267,7 @@ export default function AddEmergencyContactPage() {
             <View className="p-4">
               <TouchableOpacity
                 className="flex-row items-center justify-between"
-                onPress={() => updateForm('isPrimary', !form.isPrimary)}
-              >
+                onPress={() => updateForm('isPrimary', !form.isPrimary)}>
                 <View className="flex-1 mr-4">
                   <Text className="text-body-medium font-medium text-text-primary">
                     Set as Primary Contact
@@ -255,9 +276,12 @@ export default function AddEmergencyContactPage() {
                     Primary contact will be called first in emergencies
                   </Text>
                 </View>
-                <View className={`w-6 h-6 rounded-full border-2 items-center justify-center ${
-                  form.isPrimary ? 'border-primary bg-primary' : 'border-divider'
-                }`}>
+                <View
+                  className={`w-6 h-6 rounded-full border-2 items-center justify-center ${
+                    form.isPrimary
+                      ? 'border-primary bg-primary'
+                      : 'border-divider'
+                  }`}>
                   {form.isPrimary && (
                     <LucideIcons name="checkmark" size={14} color="white" />
                   )}
@@ -270,16 +294,21 @@ export default function AddEmergencyContactPage() {
           <Card className="mb-4 bg-primary/5 border-primary/20">
             <View className="p-4">
               <View className="flex-row items-start">
-                <LucideIcons name="information-circle-outline" size={20} color="#6366f1" />
+                <LucideIcons
+                  name="information-circle-outline"
+                  size={20}
+                  color="#6366f1"
+                />
                 <View className="flex-1 ml-3">
                   <Text className="text-primary font-medium text-body-medium mb-1">
                     Emergency Contact Guidelines
                   </Text>
                   <Text className="text-text-secondary text-body-small leading-5">
-                    • Choose someone who is usually available{'\n'}
-                    • Inform them that you've added them as emergency contact{'\n'}
-                    • Keep their contact details updated{'\n'}
-                    • Society security may contact them in emergencies
+                    • Choose someone who is usually available{'\n'}• Inform them
+                    that you&apos;ve added them as emergency contact
+• Keep
+                    their contact details updated{'\n'}• Society security may
+                    contact them in emergencies
                   </Text>
                 </View>
               </View>
@@ -288,19 +317,14 @@ export default function AddEmergencyContactPage() {
 
           {/* Action Buttons */}
           <View className="space-y-3">
-            <Button
-              variant="primary"
-              onPress={handleSave}
-              disabled={isSaving}
-            >
-              {isSaving ? "Adding Contact..." : "Add Emergency Contact"}
+            <Button variant="primary" onPress={handleSave} disabled={isSaving}>
+              {isSaving ? 'Adding Contact...' : 'Add Emergency Contact'}
             </Button>
-            
+
             <Button
               variant="secondary"
               onPress={() => safeGoBack()}
-              disabled={isSaving}
-            >
+              disabled={isSaving}>
               Cancel
             </Button>
           </View>

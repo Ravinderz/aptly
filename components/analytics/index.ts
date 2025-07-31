@@ -19,5 +19,5 @@ export type {
   NotificationCampaign,
   NotificationPreference,
   IntelligentDelivery,
-  OptimizationRecommendation
+  OptimizationRecommendation,
 } from '../../types/analytics';

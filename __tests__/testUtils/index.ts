@@ -98,7 +98,7 @@ interface CustomRenderOptions extends Omit<RenderOptions, 'wrapper'> {
 
 export const renderWithProviders = (
   ui: React.ReactElement,
-  options: CustomRenderOptions = {}
+  options: CustomRenderOptions = {},
 ) => {
   const {
     withAuth = true,
@@ -171,7 +171,7 @@ export const createMockSociety = (overrides = {}) => ({
 // Helper to test admin permissions
 export const testAdminPermissions = (
   component: React.ReactElement,
-  requiredPermissions: string[]
+  requiredPermissions: string[],
 ) => {
   // Test with permissions
   const withPermissions = renderWithProviders(component, {
@@ -180,7 +180,9 @@ export const testAdminPermissions = (
     adminContext: {
       isAdminMode: true,
       adminUser: createMockAdminUser(),
-      hasPermission: jest.fn((permission) => requiredPermissions.includes(permission)),
+      hasPermission: jest.fn((permission) =>
+        requiredPermissions.includes(permission),
+      ),
     },
   });
 
@@ -201,7 +203,10 @@ export const testAdminPermissions = (
 // Helper to test multi-society scenarios
 export const testMultiSociety = (
   component: React.ReactElement,
-  societies = [createMockSociety(), createMockSociety({ id: 'society-2', name: 'Second Society' })]
+  societies = [
+    createMockSociety(),
+    createMockSociety({ id: 'society-2', name: 'Second Society' }),
+  ],
 ) => {
   return renderWithProviders(component, {
     withAuth: true,
@@ -213,7 +218,7 @@ export const testMultiSociety = (
     },
     adminContext: {
       isAdminMode: true,
-      adminUser: createMockAdminUser({ societies: societies.map(s => s.id) }),
+      adminUser: createMockAdminUser({ societies: societies.map((s) => s.id) }),
       currentSociety: societies[0],
     },
   });
@@ -222,11 +227,11 @@ export const testMultiSociety = (
 // Helper functions for common test scenarios
 export const waitForLoadingToFinish = async () => {
   // Wait for any async operations to complete
-  await new Promise(resolve => setTimeout(resolve, 0));
+  await new Promise((resolve) => setTimeout(resolve, 0));
 };
 
 export const mockApiResponse = (data: any, delay = 0) => {
-  return new Promise(resolve => {
+  return new Promise((resolve) => {
     setTimeout(() => resolve({ data }), delay);
   });
 };
@@ -238,14 +243,21 @@ export const mockApiError = (error: any, delay = 0) => {
 };
 
 // Form testing helpers
-export const fillFormField = async (getByTestId: any, testId: string, value: string) => {
+export const fillFormField = async (
+  getByTestId: any,
+  testId: string,
+  value: string,
+) => {
   const input = getByTestId(testId);
   // Simulate user typing
   input.props.onChangeText(value);
   return input;
 };
 
-export const submitForm = async (getByTestId: any, submitButtonTestId = 'submit-button') => {
+export const submitForm = async (
+  getByTestId: any,
+  submitButtonTestId = 'submit-button',
+) => {
   const submitButton = getByTestId(submitButtonTestId);
   submitButton.props.onPress();
   return submitButton;

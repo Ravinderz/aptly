@@ -3,9 +3,7 @@
   "compilerOptions": {
     "strict": true,
     "paths": {
-      "@/*": [
-        "./*"
-      ]
+      "@/*": ["./*"]
     },
     "baseUrl": "."
   },
@@ -16,8 +14,5 @@
     "expo-env.d.ts",
     "nativewind-env.d.ts"
   ],
-  "exclude": [
-    "__tests__/**/*",
-    "node_modules"
-  ]
+  "exclude": ["__tests__/**/*", "node_modules"]
 }

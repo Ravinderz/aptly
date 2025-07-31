@@ -31,7 +31,7 @@ interface NotificationPreferences {
   quietHours: {
     enabled: boolean;
     start: string; // "22:00"
-    end: string;   // "08:00"
+    end: string; // "08:00"
   };
   createdAt: string;
   updatedAt: string;
@@ -42,7 +42,12 @@ interface Notification {
   userId: string;
   title: string;
   body: string;
-  category: 'maintenance' | 'billing' | 'community' | 'emergency' | 'governance';
+  category:
+    | 'maintenance'
+    | 'billing'
+    | 'community'
+    | 'emergency'
+    | 'governance';
   priority: 'low' | 'medium' | 'high' | 'critical';
   isRead: boolean;
   isSent: boolean;
@@ -69,13 +74,17 @@ class NotificationService {
   private static readonly NOTIFICATIONS_KEY = 'aptly_notifications';
   private static readonly DELIVERY_ATTEMPTS_KEY = 'aptly_delivery_attempts';
 
-  static async getUserPreferences(userId: string): Promise<NotificationPreferences> {
+  static async getUserPreferences(
+    userId: string,
+  ): Promise<NotificationPreferences> {
     try {
       const preferencesJson = await AsyncStorage.getItem(this.PREFERENCES_KEY);
-      const allPreferences: NotificationPreferences[] = preferencesJson ? JSON.parse(preferencesJson) : [];
-      
-      const userPreferences = allPreferences.find(p => p.userId === userId);
-      
+      const allPreferences: NotificationPreferences[] = preferencesJson
+        ? JSON.parse(preferencesJson)
+        : [];
+
+      const userPreferences = allPreferences.find((p) => p.userId === userId);
+
       if (userPreferences) {
         return userPreferences;
       }
@@ -111,12 +120,19 @@ class NotificationService {
     }
   }
 
-  static async updateUserPreferences(userId: string, updates: Partial<NotificationPreferences>): Promise<NotificationPreferences> {
+  static async updateUserPreferences(
+    userId: string,
+    updates: Partial<NotificationPreferences>,
+  ): Promise<NotificationPreferences> {
     try {
       const preferencesJson = await AsyncStorage.getItem(this.PREFERENCES_KEY);
-      const allPreferences: NotificationPreferences[] = preferencesJson ? JSON.parse(preferencesJson) : [];
-      
-      const existingIndex = allPreferences.findIndex(p => p.userId === userId);
+      const allPreferences: NotificationPreferences[] = preferencesJson
+        ? JSON.parse(preferencesJson)
+        : [];
+
+      const existingIndex = allPreferences.findIndex(
+        (p) => p.userId === userId,
+      );
       const updatedPreferences: NotificationPreferences = {
         ...updates,
         userId,
@@ -132,18 +148,32 @@ class NotificationService {
         allPreferences.push(updatedPreferences);
       }
 
-      await AsyncStorage.setItem(this.PREFERENCES_KEY, JSON.stringify(allPreferences));
-      return allPreferences[existingIndex >= 0 ? existingIndex : allPreferences.length - 1];
+      await AsyncStorage.setItem(
+        this.PREFERENCES_KEY,
+        JSON.stringify(allPreferences),
+      );
+      return allPreferences[
+        existingIndex >= 0 ? existingIndex : allPreferences.length - 1
+      ];
     } catch (error) {
       console.error('Error updating user preferences:', error);
       throw error;
     }
   }
 
-  static async createNotification(notificationData: Omit<Notification, 'id' | 'isRead' | 'isSent' | 'createdAt'>): Promise<Notification> {
+  static async createNotification(
+    notificationData: Omit<
+      Notification,
+      'id' | 'isRead' | 'isSent' | 'createdAt'
+    >,
+  ): Promise<Notification> {
     try {
-      const notificationsJson = await AsyncStorage.getItem(this.NOTIFICATIONS_KEY);
-      const notifications: Notification[] = notificationsJson ? JSON.parse(notificationsJson) : [];
+      const notificationsJson = await AsyncStorage.getItem(
+        this.NOTIFICATIONS_KEY,
+      );
+      const notifications: Notification[] = notificationsJson
+        ? JSON.parse(notificationsJson)
+        : [];
 
       const newNotification: Notification = {
         ...notificationData,
@@ -154,7 +184,10 @@ class NotificationService {
       };
 
       notifications.unshift(newNotification);
-      await AsyncStorage.setItem(this.NOTIFICATIONS_KEY, JSON.stringify(notifications));
+      await AsyncStorage.setItem(
+        this.NOTIFICATIONS_KEY,
+        JSON.stringify(notifications),
+      );
 
       // Attempt to send the notification
       await this.sendNotification(newNotification);
@@ -166,14 +199,24 @@ class NotificationService {
     }
   }
 
-  static async getUserNotifications(userId: string, limit?: number): Promise<Notification[]> {
+  static async getUserNotifications(
+    userId: string,
+    limit?: number,
+  ): Promise<Notification[]> {
     try {
-      const notificationsJson = await AsyncStorage.getItem(this.NOTIFICATIONS_KEY);
-      const allNotifications: Notification[] = notificationsJson ? JSON.parse(notificationsJson) : [];
-      
+      const notificationsJson = await AsyncStorage.getItem(
+        this.NOTIFICATIONS_KEY,
+      );
+      const allNotifications: Notification[] = notificationsJson
+        ? JSON.parse(notificationsJson)
+        : [];
+
       const userNotifications = allNotifications
-        .filter(n => n.userId === userId)
-        .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+        .filter((n) => n.userId === userId)
+        .sort(
+          (a, b) =>
+            new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+        );
 
       return limit ? userNotifications.slice(0, limit) : userNotifications;
     } catch (error) {
@@ -184,11 +227,17 @@ class NotificationService {
 
   static async markAsRead(notificationId: string): Promise<boolean> {
     try {
-      const notificationsJson = await AsyncStorage.getItem(this.NOTIFICATIONS_KEY);
-      const notifications: Notification[] = notificationsJson ? JSON.parse(notificationsJson) : [];
-      
-      const notificationIndex = notifications.findIndex(n => n.id === notificationId);
-      
+      const notificationsJson = await AsyncStorage.getItem(
+        this.NOTIFICATIONS_KEY,
+      );
+      const notifications: Notification[] = notificationsJson
+        ? JSON.parse(notificationsJson)
+        : [];
+
+      const notificationIndex = notifications.findIndex(
+        (n) => n.id === notificationId,
+      );
+
       if (notificationIndex === -1) return false;
 
       notifications[notificationIndex] = {
@@ -197,7 +246,10 @@ class NotificationService {
         readAt: new Date().toISOString(),
       };
 
-      await AsyncStorage.setItem(this.NOTIFICATIONS_KEY, JSON.stringify(notifications));
+      await AsyncStorage.setItem(
+        this.NOTIFICATIONS_KEY,
+        JSON.stringify(notifications),
+      );
       return true;
     } catch (error) {
       console.error('Error marking notification as read:', error);
@@ -208,7 +260,7 @@ class NotificationService {
   static async getUnreadCount(userId: string): Promise<number> {
     try {
       const notifications = await this.getUserNotifications(userId);
-      return notifications.filter(n => !n.isRead).length;
+      return notifications.filter((n) => !n.isRead).length;
     } catch (error) {
       console.error('Error getting unread count:', error);
       return 0;
@@ -218,34 +270,48 @@ class NotificationService {
   static async sendNotification(notification: Notification): Promise<boolean> {
     try {
       const preferences = await this.getUserPreferences(notification.userId);
-      
+
       // Check if category is enabled
       if (!preferences.categories[notification.category]) {
-        console.log(`Notification category ${notification.category} is disabled for user ${notification.userId}`);
+        console.log(
+          `Notification category ${notification.category} is disabled for user ${notification.userId}`,
+        );
         return false;
       }
 
       // Check quiet hours for non-critical notifications
-      if (notification.priority !== 'critical' && this.isInQuietHours(preferences.quietHours)) {
+      if (
+        notification.priority !== 'critical' &&
+        this.isInQuietHours(preferences.quietHours)
+      ) {
         console.log('Notification delayed due to quiet hours');
-        return await this.scheduleNotification(notification, preferences.quietHours.end);
+        return await this.scheduleNotification(
+          notification,
+          preferences.quietHours.end,
+        );
       }
 
       const deliveryChannels: Array<'push' | 'email' | 'sms'> = [];
-      
+
       if (preferences.push) deliveryChannels.push('push');
       if (preferences.email) deliveryChannels.push('email');
-      if (preferences.sms && (notification.priority === 'high' || notification.priority === 'critical')) {
+      if (
+        preferences.sms &&
+        (notification.priority === 'high' ||
+          notification.priority === 'critical')
+      ) {
         deliveryChannels.push('sms');
       }
 
       // Attempt delivery on all enabled channels
       const deliveryResults = await Promise.all(
-        deliveryChannels.map(channel => this.attemptDelivery(notification, channel))
+        deliveryChannels.map((channel) =>
+          this.attemptDelivery(notification, channel),
+        ),
       );
 
-      const successful = deliveryResults.some(result => result.success);
-      
+      const successful = deliveryResults.some((result) => result.success);
+
       if (successful) {
         await this.markAsSent(notification.id);
       }
@@ -257,10 +323,15 @@ class NotificationService {
     }
   }
 
-  static async scheduleNotification(notification: Notification, deliveryTime: string): Promise<boolean> {
+  static async scheduleNotification(
+    notification: Notification,
+    deliveryTime: string,
+  ): Promise<boolean> {
     try {
       // In a real implementation, this would integrate with a job scheduler
-      console.log(`Notification ${notification.id} scheduled for ${deliveryTime}`);
+      console.log(
+        `Notification ${notification.id} scheduled for ${deliveryTime}`,
+      );
       return true;
     } catch (error) {
       console.error('Error scheduling notification:', error);
@@ -268,12 +339,18 @@ class NotificationService {
     }
   }
 
-  static async getDeliveryStatus(notificationId: string): Promise<DeliveryAttempt[]> {
+  static async getDeliveryStatus(
+    notificationId: string,
+  ): Promise<DeliveryAttempt[]> {
     try {
-      const attemptsJson = await AsyncStorage.getItem(this.DELIVERY_ATTEMPTS_KEY);
-      const allAttempts: DeliveryAttempt[] = attemptsJson ? JSON.parse(attemptsJson) : [];
-      
-      return allAttempts.filter(a => a.notificationId === notificationId);
+      const attemptsJson = await AsyncStorage.getItem(
+        this.DELIVERY_ATTEMPTS_KEY,
+      );
+      const allAttempts: DeliveryAttempt[] = attemptsJson
+        ? JSON.parse(attemptsJson)
+        : [];
+
+      return allAttempts.filter((a) => a.notificationId === notificationId);
     } catch (error) {
       console.error('Error getting delivery status:', error);
       return [];
@@ -282,12 +359,21 @@ class NotificationService {
 
   static async clearAllNotifications(userId: string): Promise<boolean> {
     try {
-      const notificationsJson = await AsyncStorage.getItem(this.NOTIFICATIONS_KEY);
-      const notifications: Notification[] = notificationsJson ? JSON.parse(notificationsJson) : [];
-      
-      const filteredNotifications = notifications.filter(n => n.userId !== userId);
-      
-      await AsyncStorage.setItem(this.NOTIFICATIONS_KEY, JSON.stringify(filteredNotifications));
+      const notificationsJson = await AsyncStorage.getItem(
+        this.NOTIFICATIONS_KEY,
+      );
+      const notifications: Notification[] = notificationsJson
+        ? JSON.parse(notificationsJson)
+        : [];
+
+      const filteredNotifications = notifications.filter(
+        (n) => n.userId !== userId,
+      );
+
+      await AsyncStorage.setItem(
+        this.NOTIFICATIONS_KEY,
+        JSON.stringify(filteredNotifications),
+      );
       return true;
     } catch (error) {
       console.error('Error clearing notifications:', error);
@@ -296,16 +382,18 @@ class NotificationService {
   }
 
   // Private helper methods
-  private static isInQuietHours(quietHours: NotificationPreferences['quietHours']): boolean {
+  private static isInQuietHours(
+    quietHours: NotificationPreferences['quietHours'],
+  ): boolean {
     if (!quietHours.enabled) return false;
 
     const now = new Date();
     const currentTime = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
-    
+
     const [startHour, startMin] = quietHours.start.split(':').map(Number);
     const [endHour, endMin] = quietHours.end.split(':').map(Number);
     const [currentHour, currentMin] = currentTime.split(':').map(Number);
-    
+
     const startMinutes = startHour * 60 + startMin;
     const endMinutes = endHour * 60 + endMin;
     const currentMinutes = currentHour * 60 + currentMin;
@@ -314,15 +402,18 @@ class NotificationService {
     if (startMinutes > endMinutes) {
       return currentMinutes >= startMinutes || currentMinutes <= endMinutes;
     }
-    
+
     return currentMinutes >= startMinutes && currentMinutes <= endMinutes;
   }
 
-  private static async attemptDelivery(notification: Notification, channel: 'push' | 'email' | 'sms'): Promise<{ success: boolean; error?: string }> {
+  private static async attemptDelivery(
+    notification: Notification,
+    channel: 'push' | 'email' | 'sms',
+  ): Promise<{ success: boolean; error?: string }> {
     try {
       // Mock delivery logic - in real implementation would integrate with push/email/SMS services
       const isSuccessful = Math.random() > 0.1; // 90% success rate
-      
+
       const attempt: DeliveryAttempt = {
         id: Date.now().toString(),
         notificationId: notification.id,
@@ -338,17 +429,29 @@ class NotificationService {
       return { success: isSuccessful, error: attempt.error };
     } catch (error) {
       console.error(`Error attempting ${channel} delivery:`, error);
-      return { success: false, error: error instanceof Error ? error.message : 'Unknown error' };
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : 'Unknown error',
+      };
     }
   }
 
-  private static async recordDeliveryAttempt(attempt: DeliveryAttempt): Promise<void> {
+  private static async recordDeliveryAttempt(
+    attempt: DeliveryAttempt,
+  ): Promise<void> {
     try {
-      const attemptsJson = await AsyncStorage.getItem(this.DELIVERY_ATTEMPTS_KEY);
-      const attempts: DeliveryAttempt[] = attemptsJson ? JSON.parse(attemptsJson) : [];
-      
+      const attemptsJson = await AsyncStorage.getItem(
+        this.DELIVERY_ATTEMPTS_KEY,
+      );
+      const attempts: DeliveryAttempt[] = attemptsJson
+        ? JSON.parse(attemptsJson)
+        : [];
+
       attempts.push(attempt);
-      await AsyncStorage.setItem(this.DELIVERY_ATTEMPTS_KEY, JSON.stringify(attempts));
+      await AsyncStorage.setItem(
+        this.DELIVERY_ATTEMPTS_KEY,
+        JSON.stringify(attempts),
+      );
     } catch (error) {
       console.error('Error recording delivery attempt:', error);
     }
@@ -356,11 +459,17 @@ class NotificationService {
 
   private static async markAsSent(notificationId: string): Promise<void> {
     try {
-      const notificationsJson = await AsyncStorage.getItem(this.NOTIFICATIONS_KEY);
-      const notifications: Notification[] = notificationsJson ? JSON.parse(notificationsJson) : [];
-      
-      const notificationIndex = notifications.findIndex(n => n.id === notificationId);
-      
+      const notificationsJson = await AsyncStorage.getItem(
+        this.NOTIFICATIONS_KEY,
+      );
+      const notifications: Notification[] = notificationsJson
+        ? JSON.parse(notificationsJson)
+        : [];
+
+      const notificationIndex = notifications.findIndex(
+        (n) => n.id === notificationId,
+      );
+
       if (notificationIndex >= 0) {
         notifications[notificationIndex] = {
           ...notifications[notificationIndex],
@@ -368,7 +477,10 @@ class NotificationService {
           sentAt: new Date().toISOString(),
         };
 
-        await AsyncStorage.setItem(this.NOTIFICATIONS_KEY, JSON.stringify(notifications));
+        await AsyncStorage.setItem(
+          this.NOTIFICATIONS_KEY,
+          JSON.stringify(notifications),
+        );
       }
     } catch (error) {
       console.error('Error marking as sent:', error);
@@ -377,14 +489,18 @@ class NotificationService {
 }
 
 describe('NotificationService', () => {
-  const mockConsoleError = jest.spyOn(console, 'error').mockImplementation(() => {});
-  const mockConsoleLog = jest.spyOn(console, 'log').mockImplementation(() => {});
+  const mockConsoleError = jest
+    .spyOn(console, 'error')
+    .mockImplementation(() => {});
+  const mockConsoleLog = jest
+    .spyOn(console, 'log')
+    .mockImplementation(() => {});
 
   beforeEach(() => {
     jest.clearAllMocks();
     mockConsoleError.mockClear();
     mockConsoleLog.mockClear();
-    
+
     // Set up default mock behavior
     mockAsyncStorage.getItem.mockResolvedValue(null);
     mockAsyncStorage.setItem.mockResolvedValue();
@@ -414,15 +530,19 @@ describe('NotificationService', () => {
           },
           createdAt: '2024-01-15T10:00:00Z',
           updatedAt: '2024-01-15T11:00:00Z',
-        }
+        },
       ];
 
-      mockAsyncStorage.getItem.mockResolvedValue(JSON.stringify(existingPreferences));
+      mockAsyncStorage.getItem.mockResolvedValue(
+        JSON.stringify(existingPreferences),
+      );
 
       const result = await NotificationService.getUserPreferences('user1');
 
       expect(result).toEqual(existingPreferences[0]);
-      expect(mockAsyncStorage.getItem).toHaveBeenCalledWith('aptly_notification_preferences');
+      expect(mockAsyncStorage.getItem).toHaveBeenCalledWith(
+        'aptly_notification_preferences',
+      );
     });
 
     test('should create and return default preferences for new user', async () => {
@@ -455,7 +575,7 @@ describe('NotificationService', () => {
 
       expect(mockAsyncStorage.setItem).toHaveBeenCalledWith(
         'aptly_notification_preferences',
-        expect.stringContaining('"userId":"user2"')
+        expect.stringContaining('"userId":"user2"'),
       );
     });
 
@@ -463,8 +583,13 @@ describe('NotificationService', () => {
       const error = new Error('Storage error');
       mockAsyncStorage.getItem.mockRejectedValue(error);
 
-      await expect(NotificationService.getUserPreferences('user1')).rejects.toThrow('Storage error');
-      expect(mockConsoleError).toHaveBeenCalledWith('Error getting user preferences:', error);
+      await expect(
+        NotificationService.getUserPreferences('user1'),
+      ).rejects.toThrow('Storage error');
+      expect(mockConsoleError).toHaveBeenCalledWith(
+        'Error getting user preferences:',
+        error,
+      );
     });
   });
 
@@ -490,10 +615,12 @@ describe('NotificationService', () => {
           },
           createdAt: '2024-01-15T10:00:00Z',
           updatedAt: '2024-01-15T10:00:00Z',
-        }
+        },
       ];
 
-      mockAsyncStorage.getItem.mockResolvedValue(JSON.stringify(existingPreferences));
+      mockAsyncStorage.getItem.mockResolvedValue(
+        JSON.stringify(existingPreferences),
+      );
 
       const updates = {
         push: false,
@@ -504,7 +631,10 @@ describe('NotificationService', () => {
         },
       };
 
-      const result = await NotificationService.updateUserPreferences('user1', updates);
+      const result = await NotificationService.updateUserPreferences(
+        'user1',
+        updates,
+      );
 
       expect(result).toMatchObject({
         userId: 'user1',
@@ -528,7 +658,10 @@ describe('NotificationService', () => {
         sms: false,
       };
 
-      const result = await NotificationService.updateUserPreferences('user2', newPreferences);
+      const result = await NotificationService.updateUserPreferences(
+        'user2',
+        newPreferences,
+      );
 
       expect(result).toMatchObject({
         userId: 'user2',
@@ -541,7 +674,9 @@ describe('NotificationService', () => {
       const error = new Error('Update error');
       mockAsyncStorage.getItem.mockRejectedValue(error);
 
-      await expect(NotificationService.updateUserPreferences('user1', { push: false })).rejects.toThrow('Update error');
+      await expect(
+        NotificationService.updateUserPreferences('user1', { push: false }),
+      ).rejects.toThrow('Update error');
     });
   });
 
@@ -561,7 +696,8 @@ describe('NotificationService', () => {
         priority: 'medium' as const,
       };
 
-      const result = await NotificationService.createNotification(notificationData);
+      const result =
+        await NotificationService.createNotification(notificationData);
 
       expect(result).toMatchObject({
         ...notificationData,
@@ -573,7 +709,7 @@ describe('NotificationService', () => {
 
       expect(mockAsyncStorage.setItem).toHaveBeenCalledWith(
         'aptly_notifications',
-        expect.stringContaining('"title":"New Bill Available"')
+        expect.stringContaining('"title":"New Bill Available"'),
       );
     });
 
@@ -589,7 +725,9 @@ describe('NotificationService', () => {
         priority: 'low' as const,
       };
 
-      await expect(NotificationService.createNotification(notificationData)).rejects.toThrow('Creation error');
+      await expect(
+        NotificationService.createNotification(notificationData),
+      ).rejects.toThrow('Creation error');
     });
   });
 
@@ -631,14 +769,16 @@ describe('NotificationService', () => {
         },
       ];
 
-      mockAsyncStorage.getItem.mockResolvedValue(JSON.stringify(allNotifications));
+      mockAsyncStorage.getItem.mockResolvedValue(
+        JSON.stringify(allNotifications),
+      );
 
       const result = await NotificationService.getUserNotifications('user1');
 
       expect(result).toHaveLength(2);
       expect(result[0].id).toBe('3'); // Most recent first
       expect(result[1].id).toBe('1');
-      expect(result.every(n => n.userId === 'user1')).toBe(true);
+      expect(result.every((n) => n.userId === 'user1')).toBe(true);
     });
 
     test('should respect limit parameter', async () => {
@@ -654,7 +794,9 @@ describe('NotificationService', () => {
         createdAt: new Date(2024, 0, 15, 10, i).toISOString(),
       }));
 
-      mockAsyncStorage.getItem.mockResolvedValue(JSON.stringify(userNotifications));
+      mockAsyncStorage.getItem.mockResolvedValue(
+        JSON.stringify(userNotifications),
+      );
 
       const result = await NotificationService.getUserNotifications('user1', 5);
 
@@ -668,7 +810,10 @@ describe('NotificationService', () => {
       const result = await NotificationService.getUserNotifications('user1');
 
       expect(result).toEqual([]);
-      expect(mockConsoleError).toHaveBeenCalledWith('Error getting user notifications:', error);
+      expect(mockConsoleError).toHaveBeenCalledWith(
+        'Error getting user notifications:',
+        error,
+      );
     });
   });
 
@@ -685,7 +830,7 @@ describe('NotificationService', () => {
           isRead: false,
           isSent: true,
           createdAt: '2024-01-15T10:00:00Z',
-        }
+        },
       ];
 
       mockAsyncStorage.getItem.mockResolvedValue(JSON.stringify(notifications));
@@ -693,7 +838,7 @@ describe('NotificationService', () => {
       const result = await NotificationService.markAsRead('1');
 
       expect(result).toBe(true);
-      
+
       const savedData = JSON.parse(mockAsyncStorage.setItem.mock.calls[0][1]);
       expect(savedData[0].isRead).toBe(true);
       expect(savedData[0].readAt).toBeDefined();
@@ -711,7 +856,9 @@ describe('NotificationService', () => {
       const error = new Error('Mark read error');
       mockAsyncStorage.getItem.mockRejectedValue(error);
 
-      await expect(NotificationService.markAsRead('1')).rejects.toThrow('Mark read error');
+      await expect(NotificationService.markAsRead('1')).rejects.toThrow(
+        'Mark read error',
+      );
     });
   });
 
@@ -723,7 +870,9 @@ describe('NotificationService', () => {
         { id: '3', userId: 'user1', isRead: false } as any,
       ];
 
-      mockAsyncStorage.getItem.mockResolvedValue(JSON.stringify(userNotifications));
+      mockAsyncStorage.getItem.mockResolvedValue(
+        JSON.stringify(userNotifications),
+      );
 
       const result = await NotificationService.getUnreadCount('user1');
 
@@ -738,7 +887,10 @@ describe('NotificationService', () => {
 
       expect(result).toBe(0);
       // The error is logged in getUserNotifications which is called by getUnreadCount
-      expect(mockConsoleError).toHaveBeenCalledWith('Error getting user notifications:', error);
+      expect(mockConsoleError).toHaveBeenCalledWith(
+        'Error getting user notifications:',
+        error,
+      );
     });
   });
 
@@ -779,7 +931,7 @@ describe('NotificationService', () => {
 
       expect(result).toBe(false);
       expect(mockConsoleLog).toHaveBeenCalledWith(
-        'Notification category maintenance is disabled for user user1'
+        'Notification category maintenance is disabled for user user1',
       );
     });
 
@@ -825,15 +977,15 @@ describe('NotificationService', () => {
       const result = await NotificationService.sendNotification(notification);
 
       expect(result).toBe(true);
-      
+
       // Should record delivery attempts for push and email (not SMS for medium priority)
       expect(mockAsyncStorage.setItem).toHaveBeenCalledWith(
         'aptly_delivery_attempts',
-        expect.stringContaining('"channel":"push"')
+        expect.stringContaining('"channel":"push"'),
       );
       expect(mockAsyncStorage.setItem).toHaveBeenCalledWith(
         'aptly_delivery_attempts',
-        expect.stringContaining('"channel":"email"')
+        expect.stringContaining('"channel":"email"'),
       );
 
       jest.restoreAllMocks();
@@ -881,7 +1033,7 @@ describe('NotificationService', () => {
       expect(result).toBe(true);
       expect(mockAsyncStorage.setItem).toHaveBeenCalledWith(
         'aptly_delivery_attempts',
-        expect.stringContaining('"channel":"sms"')
+        expect.stringContaining('"channel":"sms"'),
       );
 
       jest.restoreAllMocks();
@@ -893,15 +1045,21 @@ describe('NotificationService', () => {
       const allNotifications: Notification[] = [
         { id: '1', userId: 'user1', title: 'User 1 notification' } as any,
         { id: '2', userId: 'user2', title: 'User 2 notification' } as any,
-        { id: '3', userId: 'user1', title: 'Another user 1 notification' } as any,
+        {
+          id: '3',
+          userId: 'user1',
+          title: 'Another user 1 notification',
+        } as any,
       ];
 
-      mockAsyncStorage.getItem.mockResolvedValue(JSON.stringify(allNotifications));
+      mockAsyncStorage.getItem.mockResolvedValue(
+        JSON.stringify(allNotifications),
+      );
 
       const result = await NotificationService.clearAllNotifications('user1');
 
       expect(result).toBe(true);
-      
+
       const savedData = JSON.parse(mockAsyncStorage.setItem.mock.calls[0][1]);
       expect(savedData).toHaveLength(1);
       expect(savedData[0].userId).toBe('user2');
@@ -911,7 +1069,9 @@ describe('NotificationService', () => {
       const error = new Error('Clear error');
       mockAsyncStorage.getItem.mockRejectedValue(error);
 
-      await expect(NotificationService.clearAllNotifications('user1')).rejects.toThrow('Clear error');
+      await expect(
+        NotificationService.clearAllNotifications('user1'),
+      ).rejects.toThrow('Clear error');
     });
   });
 
@@ -923,7 +1083,13 @@ describe('NotificationService', () => {
         push: true,
         email: false,
         sms: false,
-        categories: { maintenance: true, billing: true, community: true, emergency: true, governance: true },
+        categories: {
+          maintenance: true,
+          billing: true,
+          community: true,
+          emergency: true,
+          governance: true,
+        },
         quietHours: { enabled: false, start: '22:00', end: '08:00' },
         createdAt: '2024-01-15T10:00:00Z',
         updatedAt: '2024-01-15T10:00:00Z',
@@ -947,20 +1113,23 @@ describe('NotificationService', () => {
         priority: 'medium' as const,
       };
 
-      const notification = await NotificationService.createNotification(notificationData);
+      const notification =
+        await NotificationService.createNotification(notificationData);
       expect(notification.id).toBeDefined();
 
       // Reset mocks for subsequent operations
       jest.clearAllMocks();
-      
+
       // Mock for markAsRead operation
       const createdNotification = {
         ...notification,
         isSent: true,
-        sentAt: '2024-01-15T10:05:00Z'
+        sentAt: '2024-01-15T10:05:00Z',
       };
-      
-      mockAsyncStorage.getItem.mockResolvedValue(JSON.stringify([createdNotification]));
+
+      mockAsyncStorage.getItem.mockResolvedValue(
+        JSON.stringify([createdNotification]),
+      );
 
       // Mark as read
       const markResult = await NotificationService.markAsRead(notification.id);
@@ -970,10 +1139,12 @@ describe('NotificationService', () => {
       const readNotification = {
         ...createdNotification,
         isRead: true,
-        readAt: '2024-01-15T10:10:00Z'
+        readAt: '2024-01-15T10:10:00Z',
       };
-      
-      mockAsyncStorage.getItem.mockResolvedValue(JSON.stringify([readNotification]));
+
+      mockAsyncStorage.getItem.mockResolvedValue(
+        JSON.stringify([readNotification]),
+      );
 
       // Get unread count (should be 0 since we marked it as read)
       const unreadCount = await NotificationService.getUnreadCount('user1');
@@ -1004,15 +1175,23 @@ describe('NotificationService', () => {
       mockAsyncStorage.getItem
         .mockResolvedValueOnce(JSON.stringify([initialPreferences])) // For updateUserPreferences
         .mockResolvedValueOnce(null) // For notifications storage
-        .mockResolvedValueOnce(JSON.stringify([{
-          ...initialPreferences,
-          categories: { ...initialPreferences.categories, maintenance: true }
-        }])); // For sending notification after update
+        .mockResolvedValueOnce(
+          JSON.stringify([
+            {
+              ...initialPreferences,
+              categories: {
+                ...initialPreferences.categories,
+                maintenance: true,
+              },
+            },
+          ]),
+        ); // For sending notification after update
 
       // Update preferences to enable maintenance notifications
-      const updatedPreferences = await NotificationService.updateUserPreferences('user1', {
-        categories: { ...initialPreferences.categories, maintenance: true }
-      });
+      const updatedPreferences =
+        await NotificationService.updateUserPreferences('user1', {
+          categories: { ...initialPreferences.categories, maintenance: true },
+        });
 
       expect(updatedPreferences.categories.maintenance).toBe(true);
 

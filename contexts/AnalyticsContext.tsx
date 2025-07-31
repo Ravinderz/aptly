@@ -1,4 +1,10 @@
-import React, { createContext, useContext, useReducer, useEffect, ReactNode } from 'react';
+import React, {
+  createContext,
+  useContext,
+  useReducer,
+  useEffect,
+  ReactNode,
+} from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 // Types
@@ -15,7 +21,7 @@ import type {
   GenerateReportRequest,
   AuditLogQuery,
   NotificationCampaignRequest,
-  OptimizationAnalysisRequest
+  OptimizationAnalysisRequest,
 } from '@/types/analytics';
 
 // State interface
@@ -25,25 +31,25 @@ interface AnalyticsState {
   auditEntries: AuditEntry[];
   performanceMetrics: PerformanceMetrics[];
   systemHealth: SystemHealth | null;
-  
+
   // Notification system
   notificationTemplates: NotificationTemplate[];
   notificationCampaigns: NotificationCampaign[];
   userPreferences: NotificationPreference[];
   intelligentDelivery: IntelligentDelivery[];
-  
+
   // Optimization
   optimizationRecommendations: OptimizationRecommendation[];
-  
+
   // UI State
   isLoading: boolean;
   error: string | null;
   lastUpdated: string | null;
-  
+
   // User context
   userRole: 'resident' | 'committee_member' | 'admin';
   userId: string;
-  
+
   // Preferences
   preferences: {
     dataRetention: number; // days
@@ -69,18 +75,39 @@ type AnalyticsAction =
   | { type: 'SET_SYSTEM_HEALTH'; payload: SystemHealth }
   | { type: 'SET_NOTIFICATION_TEMPLATES'; payload: NotificationTemplate[] }
   | { type: 'ADD_NOTIFICATION_TEMPLATE'; payload: NotificationTemplate }
-  | { type: 'UPDATE_NOTIFICATION_TEMPLATE'; payload: { id: string; updates: Partial<NotificationTemplate> } }
+  | {
+      type: 'UPDATE_NOTIFICATION_TEMPLATE';
+      payload: { id: string; updates: Partial<NotificationTemplate> };
+    }
   | { type: 'SET_NOTIFICATION_CAMPAIGNS'; payload: NotificationCampaign[] }
   | { type: 'ADD_NOTIFICATION_CAMPAIGN'; payload: NotificationCampaign }
-  | { type: 'UPDATE_NOTIFICATION_CAMPAIGN'; payload: { id: string; updates: Partial<NotificationCampaign> } }
+  | {
+      type: 'UPDATE_NOTIFICATION_CAMPAIGN';
+      payload: { id: string; updates: Partial<NotificationCampaign> };
+    }
   | { type: 'SET_USER_PREFERENCES'; payload: NotificationPreference[] }
-  | { type: 'UPDATE_USER_PREFERENCE'; payload: { userId: string; updates: Partial<NotificationPreference> } }
+  | {
+      type: 'UPDATE_USER_PREFERENCE';
+      payload: { userId: string; updates: Partial<NotificationPreference> };
+    }
   | { type: 'SET_INTELLIGENT_DELIVERY'; payload: IntelligentDelivery[] }
-  | { type: 'SET_OPTIMIZATION_RECOMMENDATIONS'; payload: OptimizationRecommendation[] }
-  | { type: 'UPDATE_OPTIMIZATION_RECOMMENDATION'; payload: { id: string; updates: Partial<OptimizationRecommendation> } }
-  | { type: 'SET_USER_ROLE'; payload: 'resident' | 'committee_member' | 'admin' }
+  | {
+      type: 'SET_OPTIMIZATION_RECOMMENDATIONS';
+      payload: OptimizationRecommendation[];
+    }
+  | {
+      type: 'UPDATE_OPTIMIZATION_RECOMMENDATION';
+      payload: { id: string; updates: Partial<OptimizationRecommendation> };
+    }
+  | {
+      type: 'SET_USER_ROLE';
+      payload: 'resident' | 'committee_member' | 'admin';
+    }
   | { type: 'SET_USER_ID'; payload: string }
-  | { type: 'UPDATE_PREFERENCES'; payload: Partial<AnalyticsState['preferences']> }
+  | {
+      type: 'UPDATE_PREFERENCES';
+      payload: Partial<AnalyticsState['preferences']>;
+    }
   | { type: 'REFRESH_DATA' };
 
 // Initial state
@@ -106,183 +133,189 @@ const initialState: AnalyticsState = {
     alertThresholds: {
       performance: 500, // ms
       errors: 5, // percentage
-      usage: 80 // percentage
-    }
-  }
+      usage: 80, // percentage
+    },
+  },
 };
 
 // Reducer
-function analyticsReducer(state: AnalyticsState, action: AnalyticsAction): AnalyticsState {
+function analyticsReducer(
+  state: AnalyticsState,
+  action: AnalyticsAction,
+): AnalyticsState {
   switch (action.type) {
     case 'SET_LOADING':
       return { ...state, isLoading: action.payload };
-    
+
     case 'SET_ERROR':
       return { ...state, error: action.payload, isLoading: false };
-    
+
     case 'SET_SOCIETY_ANALYTICS':
-      return { 
-        ...state, 
-        societyAnalytics: action.payload, 
+      return {
+        ...state,
+        societyAnalytics: action.payload,
         lastUpdated: new Date().toISOString(),
-        error: null 
+        error: null,
       };
-    
+
     case 'SET_AUDIT_ENTRIES':
-      return { 
-        ...state, 
-        auditEntries: action.payload, 
+      return {
+        ...state,
+        auditEntries: action.payload,
         lastUpdated: new Date().toISOString(),
-        error: null 
+        error: null,
       };
-    
+
     case 'ADD_AUDIT_ENTRY':
       return {
         ...state,
         auditEntries: [action.payload, ...state.auditEntries].slice(0, 1000), // Keep last 1000 entries
-        lastUpdated: new Date().toISOString()
-      };
-    
-    case 'SET_PERFORMANCE_METRICS':
-      return { 
-        ...state, 
-        performanceMetrics: action.payload, 
         lastUpdated: new Date().toISOString(),
-        error: null 
       };
-    
+
+    case 'SET_PERFORMANCE_METRICS':
+      return {
+        ...state,
+        performanceMetrics: action.payload,
+        lastUpdated: new Date().toISOString(),
+        error: null,
+      };
+
     case 'ADD_PERFORMANCE_METRIC':
       return {
         ...state,
-        performanceMetrics: [...state.performanceMetrics, action.payload].slice(-100), // Keep last 100 metrics
-        lastUpdated: new Date().toISOString()
+        performanceMetrics: [...state.performanceMetrics, action.payload].slice(
+          -100,
+        ), // Keep last 100 metrics
+        lastUpdated: new Date().toISOString(),
       };
-    
+
     case 'SET_SYSTEM_HEALTH':
-      return { 
-        ...state, 
-        systemHealth: action.payload, 
+      return {
+        ...state,
+        systemHealth: action.payload,
         lastUpdated: new Date().toISOString(),
-        error: null 
+        error: null,
       };
-    
+
     case 'SET_NOTIFICATION_TEMPLATES':
-      return { 
-        ...state, 
-        notificationTemplates: action.payload, 
+      return {
+        ...state,
+        notificationTemplates: action.payload,
         lastUpdated: new Date().toISOString(),
-        error: null 
+        error: null,
       };
-    
+
     case 'ADD_NOTIFICATION_TEMPLATE':
       return {
         ...state,
         notificationTemplates: [...state.notificationTemplates, action.payload],
-        lastUpdated: new Date().toISOString()
+        lastUpdated: new Date().toISOString(),
       };
-    
+
     case 'UPDATE_NOTIFICATION_TEMPLATE':
       return {
         ...state,
-        notificationTemplates: state.notificationTemplates.map(template =>
+        notificationTemplates: state.notificationTemplates.map((template) =>
           template.id === action.payload.id
             ? { ...template, ...action.payload.updates }
-            : template
+            : template,
         ),
-        lastUpdated: new Date().toISOString()
-      };
-    
-    case 'SET_NOTIFICATION_CAMPAIGNS':
-      return { 
-        ...state, 
-        notificationCampaigns: action.payload, 
         lastUpdated: new Date().toISOString(),
-        error: null 
       };
-    
+
+    case 'SET_NOTIFICATION_CAMPAIGNS':
+      return {
+        ...state,
+        notificationCampaigns: action.payload,
+        lastUpdated: new Date().toISOString(),
+        error: null,
+      };
+
     case 'ADD_NOTIFICATION_CAMPAIGN':
       return {
         ...state,
         notificationCampaigns: [...state.notificationCampaigns, action.payload],
-        lastUpdated: new Date().toISOString()
+        lastUpdated: new Date().toISOString(),
       };
-    
+
     case 'UPDATE_NOTIFICATION_CAMPAIGN':
       return {
         ...state,
-        notificationCampaigns: state.notificationCampaigns.map(campaign =>
+        notificationCampaigns: state.notificationCampaigns.map((campaign) =>
           campaign.id === action.payload.id
             ? { ...campaign, ...action.payload.updates }
-            : campaign
+            : campaign,
         ),
-        lastUpdated: new Date().toISOString()
-      };
-    
-    case 'SET_USER_PREFERENCES':
-      return { 
-        ...state, 
-        userPreferences: action.payload, 
         lastUpdated: new Date().toISOString(),
-        error: null 
       };
-    
+
+    case 'SET_USER_PREFERENCES':
+      return {
+        ...state,
+        userPreferences: action.payload,
+        lastUpdated: new Date().toISOString(),
+        error: null,
+      };
+
     case 'UPDATE_USER_PREFERENCE':
       return {
         ...state,
-        userPreferences: state.userPreferences.map(pref =>
+        userPreferences: state.userPreferences.map((pref) =>
           pref.userId === action.payload.userId
             ? { ...pref, ...action.payload.updates }
-            : pref
+            : pref,
         ),
-        lastUpdated: new Date().toISOString()
+        lastUpdated: new Date().toISOString(),
       };
-    
+
     case 'SET_INTELLIGENT_DELIVERY':
-      return { 
-        ...state, 
-        intelligentDelivery: action.payload, 
+      return {
+        ...state,
+        intelligentDelivery: action.payload,
         lastUpdated: new Date().toISOString(),
-        error: null 
+        error: null,
       };
-    
+
     case 'SET_OPTIMIZATION_RECOMMENDATIONS':
-      return { 
-        ...state, 
-        optimizationRecommendations: action.payload, 
+      return {
+        ...state,
+        optimizationRecommendations: action.payload,
         lastUpdated: new Date().toISOString(),
-        error: null 
+        error: null,
       };
-    
+
     case 'UPDATE_OPTIMIZATION_RECOMMENDATION':
       return {
         ...state,
-        optimizationRecommendations: state.optimizationRecommendations.map(rec =>
-          rec.id === action.payload.id
-            ? { ...rec, ...action.payload.updates }
-            : rec
+        optimizationRecommendations: state.optimizationRecommendations.map(
+          (rec) =>
+            rec.id === action.payload.id
+              ? { ...rec, ...action.payload.updates }
+              : rec,
         ),
-        lastUpdated: new Date().toISOString()
+        lastUpdated: new Date().toISOString(),
       };
-    
+
     case 'SET_USER_ROLE':
       return { ...state, userRole: action.payload };
-    
+
     case 'SET_USER_ID':
       return { ...state, userId: action.payload };
-    
+
     case 'UPDATE_PREFERENCES':
       return {
         ...state,
-        preferences: { ...state.preferences, ...action.payload }
+        preferences: { ...state.preferences, ...action.payload },
       };
-    
+
     case 'REFRESH_DATA':
       return {
         ...state,
         isLoading: true,
-        error: null
+        error: null,
       };
-    
+
     default:
       return state;
   }
@@ -291,46 +324,60 @@ function analyticsReducer(state: AnalyticsState, action: AnalyticsAction): Analy
 // Context interface
 interface AnalyticsContextType {
   state: AnalyticsState;
-  
+
   // Actions
   setLoading: (loading: boolean) => void;
   setError: (error: string | null) => void;
-  
+
   // Analytics actions
   loadSocietyAnalytics: () => Promise<void>;
   generateReport: (request: GenerateReportRequest) => Promise<void>;
   exportReport: (format: 'json' | 'csv' | 'pdf') => Promise<void>;
-  
+
   // Audit actions
   loadAuditEntries: (query?: Partial<AuditLogQuery>) => Promise<void>;
   logAuditEntry: (entry: Partial<AuditEntry>) => Promise<void>;
   exportAuditLog: (format: 'json' | 'csv' | 'pdf') => Promise<void>;
-  
+
   // Performance actions
   loadPerformanceMetrics: () => Promise<void>;
   recordPerformanceMetric: (metric: PerformanceMetrics) => Promise<void>;
   loadSystemHealth: () => Promise<void>;
-  
+
   // Notification actions
   loadNotificationTemplates: () => Promise<void>;
-  createNotificationTemplate: (template: Partial<NotificationTemplate>) => Promise<void>;
-  updateNotificationTemplate: (id: string, updates: Partial<NotificationTemplate>) => Promise<void>;
+  createNotificationTemplate: (
+    template: Partial<NotificationTemplate>,
+  ) => Promise<void>;
+  updateNotificationTemplate: (
+    id: string,
+    updates: Partial<NotificationTemplate>,
+  ) => Promise<void>;
   loadNotificationCampaigns: () => Promise<void>;
-  createNotificationCampaign: (campaign: NotificationCampaignRequest) => Promise<void>;
+  createNotificationCampaign: (
+    campaign: NotificationCampaignRequest,
+  ) => Promise<void>;
   sendNotificationCampaign: (campaignId: string) => Promise<void>;
   loadUserPreferences: () => Promise<void>;
-  updateUserPreferences: (userId: string, preferences: Partial<NotificationPreference>) => Promise<void>;
-  
+  updateUserPreferences: (
+    userId: string,
+    preferences: Partial<NotificationPreference>,
+  ) => Promise<void>;
+
   // Optimization actions
   loadOptimizationRecommendations: () => Promise<void>;
-  analyzeOptimizations: (request: OptimizationAnalysisRequest) => Promise<OptimizationRecommendation[]>;
+  analyzeOptimizations: (
+    request: OptimizationAnalysisRequest,
+  ) => Promise<OptimizationRecommendation[]>;
   applyOptimization: (recommendationId: string) => Promise<void>;
   dismissAlert: (alertId: string) => Promise<void>;
-  
+
   // General actions
   refreshAllData: () => Promise<void>;
-  updateAnalyticsPreferences: (preferences: Partial<AnalyticsState['preferences']>) => Promise<void>;
-  
+  updateAnalyticsPreferences: (
+    preferences: Partial<AnalyticsState['preferences']>,
+  ) => Promise<void>;
+
   // Utility functions
   canUserAccessAnalytics: () => boolean;
   canUserExportData: () => boolean;
@@ -339,14 +386,16 @@ interface AnalyticsContextType {
 }
 
 // Create context
-const AnalyticsContext = createContext<AnalyticsContextType | undefined>(undefined);
+const AnalyticsContext = createContext<AnalyticsContextType | undefined>(
+  undefined,
+);
 
 // Storage keys
 const STORAGE_KEYS = {
   PREFERENCES: '@analytics_preferences',
   USER_ROLE: '@analytics_user_role',
   USER_ID: '@analytics_user_id',
-  CACHED_DATA: '@analytics_cached_data'
+  CACHED_DATA: '@analytics_cached_data',
 };
 
 // Provider component
@@ -354,7 +403,9 @@ interface AnalyticsProviderProps {
   children: ReactNode;
 }
 
-export const AnalyticsProvider: React.FC<AnalyticsProviderProps> = ({ children }) => {
+export const AnalyticsProvider: React.FC<AnalyticsProviderProps> = ({
+  children,
+}) => {
   const [state, dispatch] = useReducer(analyticsReducer, initialState);
 
   // Initialize data on mount
@@ -365,7 +416,10 @@ export const AnalyticsProvider: React.FC<AnalyticsProviderProps> = ({ children }
   // Save preferences to storage when they change
   useEffect(() => {
     if (state.preferences) {
-      AsyncStorage.setItem(STORAGE_KEYS.PREFERENCES, JSON.stringify(state.preferences));
+      AsyncStorage.setItem(
+        STORAGE_KEYS.PREFERENCES,
+        JSON.stringify(state.preferences),
+      );
     }
   }, [state.preferences]);
 
@@ -385,20 +439,22 @@ export const AnalyticsProvider: React.FC<AnalyticsProviderProps> = ({ children }
       dispatch({ type: 'SET_LOADING', payload: true });
 
       // Load cached preferences
-      const cachedPreferences = await AsyncStorage.getItem(STORAGE_KEYS.PREFERENCES);
+      const cachedPreferences = await AsyncStorage.getItem(
+        STORAGE_KEYS.PREFERENCES,
+      );
       if (cachedPreferences) {
-        dispatch({ 
-          type: 'UPDATE_PREFERENCES', 
-          payload: JSON.parse(cachedPreferences) 
+        dispatch({
+          type: 'UPDATE_PREFERENCES',
+          payload: JSON.parse(cachedPreferences),
         });
       }
 
       // Load user role
       const cachedUserRole = await AsyncStorage.getItem(STORAGE_KEYS.USER_ROLE);
       if (cachedUserRole) {
-        dispatch({ 
-          type: 'SET_USER_ROLE', 
-          payload: cachedUserRole as 'resident' | 'committee_member' | 'admin' 
+        dispatch({
+          type: 'SET_USER_ROLE',
+          payload: cachedUserRole as 'resident' | 'committee_member' | 'admin',
         });
       }
 
@@ -414,9 +470,8 @@ export const AnalyticsProvider: React.FC<AnalyticsProviderProps> = ({ children }
         loadSystemHealth(),
         loadNotificationTemplates(),
         loadNotificationCampaigns(),
-        loadOptimizationRecommendations()
+        loadOptimizationRecommendations(),
       ]);
-
     } catch (error) {
       console.error('Failed to initialize analytics data:', error);
       dispatch({ type: 'SET_ERROR', payload: 'Failed to load analytics data' });
@@ -428,10 +483,7 @@ export const AnalyticsProvider: React.FC<AnalyticsProviderProps> = ({ children }
   const refreshCriticalData = async () => {
     try {
       // Refresh only critical data that changes frequently
-      await Promise.all([
-        loadSystemHealth(),
-        loadPerformanceMetrics()
-      ]);
+      await Promise.all([loadSystemHealth(), loadPerformanceMetrics()]);
     } catch (error) {
       console.error('Failed to refresh critical data:', error);
     }
@@ -447,7 +499,7 @@ export const AnalyticsProvider: React.FC<AnalyticsProviderProps> = ({ children }
         reportPeriod: {
           startDate: '2024-01-01T00:00:00Z',
           endDate: '2024-01-31T23:59:59Z',
-          type: 'monthly'
+          type: 'monthly',
         },
         generatedAt: new Date().toISOString(),
         kpis: {
@@ -465,7 +517,7 @@ export const AnalyticsProvider: React.FC<AnalyticsProviderProps> = ({ children }
           digitalAdoptionRate: 73.6,
           emergencyResponseTime: 8.5,
           securityIncidentRate: 0.8,
-          visitorComplianceRate: 94.2
+          visitorComplianceRate: 94.2,
         },
         // ... rest of the mock data would be included here
         operationalMetrics: {
@@ -473,9 +525,14 @@ export const AnalyticsProvider: React.FC<AnalyticsProviderProps> = ({ children }
             totalRequests: 45,
             completedRequests: 42,
             averageResolutionTime: 4.2,
-            requestsByCategory: { 'Plumbing': 18, 'Electrical': 12, 'Painting': 8, 'Other': 7 },
+            requestsByCategory: {
+              Plumbing: 18,
+              Electrical: 12,
+              Painting: 8,
+              Other: 7,
+            },
             residentSatisfactionRating: 4.1,
-            costPerRequest: 1850
+            costPerRequest: 1850,
           },
           visitorManagement: {
             totalVisitors: 287,
@@ -483,21 +540,21 @@ export const AnalyticsProvider: React.FC<AnalyticsProviderProps> = ({ children }
             averageApprovalTime: 12.5,
             qrCodeUsageRate: 78.4,
             securityIncidents: 2,
-            peakVisitorHours: []
+            peakVisitorHours: [],
           },
           amenityUtilization: {
             bookingRate: 68.5,
             noShowRate: 8.2,
             averageBookingDuration: 2.5,
             mostPopularAmenities: [],
-            revenueGenerated: 15200
+            revenueGenerated: 15200,
           },
           communication: {
             noticeReadRate: 76.8,
             notificationDeliveryRate: 98.2,
             communityPostEngagement: 34.5,
-            averageResponseTime: 3.2
-          }
+            averageResponseTime: 3.2,
+          },
         },
         financialAnalytics: {
           collections: {
@@ -505,47 +562,47 @@ export const AnalyticsProvider: React.FC<AnalyticsProviderProps> = ({ children }
             collectionEfficiency: 92.3,
             outstandingAmount: 390000,
             collectionTrend: [],
-            paymentMethodBreakdown: []
+            paymentMethodBreakdown: [],
           },
           expenses: {
             totalExpenses: 3890000,
             expenseByCategory: [],
             budgetVariance: -5.2,
             costPerSqFt: 42.5,
-            expenseTrend: []
+            expenseTrend: [],
           },
           revenue: {
             utilityBillCommissions: 45000,
             amenityBookingRevenue: 15200,
             parkingFees: 28000,
             otherRevenues: 12000,
-            revenueGrowthRate: 8.3
+            revenueGrowthRate: 8.3,
           },
           healthIndicators: {
             cashFlowRatio: 1.24,
             debtToAssetRatio: 0.15,
             emergencyFundRatio: 0.18,
-            collectionConsistency: 0.92
-          }
+            collectionConsistency: 0.92,
+          },
         },
         governanceMetrics: {
           democraticParticipation: {
             votingParticipationRate: 72.4,
             policyProposalEngagement: 45.8,
             meetingAttendance: 38.2,
-            feedbackResponseRate: 56.7
+            feedbackResponseRate: 56.7,
           },
           leadership: {
             decisionMakingSpeed: 5.2,
             implementationSuccess: 84.6,
             residentApprovalRating: 4.1,
-            transparencyScore: 7.8
+            transparencyScore: 7.8,
           },
           compliance: {
             policyComplianceRate: 91.5,
             regulatoryAdherence: 96.8,
             auditFindings: [],
-            correctionTime: 3.5
+            correctionTime: 3.5,
           },
           emergencyPreparedness: {
             responseReadiness: 87.2,
@@ -555,10 +612,10 @@ export const AnalyticsProvider: React.FC<AnalyticsProviderProps> = ({ children }
               operational: 23,
               needsMaintenance: 2,
               outOfService: 0,
-              lastInspection: '2024-01-15T10:00:00Z'
+              lastInspection: '2024-01-15T10:00:00Z',
             },
-            contactUpdatedRate: 89.3
-          }
+            contactUpdatedRate: 89.3,
+          },
         },
         communityMetrics: {
           engagement: {
@@ -567,21 +624,21 @@ export const AnalyticsProvider: React.FC<AnalyticsProviderProps> = ({ children }
             weeklyActiveUsers: 78,
             monthlyActiveUsers: 104,
             engagementRate: 34.7,
-            sessionDuration: 12.5
+            sessionDuration: 12.5,
           },
           communication: {
             postsPerUser: 2.8,
             commentsPerPost: 4.3,
             likesPerPost: 12.7,
             mentionsPerUser: 1.6,
-            responsiveness: 76.4
+            responsiveness: 76.4,
           },
           communityHealth: {
             conflictResolutionRate: 94.2,
             cooperationIndex: 0.82,
             diversityIndex: 0.67,
             inclusionScore: 7.4,
-            wellbeingIndex: 7.8
+            wellbeingIndex: 7.8,
           },
           events: {
             eventAttendance: 42.1,
@@ -590,17 +647,17 @@ export const AnalyticsProvider: React.FC<AnalyticsProviderProps> = ({ children }
               positive: 68.4,
               negative: 12.7,
               neutral: 18.9,
-              overallScore: 0.74
+              overallScore: 0.74,
             },
-            recurringParticipants: 28
-          }
+            recurringParticipants: 28,
+          },
         },
         performanceInsights: [],
         recommendations: [],
         trends: [],
-        predictions: []
+        predictions: [],
       };
-      
+
       dispatch({ type: 'SET_SOCIETY_ANALYTICS', payload: mockAnalytics });
     } catch (error) {
       console.error('Failed to load society analytics:', error);
@@ -688,10 +745,38 @@ export const AnalyticsProvider: React.FC<AnalyticsProviderProps> = ({ children }
         components: [],
         dependencies: [],
         resources: {
-          cpu: { current: 45, average: 42, peak: 78, threshold: 80, unit: '%', trend: 'stable' },
-          memory: { current: 68, average: 65, peak: 85, threshold: 90, unit: '%', trend: 'up' },
-          storage: { current: 234, average: 220, peak: 280, threshold: 500, unit: 'GB', trend: 'up' },
-          network: { current: 125, average: 110, peak: 280, threshold: 1000, unit: 'Mbps', trend: 'stable' }
+          cpu: {
+            current: 45,
+            average: 42,
+            peak: 78,
+            threshold: 80,
+            unit: '%',
+            trend: 'stable',
+          },
+          memory: {
+            current: 68,
+            average: 65,
+            peak: 85,
+            threshold: 90,
+            unit: '%',
+            trend: 'up',
+          },
+          storage: {
+            current: 234,
+            average: 220,
+            peak: 280,
+            threshold: 500,
+            unit: 'GB',
+            trend: 'up',
+          },
+          network: {
+            current: 125,
+            average: 110,
+            peak: 280,
+            threshold: 1000,
+            unit: 'Mbps',
+            trend: 'stable',
+          },
         },
         activeAlerts: [],
         recentIncidents: [],
@@ -699,9 +784,9 @@ export const AnalyticsProvider: React.FC<AnalyticsProviderProps> = ({ children }
         lastDowntime: '2024-01-30T14:00:00Z',
         mtbf: 720,
         mttr: 45,
-        lastUpdated: new Date().toISOString()
+        lastUpdated: new Date().toISOString(),
       };
-      
+
       dispatch({ type: 'SET_SYSTEM_HEALTH', payload: mockSystemHealth });
     } catch (error) {
       console.error('Failed to load system health:', error);
@@ -720,7 +805,9 @@ export const AnalyticsProvider: React.FC<AnalyticsProviderProps> = ({ children }
     }
   };
 
-  const createNotificationTemplate = async (templateData: Partial<NotificationTemplate>) => {
+  const createNotificationTemplate = async (
+    templateData: Partial<NotificationTemplate>,
+  ) => {
     try {
       // Mock API call - would create notification template via real API
       console.log('Creating notification template:', templateData);
@@ -730,10 +817,16 @@ export const AnalyticsProvider: React.FC<AnalyticsProviderProps> = ({ children }
     }
   };
 
-  const updateNotificationTemplate = async (id: string, updates: Partial<NotificationTemplate>) => {
+  const updateNotificationTemplate = async (
+    id: string,
+    updates: Partial<NotificationTemplate>,
+  ) => {
     try {
       // Mock API call - would update notification template via real API
-      dispatch({ type: 'UPDATE_NOTIFICATION_TEMPLATE', payload: { id, updates } });
+      dispatch({
+        type: 'UPDATE_NOTIFICATION_TEMPLATE',
+        payload: { id, updates },
+      });
     } catch (error) {
       console.error('Failed to update notification template:', error);
       throw error;
@@ -751,7 +844,9 @@ export const AnalyticsProvider: React.FC<AnalyticsProviderProps> = ({ children }
     }
   };
 
-  const createNotificationCampaign = async (campaignData: NotificationCampaignRequest) => {
+  const createNotificationCampaign = async (
+    campaignData: NotificationCampaignRequest,
+  ) => {
     try {
       // Mock API call - would create notification campaign via real API
       console.log('Creating notification campaign:', campaignData);
@@ -782,10 +877,16 @@ export const AnalyticsProvider: React.FC<AnalyticsProviderProps> = ({ children }
     }
   };
 
-  const updateUserPreferences = async (userId: string, preferences: Partial<NotificationPreference>) => {
+  const updateUserPreferences = async (
+    userId: string,
+    preferences: Partial<NotificationPreference>,
+  ) => {
     try {
       // Mock API call - would update user preferences via real API
-      dispatch({ type: 'UPDATE_USER_PREFERENCE', payload: { userId, updates: preferences } });
+      dispatch({
+        type: 'UPDATE_USER_PREFERENCE',
+        payload: { userId, updates: preferences },
+      });
     } catch (error) {
       console.error('Failed to update user preferences:', error);
       throw error;
@@ -796,14 +897,19 @@ export const AnalyticsProvider: React.FC<AnalyticsProviderProps> = ({ children }
     try {
       // Mock API call - would fetch optimization recommendations from real API
       const mockRecommendations: OptimizationRecommendation[] = [];
-      dispatch({ type: 'SET_OPTIMIZATION_RECOMMENDATIONS', payload: mockRecommendations });
+      dispatch({
+        type: 'SET_OPTIMIZATION_RECOMMENDATIONS',
+        payload: mockRecommendations,
+      });
     } catch (error) {
       console.error('Failed to load optimization recommendations:', error);
       throw error;
     }
   };
 
-  const analyzeOptimizations = async (request: OptimizationAnalysisRequest): Promise<OptimizationRecommendation[]> => {
+  const analyzeOptimizations = async (
+    request: OptimizationAnalysisRequest,
+  ): Promise<OptimizationRecommendation[]> => {
     try {
       // Mock API call - would analyze optimizations via real API
       console.log('Analyzing optimizations:', request);
@@ -817,12 +923,12 @@ export const AnalyticsProvider: React.FC<AnalyticsProviderProps> = ({ children }
   const applyOptimization = async (recommendationId: string) => {
     try {
       // Mock API call - would apply optimization via real API
-      dispatch({ 
-        type: 'UPDATE_OPTIMIZATION_RECOMMENDATION', 
-        payload: { 
-          id: recommendationId, 
-          updates: { status: 'in_progress' } 
-        } 
+      dispatch({
+        type: 'UPDATE_OPTIMIZATION_RECOMMENDATION',
+        payload: {
+          id: recommendationId,
+          updates: { status: 'in_progress' },
+        },
       });
     } catch (error) {
       console.error('Failed to apply optimization:', error);
@@ -845,13 +951,18 @@ export const AnalyticsProvider: React.FC<AnalyticsProviderProps> = ({ children }
     await initializeAnalyticsData();
   };
 
-  const updateAnalyticsPreferences = async (preferences: Partial<AnalyticsState['preferences']>) => {
+  const updateAnalyticsPreferences = async (
+    preferences: Partial<AnalyticsState['preferences']>,
+  ) => {
     try {
       dispatch({ type: 'UPDATE_PREFERENCES', payload: preferences });
-      await AsyncStorage.setItem(STORAGE_KEYS.PREFERENCES, JSON.stringify({
-        ...state.preferences,
-        ...preferences
-      }));
+      await AsyncStorage.setItem(
+        STORAGE_KEYS.PREFERENCES,
+        JSON.stringify({
+          ...state.preferences,
+          ...preferences,
+        }),
+      );
     } catch (error) {
       console.error('Failed to update analytics preferences:', error);
       throw error;
@@ -874,13 +985,15 @@ export const AnalyticsProvider: React.FC<AnalyticsProviderProps> = ({ children }
     switch (state.userRole) {
       case 'admin':
         return [
-          'view_analytics', 'export_data', 'manage_notifications',
-          'view_audit_logs', 'manage_performance', 'apply_optimizations'
+          'view_analytics',
+          'export_data',
+          'manage_notifications',
+          'view_audit_logs',
+          'manage_performance',
+          'apply_optimizations',
         ];
       case 'committee_member':
-        return [
-          'view_analytics', 'manage_notifications', 'view_audit_logs'
-        ];
+        return ['view_analytics', 'manage_notifications', 'view_audit_logs'];
       case 'resident':
       default:
         return ['view_basic_metrics'];
@@ -889,8 +1002,10 @@ export const AnalyticsProvider: React.FC<AnalyticsProviderProps> = ({ children }
 
   const contextValue: AnalyticsContextType = {
     state,
-    setLoading: (loading: boolean) => dispatch({ type: 'SET_LOADING', payload: loading }),
-    setError: (error: string | null) => dispatch({ type: 'SET_ERROR', payload: error }),
+    setLoading: (loading: boolean) =>
+      dispatch({ type: 'SET_LOADING', payload: loading }),
+    setError: (error: string | null) =>
+      dispatch({ type: 'SET_ERROR', payload: error }),
     loadSocietyAnalytics,
     generateReport,
     exportReport,
@@ -917,7 +1032,7 @@ export const AnalyticsProvider: React.FC<AnalyticsProviderProps> = ({ children }
     canUserAccessAnalytics,
     canUserExportData,
     canUserManageNotifications,
-    getAnalyticsPermissions
+    getAnalyticsPermissions,
   };
 
   return (

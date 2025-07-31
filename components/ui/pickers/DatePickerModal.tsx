@@ -1,19 +1,19 @@
-import { DatePickerModalProps, DatePreset } from "@/types/pickers";
+import { DatePickerModalProps, DatePreset } from '@/types/pickers';
 import {
   addDays,
   getNextWeekend,
   isDateInRange,
   isPastDate,
   isToday,
-} from "@/utils/dateUtils";
+} from '@/utils/dateUtils';
 import {
   Calendar,
   ChevronLeft,
   ChevronRight,
   Clock,
   X,
-} from "lucide-react-native";
-import React, { useEffect, useRef, useState } from "react";
+} from 'lucide-react-native';
+import React, { useEffect, useRef, useState } from 'react';
 import {
   Animated,
   Dimensions,
@@ -22,9 +22,9 @@ import {
   Text,
   TouchableOpacity,
   View,
-} from "react-native";
+} from 'react-native';
 
-const { height: SCREEN_HEIGHT } = Dimensions.get("window");
+const { height: SCREEN_HEIGHT } = Dimensions.get('window');
 
 export default function DatePickerModal({
   visible,
@@ -37,7 +37,7 @@ export default function DatePickerModal({
   maxDaysInAdvance = 30,
   showPresets = true,
   presetOptions,
-  title = "Select Date",
+  title = 'Select Date',
 }: DatePickerModalProps) {
   const [currentDate, setCurrentDate] = useState(new Date());
   const [viewDate, setViewDate] = useState(selectedDate || new Date());
@@ -47,17 +47,17 @@ export default function DatePickerModal({
   // Default presets
   const defaultPresets: DatePreset[] = [
     {
-      label: "Today",
+      label: 'Today',
       value: new Date(),
       icon: <Calendar size={16} className="text-primary" />,
     },
     {
-      label: "Tomorrow",
+      label: 'Tomorrow',
       value: addDays(new Date(), 1),
       icon: <Clock size={16} className="text-primary" />,
     },
     {
-      label: "This Weekend",
+      label: 'This Weekend',
       value: getNextWeekend(),
       icon: <Calendar size={16} className="text-primary" />,
     },
@@ -153,30 +153,30 @@ export default function DatePickerModal({
     }
   };
 
-  const navigateMonth = (direction: "prev" | "next") => {
+  const navigateMonth = (direction: 'prev' | 'next') => {
     setViewDate((prev) => {
       const newDate = new Date(prev);
-      newDate.setMonth(prev.getMonth() + (direction === "next" ? 1 : -1));
+      newDate.setMonth(prev.getMonth() + (direction === 'next' ? 1 : -1));
       return newDate;
     });
   };
 
   const monthNames = [
-    "January",
-    "February",
-    "March",
-    "April",
-    "May",
-    "June",
-    "July",
-    "August",
-    "September",
-    "October",
-    "November",
-    "December",
+    'January',
+    'February',
+    'March',
+    'April',
+    'May',
+    'June',
+    'July',
+    'August',
+    'September',
+    'October',
+    'November',
+    'December',
   ];
 
-  const weekDays = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+  const weekDays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
   const days = getDaysInMonth(viewDate);
 
@@ -185,12 +185,10 @@ export default function DatePickerModal({
       visible={visible}
       transparent={true}
       animationType="none"
-      onRequestClose={onClose}
-    >
+      onRequestClose={onClose}>
       <Animated.View
         style={{ opacity: fadeAnim }}
-        className="flex-1 bg-black/50 justify-end"
-      >
+        className="flex-1 bg-black/50 justify-end">
         <TouchableOpacity
           className="flex-1"
           activeOpacity={1}
@@ -201,8 +199,7 @@ export default function DatePickerModal({
           style={{
             transform: [{ translateY: slideAnim }],
           }}
-          className="bg-surface rounded-t-3xl shadow-xl shadow-black/10"
-        >
+          className="bg-surface rounded-t-3xl shadow-xl shadow-black/10">
           {/* Header */}
           <View className="flex-row items-center justify-between p-6 border-b border-divider">
             <Text className="text-headline-large font-semibold text-text-primary">
@@ -210,16 +207,14 @@ export default function DatePickerModal({
             </Text>
             <TouchableOpacity
               onPress={onClose}
-              className="w-10 h-10 rounded-full bg-background items-center justify-center"
-            >
+              className="w-10 h-10 rounded-full bg-background items-center justify-center">
               <X size={20} className="text-text-primary" />
             </TouchableOpacity>
           </View>
 
           <ScrollView
             className="max-h-128"
-            showsVerticalScrollIndicator={false}
-          >
+            showsVerticalScrollIndicator={false}>
             {/* Quick Presets */}
             {showPresets && (
               <View className="p-6 border-b border-divider">
@@ -234,22 +229,20 @@ export default function DatePickerModal({
                       disabled={isDateDisabled(preset.value)}
                       className={`flex-row items-center px-4 py-2 rounded-xl border ${
                         isDateDisabled(preset.value)
-                          ? "bg-background border-divider opacity-50"
+                          ? 'bg-background border-divider opacity-50'
                           : isDateSelected(preset.value)
-                          ? "bg-primary border-primary"
-                          : "bg-background border-divider"
-                      }`}
-                    >
+                            ? 'bg-primary border-primary'
+                            : 'bg-background border-divider'
+                      }`}>
                       {preset.icon}
                       <Text
                         className={`ml-2 text-label-large font-medium ${
                           isDateDisabled(preset.value)
-                            ? "text-text-secondary"
+                            ? 'text-text-secondary'
                             : isDateSelected(preset.value)
-                            ? "text-white"
-                            : "text-text-primary"
-                        }`}
-                      >
+                              ? 'text-white'
+                              : 'text-text-primary'
+                        }`}>
                         {preset.label}
                       </Text>
                     </TouchableOpacity>
@@ -262,9 +255,8 @@ export default function DatePickerModal({
             <View className="p-6 pb-3">
               <View className="flex-row items-center justify-between mb-4">
                 <TouchableOpacity
-                  onPress={() => navigateMonth("prev")}
-                  className="w-10 h-10 rounded-full bg-background items-center justify-center"
-                >
+                  onPress={() => navigateMonth('prev')}
+                  className="w-10 h-10 rounded-full bg-background items-center justify-center">
                   <ChevronLeft size={20} className="text-text-primary" />
                 </TouchableOpacity>
 
@@ -273,9 +265,8 @@ export default function DatePickerModal({
                 </Text>
 
                 <TouchableOpacity
-                  onPress={() => navigateMonth("next")}
-                  className="w-10 h-10 rounded-full bg-background items-center justify-center"
-                >
+                  onPress={() => navigateMonth('next')}
+                  className="w-10 h-10 rounded-full bg-background items-center justify-center">
                   <ChevronRight size={20} className="text-text-primary" />
                 </TouchableOpacity>
               </View>
@@ -303,31 +294,28 @@ export default function DatePickerModal({
                     <View
                       key={index}
                       className="aspect-square p-1"
-                      style={{ width: "14.28%" }}
-                    >
+                      style={{ width: '14.28%' }}>
                       {!isEmpty && (
                         <TouchableOpacity
                           onPress={() => handleDateSelect(date)}
                           disabled={isDisabled}
                           className={`flex-1 rounded-xl items-center justify-center ${
                             isSelected
-                              ? "bg-primary"
+                              ? 'bg-primary'
                               : isTodayDate && !isSelected
-                              ? "bg-primary/10 border border-primary"
-                              : "bg-transparent"
-                          }`}
-                        >
+                                ? 'bg-primary/10 border border-primary'
+                                : 'bg-transparent'
+                          }`}>
                           <Text
                             className={`text-body-medium font-medium ${
                               isDisabled
-                                ? "text-text-secondary opacity-30"
+                                ? 'text-text-secondary opacity-30'
                                 : isSelected
-                                ? "text-white"
-                                : isTodayDate
-                                ? "text-primary"
-                                : "text-text-primary"
-                            }`}
-                          >
+                                  ? 'text-white'
+                                  : isTodayDate
+                                    ? 'text-primary'
+                                    : 'text-text-primary'
+                            }`}>
                             {date.getDate()}
                           </Text>
                         </TouchableOpacity>
@@ -343,8 +331,7 @@ export default function DatePickerModal({
           <View className="flex-row gap-3 p-6 pt-4 border-t border-divider">
             <TouchableOpacity
               onPress={onClose}
-              className="flex-1 py-3 rounded-xl border border-divider items-center"
-            >
+              className="flex-1 py-3 rounded-xl border border-divider items-center">
               <Text className="text-text-primary font-medium">Cancel</Text>
             </TouchableOpacity>
 
@@ -352,14 +339,12 @@ export default function DatePickerModal({
               onPress={onClose}
               disabled={!selectedDate}
               className={`flex-1 py-3 rounded-xl items-center ${
-                selectedDate ? "bg-primary" : "bg-primary/30"
-              }`}
-            >
+                selectedDate ? 'bg-primary' : 'bg-primary/30'
+              }`}>
               <Text
                 className={`font-medium ${
-                  selectedDate ? "text-white" : "text-white/60"
-                }`}
-              >
+                  selectedDate ? 'text-white' : 'text-white/60'
+                }`}>
                 Confirm
               </Text>
             </TouchableOpacity>

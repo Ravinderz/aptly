@@ -1,16 +1,16 @@
-import { Tabs } from "expo-router";
+import { Tabs } from 'expo-router';
 import {
   Building2,
   House,
   PencilRuler,
   Settings2,
   Users2,
-} from "lucide-react-native";
-import React from "react";
-import { Platform } from "react-native";
+} from 'lucide-react-native';
+import React from 'react';
+import { Platform } from 'react-native';
 
 export default function TabLayout() {
-  const activeColor = "#6366f1";
+  const activeColor = '#6366f1';
   return (
     <Tabs
       screenOptions={{
@@ -27,13 +27,12 @@ export default function TabLayout() {
             height: 70,
           },
         }),
-      }}
-    >
+      }}>
       <Tabs.Screen
         name="index"
         options={{
           tabBarActiveTintColor: activeColor,
-          title: "Home",
+          title: 'Home',
           tabBarIcon: ({ focused, color }) => (
             <House size={18} color={focused ? activeColor : color} />
           ),
@@ -43,7 +42,7 @@ export default function TabLayout() {
         name="visitor"
         options={{
           tabBarActiveTintColor: activeColor,
-          title: "Visitors",
+          title: 'Visitors',
           tabBarIcon: ({ focused, color }) => (
             <Users2 size={18} color={focused ? activeColor : color} />
           ),
@@ -53,7 +52,7 @@ export default function TabLayout() {
         name="community"
         options={{
           tabBarActiveTintColor: activeColor,
-          title: "Community",
+          title: 'Community',
           tabBarIcon: ({ focused, color }) => (
             <Building2 size={18} color={focused ? activeColor : color} />
           ),
@@ -63,7 +62,7 @@ export default function TabLayout() {
         name="services"
         options={{
           tabBarActiveTintColor: activeColor,
-          title: "Services",
+          title: 'Services',
           tabBarIcon: ({ focused, color }) => (
             <PencilRuler size={18} color={focused ? activeColor : color} />
           ),
@@ -73,7 +72,7 @@ export default function TabLayout() {
         name="settings"
         options={{
           tabBarActiveTintColor: activeColor,
-          title: "Settings",
+          title: 'Settings',
           tabBarIcon: ({ focused, color }) => (
             <Settings2 size={18} color={focused ? activeColor : color} />
           ),

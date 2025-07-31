@@ -21,7 +21,9 @@ jest.mock('expo-local-authentication', () => ({
   },
 }));
 
-const mockLocalAuth = LocalAuthentication as jest.Mocked<typeof LocalAuthentication>;
+const mockLocalAuth = LocalAuthentication as jest.Mocked<
+  typeof LocalAuthentication
+>;
 
 // Biometric Service Implementation (inline for testing)
 class BiometricService {
@@ -43,20 +45,20 @@ class BiometricService {
         fallbackLabel: 'Use Passcode',
         disableDeviceFallback: false,
       });
-      
+
       if (result.success) {
         return { success: true };
       } else {
-        return { 
-          success: false, 
-          error: result.error || 'Authentication failed' 
+        return {
+          success: false,
+          error: result.error || 'Authentication failed',
         };
       }
     } catch (error) {
       console.error('Biometric authentication error:', error);
-      return { 
-        success: false, 
-        error: error instanceof Error ? error.message : 'Unknown error' 
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : 'Unknown error',
       };
     }
   }
@@ -77,7 +79,7 @@ class BiometricService {
       if (!isAvailable) {
         throw new Error('Biometric authentication is not available');
       }
-      
+
       const authResult = await this.authenticate();
       return authResult.success;
     } catch (error) {
@@ -94,7 +96,9 @@ class BiometricService {
 }
 
 describe('BiometricService', () => {
-  const mockConsoleError = jest.spyOn(console, 'error').mockImplementation(() => {});
+  const mockConsoleError = jest
+    .spyOn(console, 'error')
+    .mockImplementation(() => {});
 
   beforeEach(() => {
     jest.clearAllMocks();
@@ -138,7 +142,10 @@ describe('BiometricService', () => {
       const result = await BiometricService.isAvailable();
 
       expect(result).toBe(false);
-      expect(mockConsoleError).toHaveBeenCalledWith('Error checking biometric availability:', error);
+      expect(mockConsoleError).toHaveBeenCalledWith(
+        'Error checking biometric availability:',
+        error,
+      );
     });
 
     test('should handle both hardware and enrollment failures', async () => {
@@ -176,9 +183,9 @@ describe('BiometricService', () => {
 
       const result = await BiometricService.authenticate();
 
-      expect(result).toEqual({ 
-        success: false, 
-        error: 'User cancelled' 
+      expect(result).toEqual({
+        success: false,
+        error: 'User cancelled',
       });
     });
 
@@ -190,9 +197,9 @@ describe('BiometricService', () => {
 
       const result = await BiometricService.authenticate();
 
-      expect(result).toEqual({ 
-        success: false, 
-        error: 'Authentication failed' 
+      expect(result).toEqual({
+        success: false,
+        error: 'Authentication failed',
       });
     });
 
@@ -202,11 +209,14 @@ describe('BiometricService', () => {
 
       const result = await BiometricService.authenticate();
 
-      expect(result).toEqual({ 
-        success: false, 
-        error: 'Authentication error' 
+      expect(result).toEqual({
+        success: false,
+        error: 'Authentication error',
       });
-      expect(mockConsoleError).toHaveBeenCalledWith('Biometric authentication error:', error);
+      expect(mockConsoleError).toHaveBeenCalledWith(
+        'Biometric authentication error:',
+        error,
+      );
     });
 
     test('should handle non-Error exceptions', async () => {
@@ -214,9 +224,9 @@ describe('BiometricService', () => {
 
       const result = await BiometricService.authenticate();
 
-      expect(result).toEqual({ 
-        success: false, 
-        error: 'Unknown error' 
+      expect(result).toEqual({
+        success: false,
+        error: 'Unknown error',
       });
     });
   });
@@ -238,7 +248,10 @@ describe('BiometricService', () => {
       const result = await BiometricService.getSupportedTypes();
 
       expect(result).toEqual([]);
-      expect(mockConsoleError).toHaveBeenCalledWith('Error getting supported types:', error);
+      expect(mockConsoleError).toHaveBeenCalledWith(
+        'Error getting supported types:',
+        error,
+      );
     });
 
     test('should handle multiple authentication types', async () => {
@@ -272,8 +285,8 @@ describe('BiometricService', () => {
 
       expect(result).toBe(false);
       expect(mockConsoleError).toHaveBeenCalledWith(
-        'Error enabling biometric:', 
-        expect.any(Error)
+        'Error enabling biometric:',
+        expect.any(Error),
       );
     });
 
@@ -298,9 +311,15 @@ describe('BiometricService', () => {
 
       expect(result).toBe(false);
       // The error is first logged in isAvailable(), then in enableBiometric()
-      expect(mockConsoleError).toHaveBeenCalledWith('Error checking biometric availability:', error);
-      expect(mockConsoleError).toHaveBeenCalledWith('Error enabling biometric:', 
-        expect.objectContaining({ message: 'Biometric authentication is not available' })
+      expect(mockConsoleError).toHaveBeenCalledWith(
+        'Error checking biometric availability:',
+        error,
+      );
+      expect(mockConsoleError).toHaveBeenCalledWith(
+        'Error enabling biometric:',
+        expect.objectContaining({
+          message: 'Biometric authentication is not available',
+        }),
       );
     });
   });
@@ -328,7 +347,7 @@ describe('BiometricService', () => {
       // Check availability
       mockLocalAuth.hasHardwareAsync.mockResolvedValue(true);
       mockLocalAuth.isEnrolledAsync.mockResolvedValue(true);
-      
+
       const isAvailable = await BiometricService.isAvailable();
       expect(isAvailable).toBe(true);
 
@@ -342,7 +361,7 @@ describe('BiometricService', () => {
         success: true,
         error: null,
       } as any);
-      
+
       const enabled = await BiometricService.enableBiometric();
       expect(enabled).toBe(true);
 
@@ -355,7 +374,7 @@ describe('BiometricService', () => {
       // Hardware not available
       mockLocalAuth.hasHardwareAsync.mockResolvedValue(false);
       mockLocalAuth.isEnrolledAsync.mockResolvedValue(true);
-      
+
       const isAvailable = await BiometricService.isAvailable();
       expect(isAvailable).toBe(false);
 
@@ -389,7 +408,7 @@ describe('BiometricService', () => {
       const authResult = await BiometricService.authenticate();
       expect(authResult).toEqual({
         success: false,
-        error: 'User cancelled'
+        error: 'User cancelled',
       });
 
       const enabled = await BiometricService.enableBiometric();

@@ -13,9 +13,9 @@ export interface PaymentMethod {
 }
 
 // Billing service types
-export type BillingService = 
+export type BillingService =
   | 'mobile-recharge'
-  | 'broadband-recharge' 
+  | 'broadband-recharge'
   | 'cylinder-booking'
   | 'gas-recharge'
   | 'dishtv-recharge'
@@ -182,7 +182,7 @@ export interface Transaction {
 }
 
 // Service-specific transaction details
-export type BillerTransaction = 
+export type BillerTransaction =
   | MobileTransaction
   | BroadbandTransaction
   | CylinderTransaction

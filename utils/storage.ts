@@ -10,7 +10,7 @@ export const STORAGE_KEYS = {
   COMMUNITY_POSTS: 'aptly_community_posts',
   NOTICES: 'aptly_notices',
   MAINTENANCE_REQUESTS: 'aptly_maintenance_requests',
-  BILLING_DATA: 'aptly_billing_data'
+  BILLING_DATA: 'aptly_billing_data',
 } as const;
 
 // Generic storage operations
@@ -62,7 +62,9 @@ export class StorageService {
     }
   }
 
-  static async multiGet(keys: string[]): Promise<readonly [string, string | null][]> {
+  static async multiGet(
+    keys: string[],
+  ): Promise<readonly [string, string | null][]> {
     try {
       return await AsyncStorage.multiGet(keys);
     } catch (error) {
@@ -97,22 +99,26 @@ export interface Vehicle {
 
 export class VehicleStorage {
   static async getVehicles(): Promise<Vehicle[]> {
-    const vehicles = await StorageService.getItem<Vehicle[]>(STORAGE_KEYS.VEHICLES);
+    const vehicles = await StorageService.getItem<Vehicle[]>(
+      STORAGE_KEYS.VEHICLES,
+    );
     return vehicles || [];
   }
 
-  static async saveVehicle(vehicle: Omit<Vehicle, 'id' | 'createdAt' | 'updatedAt'>): Promise<Vehicle> {
+  static async saveVehicle(
+    vehicle: Omit<Vehicle, 'id' | 'createdAt' | 'updatedAt'>,
+  ): Promise<Vehicle> {
     const vehicles = await this.getVehicles();
     const newVehicle: Vehicle = {
       ...vehicle,
       id: Date.now().toString(),
       createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString()
+      updatedAt: new Date().toISOString(),
     };
 
     // If this is set as primary, remove primary from others
     if (newVehicle.isPrimary) {
-      vehicles.forEach(v => v.isPrimary = false);
+      vehicles.forEach((v) => (v.isPrimary = false));
     }
 
     vehicles.push(newVehicle);
@@ -120,21 +126,24 @@ export class VehicleStorage {
     return newVehicle;
   }
 
-  static async updateVehicle(id: string, updates: Partial<Omit<Vehicle, 'id' | 'createdAt'>>): Promise<Vehicle | null> {
+  static async updateVehicle(
+    id: string,
+    updates: Partial<Omit<Vehicle, 'id' | 'createdAt'>>,
+  ): Promise<Vehicle | null> {
     const vehicles = await this.getVehicles();
-    const vehicleIndex = vehicles.findIndex(v => v.id === id);
-    
+    const vehicleIndex = vehicles.findIndex((v) => v.id === id);
+
     if (vehicleIndex === -1) return null;
 
     // If setting as primary, remove primary from others
     if (updates.isPrimary) {
-      vehicles.forEach(v => v.isPrimary = false);
+      vehicles.forEach((v) => (v.isPrimary = false));
     }
 
     vehicles[vehicleIndex] = {
       ...vehicles[vehicleIndex],
       ...updates,
-      updatedAt: new Date().toISOString()
+      updatedAt: new Date().toISOString(),
     };
 
     await StorageService.setItem(STORAGE_KEYS.VEHICLES, vehicles);
@@ -143,10 +152,10 @@ export class VehicleStorage {
 
   static async deleteVehicle(id: string): Promise<boolean> {
     const vehicles = await this.getVehicles();
-    const filteredVehicles = vehicles.filter(v => v.id !== id);
-    
+    const filteredVehicles = vehicles.filter((v) => v.id !== id);
+
     if (filteredVehicles.length === vehicles.length) return false;
-    
+
     await StorageService.setItem(STORAGE_KEYS.VEHICLES, filteredVehicles);
     return true;
   }
@@ -156,7 +165,13 @@ export class VehicleStorage {
 export interface Document {
   id: string;
   name: string;
-  type: 'aadhar' | 'pan' | 'passport' | 'driving_license' | 'property_papers' | 'other';
+  type:
+    | 'aadhar'
+    | 'pan'
+    | 'passport'
+    | 'driving_license'
+    | 'property_papers'
+    | 'other';
   description?: string;
   fileUri: string;
   mimeType: string;
@@ -167,17 +182,21 @@ export interface Document {
 
 export class DocumentStorage {
   static async getDocuments(): Promise<Document[]> {
-    const documents = await StorageService.getItem<Document[]>(STORAGE_KEYS.DOCUMENTS);
+    const documents = await StorageService.getItem<Document[]>(
+      STORAGE_KEYS.DOCUMENTS,
+    );
     return documents || [];
   }
 
-  static async saveDocument(document: Omit<Document, 'id' | 'createdAt' | 'updatedAt'>): Promise<Document> {
+  static async saveDocument(
+    document: Omit<Document, 'id' | 'createdAt' | 'updatedAt'>,
+  ): Promise<Document> {
     const documents = await this.getDocuments();
     const newDocument: Document = {
       ...document,
       id: Date.now().toString(),
       createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString()
+      updatedAt: new Date().toISOString(),
     };
 
     documents.push(newDocument);
@@ -187,10 +206,10 @@ export class DocumentStorage {
 
   static async deleteDocument(id: string): Promise<boolean> {
     const documents = await this.getDocuments();
-    const filteredDocuments = documents.filter(d => d.id !== id);
-    
+    const filteredDocuments = documents.filter((d) => d.id !== id);
+
     if (filteredDocuments.length === documents.length) return false;
-    
+
     await StorageService.setItem(STORAGE_KEYS.DOCUMENTS, filteredDocuments);
     return true;
   }
@@ -211,22 +230,26 @@ export interface EmergencyContact {
 
 export class EmergencyContactStorage {
   static async getContacts(): Promise<EmergencyContact[]> {
-    const contacts = await StorageService.getItem<EmergencyContact[]>(STORAGE_KEYS.EMERGENCY_CONTACTS);
+    const contacts = await StorageService.getItem<EmergencyContact[]>(
+      STORAGE_KEYS.EMERGENCY_CONTACTS,
+    );
     return contacts || [];
   }
 
-  static async saveContact(contact: Omit<EmergencyContact, 'id' | 'createdAt' | 'updatedAt'>): Promise<EmergencyContact> {
+  static async saveContact(
+    contact: Omit<EmergencyContact, 'id' | 'createdAt' | 'updatedAt'>,
+  ): Promise<EmergencyContact> {
     const contacts = await this.getContacts();
     const newContact: EmergencyContact = {
       ...contact,
       id: Date.now().toString(),
       createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString()
+      updatedAt: new Date().toISOString(),
     };
 
     // If this is set as primary, remove primary from others
     if (newContact.isPrimary) {
-      contacts.forEach(c => c.isPrimary = false);
+      contacts.forEach((c) => (c.isPrimary = false));
     }
 
     contacts.push(newContact);
@@ -234,21 +257,24 @@ export class EmergencyContactStorage {
     return newContact;
   }
 
-  static async updateContact(id: string, updates: Partial<Omit<EmergencyContact, 'id' | 'createdAt'>>): Promise<EmergencyContact | null> {
+  static async updateContact(
+    id: string,
+    updates: Partial<Omit<EmergencyContact, 'id' | 'createdAt'>>,
+  ): Promise<EmergencyContact | null> {
     const contacts = await this.getContacts();
-    const contactIndex = contacts.findIndex(c => c.id === id);
-    
+    const contactIndex = contacts.findIndex((c) => c.id === id);
+
     if (contactIndex === -1) return null;
 
     // If setting as primary, remove primary from others
     if (updates.isPrimary) {
-      contacts.forEach(c => c.isPrimary = false);
+      contacts.forEach((c) => (c.isPrimary = false));
     }
 
     contacts[contactIndex] = {
       ...contacts[contactIndex],
       ...updates,
-      updatedAt: new Date().toISOString()
+      updatedAt: new Date().toISOString(),
     };
 
     await StorageService.setItem(STORAGE_KEYS.EMERGENCY_CONTACTS, contacts);
@@ -257,11 +283,14 @@ export class EmergencyContactStorage {
 
   static async deleteContact(id: string): Promise<boolean> {
     const contacts = await this.getContacts();
-    const filteredContacts = contacts.filter(c => c.id !== id);
-    
+    const filteredContacts = contacts.filter((c) => c.id !== id);
+
     if (filteredContacts.length === contacts.length) return false;
-    
-    await StorageService.setItem(STORAGE_KEYS.EMERGENCY_CONTACTS, filteredContacts);
+
+    await StorageService.setItem(
+      STORAGE_KEYS.EMERGENCY_CONTACTS,
+      filteredContacts,
+    );
     return true;
   }
 }
@@ -290,35 +319,41 @@ export interface AppSettings {
 
 export class SettingsStorage {
   static async getSettings(): Promise<AppSettings> {
-    const settings = await StorageService.getItem<AppSettings>(STORAGE_KEYS.SETTINGS);
-    return settings || {
-      theme: 'system',
-      notifications: {
-        push: true,
-        email: false,
-        sms: true
-      },
-      security: {
-        biometricEnabled: false,
-        autoLock: false,
-        autoLockTimeout: 5
-      },
-      privacy: {
-        shareWithSociety: true,
-        allowMentions: true,
-        profileVisibility: 'residents'
-      },
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString()
-    };
+    const settings = await StorageService.getItem<AppSettings>(
+      STORAGE_KEYS.SETTINGS,
+    );
+    return (
+      settings || {
+        theme: 'system',
+        notifications: {
+          push: true,
+          email: false,
+          sms: true,
+        },
+        security: {
+          biometricEnabled: false,
+          autoLock: false,
+          autoLockTimeout: 5,
+        },
+        privacy: {
+          shareWithSociety: true,
+          allowMentions: true,
+          profileVisibility: 'residents',
+        },
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      }
+    );
   }
 
-  static async updateSettings(updates: Partial<Omit<AppSettings, 'createdAt' | 'updatedAt'>>): Promise<AppSettings> {
+  static async updateSettings(
+    updates: Partial<Omit<AppSettings, 'createdAt' | 'updatedAt'>>,
+  ): Promise<AppSettings> {
     const settings = await this.getSettings();
     const updatedSettings: AppSettings = {
       ...settings,
       ...updates,
-      updatedAt: new Date().toISOString()
+      updatedAt: new Date().toISOString(),
     };
 
     await StorageService.setItem(STORAGE_KEYS.SETTINGS, updatedSettings);
@@ -347,24 +382,29 @@ export interface Notice {
 
 export class NoticeStorage {
   static async getNotices(): Promise<Notice[]> {
-    const notices = await StorageService.getItem<Notice[]>(STORAGE_KEYS.NOTICES);
+    const notices = await StorageService.getItem<Notice[]>(
+      STORAGE_KEYS.NOTICES,
+    );
     return notices || [];
   }
 
   static async markNoticeAsRead(id: string): Promise<boolean> {
     const notices = await this.getNotices();
-    const noticeIndex = notices.findIndex(n => n.id === id);
-    
+    const noticeIndex = notices.findIndex((n) => n.id === id);
+
     if (noticeIndex === -1) return false;
-    
+
     notices[noticeIndex].isRead = true;
     await StorageService.setItem(STORAGE_KEYS.NOTICES, notices);
     return true;
   }
 
-  static async getNoticesInDateRange(startDate: Date, endDate: Date): Promise<Notice[]> {
+  static async getNoticesInDateRange(
+    startDate: Date,
+    endDate: Date,
+  ): Promise<Notice[]> {
     const notices = await this.getNotices();
-    return notices.filter(notice => {
+    return notices.filter((notice) => {
       const publishedDate = new Date(notice.publishedAt);
       return publishedDate >= startDate && publishedDate <= endDate;
     });
@@ -396,7 +436,7 @@ export const initializeMockData = async () => {
       registrationNumber: 'DL-01-AB-1234',
       color: 'White',
       parkingSlot: 'A-15',
-      isPrimary: true
+      isPrimary: true,
     });
   }
 
@@ -409,7 +449,7 @@ export const initializeMockData = async () => {
       description: 'Identity proof document',
       fileUri: 'mock://aadhar.pdf',
       mimeType: 'application/pdf',
-      size: 1024000
+      size: 1024000,
     });
   }
 
@@ -422,7 +462,7 @@ export const initializeMockData = async () => {
       phoneNumber: '9876543211',
       alternatePhone: '8765432198',
       address: 'Same flat - A-301',
-      isPrimary: true
+      isPrimary: true,
     });
   }
 };

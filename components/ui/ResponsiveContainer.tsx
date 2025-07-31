@@ -1,6 +1,6 @@
 /**
  * ResponsiveContainer Component
- * 
+ *
  * Universal container component that applies responsive design principles
  * without hardcoding screen sizes. Provides consistent spacing, overflow
  * protection, and flexible layouts that work on any device.
@@ -8,7 +8,11 @@
 
 import React, { ReactNode } from 'react';
 import { View, ScrollView, StyleSheet } from 'react-native';
-import { responsiveClasses, layoutUtils, scrollUtils } from '@/utils/responsive';
+import {
+  responsiveClasses,
+  layoutUtils,
+  scrollUtils,
+} from '@/utils/responsive';
 
 interface ResponsiveContainerProps {
   children: ReactNode;
@@ -42,15 +46,15 @@ export const ResponsiveContainer: React.FC<ResponsiveContainerProps> = ({
   // Generate responsive classes
   const containerClass = responsiveClasses.container();
   const contentSpacingClass = responsiveClasses.contentSpacing();
-  
+
   // Padding mapping
   const paddingClasses = {
     none: '',
     sm: 'p-2',
-    md: 'p-4', 
+    md: 'p-4',
     lg: 'p-6',
   };
-  
+
   // Gap mapping
   const gapClasses = {
     none: '',
@@ -66,7 +70,9 @@ export const ResponsiveContainer: React.FC<ResponsiveContainerProps> = ({
     preventOverflow ? 'overflow-hidden' : '',
     centerContent ? 'items-center justify-center' : '',
     className,
-  ].filter(Boolean).join(' ');
+  ]
+    .filter(Boolean)
+    .join(' ');
 
   const baseStyle = [
     preventOverflow ? layoutUtils.preventContainerOverflow : {},
@@ -81,8 +87,7 @@ export const ResponsiveContainer: React.FC<ResponsiveContainerProps> = ({
         style={baseStyle}
         contentContainerStyle={scrollUtils.scrollContainerStyle}
         showsVerticalScrollIndicator={showScrollIndicator}
-        keyboardShouldPersistTaps={keyboardAware ? 'handled' : 'never'}
-      >
+        keyboardShouldPersistTaps={keyboardAware ? 'handled' : 'never'}>
         {children}
       </ScrollView>
     );
@@ -90,10 +95,9 @@ export const ResponsiveContainer: React.FC<ResponsiveContainerProps> = ({
 
   if (type === 'flex') {
     return (
-      <View 
+      <View
         className={`${baseClasses} flex-1`}
-        style={[...baseStyle, layoutUtils.safeFlexContainer]}
-      >
+        style={[...baseStyle, layoutUtils.safeFlexContainer]}>
         {children}
       </View>
     );
@@ -124,7 +128,7 @@ export const ResponsiveCard: React.FC<ResponsiveCardProps> = ({
   style,
 }) => {
   const cardClass = responsiveClasses.card();
-  
+
   const variantClasses = {
     default: 'bg-background border border-divider',
     surface: 'bg-surface border border-divider',
@@ -136,13 +140,14 @@ export const ResponsiveCard: React.FC<ResponsiveCardProps> = ({
     variantClasses[variant],
     'rounded-xl',
     className,
-  ].filter(Boolean).join(' ');
+  ]
+    .filter(Boolean)
+    .join(' ');
 
   return (
-    <View 
+    <View
       className={cardClasses}
-      style={[layoutUtils.preventContainerOverflow, style]}
-    >
+      style={[layoutUtils.preventContainerOverflow, style]}>
       {children}
     </View>
   );
@@ -171,7 +176,7 @@ export const ResponsiveRow: React.FC<ResponsiveRowProps> = ({
 }) => {
   const alignClasses = {
     start: 'items-start',
-    center: 'items-center', 
+    center: 'items-center',
     end: 'items-end',
     stretch: 'items-stretch',
   };
@@ -198,7 +203,9 @@ export const ResponsiveRow: React.FC<ResponsiveRowProps> = ({
     justifyClasses[justify],
     gapClasses[gap],
     className,
-  ].filter(Boolean).join(' ');
+  ]
+    .filter(Boolean)
+    .join(' ');
 
   return (
     <View className={rowClasses} style={layoutUtils.preventContainerOverflow}>
@@ -229,11 +236,11 @@ export const ResponsiveText: React.FC<ResponsiveTextProps> = ({
   style,
 }) => {
   const Text = require('react-native').Text;
-  
+
   const variantSizeClasses = {
     display: {
       small: 'text-display-small',
-      medium: 'text-display-medium', 
+      medium: 'text-display-medium',
       large: 'text-display-large',
     },
     headline: {
@@ -248,7 +255,7 @@ export const ResponsiveText: React.FC<ResponsiveTextProps> = ({
     },
     label: {
       small: 'text-label-small',
-      medium: 'text-label-medium', 
+      medium: 'text-label-medium',
       large: 'text-label-large',
     },
   };
@@ -257,14 +264,15 @@ export const ResponsiveText: React.FC<ResponsiveTextProps> = ({
     variantSizeClasses[variant][size],
     'text-text-primary',
     className,
-  ].filter(Boolean).join(' ');
+  ]
+    .filter(Boolean)
+    .join(' ');
 
   return (
     <Text
       className={textClasses}
       style={[layoutUtils.preventTextOverflow, style]}
-      numberOfLines={numberOfLines}
-    >
+      numberOfLines={numberOfLines}>
       {children}
     </Text>
   );
@@ -295,7 +303,7 @@ export const ResponsiveButton: React.FC<ResponsiveButtonProps> = ({
 }) => {
   const TouchableOpacity = require('react-native').TouchableOpacity;
   const buttonClass = responsiveClasses.button();
-  
+
   const variantClasses = {
     primary: 'bg-primary',
     secondary: 'bg-secondary',
@@ -316,7 +324,9 @@ export const ResponsiveButton: React.FC<ResponsiveButtonProps> = ({
     'rounded-xl items-center justify-center',
     disabled ? 'opacity-50' : '',
     className,
-  ].filter(Boolean).join(' ');
+  ]
+    .filter(Boolean)
+    .join(' ');
 
   return (
     <TouchableOpacity
@@ -324,8 +334,7 @@ export const ResponsiveButton: React.FC<ResponsiveButtonProps> = ({
       style={style}
       onPress={onPress}
       disabled={disabled}
-      activeOpacity={0.7}
-    >
+      activeOpacity={0.7}>
       {children}
     </TouchableOpacity>
   );

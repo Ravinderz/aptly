@@ -1,11 +1,18 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, RefreshControl, FlatList } from 'react-native';
-import { 
-  Shield, 
-  Users, 
-  AlertTriangle, 
-  CheckCircle, 
-  XCircle, 
+import {
+  View,
+  Text,
+  ScrollView,
+  TouchableOpacity,
+  RefreshControl,
+  FlatList,
+} from 'react-native';
+import {
+  Shield,
+  Users,
+  AlertTriangle,
+  CheckCircle,
+  XCircle,
   Clock,
   Eye,
   Search,
@@ -18,7 +25,7 @@ import {
   UserCheck,
   UserX,
   Activity,
-  Bell
+  Bell,
 } from 'lucide-react-native';
 import { useAdmin } from '@/contexts/AdminContext';
 import { useSociety } from '@/contexts/SocietyContext';
@@ -38,7 +45,11 @@ interface VisitorSecurityStats {
 
 interface SecurityIncident {
   id: string;
-  type: 'unauthorized_entry' | 'visitor_overstay' | 'suspicious_activity' | 'document_mismatch';
+  type:
+    | 'unauthorized_entry'
+    | 'visitor_overstay'
+    | 'suspicious_activity'
+    | 'document_mismatch';
   severity: 'low' | 'medium' | 'high' | 'critical';
   title: string;
   description: string;
@@ -80,16 +91,19 @@ const SecurityAdmin: React.FC = () => {
   const { checkPermission, activeSociety, availableSocieties } = useAdmin();
   const { bulkOperation, filterNotificationsForSociety } = useSociety();
   const { showAlert, AlertComponent } = useAlert();
-  
-  const [securityStats, setSecurityStats] = useState<VisitorSecurityStats | null>(null);
-  const [securityIncidents, setSecurityIncidents] = useState<SecurityIncident[]>([]);
+
+  const [securityStats, setSecurityStats] =
+    useState<VisitorSecurityStats | null>(null);
+  const [securityIncidents, setSecurityIncidents] = useState<
+    SecurityIncident[]
+  >([]);
   const [bulkActions, setBulkActions] = useState<BulkVisitorAction[]>([]);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [activeFilter, setActiveFilter] = useState<VisitorFilter>({
     status: 'all',
     timeframe: 'today',
     societies: [],
-    riskLevel: 'all'
+    riskLevel: 'all',
   });
 
   useEffect(() => {
@@ -103,11 +117,11 @@ const SecurityAdmin: React.FC = () => {
         const stats = await loadSecurityStats(activeSociety.id);
         setSecurityStats(stats);
       }
-      
+
       // Load security incidents
       const incidents = await loadSecurityIncidents();
       setSecurityIncidents(incidents);
-      
+
       // Load recent bulk actions
       const actions = await loadBulkVisitorActions();
       setBulkActions(actions);
@@ -116,7 +130,9 @@ const SecurityAdmin: React.FC = () => {
     }
   };
 
-  const loadSecurityStats = async (societyId: string): Promise<VisitorSecurityStats> => {
+  const loadSecurityStats = async (
+    societyId: string,
+  ): Promise<VisitorSecurityStats> => {
     // Mock implementation - replace with actual API call
     return new Promise((resolve) => {
       setTimeout(() => {
@@ -128,7 +144,7 @@ const SecurityAdmin: React.FC = () => {
           activeVisitors: Math.floor(Math.random() * 15) + 5,
           overdueVisitors: Math.floor(Math.random() * 8),
           securityIncidents: Math.floor(Math.random() * 3),
-          averageApprovalTime: Math.floor(Math.random() * 30) + 15
+          averageApprovalTime: Math.floor(Math.random() * 30) + 15,
         });
       }, 300);
     });
@@ -150,7 +166,7 @@ const SecurityAdmin: React.FC = () => {
             reportedBy: 'Security Guard',
             reportedAt: new Date(Date.now() - 3600000).toISOString(),
             status: 'open',
-            location: 'Building A, Floor 3'
+            location: 'Building A, Floor 3',
           },
           {
             id: '2',
@@ -163,8 +179,8 @@ const SecurityAdmin: React.FC = () => {
             reportedBy: 'Resident',
             reportedAt: new Date(Date.now() - 7200000).toISOString(),
             status: 'investigating',
-            location: 'Parking Area'
-          }
+            location: 'Parking Area',
+          },
         ]);
       }, 200);
     });
@@ -180,7 +196,7 @@ const SecurityAdmin: React.FC = () => {
             type: 'bulk_approve',
             title: 'Bulk Visitor Approval',
             description: 'Approved delivery visitors for multiple societies',
-            targetSocieties: availableSocieties.slice(0, 2).map(s => s.id),
+            targetSocieties: availableSocieties.slice(0, 2).map((s) => s.id),
             visitorCount: 45,
             status: 'completed',
             createdAt: new Date(Date.now() - 86400000).toISOString(),
@@ -188,8 +204,8 @@ const SecurityAdmin: React.FC = () => {
             results: {
               successful: 42,
               failed: 3,
-              details: ['3 visitors failed verification checks']
-            }
+              details: ['3 visitors failed verification checks'],
+            },
           },
           {
             id: '2',
@@ -199,8 +215,8 @@ const SecurityAdmin: React.FC = () => {
             targetSocieties: [activeSociety?.id].filter(Boolean),
             visitorCount: 12,
             status: 'processing',
-            createdAt: new Date().toISOString()
-          }
+            createdAt: new Date().toISOString(),
+          },
         ]);
       }, 300);
     });
@@ -217,8 +233,9 @@ const SecurityAdmin: React.FC = () => {
       showAlert({
         type: 'error',
         title: 'Permission Denied',
-        message: 'You do not have permission to perform bulk visitor operations',
-        primaryAction: { label: 'OK', onPress: () => {} }
+        message:
+          'You do not have permission to perform bulk visitor operations',
+        primaryAction: { label: 'OK', onPress: () => {} },
       });
       return;
     }
@@ -226,19 +243,22 @@ const SecurityAdmin: React.FC = () => {
     try {
       const result = await bulkOperation('bulk_approve_visitors', {
         filter: activeFilter,
-        societies: activeFilter.societies.length > 0 ? activeFilter.societies : [activeSociety?.id],
+        societies:
+          activeFilter.societies.length > 0
+            ? activeFilter.societies
+            : [activeSociety?.id],
         criteria: {
           minRating: 4,
           maxWaitTime: 30,
-          verificationType: 'standard'
-        }
+          verificationType: 'standard',
+        },
       });
 
       showAlert({
         type: 'success',
         title: 'Bulk Approval Complete',
         message: `Successfully processed ${result.results.length} visitor approvals`,
-        primaryAction: { label: 'OK', onPress: () => {} }
+        primaryAction: { label: 'OK', onPress: () => {} },
       });
 
       await loadSecurityData();
@@ -246,8 +266,11 @@ const SecurityAdmin: React.FC = () => {
       showAlert({
         type: 'error',
         title: 'Bulk Approval Failed',
-        message: error instanceof Error ? error.message : 'Failed to process bulk approvals',
-        primaryAction: { label: 'OK', onPress: () => {} }
+        message:
+          error instanceof Error
+            ? error.message
+            : 'Failed to process bulk approvals',
+        primaryAction: { label: 'OK', onPress: () => {} },
       });
     }
   };
@@ -258,7 +281,7 @@ const SecurityAdmin: React.FC = () => {
         type: 'error',
         title: 'Permission Denied',
         message: 'You do not have permission to run security checks',
-        primaryAction: { label: 'OK', onPress: () => {} }
+        primaryAction: { label: 'OK', onPress: () => {} },
       });
       return;
     }
@@ -267,32 +290,42 @@ const SecurityAdmin: React.FC = () => {
       const result = await bulkOperation('security_verification', {
         societyId: activeSociety?.id,
         level: 'enhanced',
-        includeBackgroundCheck: true
+        includeBackgroundCheck: true,
       });
 
       showAlert({
         type: 'success',
         title: 'Security Check Initiated',
         message: `Security verification started for ${result.results.length} pending visitors`,
-        primaryAction: { label: 'OK', onPress: () => {} }
+        primaryAction: { label: 'OK', onPress: () => {} },
       });
     } catch (error) {
       showAlert({
         type: 'error',
         title: 'Security Check Failed',
-        message: error instanceof Error ? error.message : 'Failed to initiate security checks',
-        primaryAction: { label: 'OK', onPress: () => {} }
+        message:
+          error instanceof Error
+            ? error.message
+            : 'Failed to initiate security checks',
+        primaryAction: { label: 'OK', onPress: () => {} },
       });
     }
   };
 
-  const handleIncidentAction = async (incidentId: string, action: 'resolve' | 'escalate') => {
+  const handleIncidentAction = async (
+    incidentId: string,
+    action: 'resolve' | 'escalate',
+  ) => {
     try {
       // Mock incident action - replace with actual API call
-      const updatedIncidents = securityIncidents.map(incident => 
-        incident.id === incidentId 
-          ? { ...incident, status: action === 'resolve' ? 'resolved' : 'escalated' as const }
-          : incident
+      const updatedIncidents = securityIncidents.map((incident) =>
+        incident.id === incidentId
+          ? {
+              ...incident,
+              status:
+                action === 'resolve' ? 'resolved' : ('escalated' as const),
+            }
+          : incident,
       );
       setSecurityIncidents(updatedIncidents);
 
@@ -300,35 +333,48 @@ const SecurityAdmin: React.FC = () => {
         type: 'success',
         title: `Incident ${action === 'resolve' ? 'Resolved' : 'Escalated'}`,
         message: `Security incident has been ${action === 'resolve' ? 'marked as resolved' : 'escalated to higher authority'}`,
-        primaryAction: { label: 'OK', onPress: () => {} }
+        primaryAction: { label: 'OK', onPress: () => {} },
       });
     } catch (error) {
       showAlert({
         type: 'error',
         title: 'Action Failed',
-        message: error instanceof Error ? error.message : `Failed to ${action} incident`,
-        primaryAction: { label: 'OK', onPress: () => {} }
+        message:
+          error instanceof Error
+            ? error.message
+            : `Failed to ${action} incident`,
+        primaryAction: { label: 'OK', onPress: () => {} },
       });
     }
   };
 
   const getIncidentSeverityColor = (severity: string) => {
     switch (severity) {
-      case 'critical': return 'text-red-600';
-      case 'high': return 'text-orange-600';
-      case 'medium': return 'text-yellow-600';
-      case 'low': return 'text-blue-600';
-      default: return 'text-text-secondary';
+      case 'critical':
+        return 'text-red-600';
+      case 'high':
+        return 'text-orange-600';
+      case 'medium':
+        return 'text-yellow-600';
+      case 'low':
+        return 'text-blue-600';
+      default:
+        return 'text-text-secondary';
     }
   };
 
   const getIncidentIcon = (type: string) => {
     switch (type) {
-      case 'unauthorized_entry': return Shield;
-      case 'visitor_overstay': return Clock;
-      case 'suspicious_activity': return AlertTriangle;
-      case 'document_mismatch': return Eye;
-      default: return AlertTriangle;
+      case 'unauthorized_entry':
+        return Shield;
+      case 'visitor_overstay':
+        return Clock;
+      case 'suspicious_activity':
+        return AlertTriangle;
+      case 'document_mismatch':
+        return Eye;
+      default:
+        return AlertTriangle;
     }
   };
 
@@ -352,13 +398,12 @@ const SecurityAdmin: React.FC = () => {
   }
 
   return (
-    <ScrollView 
+    <ScrollView
       className="flex-1 bg-background"
       showsVerticalScrollIndicator={false}
       refreshControl={
         <RefreshControl refreshing={isRefreshing} onRefresh={handleRefresh} />
-      }
-    >
+      }>
       {/* Header */}
       <View className="p-6 bg-surface border-b border-divider">
         <View className="flex-row items-center justify-between mb-4">
@@ -378,16 +423,18 @@ const SecurityAdmin: React.FC = () => {
           {(['pending', 'approved', 'overdue'] as const).map((status) => (
             <TouchableOpacity
               key={status}
-              onPress={() => setActiveFilter(prev => ({ ...prev, status }))}
+              onPress={() => setActiveFilter((prev) => ({ ...prev, status }))}
               className={`px-3 py-1.5 rounded-full border ${
-                activeFilter.status === status 
-                  ? 'bg-primary border-primary' 
+                activeFilter.status === status
+                  ? 'bg-primary border-primary'
                   : 'bg-transparent border-divider'
-              }`}
-            >
-              <Text className={`text-label-medium font-medium ${
-                activeFilter.status === status ? 'text-white' : 'text-text-secondary'
               }`}>
+              <Text
+                className={`text-label-medium font-medium ${
+                  activeFilter.status === status
+                    ? 'text-white'
+                    : 'text-text-secondary'
+                }`}>
                 {status.charAt(0).toUpperCase() + status.slice(1)}
               </Text>
             </TouchableOpacity>
@@ -401,7 +448,7 @@ const SecurityAdmin: React.FC = () => {
           <Text className="text-headline-medium font-semibold text-text-primary mb-4">
             Security Overview - {activeSociety?.name}
           </Text>
-          
+
           <View className="flex-row flex-wrap -mx-2">
             <View className="w-1/2 px-2 mb-4">
               <StatWidget
@@ -448,7 +495,7 @@ const SecurityAdmin: React.FC = () => {
         <Text className="text-headline-medium font-semibold text-text-primary mb-4">
           Security Actions
         </Text>
-        
+
         <View className="flex-row flex-wrap -mx-2">
           {checkPermission('visitors', 'bulk_actions') && (
             <View className="w-1/2 px-2 mb-4">
@@ -460,7 +507,7 @@ const SecurityAdmin: React.FC = () => {
               />
             </View>
           )}
-          
+
           {checkPermission('visitors', 'approve') && (
             <View className="w-1/2 px-2 mb-4">
               <QuickActionWidget
@@ -471,7 +518,7 @@ const SecurityAdmin: React.FC = () => {
               />
             </View>
           )}
-          
+
           <View className="w-1/2 px-2 mb-4">
             <QuickActionWidget
               title="Visitor Analytics"
@@ -480,7 +527,7 @@ const SecurityAdmin: React.FC = () => {
               onPress={() => console.log('Visitor analytics')}
             />
           </View>
-          
+
           <View className="w-1/2 px-2 mb-4">
             <QuickActionWidget
               title="Access Logs"
@@ -498,76 +545,102 @@ const SecurityAdmin: React.FC = () => {
           <Text className="text-headline-medium font-semibold text-text-primary mb-4">
             Active Security Incidents
           </Text>
-          
+
           <View className="space-y-3">
             {securityIncidents.map((incident) => {
               const IncidentIcon = getIncidentIcon(incident.type);
-              
+
               return (
-                <View key={incident.id} className="bg-surface rounded-xl p-4 border border-divider">
+                <View
+                  key={incident.id}
+                  className="bg-surface rounded-xl p-4 border border-divider">
                   <View className="flex-row items-start justify-between mb-3">
                     <View className="flex-1 mr-3">
                       <View className="flex-row items-center mb-2">
-                        <IncidentIcon size={16} className={getIncidentSeverityColor(incident.severity)} />
+                        <IncidentIcon
+                          size={16}
+                          className={getIncidentSeverityColor(
+                            incident.severity,
+                          )}
+                        />
                         <Text className="text-body-large font-semibold text-text-primary ml-2">
                           {incident.title}
                         </Text>
                       </View>
-                      
+
                       <Text className="text-body-medium text-text-secondary mb-2">
                         {incident.description}
                       </Text>
-                      
+
                       {incident.visitorName && (
                         <View className="flex-row items-center mb-2">
-                          <Users size={14} className="text-text-secondary mr-2" />
+                          <Users
+                            size={14}
+                            className="text-text-secondary mr-2"
+                          />
                           <Text className="text-label-medium text-text-secondary">
                             Visitor: {incident.visitorName}
                           </Text>
                         </View>
                       )}
-                      
+
                       {incident.location && (
                         <View className="flex-row items-center mb-2">
-                          <MapPin size={14} className="text-text-secondary mr-2" />
+                          <MapPin
+                            size={14}
+                            className="text-text-secondary mr-2"
+                          />
                           <Text className="text-label-medium text-text-secondary">
                             Location: {incident.location}
                           </Text>
                         </View>
                       )}
-                      
+
                       <Text className="text-label-small text-text-secondary">
-                        Reported by {incident.reportedBy} • {new Date(incident.reportedAt).toLocaleTimeString()}
+                        Reported by {incident.reportedBy} •{' '}
+                        {new Date(incident.reportedAt).toLocaleTimeString()}
                       </Text>
                     </View>
-                    
-                    <View className={`px-2 py-1 rounded-full ${
-                      incident.severity === 'critical' ? 'bg-red-100' :
-                      incident.severity === 'high' ? 'bg-orange-100' :
-                      incident.severity === 'medium' ? 'bg-yellow-100' : 'bg-blue-100'
-                    }`}>
-                      <Text className={`text-label-small font-medium ${getIncidentSeverityColor(incident.severity)}`}>
+
+                    <View
+                      className={`px-2 py-1 rounded-full ${
+                        incident.severity === 'critical'
+                          ? 'bg-red-100'
+                          : incident.severity === 'high'
+                            ? 'bg-orange-100'
+                            : incident.severity === 'medium'
+                              ? 'bg-yellow-100'
+                              : 'bg-blue-100'
+                      }`}>
+                      <Text
+                        className={`text-label-small font-medium ${getIncidentSeverityColor(incident.severity)}`}>
                         {incident.severity.toUpperCase()}
                       </Text>
                     </View>
                   </View>
-                  
+
                   {incident.status === 'open' && (
                     <View className="flex-row gap-2 pt-3 border-t border-divider/50">
                       <TouchableOpacity
-                        onPress={() => handleIncidentAction(incident.id, 'resolve')}
-                        className="flex-1 py-2 bg-green-600 rounded-lg flex-row items-center justify-center"
-                      >
+                        onPress={() =>
+                          handleIncidentAction(incident.id, 'resolve')
+                        }
+                        className="flex-1 py-2 bg-green-600 rounded-lg flex-row items-center justify-center">
                         <CheckCircle size={16} color="white" />
-                        <Text className="text-white font-medium ml-2">Resolve</Text>
+                        <Text className="text-white font-medium ml-2">
+                          Resolve
+                        </Text>
                       </TouchableOpacity>
-                      
+
                       <TouchableOpacity
-                        onPress={() => handleIncidentAction(incident.id, 'escalate')}
-                        className="flex-1 py-2 bg-orange-600 rounded-lg flex-row items-center justify-center"
-                      >
+                        onPress={() =>
+                          handleIncidentAction(incident.id, 'escalate')
+                        }
+                        className="flex-1 py-2 bg-orange-600 rounded-lg flex-row items-center justify-center">
                         <Bell size={16} color="white" />
-                        <Text className="text-white font-medium ml-2">Escalate</Text>
+                        <Text className="text-white font-medium ml-2">
+                          Escalate
+                        </Text>
                       </TouchableOpacity>
                     </View>
                   )}
@@ -584,10 +657,12 @@ const SecurityAdmin: React.FC = () => {
           <Text className="text-headline-medium font-semibold text-text-primary mb-4">
             Recent Security Operations
           </Text>
-          
+
           <View className="space-y-3">
             {bulkActions.map((action) => (
-              <View key={action.id} className="bg-surface rounded-xl p-4 border border-divider">
+              <View
+                key={action.id}
+                className="bg-surface rounded-xl p-4 border border-divider">
                 <View className="flex-row items-start justify-between mb-2">
                   <View className="flex-1 mr-3">
                     <Text className="text-body-large font-semibold text-text-primary mb-1">
@@ -596,22 +671,33 @@ const SecurityAdmin: React.FC = () => {
                     <Text className="text-body-medium text-text-secondary mb-2">
                       {action.description}
                     </Text>
-                    
-                    <View className={`inline-flex px-2 py-1 rounded-full ${
-                      action.status === 'completed' ? 'bg-green-100' :
-                      action.status === 'processing' ? 'bg-blue-100' :
-                      action.status === 'failed' ? 'bg-red-100' : 'bg-orange-100'
-                    }`}>
-                      <Text className={`text-label-small font-medium ${
-                        action.status === 'completed' ? 'text-green-600' :
-                        action.status === 'processing' ? 'text-blue-600' :
-                        action.status === 'failed' ? 'text-red-600' : 'text-orange-600'
+
+                    <View
+                      className={`inline-flex px-2 py-1 rounded-full ${
+                        action.status === 'completed'
+                          ? 'bg-green-100'
+                          : action.status === 'processing'
+                            ? 'bg-blue-100'
+                            : action.status === 'failed'
+                              ? 'bg-red-100'
+                              : 'bg-orange-100'
                       }`}>
-                        {action.status.charAt(0).toUpperCase() + action.status.slice(1)}
+                      <Text
+                        className={`text-label-small font-medium ${
+                          action.status === 'completed'
+                            ? 'text-green-600'
+                            : action.status === 'processing'
+                              ? 'text-blue-600'
+                              : action.status === 'failed'
+                                ? 'text-red-600'
+                                : 'text-orange-600'
+                        }`}>
+                        {action.status.charAt(0).toUpperCase() +
+                          action.status.slice(1)}
                       </Text>
                     </View>
                   </View>
-                  
+
                   <View className="items-end">
                     <Text className="text-body-medium font-semibold text-text-primary">
                       {action.visitorCount} visitors
@@ -621,11 +707,12 @@ const SecurityAdmin: React.FC = () => {
                     </Text>
                   </View>
                 </View>
-                
+
                 {action.results && (
                   <View className="pt-2 border-t border-divider/50">
                     <Text className="text-label-medium text-text-secondary">
-                      Results: {action.results.successful} successful, {action.results.failed} failed
+                      Results: {action.results.successful} successful,{' '}
+                      {action.results.failed} failed
                     </Text>
                   </View>
                 )}

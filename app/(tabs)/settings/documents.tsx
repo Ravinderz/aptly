@@ -4,7 +4,11 @@ import { ArrowLeft } from 'lucide-react-native';
 import { router, useFocusEffect } from 'expo-router';
 import { Button } from '../../../components/ui/Button';
 import DocumentViewer from '../../../components/ui/DocumentViewer';
-import { DocumentStorage, Document, initializeMockData } from '../../../utils/storage';
+import {
+  DocumentStorage,
+  Document,
+  initializeMockData,
+} from '../../../utils/storage';
 
 export default function Documents() {
   const [documents, setDocuments] = useState<Document[]>([]);
@@ -17,7 +21,7 @@ export default function Documents() {
   useFocusEffect(
     React.useCallback(() => {
       loadDocuments();
-    }, [])
+    }, []),
   );
 
   const initializeData = async () => {
@@ -67,8 +71,7 @@ export default function Documents() {
             variant="ghost"
             size="sm"
             onPress={() => router.back()}
-            className="mr-2 p-2"
-          >
+            className="mr-2 p-2">
             <ArrowLeft size={20} color="#6366f1" />
           </Button>
           <Text className="text-text-primary text-headline-large font-semibold">

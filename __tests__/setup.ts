@@ -44,7 +44,7 @@ jest.mock('expo-image-picker', () => ({
 // Enhanced AsyncStorage mock with better promise handling
 jest.mock('@react-native-async-storage/async-storage', () => {
   let store = {} as Record<string, string>;
-  
+
   return {
     getItem: jest.fn((key) => {
       return Promise.resolve(store[key] || null);
@@ -65,7 +65,7 @@ jest.mock('@react-native-async-storage/async-storage', () => {
       return Promise.resolve(Object.keys(store));
     }),
     multiGet: jest.fn((keys) => {
-      return Promise.resolve(keys.map(key => [key, store[key] || null]));
+      return Promise.resolve(keys.map((key) => [key, store[key] || null]));
     }),
     multiSet: jest.fn((keyValuePairs) => {
       keyValuePairs.forEach(([key, value]) => {
@@ -170,12 +170,14 @@ global.console = {
 
 // Mock additional Expo modules
 jest.mock('expo-document-picker', () => ({
-  getDocumentAsync: jest.fn(() => Promise.resolve({
-    type: 'success',
-    uri: 'mock-uri',
-    name: 'mock-document.pdf',
-    size: 1024,
-  })),
+  getDocumentAsync: jest.fn(() =>
+    Promise.resolve({
+      type: 'success',
+      uri: 'mock-uri',
+      name: 'mock-document.pdf',
+      size: 1024,
+    }),
+  ),
   DocumentPickerOptions: {},
 }));
 
@@ -252,7 +254,7 @@ jest.useFakeTimers();
 beforeEach(() => {
   // Clear all mocks before each test
   jest.clearAllMocks();
-  
+
   // Reset console mocks
   (global.console.log as jest.Mock).mockClear();
   (global.console.warn as jest.Mock).mockClear();

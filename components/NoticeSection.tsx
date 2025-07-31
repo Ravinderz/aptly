@@ -1,6 +1,13 @@
 import React from 'react';
 import { View, Text, TouchableOpacity } from 'react-native';
-import { Bell, Calendar, Users, Zap, Shield, AlertTriangle } from 'lucide-react-native';
+import {
+  Bell,
+  Calendar,
+  Users,
+  Zap,
+  Shield,
+  AlertTriangle,
+} from 'lucide-react-native';
 import { router } from 'expo-router';
 import HighlightCard from './ui/HighlightCard';
 
@@ -20,30 +27,33 @@ const NoticeSection = () => {
     {
       id: '1',
       title: 'Water Supply Maintenance',
-      description: 'Water supply will be interrupted tomorrow (Jan 20) from 10 AM to 2 PM for tank cleaning. Please store water in advance.',
+      description:
+        'Water supply will be interrupted tomorrow (Jan 20) from 10 AM to 2 PM for tank cleaning. Please store water in advance.',
       variant: 'warning',
       date: '2024-01-19',
       category: 'maintenance',
-      icon: <Zap size={16} className="text-warning" />
+      icon: <Zap size={16} className="text-warning" />,
     },
     {
-      id: '2', 
+      id: '2',
       title: 'Society Meeting This Weekend',
-      description: 'Monthly society meeting scheduled for Saturday 6 PM in the community hall. Agenda: Budget discussion and new rules.',
+      description:
+        'Monthly society meeting scheduled for Saturday 6 PM in the community hall. Agenda: Budget discussion and new rules.',
       variant: 'info',
       date: '2024-01-18',
       category: 'community',
-      icon: <Users size={16} className="text-primary" />
+      icon: <Users size={16} className="text-primary" />,
     },
     {
       id: '3',
       title: 'New Security Guidelines',
-      description: 'All visitors must now register via the app. Identity verification is mandatory for entry after 8 PM.',
+      description:
+        'All visitors must now register via the app. Identity verification is mandatory for entry after 8 PM.',
       variant: 'primary',
       date: '2024-01-17',
       category: 'security',
-      icon: <Shield size={16} className="text-primary" />
-    }
+      icon: <Shield size={16} className="text-primary" />,
+    },
   ];
 
   const formatDate = (dateString: string) => {
@@ -55,10 +65,14 @@ const NoticeSection = () => {
 
   const getCategoryColor = (category: string) => {
     switch (category) {
-      case 'maintenance': return 'text-warning';
-      case 'community': return 'text-primary';
-      case 'security': return 'text-secondary';
-      default: return 'text-text-secondary';
+      case 'maintenance':
+        return 'text-warning';
+      case 'community':
+        return 'text-primary';
+      case 'security':
+        return 'text-secondary';
+      default:
+        return 'text-text-secondary';
     }
   };
 
@@ -76,12 +90,13 @@ const NoticeSection = () => {
             Society Notices
           </Text>
         </View>
-        <TouchableOpacity 
+        <TouchableOpacity
           className="bg-primary/10 rounded-full px-3 py-1"
           onPress={() => router.push('/(tabs)/notices')}
-          activeOpacity={0.7}
-        >
-          <Text className="text-primary text-label-large font-semibold">View All</Text>
+          activeOpacity={0.7}>
+          <Text className="text-primary text-label-large font-semibold">
+            View All
+          </Text>
         </TouchableOpacity>
       </View>
 
@@ -90,8 +105,7 @@ const NoticeSection = () => {
         <HighlightCard
           title={notices[0].title}
           variant={notices[0].variant}
-          size="lg"
-        >
+          size="lg">
           <Text className="text-text-secondary leading-6 mb-3">
             {notices[0].description}
           </Text>

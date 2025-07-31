@@ -6,7 +6,7 @@ import {
   adminStyles,
   adminTailwindClasses,
   createAdminComponentStyle,
-  AdminThemeColors
+  AdminThemeColors,
 } from '../../utils/adminTheme';
 
 describe('Admin Theme Utilities', () => {
@@ -17,13 +17,13 @@ describe('Admin Theme Utilities', () => {
       expect(adminTheme.primaryLight).toBe('#334155');
       expect(adminTheme.primaryDark).toBe('#0f172a');
       expect(adminTheme.primaryContrast).toBe('#ffffff');
-      
+
       // Secondary colors
       expect(adminTheme.secondary).toBe('#f59e0b');
       expect(adminTheme.secondaryLight).toBe('#fbbf24');
       expect(adminTheme.secondaryDark).toBe('#d97706');
       expect(adminTheme.secondaryContrast).toBe('#1e293b');
-      
+
       // Status colors
       expect(adminTheme.success).toBe('#10b981');
       expect(adminTheme.warning).toBe('#f97316');
@@ -36,7 +36,7 @@ describe('Admin Theme Utilities', () => {
       expect(adminTheme.primary).toContain('#');
       expect(adminTheme.primaryLight).toContain('#');
       expect(adminTheme.primaryDark).toContain('#');
-      
+
       // Secondary should be gold-based (amber)
       expect(adminTheme.secondary).toContain('#f59e0b');
       expect(adminTheme.secondaryLight).toContain('#fbbf24');
@@ -150,7 +150,10 @@ describe('Admin Theme Utilities', () => {
 
     test('should have elevated surface with shadow properties', () => {
       expect(adminStyles.elevatedSurface.shadowColor).toBe(adminTheme.primary);
-      expect(adminStyles.elevatedSurface.shadowOffset).toEqual({ width: 0, height: 4 });
+      expect(adminStyles.elevatedSurface.shadowOffset).toEqual({
+        width: 0,
+        height: 4,
+      });
       expect(adminStyles.elevatedSurface.shadowOpacity).toBe(0.15);
       expect(adminStyles.elevatedSurface.shadowRadius).toBe(12);
       expect(adminStyles.elevatedSurface.elevation).toBe(4);
@@ -159,42 +162,56 @@ describe('Admin Theme Utilities', () => {
     test('should have distinct admin and resident header styles', () => {
       expect(adminStyles.adminHeader.backgroundColor).toBe(adminTheme.primary);
       expect(adminStyles.adminHeader.borderBottomWidth).toBe(2);
-      expect(adminStyles.adminHeader.borderBottomColor).toBe(adminTheme.secondary);
-      
-      expect(adminStyles.residentHeader.backgroundColor).toBe(residentTheme.primary);
-      expect(adminStyles.residentHeader.backgroundColor).not.toBe(adminTheme.primary);
+      expect(adminStyles.adminHeader.borderBottomColor).toBe(
+        adminTheme.secondary,
+      );
+
+      expect(adminStyles.residentHeader.backgroundColor).toBe(
+        residentTheme.primary,
+      );
+      expect(adminStyles.residentHeader.backgroundColor).not.toBe(
+        adminTheme.primary,
+      );
     });
 
     test('should have button variants with proper styling', () => {
       // Primary button
-      expect(adminStyles.adminPrimaryButton.backgroundColor).toBe(adminTheme.primary);
+      expect(adminStyles.adminPrimaryButton.backgroundColor).toBe(
+        adminTheme.primary,
+      );
       expect(adminStyles.adminPrimaryButton.borderRadius).toBe(8);
       expect(adminStyles.adminPrimaryButton.alignItems).toBe('center');
-      
+
       // Secondary button
-      expect(adminStyles.adminSecondaryButton.backgroundColor).toBe('transparent');
+      expect(adminStyles.adminSecondaryButton.backgroundColor).toBe(
+        'transparent',
+      );
       expect(adminStyles.adminSecondaryButton.borderWidth).toBe(2);
-      expect(adminStyles.adminSecondaryButton.borderColor).toBe(adminTheme.primary);
-      
+      expect(adminStyles.adminSecondaryButton.borderColor).toBe(
+        adminTheme.primary,
+      );
+
       // Accent button
-      expect(adminStyles.adminAccentButton.backgroundColor).toBe(adminTheme.secondary);
+      expect(adminStyles.adminAccentButton.backgroundColor).toBe(
+        adminTheme.secondary,
+      );
     });
 
     test('should have text styles with proper typography hierarchy', () => {
       expect(adminStyles.adminHeading.fontSize).toBe(24);
       expect(adminStyles.adminHeading.fontWeight).toBe('700');
       expect(adminStyles.adminHeading.color).toBe(adminTheme.textPrimary);
-      
+
       expect(adminStyles.adminSubheading.fontSize).toBe(18);
       expect(adminStyles.adminSubheading.fontWeight).toBe('600');
-      
+
       expect(adminStyles.adminBody.fontSize).toBe(16);
       expect(adminStyles.adminBody.fontWeight).toBe('500');
       expect(adminStyles.adminBody.lineHeight).toBe(24);
-      
+
       expect(adminStyles.adminLabel.fontSize).toBe(14);
       expect(adminStyles.adminLabel.fontWeight).toBe('600');
-      
+
       expect(adminStyles.adminCaption.fontSize).toBe(12);
       expect(adminStyles.adminCaption.fontWeight).toBe('500');
     });
@@ -203,8 +220,10 @@ describe('Admin Theme Utilities', () => {
       expect(adminStyles.adminInput.borderWidth).toBe(2);
       expect(adminStyles.adminInput.borderColor).toBe(adminTheme.border);
       expect(adminStyles.adminInput.backgroundColor).toBe(adminTheme.surface);
-      
-      expect(adminStyles.adminInputFocused.borderColor).toBe(adminTheme.primary);
+
+      expect(adminStyles.adminInputFocused.borderColor).toBe(
+        adminTheme.primary,
+      );
       expect(adminStyles.adminInputError.borderColor).toBe(adminTheme.error);
     });
 
@@ -212,18 +231,26 @@ describe('Admin Theme Utilities', () => {
       expect(adminStyles.adminTabBar.backgroundColor).toBe(adminTheme.primary);
       expect(adminStyles.adminTabBar.borderTopWidth).toBe(2);
       expect(adminStyles.adminTabBar.borderTopColor).toBe(adminTheme.secondary);
-      
+
       expect(adminStyles.adminTabTextActive.color).toBe(adminTheme.secondary);
-      expect(adminStyles.adminTabTextInactive.color).toBe(adminTheme.textInverse);
+      expect(adminStyles.adminTabTextInactive.color).toBe(
+        adminTheme.textInverse,
+      );
       expect(adminStyles.adminTabTextInactive.opacity).toBe(0.7);
     });
 
     test('should have mode toggle styles', () => {
       expect(adminStyles.modeToggle.flexDirection).toBe('row');
-      expect(adminStyles.modeToggle.backgroundColor).toBe(adminTheme.surfaceElevated);
-      
-      expect(adminStyles.modeToggleOptionActive.backgroundColor).toBe(adminTheme.primary);
-      expect(adminStyles.modeToggleOptionInactive.backgroundColor).toBe('transparent');
+      expect(adminStyles.modeToggle.backgroundColor).toBe(
+        adminTheme.surfaceElevated,
+      );
+
+      expect(adminStyles.modeToggleOptionActive.backgroundColor).toBe(
+        adminTheme.primary,
+      );
+      expect(adminStyles.modeToggleOptionInactive.backgroundColor).toBe(
+        'transparent',
+      );
     });
   });
 
@@ -232,7 +259,9 @@ describe('Admin Theme Utilities', () => {
       expect(adminTailwindClasses['bg-admin-primary']).toBe('bg-[#1e293b]');
       expect(adminTailwindClasses['bg-admin-secondary']).toBe('bg-[#f59e0b]');
       expect(adminTailwindClasses['text-admin-primary']).toBe('text-[#1e293b]');
-      expect(adminTailwindClasses['text-admin-secondary']).toBe('text-[#f59e0b]');
+      expect(adminTailwindClasses['text-admin-secondary']).toBe(
+        'text-[#f59e0b]',
+      );
     });
 
     test('should have status color classes', () => {
@@ -249,14 +278,24 @@ describe('Admin Theme Utilities', () => {
     });
 
     test('should have text utility classes', () => {
-      expect(adminTailwindClasses['text-admin-text-primary']).toBe('text-[#0f172a]');
-      expect(adminTailwindClasses['text-admin-text-secondary']).toBe('text-[#475569]');
-      expect(adminTailwindClasses['text-admin-text-tertiary']).toBe('text-[#64748b]');
-      expect(adminTailwindClasses['text-admin-text-inverse']).toBe('text-white');
+      expect(adminTailwindClasses['text-admin-text-primary']).toBe(
+        'text-[#0f172a]',
+      );
+      expect(adminTailwindClasses['text-admin-text-secondary']).toBe(
+        'text-[#475569]',
+      );
+      expect(adminTailwindClasses['text-admin-text-tertiary']).toBe(
+        'text-[#64748b]',
+      );
+      expect(adminTailwindClasses['text-admin-text-inverse']).toBe(
+        'text-white',
+      );
     });
 
     test('should have admin-specific utility classes', () => {
-      expect(adminTailwindClasses['shadow-admin']).toBe('shadow-lg shadow-[#1e293b]/15');
+      expect(adminTailwindClasses['shadow-admin']).toBe(
+        'shadow-lg shadow-[#1e293b]/15',
+      );
       expect(adminTailwindClasses['border-admin']).toBe('border-[#e2e8f0]');
     });
   });
@@ -265,7 +304,7 @@ describe('Admin Theme Utilities', () => {
     const baseStyle = {
       backgroundColor: '#ffffff',
       borderRadius: 4,
-      padding: 16
+      padding: 16,
     };
 
     test('should return base style for resident mode', () => {
@@ -275,7 +314,7 @@ describe('Admin Theme Utilities', () => {
 
     test('should apply admin transformations for admin mode', () => {
       const result = createAdminComponentStyle(baseStyle, 'admin');
-      
+
       expect(result.backgroundColor).toBe(baseStyle.backgroundColor);
       expect(result.borderRadius).toBe(baseStyle.borderRadius);
       expect(result.padding).toBe(baseStyle.padding);
@@ -290,11 +329,11 @@ describe('Admin Theme Utilities', () => {
         padding: 20,
         margin: 10,
         flex: 1,
-        alignItems: 'center' as const
+        alignItems: 'center' as const,
       };
 
       const result = createAdminComponentStyle(complexBaseStyle, 'admin');
-      
+
       expect(result.margin).toBe(10);
       expect(result.flex).toBe(1);
       expect(result.alignItems).toBe('center');
@@ -304,7 +343,7 @@ describe('Admin Theme Utilities', () => {
 
     test('should handle empty base style', () => {
       const result = createAdminComponentStyle({}, 'admin');
-      
+
       expect(result.borderColor).toBe(adminTheme.border);
       expect(result.shadowColor).toBe(adminTheme.primary);
     });
@@ -313,8 +352,8 @@ describe('Admin Theme Utilities', () => {
   describe('color consistency', () => {
     test('should have valid hex color formats', () => {
       const hexColorRegex = /^#[0-9A-Fa-f]{6}$/;
-      
-      Object.values(adminTheme).forEach(value => {
+
+      Object.values(adminTheme).forEach((value) => {
         if (typeof value === 'string') {
           expect(value).toMatch(hexColorRegex);
         }

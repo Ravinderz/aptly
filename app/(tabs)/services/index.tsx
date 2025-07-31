@@ -1,10 +1,10 @@
-import { TabHeader } from "@/components/ui/headers";
+import { TabHeader } from '@/components/ui/headers';
 import {
   ResponsiveContainer,
   ResponsiveText,
-} from "@/components/ui/ResponsiveContainer";
-import { WithFeatureFlag, useFeature } from "@/contexts/FeatureFlagContext";
-import { useRouter } from "expo-router";
+} from '@/components/ui/ResponsiveContainer';
+import { WithFeatureFlag, useFeature } from '@/contexts/FeatureFlagContext';
+import { useRouter } from 'expo-router';
 import {
   BarChart3,
   Clock,
@@ -14,82 +14,75 @@ import {
   Users,
   Vote,
   Wrench,
-} from "lucide-react-native";
-import React from "react";
-import { SafeAreaView, Text, TouchableOpacity, View } from "react-native";
+} from 'lucide-react-native';
+import React from 'react';
+import { SafeAreaView, Text, TouchableOpacity, View } from 'react-native';
 
 export default function Services() {
   const router = useRouter();
 
-  // Feature flag checks
-  const hasAnalytics = useFeature("analytics_dashboard");
-  const hasGovernance = useFeature("governance_center");
-  const hasMaintenanceTracking = useFeature("maintenance_tracking");
-  const hasOnlinePayments = useFeature("online_payments");
-  const hasVendorManagement = useFeature("vendor_management");
-
   // Mock data for recent activities
   const recentRequests = [
     {
-      id: "1",
-      title: "Plumbing Issue - Kitchen Sink",
-      status: "in_progress",
-      priority: "high",
-      date: "2 hours ago",
-      category: "Plumbing",
+      id: '1',
+      title: 'Plumbing Issue - Kitchen Sink',
+      status: 'in_progress',
+      priority: 'high',
+      date: '2 hours ago',
+      category: 'Plumbing',
     },
     {
-      id: "2",
-      title: "Electrical Work - Hall Fan",
-      status: "completed",
-      priority: "medium",
-      date: "1 day ago",
-      category: "Electrical",
+      id: '2',
+      title: 'Electrical Work - Hall Fan',
+      status: 'completed',
+      priority: 'medium',
+      date: '1 day ago',
+      category: 'Electrical',
     },
   ];
 
   const unpaidBills = [
     {
-      id: "1",
-      title: "Maintenance Bill - March 2024",
-      amount: "₹5,250",
-      dueDate: "Mar 31, 2024",
-      status: "overdue",
+      id: '1',
+      title: 'Maintenance Bill - March 2024',
+      amount: '₹5,250',
+      dueDate: 'Mar 31, 2024',
+      status: 'overdue',
     },
     {
-      id: "2",
-      title: "Water Bill - March 2024",
-      amount: "₹850",
-      dueDate: "Apr 5, 2024",
-      status: "pending",
+      id: '2',
+      title: 'Water Bill - March 2024',
+      amount: '₹850',
+      dueDate: 'Apr 5, 2024',
+      status: 'pending',
     },
   ];
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case "completed":
-        return "text-success";
-      case "in_progress":
-        return "text-warning";
-      case "pending":
-        return "text-primary";
-      case "overdue":
-        return "text-error";
+      case 'completed':
+        return 'text-success';
+      case 'in_progress':
+        return 'text-warning';
+      case 'pending':
+        return 'text-primary';
+      case 'overdue':
+        return 'text-error';
       default:
-        return "text-text-secondary";
+        return 'text-text-secondary';
     }
   };
 
   const getPriorityColor = (priority: string) => {
     switch (priority) {
-      case "high":
-        return "bg-error/20 text-error";
-      case "medium":
-        return "bg-warning/20 text-warning";
-      case "low":
-        return "bg-success/20 text-success";
+      case 'high':
+        return 'bg-error/20 text-error';
+      case 'medium':
+        return 'bg-warning/20 text-warning';
+      case 'low':
+        return 'bg-success/20 text-success';
       default:
-        return "bg-primary/20 text-primary";
+        return 'bg-primary/20 text-primary';
     }
   };
 
@@ -105,16 +98,14 @@ export default function Services() {
             <ResponsiveText
               variant="headline"
               size="medium"
-              className="font-semibold mb-4"
-            >
+              className="font-semibold mb-4">
               Quick Actions
             </ResponsiveText>
             <TouchableOpacity
               className="bg-primary rounded-2xl p-5 flex-row items-center justify-center"
               onPress={() =>
-                router.push("/(tabs)/services/maintenance/common-area/create")
-              }
-            >
+                router.push('/(tabs)/services/maintenance/common-area/create')
+              }>
               <Plus size={24} color="white" />
               <ResponsiveText className="text-white font-semibold ml-3">
                 New Maintenance Request
@@ -132,8 +123,7 @@ export default function Services() {
           {/* Vendor Directory Card - Full Width */}
           <TouchableOpacity
             className="bg-surface rounded-2xl p-6 border border-divider mb-5"
-            onPress={() => router.push("/(tabs)/services/vendors")}
-          >
+            onPress={() => router.push('/(tabs)/services/vendors')}>
             <View className="flex-row items-center">
               <View className="bg-primary/10 rounded-full w-12 h-12 items-center justify-center mr-4">
                 <Users size={24} color="#6366f1" />
@@ -165,8 +155,7 @@ export default function Services() {
             {/* Maintenance Requests Card */}
             <TouchableOpacity
               className="flex-1 bg-surface rounded-2xl p-6 border border-divider"
-              onPress={() => router.push("/(tabs)/services/maintenance")}
-            >
+              onPress={() => router.push('/(tabs)/services/maintenance')}>
               <View className="bg-primary/10 rounded-full w-12 h-12 items-center justify-center mb-5">
                 <Wrench size={24} color="#6366f1" />
               </View>
@@ -188,8 +177,7 @@ export default function Services() {
             {/* Billing Card */}
             <TouchableOpacity
               className="flex-1 bg-surface rounded-2xl p-6 border border-divider"
-              onPress={() => router.push("/(tabs)/services/billing")}
-            >
+              onPress={() => router.push('/(tabs)/services/billing')}>
               <View className="bg-success/10 rounded-full w-12 h-12 items-center justify-center mb-5">
                 <Receipt size={24} color="#4CAF50" />
               </View>
@@ -213,8 +201,7 @@ export default function Services() {
             {/* Governance Card */}
             <TouchableOpacity
               className="flex-1 bg-surface rounded-2xl p-6 border border-divider"
-              onPress={() => router.push("/(tabs)/services/governance")}
-            >
+              onPress={() => router.push('/(tabs)/services/governance')}>
               <View className="bg-indigo-500/10 rounded-full w-12 h-12 items-center justify-center mb-5">
                 <Vote size={24} color="#6366f1" />
               </View>
@@ -236,8 +223,7 @@ export default function Services() {
             {/* Analytics Card */}
             <TouchableOpacity
               className="flex-1 bg-surface rounded-2xl p-6 border border-divider"
-              onPress={() => router.push("/(tabs)/services/analytics")}
-            >
+              onPress={() => router.push('/(tabs)/services/analytics')}>
               <View className="bg-purple-500/10 rounded-full w-12 h-12 items-center justify-center mb-5">
                 <BarChart3 size={24} color="#8B5CF6" />
               </View>
@@ -266,8 +252,7 @@ export default function Services() {
                 Recent Requests
               </Text>
               <TouchableOpacity
-                onPress={() => router.push("/(tabs)/services/maintenance")}
-              >
+                onPress={() => router.push('/(tabs)/services/maintenance')}>
                 <Text className="text-primary font-medium">View All</Text>
               </TouchableOpacity>
             </View>
@@ -278,19 +263,17 @@ export default function Services() {
                   className="bg-surface rounded-xl p-5 border border-divider mb-3"
                   onPress={() =>
                     router.push(
-                      `/(tabs)/services/maintenance/common-area/${request.id}`
+                      `/(tabs)/services/maintenance/common-area/${request.id}`,
                     )
-                  }
-                >
+                  }>
                   <View className="flex-row items-start justify-between mb-3">
                     <Text className="text-text-primary font-medium flex-1 mr-3">
                       {request.title}
                     </Text>
                     <View
                       className={`rounded-full px-3 py-1 ${getPriorityColor(
-                        request.priority
-                      )}`}
-                    >
+                        request.priority,
+                      )}`}>
                       <Text className="text-xs font-medium uppercase">
                         {request.priority}
                       </Text>
@@ -305,10 +288,9 @@ export default function Services() {
                     </View>
                     <Text
                       className={`text-sm font-medium capitalize ${getStatusColor(
-                        request.status
-                      )}`}
-                    >
-                      {request.status.replace("_", " ")}
+                        request.status,
+                      )}`}>
+                      {request.status.replace('_', ' ')}
                     </Text>
                   </View>
                 </TouchableOpacity>
@@ -325,8 +307,7 @@ export default function Services() {
                 Pending Bills
               </Text>
               <TouchableOpacity
-                onPress={() => router.push("/(tabs)/services/billing")}
-              >
+                onPress={() => router.push('/(tabs)/services/billing')}>
                 <Text className="text-primary font-medium">View All</Text>
               </TouchableOpacity>
             </View>
@@ -337,8 +318,7 @@ export default function Services() {
                   className="bg-surface rounded-xl p-5 border border-divider mb-3"
                   onPress={() =>
                     router.push(`/(tabs)/services/billing/${bill.id}`)
-                  }
-                >
+                  }>
                   <View className="flex-row items-start justify-between mb-3">
                     <Text className="text-text-primary font-medium flex-1 mr-3">
                       {bill.title}
@@ -353,17 +333,15 @@ export default function Services() {
                     </Text>
                     <View
                       className={`rounded-full px-3 py-1 ${
-                        bill.status === "overdue"
-                          ? "bg-error/20"
-                          : "bg-warning/20"
-                      }`}
-                    >
+                        bill.status === 'overdue'
+                          ? 'bg-error/20'
+                          : 'bg-warning/20'
+                      }`}>
                       <Text
                         className={`text-xs font-medium ${getStatusColor(
-                          bill.status
-                        )}`}
-                      >
-                        {bill.status === "overdue" ? "Overdue" : "Pending"}
+                          bill.status,
+                        )}`}>
+                        {bill.status === 'overdue' ? 'Overdue' : 'Pending'}
                       </Text>
                     </View>
                   </View>

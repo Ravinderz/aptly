@@ -1,12 +1,15 @@
-import { Stack } from "expo-router";
-import React from "react";
+import { Stack } from 'expo-router';
+import React from 'react';
 
 const _layout = () => {
   return (
     <Stack screenOptions={{ headerShown: false }}>
       <Stack.Screen name="index" options={{ headerShown: false }} />
       <Stack.Screen name="[category]" options={{ headerShown: false }} />
-      <Stack.Screen name="[category]/[vendorId]" options={{ headerShown: false }} />
+      <Stack.Screen
+        name="[category]/[vendorId]"
+        options={{ headerShown: false }}
+      />
     </Stack>
   );
 };

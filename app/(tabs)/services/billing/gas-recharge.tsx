@@ -1,6 +1,19 @@
 import React, { useState } from 'react';
-import { SafeAreaView, ScrollView, View, Text, TextInput, TouchableOpacity } from 'react-native';
-import { ArrowLeft, Car, AlertCircle, CreditCard, Gift } from 'lucide-react-native';
+import {
+  SafeAreaView,
+  ScrollView,
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+} from 'react-native';
+import {
+  ArrowLeft,
+  Car,
+  AlertCircle,
+  CreditCard,
+  Gift,
+} from 'lucide-react-native';
 import { router } from 'expo-router';
 import { Button } from '../../../../components/ui/Button';
 import { Card } from '../../../../components/ui/Card';
@@ -24,8 +37,12 @@ interface Provider {
 
 export default function GasRecharge() {
   const [customerId, setCustomerId] = useState('');
-  const [selectedProvider, setSelectedProvider] = useState<Provider | null>(null);
-  const [selectedAmount, setSelectedAmount] = useState<RechargeAmount | null>(null);
+  const [selectedProvider, setSelectedProvider] = useState<Provider | null>(
+    null,
+  );
+  const [selectedAmount, setSelectedAmount] = useState<RechargeAmount | null>(
+    null,
+  );
   const [customAmount, setCustomAmount] = useState('');
   const [isDetecting, setIsDetecting] = useState(false);
 
@@ -40,7 +57,7 @@ export default function GasRecharge() {
         { id: '2', amount: 1000, bonus: '8% extra credit' },
         { id: '3', amount: 2000, bonus: '10% extra credit' },
         { id: '4', amount: 5000, bonus: '12% extra credit' },
-      ]
+      ],
     },
     {
       id: 'mgl',
@@ -52,7 +69,7 @@ export default function GasRecharge() {
         { id: '6', amount: 1000, bonus: '8% extra credit', popular: true },
         { id: '7', amount: 2000, bonus: '10% extra credit' },
         { id: '8', amount: 5000, bonus: '12% extra credit' },
-      ]
+      ],
     },
     {
       id: 'ggl',
@@ -64,28 +81,34 @@ export default function GasRecharge() {
         { id: '10', amount: 1000, bonus: '7% extra credit' },
         { id: '11', amount: 2000, bonus: '9% extra credit', popular: true },
         { id: '12', amount: 5000, bonus: '11% extra credit' },
-      ]
-    }
+      ],
+    },
   ];
 
   const detectProvider = async () => {
     if (customerId.length < 8) {
-      showErrorAlert('Invalid Customer ID', 'Please enter a valid PNG customer ID (minimum 8 characters)');
+      showErrorAlert(
+        'Invalid Customer ID',
+        'Please enter a valid PNG customer ID (minimum 8 characters)',
+      );
       return;
     }
 
     setIsDetecting(true);
-    
+
     // Simulate provider detection based on customer ID pattern
     setTimeout(() => {
       const prefix = customerId.substring(0, 2).toUpperCase();
       let detectedProvider;
-      
-      if (prefix.startsWith('IG') || customerId.startsWith('11')) detectedProvider = providers[0]; // IGL
-      else if (prefix.startsWith('MG') || customerId.startsWith('22')) detectedProvider = providers[1]; // MGL
-      else if (prefix.startsWith('GG') || customerId.startsWith('33')) detectedProvider = providers[2]; // GGL
+
+      if (prefix.startsWith('IG') || customerId.startsWith('11'))
+        detectedProvider = providers[0]; // IGL
+      else if (prefix.startsWith('MG') || customerId.startsWith('22'))
+        detectedProvider = providers[1]; // MGL
+      else if (prefix.startsWith('GG') || customerId.startsWith('33'))
+        detectedProvider = providers[2]; // GGL
       else detectedProvider = providers[0]; // Default to IGL
-      
+
       setSelectedProvider(detectedProvider);
       setIsDetecting(false);
     }, 1500);
@@ -93,13 +116,19 @@ export default function GasRecharge() {
 
   const handleRecharge = () => {
     if (!customerId || !selectedProvider) {
-      showErrorAlert('Missing Information', 'Please enter customer ID and select provider');
+      showErrorAlert(
+        'Missing Information',
+        'Please enter customer ID and select provider',
+      );
       return;
     }
 
     const amount = selectedAmount?.amount || parseInt(customAmount);
     if (!amount || amount < 100) {
-      showErrorAlert('Invalid Amount', 'Please select an amount or enter minimum ₹100');
+      showErrorAlert(
+        'Invalid Amount',
+        'Please select an amount or enter minimum ₹100',
+      );
       return;
     }
 
@@ -112,8 +141,8 @@ export default function GasRecharge() {
         provider: selectedProvider.name,
         amount: amount.toString(),
         rechargeDetails: selectedAmount ? JSON.stringify(selectedAmount) : '',
-        cashback: Math.round(amount * 0.025).toString() // 2.5% cashback
-      }
+        cashback: Math.round(amount * 0.025).toString(), // 2.5% cashback
+      },
     });
   };
 
@@ -128,9 +157,10 @@ export default function GasRecharge() {
         <Button
           variant="ghost"
           size="sm"
-          onPress={() => router.canGoBack() ? router.back() : router.replace('/(tabs)')}
-          className="mr-2 p-2"
-        >
+          onPress={() =>
+            router.canGoBack() ? router.back() : router.replace('/(tabs)')
+          }
+          className="mr-2 p-2">
           <ArrowLeft size={20} color="#6366f1" />
         </Button>
         <Car size={20} color="#D32F2F" />
@@ -145,7 +175,7 @@ export default function GasRecharge() {
           <Text className="text-text-primary text-headline-medium font-semibold mb-4">
             Enter PNG Customer ID
           </Text>
-          
+
           <View className="flex-row items-center bg-background rounded-xl px-4 py-4 border border-divider mb-4">
             <Text className="text-text-primary text-body-large mr-3">ID</Text>
             <TextInput
@@ -158,11 +188,10 @@ export default function GasRecharge() {
           </View>
 
           {customerId.length >= 8 && !selectedProvider && (
-            <Button 
-              onPress={detectProvider} 
+            <Button
+              onPress={detectProvider}
               disabled={isDetecting}
-              className="mb-4"
-            >
+              className="mb-4">
               {isDetecting ? 'Detecting Provider...' : 'Detect Gas Provider'}
             </Button>
           )}
@@ -174,15 +203,21 @@ export default function GasRecharge() {
             <Text className="text-text-primary text-headline-medium font-semibold mb-4">
               Selected Gas Provider
             </Text>
-            
+
             <View className="flex-row items-center p-4 bg-error/5 rounded-xl border border-error/20">
               <Text className="text-2xl mr-3">{selectedProvider.logo}</Text>
               <View className="flex-1">
-                <Text className="text-text-primary font-semibold text-body-medium">{selectedProvider.name}</Text>
-                <Text className="text-text-secondary text-body-medium">PNG Connection verified</Text>
+                <Text className="text-text-primary font-semibold text-body-medium">
+                  {selectedProvider.name}
+                </Text>
+                <Text className="text-text-secondary text-body-medium">
+                  PNG Connection verified
+                </Text>
               </View>
               <TouchableOpacity onPress={() => setSelectedProvider(null)}>
-                <Text className="text-primary text-body-medium font-medium">Change</Text>
+                <Text className="text-primary text-body-medium font-medium">
+                  Change
+                </Text>
               </TouchableOpacity>
             </View>
           </Card>
@@ -194,24 +229,27 @@ export default function GasRecharge() {
             <Text className="text-text-primary text-headline-medium font-semibold mb-4">
               Select Recharge Amount
             </Text>
-            
+
             <View className="space-y-3">
               {selectedProvider.amounts.map((rechargeAmount) => (
                 <TouchableOpacity
                   key={rechargeAmount.id}
                   onPress={() => setSelectedAmount(rechargeAmount)}
                   className={`bg-surface rounded-xl p-4 border ${
-                    selectedAmount?.id === rechargeAmount.id ? 'border-primary bg-primary/5' : 'border-divider'
-                  }`}
-                >
+                    selectedAmount?.id === rechargeAmount.id
+                      ? 'border-primary bg-primary/5'
+                      : 'border-divider'
+                  }`}>
                   {rechargeAmount.popular && (
                     <View className="absolute -top-2 left-4">
                       <View className="bg-success rounded-full px-3 py-1">
-                        <Text className="text-white text-label-large font-bold">POPULAR</Text>
+                        <Text className="text-white text-label-large font-bold">
+                          POPULAR
+                        </Text>
                       </View>
                     </View>
                   )}
-                  
+
                   <View className="flex-row items-center justify-between mb-3">
                     <View className="flex-row items-center">
                       <Car size={16} color="#D32F2F" />
@@ -225,7 +263,7 @@ export default function GasRecharge() {
                       </Text>
                     </View>
                   </View>
-                  
+
                   <View className="flex-row items-center justify-between">
                     <View>
                       <Text className="text-text-primary font-semibold text-body-large">
@@ -253,7 +291,7 @@ export default function GasRecharge() {
             <Text className="text-text-primary text-headline-medium font-semibold mb-4">
               Or Enter Custom Amount
             </Text>
-            
+
             <View className="flex-row items-center bg-background rounded-xl px-4 py-4 border border-divider">
               <Text className="text-text-primary text-body-large mr-3">₹</Text>
               <TextInput
@@ -265,7 +303,7 @@ export default function GasRecharge() {
                 keyboardType="numeric"
               />
             </View>
-            
+
             {customAmount && parseInt(customAmount) >= 100 && (
               <View className="mt-3 p-3 bg-success/10 rounded-xl">
                 <Text className="text-success text-body-medium">
@@ -281,28 +319,39 @@ export default function GasRecharge() {
           title="About PNG Recharge"
           variant="info"
           size="sm"
-          className="mx-6 mb-6"
-        >
+          className="mx-6 mb-6">
           <View className="space-y-2">
             <View className="flex-row items-start">
               <Text className="text-primary mr-2">🚗</Text>
               <View className="flex-1">
-                <Text className="text-text-primary font-medium text-body-medium">Piped Natural Gas (PNG)</Text>
-                <Text className="text-text-secondary text-body-medium">For home cooking and water heating</Text>
+                <Text className="text-text-primary font-medium text-body-medium">
+                  Piped Natural Gas (PNG)
+                </Text>
+                <Text className="text-text-secondary text-body-medium">
+                  For home cooking and water heating
+                </Text>
               </View>
             </View>
             <View className="flex-row items-start">
               <Text className="text-primary mr-2">⛽</Text>
               <View className="flex-1">
-                <Text className="text-text-primary font-medium text-body-medium">CNG Vehicle</Text>
-                <Text className="text-text-secondary text-body-medium">For compressed natural gas vehicles</Text>
+                <Text className="text-text-primary font-medium text-body-medium">
+                  CNG Vehicle
+                </Text>
+                <Text className="text-text-secondary text-body-medium">
+                  For compressed natural gas vehicles
+                </Text>
               </View>
             </View>
             <View className="flex-row items-start">
               <Text className="text-primary mr-2">💳</Text>
               <View className="flex-1">
-                <Text className="text-text-primary font-medium text-body-medium">Prepaid System</Text>
-                <Text className="text-text-secondary text-body-medium">Recharge balance and use as needed</Text>
+                <Text className="text-text-primary font-medium text-body-medium">
+                  Prepaid System
+                </Text>
+                <Text className="text-text-secondary text-body-medium">
+                  Recharge balance and use as needed
+                </Text>
               </View>
             </View>
           </View>
@@ -314,8 +363,7 @@ export default function GasRecharge() {
             title="Cashback Offer"
             variant="success"
             size="sm"
-            className="mx-6 mb-6"
-          >
+            className="mx-6 mb-6">
             <View className="flex-row items-center">
               <Gift size={16} color="#4CAF50" />
               <Text className="text-text-secondary text-body-medium ml-2">
@@ -330,8 +378,7 @@ export default function GasRecharge() {
           title="Important Information"
           variant="info"
           size="sm"
-          className="mx-6 mb-8"
-        >
+          className="mx-6 mb-8">
           <View className="space-y-2">
             <View className="flex-row items-start">
               <AlertCircle size={14} color="#6366f1" className="mt-0.5 mr-2" />
@@ -365,16 +412,25 @@ export default function GasRecharge() {
       {selectedProvider && customerId.length >= 8 && (
         <View className="px-6 py-4 bg-surface border-t border-divider">
           <View className="flex-row items-center justify-between mb-4">
-            <Text className="text-text-secondary text-body-medium">Recharge Amount</Text>
+            <Text className="text-text-secondary text-body-medium">
+              Recharge Amount
+            </Text>
             <Text className="text-text-primary font-bold text-display-small">
-              {formatCurrency(selectedAmount?.amount || parseInt(customAmount) || 0)}
+              {formatCurrency(
+                selectedAmount?.amount || parseInt(customAmount) || 0,
+              )}
             </Text>
           </View>
-          
-          <Button onPress={handleRecharge} className="flex-row items-center justify-center">
+
+          <Button
+            onPress={handleRecharge}
+            className="flex-row items-center justify-center">
             <CreditCard size={16} color="white" />
             <Text className="text-white font-semibold ml-2 text-body-medium">
-              Recharge {formatCurrency(selectedAmount?.amount || parseInt(customAmount) || 0)}
+              Recharge{' '}
+              {formatCurrency(
+                selectedAmount?.amount || parseInt(customAmount) || 0,
+              )}
             </Text>
           </Button>
         </View>

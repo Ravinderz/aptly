@@ -1,11 +1,21 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, Dimensions } from 'react-native';
-import { showConfirmAlert, showSuccessAlert, showErrorAlert } from '@/utils/alert';
+import {
+  View,
+  Text,
+  ScrollView,
+  TouchableOpacity,
+  Dimensions,
+} from 'react-native';
+import {
+  showConfirmAlert,
+  showSuccessAlert,
+  showErrorAlert,
+} from '@/utils/alert';
 import LucideIcons from '@/components/ui/LucideIcons';
 import { LineChart, BarChart, PieChart } from 'react-native-chart-kit';
 
 // Types
-import type { 
+import type {
   PerformanceMetrics,
   SystemHealth,
   OptimizationRecommendation,
@@ -14,7 +24,7 @@ import type {
   HealthStatus,
   ResourceMetric,
   Alert as SystemAlert,
-  Incident
+  Incident,
 } from '@/types/analytics';
 
 // UI Components
@@ -39,12 +49,16 @@ export const PerformanceOptimizer: React.FC<PerformanceOptimizerProps> = ({
   onApplyOptimization,
   onDismissAlert,
   onRefreshMetrics,
-  userRole
+  userRole,
 }) => {
-  const [activeTab, setActiveTab] = useState<'overview' | 'performance' | 'health' | 'recommendations'>('overview');
+  const [activeTab, setActiveTab] = useState<
+    'overview' | 'performance' | 'health' | 'recommendations'
+  >('overview');
   const [selectedMetric, setSelectedMetric] = useState<string | null>(null);
   const [refreshing, setRefreshing] = useState(false);
-  const [processingOptimizations, setProcessingOptimizations] = useState<Set<string>>(new Set());
+  const [processingOptimizations, setProcessingOptimizations] = useState<
+    Set<string>
+  >(new Set());
 
   const canManageSystem = userRole === 'admin';
   const canViewReports = userRole !== 'resident';
@@ -52,17 +66,31 @@ export const PerformanceOptimizer: React.FC<PerformanceOptimizerProps> = ({
   // Calculate performance trends
   const performanceTrends = useMemo(() => {
     if (performanceMetrics.length === 0) return null;
-    
+
     const latest = performanceMetrics[performanceMetrics.length - 1];
     const previous = performanceMetrics[performanceMetrics.length - 2];
-    
+
     if (!previous) return null;
 
     return {
-      responseTime: calculateTrend(previous.application.responseTime, latest.application.responseTime),
-      errorRate: calculateTrend(previous.application.errorRate, latest.application.errorRate, true),
-      memoryUsage: calculateTrend(previous.application.memoryUsage, latest.application.memoryUsage, true),
-      throughput: calculateTrend(previous.application.throughput, latest.application.throughput)
+      responseTime: calculateTrend(
+        previous.application.responseTime,
+        latest.application.responseTime,
+      ),
+      errorRate: calculateTrend(
+        previous.application.errorRate,
+        latest.application.errorRate,
+        true,
+      ),
+      memoryUsage: calculateTrend(
+        previous.application.memoryUsage,
+        latest.application.memoryUsage,
+        true,
+      ),
+      throughput: calculateTrend(
+        previous.application.throughput,
+        latest.application.throughput,
+      ),
     };
   }, [performanceMetrics]);
 
@@ -72,16 +100,22 @@ export const PerformanceOptimizer: React.FC<PerformanceOptimizerProps> = ({
       healthy: 100,
       warning: 70,
       critical: 30,
-      unknown: 50
+      unknown: 50,
     };
 
-    const componentScores = systemHealth.components.map(c => weights[c.status] || 50);
-    const dependencyScores = systemHealth.dependencies.map(d => weights[d.status] || 50);
-    
-    const avgComponentScore = componentScores.reduce((a, b) => a + b, 0) / componentScores.length;
-    const avgDependencyScore = dependencyScores.reduce((a, b) => a + b, 0) / dependencyScores.length;
-    
-    return Math.round((avgComponentScore * 0.7) + (avgDependencyScore * 0.3));
+    const componentScores = systemHealth.components.map(
+      (c) => weights[c.status] || 50,
+    );
+    const dependencyScores = systemHealth.dependencies.map(
+      (d) => weights[d.status] || 50,
+    );
+
+    const avgComponentScore =
+      componentScores.reduce((a, b) => a + b, 0) / componentScores.length;
+    const avgDependencyScore =
+      dependencyScores.reduce((a, b) => a + b, 0) / dependencyScores.length;
+
+    return Math.round(avgComponentScore * 0.7 + avgDependencyScore * 0.3);
   }, [systemHealth]);
 
   const handleRefresh = async () => {
@@ -95,19 +129,23 @@ export const PerformanceOptimizer: React.FC<PerformanceOptimizerProps> = ({
     }
   };
 
-  const handleApplyOptimization = async (recommendation: OptimizationRecommendation) => {
+  const handleApplyOptimization = async (
+    recommendation: OptimizationRecommendation,
+  ) => {
     showConfirmAlert(
       'Apply Optimization',
       `Apply "${recommendation.title}"?\n\nThis will ${recommendation.proposedSolution}`,
       async () => {
-        setProcessingOptimizations(prev => new Set([...prev, recommendation.id]));
+        setProcessingOptimizations(
+          (prev) => new Set([...prev, recommendation.id]),
+        );
         try {
           await onApplyOptimization(recommendation.id);
           showSuccessAlert('Success', 'Optimization applied successfully');
         } catch (error) {
           showErrorAlert('Error', 'Failed to apply optimization');
         } finally {
-          setProcessingOptimizations(prev => {
+          setProcessingOptimizations((prev) => {
             const newSet = new Set(prev);
             newSet.delete(recommendation.id);
             return newSet;
@@ -118,17 +156,25 @@ export const PerformanceOptimizer: React.FC<PerformanceOptimizerProps> = ({
   };
 
   const renderOverview = () => {
-    const criticalAlerts = systemHealth.activeAlerts.filter(a => a.severity === 'critical').length;
-    const warningAlerts = systemHealth.activeAlerts.filter(a => a.severity === 'warning').length;
-    const highPriorityRecommendations = optimizationRecommendations.filter(r => r.priority === 'critical' || r.priority === 'high').length;
+    const criticalAlerts = systemHealth.activeAlerts.filter(
+      (a) => a.severity === 'critical',
+    ).length;
+    const warningAlerts = systemHealth.activeAlerts.filter(
+      (a) => a.severity === 'warning',
+    ).length;
+    const highPriorityRecommendations = optimizationRecommendations.filter(
+      (r) => r.priority === 'critical' || r.priority === 'high',
+    ).length;
 
     return (
       <ScrollView className="p-4">
         {/* Health Score */}
         <Card className="mb-4">
           <View className="p-4 items-center">
-            <View className={`w-20 h-20 rounded-full items-center justify-center mb-3 ${getHealthScoreStyle(healthScore).bg}`}>
-              <Text className={`text-display-small font-bold ${getHealthScoreStyle(healthScore).text}`}>
+            <View
+              className={`w-20 h-20 rounded-full items-center justify-center mb-3 ${getHealthScoreStyle(healthScore).bg}`}>
+              <Text
+                className={`text-display-small font-bold ${getHealthScoreStyle(healthScore).text}`}>
                 {healthScore}
               </Text>
             </View>
@@ -188,7 +234,11 @@ export const PerformanceOptimizer: React.FC<PerformanceOptimizerProps> = ({
           <Card>
             <View className="p-4 items-center">
               <View className="flex-row items-center mb-2">
-                <LucideIcons name="settings-outline" size={20} color="#6366F1" />
+                <LucideIcons
+                  name="settings-outline"
+                  size={20}
+                  color="#6366F1"
+                />
                 <Text className="text-display-medium font-bold text-primary ml-2">
                   {highPriorityRecommendations}
                 </Text>
@@ -207,16 +257,21 @@ export const PerformanceOptimizer: React.FC<PerformanceOptimizerProps> = ({
               <Text className="text-headline-small font-semibold text-text-primary mb-4">
                 Recent Incidents
               </Text>
-              
+
               {systemHealth.recentIncidents.slice(0, 3).map((incident) => (
-                <View key={incident.id} className="flex-row items-start mb-3 last:mb-0">
-                  <View className={`w-3 h-3 rounded-full mt-2 mr-3 ${getIncidentSeverityColor(incident.severity)}`} />
+                <View
+                  key={incident.id}
+                  className="flex-row items-start mb-3 last:mb-0">
+                  <View
+                    className={`w-3 h-3 rounded-full mt-2 mr-3 ${getIncidentSeverityColor(incident.severity)}`}
+                  />
                   <View className="flex-1">
                     <Text className="text-body-medium font-medium text-text-primary">
                       {incident.title}
                     </Text>
                     <Text className="text-body-small text-text-secondary">
-                      {new Date(incident.startTime).toLocaleString()} • {incident.status}
+                      {new Date(incident.startTime).toLocaleString()} •{' '}
+                      {incident.status}
                     </Text>
                     {incident.rootCause && (
                       <Text className="text-body-small text-text-secondary mt-1">
@@ -237,33 +292,60 @@ export const PerformanceOptimizer: React.FC<PerformanceOptimizerProps> = ({
               <Text className="text-headline-small font-semibold text-text-primary mb-4">
                 Performance Trends
               </Text>
-              
+
               <View className="grid grid-cols-2 gap-4">
                 <View>
-                  <Text className="text-body-small text-text-secondary">Response Time</Text>
+                  <Text className="text-body-small text-text-secondary">
+                    Response Time
+                  </Text>
                   <View className="flex-row items-center">
                     <Text className="text-body-large font-semibold text-text-primary">
-                      {performanceMetrics[performanceMetrics.length - 1]?.application.responseTime}ms
+                      {
+                        performanceMetrics[performanceMetrics.length - 1]
+                          ?.application.responseTime
+                      }
+                      ms
                     </Text>
-                    <LucideIcons 
-                      name={performanceTrends.responseTime.direction === 'up' ? 'TrendingUp' : 'TrendingDown'} 
-                      size={16} 
-                      color={performanceTrends.responseTime.isImprovement ? '#4CAF50' : '#D32F2F'} 
+                    <LucideIcons
+                      name={
+                        performanceTrends.responseTime.direction === 'up'
+                          ? 'TrendingUp'
+                          : 'TrendingDown'
+                      }
+                      size={16}
+                      color={
+                        performanceTrends.responseTime.isImprovement
+                          ? '#4CAF50'
+                          : '#D32F2F'
+                      }
                       style={{ marginLeft: 4 }}
                     />
                   </View>
                 </View>
-                
+
                 <View>
-                  <Text className="text-body-small text-text-secondary">Error Rate</Text>
+                  <Text className="text-body-small text-text-secondary">
+                    Error Rate
+                  </Text>
                   <View className="flex-row items-center">
                     <Text className="text-body-large font-semibold text-text-primary">
-                      {performanceMetrics[performanceMetrics.length - 1]?.application.errorRate.toFixed(2)}%
+                      {performanceMetrics[
+                        performanceMetrics.length - 1
+                      ]?.application.errorRate.toFixed(2)}
+                      %
                     </Text>
-                    <LucideIcons 
-                      name={performanceTrends.errorRate.direction === 'up' ? 'TrendingUp' : 'TrendingDown'} 
-                      size={16} 
-                      color={performanceTrends.errorRate.isImprovement ? '#4CAF50' : '#D32F2F'} 
+                    <LucideIcons
+                      name={
+                        performanceTrends.errorRate.direction === 'up'
+                          ? 'TrendingUp'
+                          : 'TrendingDown'
+                      }
+                      size={16}
+                      color={
+                        performanceTrends.errorRate.isImprovement
+                          ? '#4CAF50'
+                          : '#D32F2F'
+                      }
                       style={{ marginLeft: 4 }}
                     />
                   </View>
@@ -280,15 +362,13 @@ export const PerformanceOptimizer: React.FC<PerformanceOptimizerProps> = ({
               variant="secondary"
               onPress={handleRefresh}
               disabled={refreshing}
-              className="flex-1"
-            >
+              className="flex-1">
               Refresh Metrics
             </Button>
             <Button
               variant="primary"
               onPress={() => setActiveTab('performance')}
-              className="flex-1"
-            >
+              className="flex-1">
               View Reports
             </Button>
           </View>
@@ -340,8 +420,8 @@ export const PerformanceOptimizer: React.FC<PerformanceOptimizerProps> = ({
                 propsForDots: {
                   r: '4',
                   strokeWidth: '2',
-                  stroke: '#6366f1'
-                }
+                  stroke: '#6366f1',
+                },
               }}
               bezier
               style={{
@@ -417,14 +497,16 @@ export const PerformanceOptimizer: React.FC<PerformanceOptimizerProps> = ({
             <Text className="text-headline-small font-semibold text-text-primary mb-4">
               Active Alerts
             </Text>
-            
+
             {systemHealth.activeAlerts.map((alert) => (
               <AlertCard
                 key={alert.id}
                 type={alert.severity}
                 title={alert.title}
                 message={alert.description}
-                onDismiss={canManageSystem ? () => onDismissAlert(alert.id) : undefined}
+                onDismiss={
+                  canManageSystem ? () => onDismissAlert(alert.id) : undefined
+                }
                 className="mb-3 last:mb-0"
               />
             ))}
@@ -438,9 +520,11 @@ export const PerformanceOptimizer: React.FC<PerformanceOptimizerProps> = ({
           <Text className="text-headline-small font-semibold text-text-primary mb-4">
             Component Health
           </Text>
-          
+
           {systemHealth.components.map((component) => (
-            <View key={component.component} className="flex-row items-center justify-between py-3 border-b border-border-primary last:border-b-0">
+            <View
+              key={component.component}
+              className="flex-row items-center justify-between py-3 border-b border-border-primary last:border-b-0">
               <View className="flex-1">
                 <Text className="text-body-medium font-medium text-text-primary">
                   {component.component}
@@ -455,8 +539,10 @@ export const PerformanceOptimizer: React.FC<PerformanceOptimizerProps> = ({
                 )}
               </View>
               <View className="items-end">
-                <View className={`px-3 py-1 rounded-full ${getHealthStatusStyle(component.status).bg}`}>
-                  <Text className={`text-label-small font-medium ${getHealthStatusStyle(component.status).text}`}>
+                <View
+                  className={`px-3 py-1 rounded-full ${getHealthStatusStyle(component.status).bg}`}>
+                  <Text
+                    className={`text-label-small font-medium ${getHealthStatusStyle(component.status).text}`}>
                     {component.status.toUpperCase()}
                   </Text>
                 </View>
@@ -477,7 +563,7 @@ export const PerformanceOptimizer: React.FC<PerformanceOptimizerProps> = ({
           <Text className="text-headline-small font-semibold text-text-primary mb-4">
             Resource Usage
           </Text>
-          
+
           {Object.entries(systemHealth.resources).map(([resource, metric]) => (
             <View key={resource} className="mb-4 last:mb-0">
               <View className="flex-row items-center justify-between mb-2">
@@ -488,23 +574,25 @@ export const PerformanceOptimizer: React.FC<PerformanceOptimizerProps> = ({
                   {metric.current} / {metric.threshold} {metric.unit}
                 </Text>
               </View>
-              
+
               <View className="h-2 bg-gray-200 rounded-full overflow-hidden">
-                <View 
+                <View
                   className={`h-full rounded-full ${getResourceUsageColor(metric)}`}
-                  style={{ width: `${Math.min((metric.current / metric.threshold) * 100, 100)}%` }}
+                  style={{
+                    width: `${Math.min((metric.current / metric.threshold) * 100, 100)}%`,
+                  }}
                 />
               </View>
-              
+
               <View className="flex-row items-center justify-between mt-1">
                 <Text className="text-body-small text-text-secondary">
                   Avg: {metric.average} {metric.unit}
                 </Text>
                 <View className="flex-row items-center">
-                  <LucideIcons 
-                    name={getTrendIcon(metric.trend)} 
-                    size={12} 
-                    color={getTrendColor(metric.trend)} 
+                  <LucideIcons
+                    name={getTrendIcon(metric.trend)}
+                    size={12}
+                    color={getTrendColor(metric.trend)}
                   />
                   <Text className="text-body-small text-text-secondary ml-1">
                     Peak: {metric.peak} {metric.unit}
@@ -547,22 +635,28 @@ export const PerformanceOptimizer: React.FC<PerformanceOptimizerProps> = ({
                     <Text className="text-body-medium text-text-secondary mb-2">
                       {recommendation.description}
                     </Text>
-                    
+
                     <View className="flex-row items-center gap-2">
-                      <View className={`px-2 py-1 rounded-full ${getPriorityStyle(recommendation.priority).bg}`}>
-                        <Text className={`text-label-small font-medium ${getPriorityStyle(recommendation.priority).text}`}>
+                      <View
+                        className={`px-2 py-1 rounded-full ${getPriorityStyle(recommendation.priority).bg}`}>
+                        <Text
+                          className={`text-label-small font-medium ${getPriorityStyle(recommendation.priority).text}`}>
                           {recommendation.priority.toUpperCase()}
                         </Text>
                       </View>
-                      
-                      <View className={`px-2 py-1 rounded-full ${getCategoryStyle(recommendation.category).bg}`}>
-                        <Text className={`text-label-small font-medium ${getCategoryStyle(recommendation.category).text}`}>
-                          {recommendation.category.replace('_', ' ').toUpperCase()}
+
+                      <View
+                        className={`px-2 py-1 rounded-full ${getCategoryStyle(recommendation.category).bg}`}>
+                        <Text
+                          className={`text-label-small font-medium ${getCategoryStyle(recommendation.category).text}`}>
+                          {recommendation.category
+                            .replace('_', ' ')
+                            .toUpperCase()}
                         </Text>
                       </View>
                     </View>
                   </View>
-                  
+
                   <View className="items-end">
                     <Text className="text-body-small text-text-secondary">
                       Est. timeline
@@ -578,17 +672,21 @@ export const PerformanceOptimizer: React.FC<PerformanceOptimizerProps> = ({
                   <Text className="text-body-small font-medium text-text-primary mb-2">
                     Expected Impact:
                   </Text>
-                  
+
                   <View className="grid grid-cols-2 gap-3">
                     <View className="bg-surface-secondary p-3 rounded-lg">
-                      <Text className="text-body-small text-text-secondary">Performance</Text>
+                      <Text className="text-body-small text-text-secondary">
+                        Performance
+                      </Text>
                       <Text className="text-body-large font-semibold text-success">
                         +{recommendation.impact.performanceImprovement}%
                       </Text>
                     </View>
-                    
+
                     <View className="bg-surface-secondary p-3 rounded-lg">
-                      <Text className="text-body-small text-text-secondary">UX Score</Text>
+                      <Text className="text-body-small text-text-secondary">
+                        UX Score
+                      </Text>
                       <Text className="text-body-large font-semibold text-primary">
                         {recommendation.impact.userExperienceScore}/10
                       </Text>
@@ -602,28 +700,33 @@ export const PerformanceOptimizer: React.FC<PerformanceOptimizerProps> = ({
                     <Text className="text-body-small font-medium text-text-primary mb-2">
                       Implementation Steps:
                     </Text>
-                    
-                    {recommendation.implementationPlan.slice(0, 3).map((step) => (
-                      <View key={step.step} className="flex-row items-start mb-2">
-                        <View className="w-5 h-5 bg-primary/20 rounded-full items-center justify-center mr-3 mt-1">
-                          <Text className="text-label-small font-medium text-primary">
-                            {step.step}
-                          </Text>
+
+                    {recommendation.implementationPlan
+                      .slice(0, 3)
+                      .map((step) => (
+                        <View
+                          key={step.step}
+                          className="flex-row items-start mb-2">
+                          <View className="w-5 h-5 bg-primary/20 rounded-full items-center justify-center mr-3 mt-1">
+                            <Text className="text-label-small font-medium text-primary">
+                              {step.step}
+                            </Text>
+                          </View>
+                          <View className="flex-1">
+                            <Text className="text-body-small text-text-primary">
+                              {step.title}
+                            </Text>
+                            <Text className="text-body-small text-text-secondary">
+                              {step.estimatedDuration}
+                            </Text>
+                          </View>
                         </View>
-                        <View className="flex-1">
-                          <Text className="text-body-small text-text-primary">
-                            {step.title}
-                          </Text>
-                          <Text className="text-body-small text-text-secondary">
-                            {step.estimatedDuration}
-                          </Text>
-                        </View>
-                      </View>
-                    ))}
-                    
+                      ))}
+
                     {recommendation.implementationPlan.length > 3 && (
                       <Text className="text-body-small text-text-secondary ml-8">
-                        +{recommendation.implementationPlan.length - 3} more steps
+                        +{recommendation.implementationPlan.length - 3} more
+                        steps
                       </Text>
                     )}
                   </View>
@@ -637,23 +740,27 @@ export const PerformanceOptimizer: React.FC<PerformanceOptimizerProps> = ({
                       size="sm"
                       onPress={() => handleApplyOptimization(recommendation)}
                       disabled={processingOptimizations.has(recommendation.id)}
-                      className="flex-1"
-                    >
-                      {processingOptimizations.has(recommendation.id) ? "Applying..." : "Apply Optimization"}
+                      className="flex-1">
+                      {processingOptimizations.has(recommendation.id)
+                        ? 'Applying...'
+                        : 'Apply Optimization'}
                     </Button>
                   ) : (
-                    <View className={`flex-1 px-3 py-2 rounded-lg ${getStatusStyle(recommendation.status).bg} border ${getStatusStyle(recommendation.status).border}`}>
-                      <Text className={`text-body-small text-center ${getStatusStyle(recommendation.status).text}`}>
+                    <View
+                      className={`flex-1 px-3 py-2 rounded-lg ${getStatusStyle(recommendation.status).bg} border ${getStatusStyle(recommendation.status).border}`}>
+                      <Text
+                        className={`text-body-small text-center ${getStatusStyle(recommendation.status).text}`}>
                         {recommendation.status.replace('_', ' ').toUpperCase()}
                       </Text>
                     </View>
                   )}
-                  
+
                   <Button
                     variant="ghost"
                     size="sm"
-                    onPress={() => {/* Navigate to details */}}
-                  >
+                    onPress={() => {
+                      /* Navigate to details */
+                    }}>
                     Details
                   </Button>
                 </View>
@@ -677,20 +784,22 @@ export const PerformanceOptimizer: React.FC<PerformanceOptimizerProps> = ({
       </View>
 
       {/* Health Status Banner */}
-      <View className={`p-4 border-b border-border-primary ${getHealthScoreStyle(healthScore).banner}`}>
+      <View
+        className={`p-4 border-b border-border-primary ${getHealthScoreStyle(healthScore).banner}`}>
         <View className="flex-row items-center justify-between">
           <View className="flex-row items-center">
-            <LucideIcons 
-              name={getHealthScoreIcon(healthScore)} 
-              size={24} 
-              color={getHealthScoreStyle(healthScore).iconColor} 
+            <LucideIcons
+              name={getHealthScoreIcon(healthScore)}
+              size={24}
+              color={getHealthScoreStyle(healthScore).iconColor}
             />
             <View className="ml-3">
               <Text className="text-body-large font-semibold text-text-primary">
                 System Health: {healthScore}/100
               </Text>
               <Text className="text-body-small text-text-secondary">
-                {systemHealth.activeAlerts.length} alerts • {systemHealth.uptime.toFixed(1)}% uptime
+                {systemHealth.activeAlerts.length} alerts •{' '}
+                {systemHealth.uptime.toFixed(1)}% uptime
               </Text>
             </View>
           </View>
@@ -705,25 +814,37 @@ export const PerformanceOptimizer: React.FC<PerformanceOptimizerProps> = ({
         {[
           { key: 'overview', label: 'Overview', icon: 'Gauge' },
           { key: 'performance', label: 'Performance', icon: 'BarChart3' },
-          { key: 'health', label: 'Health', icon: 'Heart', count: systemHealth.activeAlerts.length },
-          { key: 'recommendations', label: 'Optimize', icon: 'Settings', count: optimizationRecommendations.filter(r => r.priority === 'critical' || r.priority === 'high').length }
+          {
+            key: 'health',
+            label: 'Health',
+            icon: 'Heart',
+            count: systemHealth.activeAlerts.length,
+          },
+          {
+            key: 'recommendations',
+            label: 'Optimize',
+            icon: 'Settings',
+            count: optimizationRecommendations.filter(
+              (r) => r.priority === 'critical' || r.priority === 'high',
+            ).length,
+          },
         ].map((tab) => (
           <TouchableOpacity
             key={tab.key}
             onPress={() => setActiveTab(tab.key as any)}
             className={`flex-1 p-4 border-b-2 ${
               activeTab === tab.key ? 'border-primary' : 'border-transparent'
-            }`}
-          >
+            }`}>
             <View className="items-center relative">
-              <LucideIcons 
-                name={getTabIcon(tab.icon)} 
-                size={20} 
-                color={activeTab === tab.key ? '#6366f1' : '#757575'} 
+              <LucideIcons
+                name={getTabIcon(tab.icon)}
+                size={20}
+                color={activeTab === tab.key ? '#6366f1' : '#757575'}
               />
-              <Text className={`text-body-small font-medium mt-1 ${
-                activeTab === tab.key ? 'text-primary' : 'text-text-secondary'
-              }`}>
+              <Text
+                className={`text-body-small font-medium mt-1 ${
+                  activeTab === tab.key ? 'text-primary' : 'text-text-secondary'
+                }`}>
                 {tab.label}
               </Text>
               {tab.count && tab.count > 0 && (
@@ -741,20 +862,45 @@ export const PerformanceOptimizer: React.FC<PerformanceOptimizerProps> = ({
       {/* Content */}
       <View className="flex-1 bg-surface-secondary">
         {activeTab === 'overview' && renderOverview()}
-        {activeTab === 'performance' && (canViewReports ? renderPerformanceCharts() : <View className="flex-1 items-center justify-center p-4"><Text className="text-text-secondary">Access Restricted</Text></View>)}
-        {activeTab === 'health' && (canViewReports ? renderSystemHealth() : <View className="flex-1 items-center justify-center p-4"><Text className="text-text-secondary">Access Restricted</Text></View>)}
-        {activeTab === 'recommendations' && (canViewReports ? renderRecommendations() : <View className="flex-1 items-center justify-center p-4"><Text className="text-text-secondary">Access Restricted</Text></View>)}
+        {activeTab === 'performance' &&
+          (canViewReports ? (
+            renderPerformanceCharts()
+          ) : (
+            <View className="flex-1 items-center justify-center p-4">
+              <Text className="text-text-secondary">Access Restricted</Text>
+            </View>
+          ))}
+        {activeTab === 'health' &&
+          (canViewReports ? (
+            renderSystemHealth()
+          ) : (
+            <View className="flex-1 items-center justify-center p-4">
+              <Text className="text-text-secondary">Access Restricted</Text>
+            </View>
+          ))}
+        {activeTab === 'recommendations' &&
+          (canViewReports ? (
+            renderRecommendations()
+          ) : (
+            <View className="flex-1 items-center justify-center p-4">
+              <Text className="text-text-secondary">Access Restricted</Text>
+            </View>
+          ))}
       </View>
     </View>
   );
 };
 
 // Helper functions
-const calculateTrend = (previous: number, current: number, lowerIsBetter: boolean = false): { direction: 'up' | 'down', change: number, isImprovement: boolean } => {
+const calculateTrend = (
+  previous: number,
+  current: number,
+  lowerIsBetter: boolean = false,
+): { direction: 'up' | 'down'; change: number; isImprovement: boolean } => {
   const change = ((current - previous) / previous) * 100;
   const direction = change > 0 ? 'up' : 'down';
   const isImprovement = lowerIsBetter ? change < 0 : change > 0;
-  
+
   return { direction, change: Math.abs(change), isImprovement };
 };
 
@@ -764,21 +910,21 @@ const getHealthScoreStyle = (score: number) => {
       bg: 'bg-success/10',
       text: 'text-success',
       banner: 'bg-success/5',
-      iconColor: '#4CAF50'
+      iconColor: '#4CAF50',
     };
   } else if (score >= 70) {
     return {
       bg: 'bg-warning/10',
       text: 'text-warning',
       banner: 'bg-warning/5',
-      iconColor: '#FF9800'
+      iconColor: '#FF9800',
     };
   } else {
     return {
       bg: 'bg-error/10',
       text: 'text-error',
       banner: 'bg-error/5',
-      iconColor: '#D32F2F'
+      iconColor: '#D32F2F',
     };
   }
 };
@@ -794,7 +940,7 @@ const getHealthStatusStyle = (status: HealthStatus) => {
     healthy: { bg: 'bg-success/10', text: 'text-success' },
     warning: { bg: 'bg-warning/10', text: 'text-warning' },
     critical: { bg: 'bg-error/10', text: 'text-error' },
-    unknown: { bg: 'bg-gray-100', text: 'text-gray-700' }
+    unknown: { bg: 'bg-gray-100', text: 'text-gray-700' },
   };
   return styles[status] || styles.unknown;
 };
@@ -803,7 +949,7 @@ const getIncidentSeverityColor = (severity: string): string => {
   const colors = {
     critical: 'bg-error',
     major: 'bg-warning',
-    minor: 'bg-blue-500'
+    minor: 'bg-blue-500',
   };
   return colors[severity as keyof typeof colors] || 'bg-gray-400';
 };
@@ -813,7 +959,7 @@ const getPriorityStyle = (priority: OptimizationPriority) => {
     critical: { bg: 'bg-error/10', text: 'text-error' },
     high: { bg: 'bg-warning/10', text: 'text-warning' },
     medium: { bg: 'bg-blue-50', text: 'text-blue-700' },
-    low: { bg: 'bg-gray-50', text: 'text-gray-700' }
+    low: { bg: 'bg-gray-50', text: 'text-gray-700' },
   };
   return styles[priority] || styles.medium;
 };
@@ -824,18 +970,38 @@ const getCategoryStyle = (category: OptimizationCategory) => {
     cost: { bg: 'bg-green-50', text: 'text-green-700' },
     security: { bg: 'bg-red-50', text: 'text-red-700' },
     user_experience: { bg: 'bg-blue-50', text: 'text-blue-700' },
-    scalability: { bg: 'bg-indigo-50', text: 'text-indigo-700' }
+    scalability: { bg: 'bg-indigo-50', text: 'text-indigo-700' },
   };
   return styles[category] || styles.performance;
 };
 
 const getStatusStyle = (status: string) => {
   const styles = {
-    pending: { bg: 'bg-gray-50', text: 'text-gray-700', border: 'border-gray-200' },
-    approved: { bg: 'bg-blue-50', text: 'text-blue-700', border: 'border-blue-200' },
-    in_progress: { bg: 'bg-warning/10', text: 'text-warning', border: 'border-warning/20' },
-    completed: { bg: 'bg-success/10', text: 'text-success', border: 'border-success/20' },
-    rejected: { bg: 'bg-error/10', text: 'text-error', border: 'border-error/20' }
+    pending: {
+      bg: 'bg-gray-50',
+      text: 'text-gray-700',
+      border: 'border-gray-200',
+    },
+    approved: {
+      bg: 'bg-blue-50',
+      text: 'text-blue-700',
+      border: 'border-blue-200',
+    },
+    in_progress: {
+      bg: 'bg-warning/10',
+      text: 'text-warning',
+      border: 'border-warning/20',
+    },
+    completed: {
+      bg: 'bg-success/10',
+      text: 'text-success',
+      border: 'border-success/20',
+    },
+    rejected: {
+      bg: 'bg-error/10',
+      text: 'text-error',
+      border: 'border-error/20',
+    },
   };
   return styles[status as keyof typeof styles] || styles.pending;
 };
@@ -848,7 +1014,11 @@ const getResourceUsageColor = (metric: ResourceMetric): string => {
 };
 
 const getTrendIcon = (trend: string): string => {
-  return trend === 'up' ? 'TrendingUp' : trend === 'down' ? 'TrendingDown' : 'Minus';
+  return trend === 'up'
+    ? 'TrendingUp'
+    : trend === 'down'
+      ? 'TrendingDown'
+      : 'Minus';
 };
 
 const getTrendColor = (trend: string): string => {
@@ -857,40 +1027,73 @@ const getTrendColor = (trend: string): string => {
 
 const getTabIcon = (iconName: string): string => {
   const iconMap: { [key: string]: string } = {
-    'Gauge': 'Gauge',
-    'BarChart3': 'BarChart3',
-    'Heart': 'Heart',
-    'Settings': 'Settings'
+    Gauge: 'Gauge',
+    BarChart3: 'BarChart3',
+    Heart: 'Heart',
+    Settings: 'Settings',
   };
   return iconMap[iconName] || iconName;
 };
 
 const prepareChartData = (metrics: PerformanceMetrics[]) => {
   const last7 = metrics.slice(-7);
-  
+
   return {
     responseTime: {
-      labels: last7.map(m => new Date(m.timestamp).toLocaleDateString('en', { month: 'short', day: 'numeric' })),
-      datasets: [{
-        data: last7.map(m => m.application.responseTime)
-      }]
+      labels: last7.map((m) =>
+        new Date(m.timestamp).toLocaleDateString('en', {
+          month: 'short',
+          day: 'numeric',
+        }),
+      ),
+      datasets: [
+        {
+          data: last7.map((m) => m.application.responseTime),
+        },
+      ],
     },
     resourceUsage: {
       labels: ['CPU', 'Memory', 'Storage'],
-      datasets: [{
-        data: [
-          metrics[metrics.length - 1]?.application.cpuUsage || 0,
-          metrics[metrics.length - 1]?.application.memoryUsage || 0,
-          50 // Mock storage usage
-        ]
-      }]
+      datasets: [
+        {
+          data: [
+            metrics[metrics.length - 1]?.application.cpuUsage || 0,
+            metrics[metrics.length - 1]?.application.memoryUsage || 0,
+            50, // Mock storage usage
+          ],
+        },
+      ],
     },
     errorDistribution: [
-      { name: 'Application', count: 15, color: '#D32F2F', legendFontColor: '#7F7F7F', legendFontSize: 12 },
-      { name: 'Network', count: 8, color: '#FF9800', legendFontColor: '#7F7F7F', legendFontSize: 12 },
-      { name: 'Database', count: 3, color: '#6366F1', legendFontColor: '#7F7F7F', legendFontSize: 12 },
-      { name: 'System', count: 2, color: '#4CAF50', legendFontColor: '#7F7F7F', legendFontSize: 12 }
-    ]
+      {
+        name: 'Application',
+        count: 15,
+        color: '#D32F2F',
+        legendFontColor: '#7F7F7F',
+        legendFontSize: 12,
+      },
+      {
+        name: 'Network',
+        count: 8,
+        color: '#FF9800',
+        legendFontColor: '#7F7F7F',
+        legendFontSize: 12,
+      },
+      {
+        name: 'Database',
+        count: 3,
+        color: '#6366F1',
+        legendFontColor: '#7F7F7F',
+        legendFontSize: 12,
+      },
+      {
+        name: 'System',
+        count: 2,
+        color: '#4CAF50',
+        legendFontColor: '#7F7F7F',
+        legendFontSize: 12,
+      },
+    ],
   };
 };
 

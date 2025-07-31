@@ -1,4 +1,10 @@
-import React, { createContext, useContext, useReducer, useEffect, ReactNode } from 'react';
+import React, {
+  createContext,
+  useContext,
+  useReducer,
+  useEffect,
+  ReactNode,
+} from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 // Types
@@ -9,7 +15,7 @@ import type {
   PolicyProposal,
   VotingAnalytics,
   EmergencyAnalytics,
-  GovernanceDashboard as GovernanceDashboardData
+  GovernanceDashboard as GovernanceDashboardData,
 } from '@/types/governance';
 
 // State interface
@@ -22,16 +28,16 @@ interface GovernanceState {
   dashboardData: GovernanceDashboardData | null;
   votingAnalytics: VotingAnalytics | null;
   emergencyAnalytics: EmergencyAnalytics | null;
-  
+
   // UI State
   isLoading: boolean;
   error: string | null;
   lastUpdated: string | null;
-  
+
   // User context
   userRole: 'resident' | 'committee_member' | 'admin';
   userId: string;
-  
+
   // Preferences
   preferences: {
     notifications: boolean;
@@ -46,21 +52,36 @@ type GovernanceAction =
   | { type: 'SET_ERROR'; payload: string | null }
   | { type: 'SET_VOTING_CAMPAIGNS'; payload: VotingCampaign[] }
   | { type: 'ADD_VOTING_CAMPAIGN'; payload: VotingCampaign }
-  | { type: 'UPDATE_VOTING_CAMPAIGN'; payload: { id: string; updates: Partial<VotingCampaign> } }
+  | {
+      type: 'UPDATE_VOTING_CAMPAIGN';
+      payload: { id: string; updates: Partial<VotingCampaign> };
+    }
   | { type: 'SET_EMERGENCY_ALERTS'; payload: EmergencyAlert[] }
   | { type: 'ADD_EMERGENCY_ALERT'; payload: EmergencyAlert }
-  | { type: 'UPDATE_EMERGENCY_ALERT'; payload: { id: string; updates: Partial<EmergencyAlert> } }
+  | {
+      type: 'UPDATE_EMERGENCY_ALERT';
+      payload: { id: string; updates: Partial<EmergencyAlert> };
+    }
   | { type: 'SET_SUCCESSION_PLANS'; payload: SuccessionPlan[] }
   | { type: 'ADD_SUCCESSION_PLAN'; payload: SuccessionPlan }
   | { type: 'SET_POLICY_PROPOSALS'; payload: PolicyProposal[] }
   | { type: 'ADD_POLICY_PROPOSAL'; payload: PolicyProposal }
-  | { type: 'UPDATE_POLICY_PROPOSAL'; payload: { id: string; updates: Partial<PolicyProposal> } }
+  | {
+      type: 'UPDATE_POLICY_PROPOSAL';
+      payload: { id: string; updates: Partial<PolicyProposal> };
+    }
   | { type: 'SET_DASHBOARD_DATA'; payload: GovernanceDashboardData }
   | { type: 'SET_VOTING_ANALYTICS'; payload: VotingAnalytics }
   | { type: 'SET_EMERGENCY_ANALYTICS'; payload: EmergencyAnalytics }
-  | { type: 'SET_USER_ROLE'; payload: 'resident' | 'committee_member' | 'admin' }
+  | {
+      type: 'SET_USER_ROLE';
+      payload: 'resident' | 'committee_member' | 'admin';
+    }
   | { type: 'SET_USER_ID'; payload: string }
-  | { type: 'UPDATE_PREFERENCES'; payload: Partial<GovernanceState['preferences']> }
+  | {
+      type: 'UPDATE_PREFERENCES';
+      payload: Partial<GovernanceState['preferences']>;
+    }
   | { type: 'REFRESH_DATA' };
 
 // Initial state
@@ -80,153 +101,156 @@ const initialState: GovernanceState = {
   preferences: {
     notifications: true,
     emailAlerts: false,
-    emergencyContacts: []
-  }
+    emergencyContacts: [],
+  },
 };
 
 // Reducer
-function governanceReducer(state: GovernanceState, action: GovernanceAction): GovernanceState {
+function governanceReducer(
+  state: GovernanceState,
+  action: GovernanceAction,
+): GovernanceState {
   switch (action.type) {
     case 'SET_LOADING':
       return { ...state, isLoading: action.payload };
-    
+
     case 'SET_ERROR':
       return { ...state, error: action.payload, isLoading: false };
-    
+
     case 'SET_VOTING_CAMPAIGNS':
-      return { 
-        ...state, 
-        votingCampaigns: action.payload, 
+      return {
+        ...state,
+        votingCampaigns: action.payload,
         lastUpdated: new Date().toISOString(),
-        error: null 
+        error: null,
       };
-    
+
     case 'ADD_VOTING_CAMPAIGN':
       return {
         ...state,
         votingCampaigns: [...state.votingCampaigns, action.payload],
-        lastUpdated: new Date().toISOString()
+        lastUpdated: new Date().toISOString(),
       };
-    
+
     case 'UPDATE_VOTING_CAMPAIGN':
       return {
         ...state,
-        votingCampaigns: state.votingCampaigns.map(campaign =>
+        votingCampaigns: state.votingCampaigns.map((campaign) =>
           campaign.id === action.payload.id
             ? { ...campaign, ...action.payload.updates }
-            : campaign
+            : campaign,
         ),
-        lastUpdated: new Date().toISOString()
-      };
-    
-    case 'SET_EMERGENCY_ALERTS':
-      return { 
-        ...state, 
-        emergencyAlerts: action.payload, 
         lastUpdated: new Date().toISOString(),
-        error: null 
       };
-    
+
+    case 'SET_EMERGENCY_ALERTS':
+      return {
+        ...state,
+        emergencyAlerts: action.payload,
+        lastUpdated: new Date().toISOString(),
+        error: null,
+      };
+
     case 'ADD_EMERGENCY_ALERT':
       return {
         ...state,
         emergencyAlerts: [...state.emergencyAlerts, action.payload],
-        lastUpdated: new Date().toISOString()
+        lastUpdated: new Date().toISOString(),
       };
-    
+
     case 'UPDATE_EMERGENCY_ALERT':
       return {
         ...state,
-        emergencyAlerts: state.emergencyAlerts.map(alert =>
+        emergencyAlerts: state.emergencyAlerts.map((alert) =>
           alert.id === action.payload.id
             ? { ...alert, ...action.payload.updates }
-            : alert
+            : alert,
         ),
-        lastUpdated: new Date().toISOString()
-      };
-    
-    case 'SET_SUCCESSION_PLANS':
-      return { 
-        ...state, 
-        successionPlans: action.payload, 
         lastUpdated: new Date().toISOString(),
-        error: null 
       };
-    
+
+    case 'SET_SUCCESSION_PLANS':
+      return {
+        ...state,
+        successionPlans: action.payload,
+        lastUpdated: new Date().toISOString(),
+        error: null,
+      };
+
     case 'ADD_SUCCESSION_PLAN':
       return {
         ...state,
         successionPlans: [...state.successionPlans, action.payload],
-        lastUpdated: new Date().toISOString()
-      };
-    
-    case 'SET_POLICY_PROPOSALS':
-      return { 
-        ...state, 
-        policyProposals: action.payload, 
         lastUpdated: new Date().toISOString(),
-        error: null 
       };
-    
+
+    case 'SET_POLICY_PROPOSALS':
+      return {
+        ...state,
+        policyProposals: action.payload,
+        lastUpdated: new Date().toISOString(),
+        error: null,
+      };
+
     case 'ADD_POLICY_PROPOSAL':
       return {
         ...state,
         policyProposals: [...state.policyProposals, action.payload],
-        lastUpdated: new Date().toISOString()
+        lastUpdated: new Date().toISOString(),
       };
-    
+
     case 'UPDATE_POLICY_PROPOSAL':
       return {
         ...state,
-        policyProposals: state.policyProposals.map(proposal =>
+        policyProposals: state.policyProposals.map((proposal) =>
           proposal.id === action.payload.id
             ? { ...proposal, ...action.payload.updates }
-            : proposal
+            : proposal,
         ),
-        lastUpdated: new Date().toISOString()
-      };
-    
-    case 'SET_DASHBOARD_DATA':
-      return { 
-        ...state, 
-        dashboardData: action.payload, 
         lastUpdated: new Date().toISOString(),
-        error: null 
       };
-    
+
+    case 'SET_DASHBOARD_DATA':
+      return {
+        ...state,
+        dashboardData: action.payload,
+        lastUpdated: new Date().toISOString(),
+        error: null,
+      };
+
     case 'SET_VOTING_ANALYTICS':
-      return { 
-        ...state, 
-        votingAnalytics: action.payload, 
-        lastUpdated: new Date().toISOString() 
+      return {
+        ...state,
+        votingAnalytics: action.payload,
+        lastUpdated: new Date().toISOString(),
       };
-    
+
     case 'SET_EMERGENCY_ANALYTICS':
-      return { 
-        ...state, 
-        emergencyAnalytics: action.payload, 
-        lastUpdated: new Date().toISOString() 
+      return {
+        ...state,
+        emergencyAnalytics: action.payload,
+        lastUpdated: new Date().toISOString(),
       };
-    
+
     case 'SET_USER_ROLE':
       return { ...state, userRole: action.payload };
-    
+
     case 'SET_USER_ID':
       return { ...state, userId: action.payload };
-    
+
     case 'UPDATE_PREFERENCES':
       return {
         ...state,
-        preferences: { ...state.preferences, ...action.payload }
+        preferences: { ...state.preferences, ...action.payload },
       };
-    
+
     case 'REFRESH_DATA':
       return {
         ...state,
         isLoading: true,
-        error: null
+        error: null,
       };
-    
+
     default:
       return state;
   }
@@ -235,50 +259,57 @@ function governanceReducer(state: GovernanceState, action: GovernanceAction): Go
 // Context interface
 interface GovernanceContextType {
   state: GovernanceState;
-  
+
   // Actions
   setLoading: (loading: boolean) => void;
   setError: (error: string | null) => void;
-  
+
   // Voting actions
   loadVotingCampaigns: () => Promise<void>;
   createVotingCampaign: (campaign: Partial<VotingCampaign>) => Promise<void>;
   voteInCampaign: (campaignId: string, candidateId: string) => Promise<void>;
-  
+
   // Emergency actions
   loadEmergencyAlerts: () => Promise<void>;
   createEmergencyAlert: (alert: Partial<EmergencyAlert>) => Promise<void>;
   resolveEmergencyAlert: (alertId: string) => Promise<void>;
-  
+
   // Succession actions
   loadSuccessionPlans: () => Promise<void>;
   createSuccessionPlan: (plan: Partial<SuccessionPlan>) => Promise<void>;
   triggerSuccession: (planId: string) => Promise<void>;
-  
+
   // Policy actions
   loadPolicyProposals: () => Promise<void>;
   createPolicyProposal: (proposal: Partial<PolicyProposal>) => Promise<void>;
-  voteOnPolicy: (proposalId: string, vote: 'approve' | 'reject') => Promise<void>;
-  
+  voteOnPolicy: (
+    proposalId: string,
+    vote: 'approve' | 'reject',
+  ) => Promise<void>;
+
   // General actions
   loadDashboardData: () => Promise<void>;
   refreshAllData: () => Promise<void>;
-  updateUserPreferences: (preferences: Partial<GovernanceState['preferences']>) => Promise<void>;
-  
+  updateUserPreferences: (
+    preferences: Partial<GovernanceState['preferences']>,
+  ) => Promise<void>;
+
   // Utility functions
   canUserPerformAction: (action: string) => boolean;
   getUserPermissions: () => string[];
 }
 
 // Create context
-const GovernanceContext = createContext<GovernanceContextType | undefined>(undefined);
+const GovernanceContext = createContext<GovernanceContextType | undefined>(
+  undefined,
+);
 
 // Storage keys
 const STORAGE_KEYS = {
   PREFERENCES: '@governance_preferences',
   USER_ROLE: '@governance_user_role',
   USER_ID: '@governance_user_id',
-  CACHED_DATA: '@governance_cached_data'
+  CACHED_DATA: '@governance_cached_data',
 };
 
 // Provider component
@@ -286,7 +317,9 @@ interface GovernanceProviderProps {
   children: ReactNode;
 }
 
-export const GovernanceProvider: React.FC<GovernanceProviderProps> = ({ children }) => {
+export const GovernanceProvider: React.FC<GovernanceProviderProps> = ({
+  children,
+}) => {
   const [state, dispatch] = useReducer(governanceReducer, initialState);
 
   // Initialize data on mount
@@ -297,7 +330,10 @@ export const GovernanceProvider: React.FC<GovernanceProviderProps> = ({ children
   // Save preferences to storage when they change
   useEffect(() => {
     if (state.preferences) {
-      AsyncStorage.setItem(STORAGE_KEYS.PREFERENCES, JSON.stringify(state.preferences));
+      AsyncStorage.setItem(
+        STORAGE_KEYS.PREFERENCES,
+        JSON.stringify(state.preferences),
+      );
     }
   }, [state.preferences]);
 
@@ -306,20 +342,22 @@ export const GovernanceProvider: React.FC<GovernanceProviderProps> = ({ children
       dispatch({ type: 'SET_LOADING', payload: true });
 
       // Load cached preferences
-      const cachedPreferences = await AsyncStorage.getItem(STORAGE_KEYS.PREFERENCES);
+      const cachedPreferences = await AsyncStorage.getItem(
+        STORAGE_KEYS.PREFERENCES,
+      );
       if (cachedPreferences) {
-        dispatch({ 
-          type: 'UPDATE_PREFERENCES', 
-          payload: JSON.parse(cachedPreferences) 
+        dispatch({
+          type: 'UPDATE_PREFERENCES',
+          payload: JSON.parse(cachedPreferences),
         });
       }
 
       // Load user role
       const cachedUserRole = await AsyncStorage.getItem(STORAGE_KEYS.USER_ROLE);
       if (cachedUserRole) {
-        dispatch({ 
-          type: 'SET_USER_ROLE', 
-          payload: cachedUserRole as 'resident' | 'committee_member' | 'admin' 
+        dispatch({
+          type: 'SET_USER_ROLE',
+          payload: cachedUserRole as 'resident' | 'committee_member' | 'admin',
         });
       }
 
@@ -335,12 +373,14 @@ export const GovernanceProvider: React.FC<GovernanceProviderProps> = ({ children
         loadEmergencyAlerts(),
         loadSuccessionPlans(),
         loadPolicyProposals(),
-        loadDashboardData()
+        loadDashboardData(),
       ]);
-
     } catch (error) {
       console.error('Failed to initialize governance data:', error);
-      dispatch({ type: 'SET_ERROR', payload: 'Failed to load governance data' });
+      dispatch({
+        type: 'SET_ERROR',
+        payload: 'Failed to load governance data',
+      });
     } finally {
       dispatch({ type: 'SET_LOADING', payload: false });
     }
@@ -375,8 +415,8 @@ export const GovernanceProvider: React.FC<GovernanceProviderProps> = ({ children
               manifesto: 'Transparent financial management',
               nominatedBy: 'user-456',
               endorsements: [],
-              votes: 45
-            }
+              votes: 45,
+            },
           ],
           options: [],
           eligibleVoters: ['user1', 'user2', 'user3'],
@@ -386,17 +426,17 @@ export const GovernanceProvider: React.FC<GovernanceProviderProps> = ({ children
             excludedRoles: [],
             includeOwners: true,
             includeTenants: true,
-            includeFamilyMembers: false
+            includeFamilyMembers: false,
           },
           totalVotes: 45,
           results: undefined,
           isResultsPublished: false,
           auditLog: [],
           createdAt: '2024-01-01T10:00:00Z',
-          updatedAt: '2024-01-15T10:00:00Z'
-        }
+          updatedAt: '2024-01-15T10:00:00Z',
+        },
       ];
-      
+
       dispatch({ type: 'SET_VOTING_CAMPAIGNS', payload: campaigns });
     } catch (error) {
       console.error('Failed to load voting campaigns:', error);
@@ -404,7 +444,9 @@ export const GovernanceProvider: React.FC<GovernanceProviderProps> = ({ children
     }
   };
 
-  const createVotingCampaign = async (campaignData: Partial<VotingCampaign>) => {
+  const createVotingCampaign = async (
+    campaignData: Partial<VotingCampaign>,
+  ) => {
     try {
       // Mock API call
       const newCampaign: VotingCampaign = {
@@ -414,7 +456,9 @@ export const GovernanceProvider: React.FC<GovernanceProviderProps> = ({ children
         type: campaignData.type || 'emergency_decision',
         status: 'draft',
         startDate: campaignData.startDate || new Date().toISOString(),
-        endDate: campaignData.endDate || new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
+        endDate:
+          campaignData.endDate ||
+          new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
         isAnonymous: campaignData.isAnonymous || true,
         requiresQuorum: campaignData.requiresQuorum || false,
         minimumParticipation: campaignData.minimumParticipation || 30,
@@ -424,7 +468,7 @@ export const GovernanceProvider: React.FC<GovernanceProviderProps> = ({ children
         eligibleVoters: [], // Will be populated based on eligibility rules
         createdBy: state.userId,
         createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString()
+        updatedAt: new Date().toISOString(),
       };
 
       dispatch({ type: 'ADD_VOTING_CAMPAIGN', payload: newCampaign });
@@ -437,15 +481,17 @@ export const GovernanceProvider: React.FC<GovernanceProviderProps> = ({ children
   const voteInCampaign = async (campaignId: string, candidateId: string) => {
     try {
       // Mock API call
-      dispatch({ 
-        type: 'UPDATE_VOTING_CAMPAIGN', 
-        payload: { 
-          id: campaignId, 
-          updates: { 
-            totalVotes: (state.votingCampaigns.find(c => c.id === campaignId)?.totalVotes || 0) + 1,
-            updatedAt: new Date().toISOString()
-          } 
-        } 
+      dispatch({
+        type: 'UPDATE_VOTING_CAMPAIGN',
+        payload: {
+          id: campaignId,
+          updates: {
+            totalVotes:
+              (state.votingCampaigns.find((c) => c.id === campaignId)
+                ?.totalVotes || 0) + 1,
+            updatedAt: new Date().toISOString(),
+          },
+        },
       });
     } catch (error) {
       console.error('Failed to vote in campaign:', error);
@@ -460,7 +506,8 @@ export const GovernanceProvider: React.FC<GovernanceProviderProps> = ({ children
         {
           id: 'alert-1',
           title: 'Water Supply Disruption',
-          description: 'Water supply will be disrupted from 2 PM to 6 PM for maintenance',
+          description:
+            'Water supply will be disrupted from 2 PM to 6 PM for maintenance',
           severity: 'medium',
           type: 'water_shortage',
           status: 'active',
@@ -480,8 +527,8 @@ export const GovernanceProvider: React.FC<GovernanceProviderProps> = ({ children
               timeoutMinutes: 30,
               isActivated: true,
               activatedAt: '2024-01-20T08:00:00Z',
-              acknowledgedAt: '2024-01-20T08:15:00Z'
-            }
+              acknowledgedAt: '2024-01-20T08:15:00Z',
+            },
           ],
           currentResponder: 'user-engineer',
           notifications: [],
@@ -493,10 +540,10 @@ export const GovernanceProvider: React.FC<GovernanceProviderProps> = ({ children
           overriddenBy: undefined,
           overrideReason: undefined,
           createdAt: '2024-01-20T08:00:00Z',
-          updatedAt: '2024-01-20T08:00:00Z'
-        }
+          updatedAt: '2024-01-20T08:00:00Z',
+        },
       ];
-      
+
       dispatch({ type: 'SET_EMERGENCY_ALERTS', payload: alerts });
     } catch (error) {
       console.error('Failed to load emergency alerts:', error);
@@ -523,7 +570,7 @@ export const GovernanceProvider: React.FC<GovernanceProviderProps> = ({ children
         isResolved: false,
         createdBy: state.userId,
         createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString()
+        updatedAt: new Date().toISOString(),
       };
 
       dispatch({ type: 'ADD_EMERGENCY_ALERT', payload: newAlert });
@@ -536,16 +583,16 @@ export const GovernanceProvider: React.FC<GovernanceProviderProps> = ({ children
   const resolveEmergencyAlert = async (alertId: string) => {
     try {
       // Mock API call
-      dispatch({ 
-        type: 'UPDATE_EMERGENCY_ALERT', 
-        payload: { 
-          id: alertId, 
-          updates: { 
+      dispatch({
+        type: 'UPDATE_EMERGENCY_ALERT',
+        payload: {
+          id: alertId,
+          updates: {
             status: 'resolved',
             isResolved: true,
-            updatedAt: new Date().toISOString()
-          } 
-        } 
+            updatedAt: new Date().toISOString(),
+          },
+        },
       });
     } catch (error) {
       console.error('Failed to resolve emergency alert:', error);
@@ -593,7 +640,9 @@ export const GovernanceProvider: React.FC<GovernanceProviderProps> = ({ children
     }
   };
 
-  const createPolicyProposal = async (proposalData: Partial<PolicyProposal>) => {
+  const createPolicyProposal = async (
+    proposalData: Partial<PolicyProposal>,
+  ) => {
     try {
       // Mock API call - would create via real API
       console.log('Creating policy proposal:', proposalData);
@@ -603,7 +652,10 @@ export const GovernanceProvider: React.FC<GovernanceProviderProps> = ({ children
     }
   };
 
-  const voteOnPolicy = async (proposalId: string, vote: 'approve' | 'reject') => {
+  const voteOnPolicy = async (
+    proposalId: string,
+    vote: 'approve' | 'reject',
+  ) => {
     try {
       // Mock API call - would submit vote via real API
       console.log('Voting on policy:', { proposalId, vote });
@@ -618,23 +670,27 @@ export const GovernanceProvider: React.FC<GovernanceProviderProps> = ({ children
       // Mock API call
       const dashboardData: GovernanceDashboardData = {
         society_id: 'society-1',
-        activeVotingCampaigns: state.votingCampaigns.filter(c => c.status === 'active').length,
+        activeVotingCampaigns: state.votingCampaigns.filter(
+          (c) => c.status === 'active',
+        ).length,
         totalVoters: 150,
         averageParticipation: 55.3,
-        activeEmergencies: state.emergencyAlerts.filter(a => a.status === 'active').length,
+        activeEmergencies: state.emergencyAlerts.filter(
+          (a) => a.status === 'active',
+        ).length,
         lastEmergencyDate: '2024-01-10T08:00:00Z',
         pendingPolicies: 2,
         implementedPoliciesThisYear: 5,
         communityEngagement: {
           eventsThisMonth: 3,
           averageAttendance: 85,
-          satisfactionScore: 4.2
+          satisfactionScore: 4.2,
         },
         succession: {
           planExists: true,
           deputiesAssigned: 2,
-          lastReviewDate: '2024-01-01T00:00:00Z'
-        }
+          lastReviewDate: '2024-01-01T00:00:00Z',
+        },
       };
 
       dispatch({ type: 'SET_DASHBOARD_DATA', payload: dashboardData });
@@ -649,13 +705,18 @@ export const GovernanceProvider: React.FC<GovernanceProviderProps> = ({ children
     await initializeGovernanceData();
   };
 
-  const updateUserPreferences = async (preferences: Partial<GovernanceState['preferences']>) => {
+  const updateUserPreferences = async (
+    preferences: Partial<GovernanceState['preferences']>,
+  ) => {
     try {
       dispatch({ type: 'UPDATE_PREFERENCES', payload: preferences });
-      await AsyncStorage.setItem(STORAGE_KEYS.PREFERENCES, JSON.stringify({
-        ...state.preferences,
-        ...preferences
-      }));
+      await AsyncStorage.setItem(
+        STORAGE_KEYS.PREFERENCES,
+        JSON.stringify({
+          ...state.preferences,
+          ...preferences,
+        }),
+      );
     } catch (error) {
       console.error('Failed to update user preferences:', error);
       throw error;
@@ -671,32 +732,45 @@ export const GovernanceProvider: React.FC<GovernanceProviderProps> = ({ children
     switch (state.userRole) {
       case 'admin':
         return [
-          'create_campaign', 'edit_campaign', 'delete_campaign',
-          'create_emergency', 'resolve_emergency',
-          'create_succession_plan', 'trigger_succession',
-          'create_policy', 'approve_policy',
-          'view_analytics', 'export_data'
+          'create_campaign',
+          'edit_campaign',
+          'delete_campaign',
+          'create_emergency',
+          'resolve_emergency',
+          'create_succession_plan',
+          'trigger_succession',
+          'create_policy',
+          'approve_policy',
+          'view_analytics',
+          'export_data',
         ];
       case 'committee_member':
         return [
-          'create_campaign', 'edit_campaign',
-          'create_emergency', 'resolve_emergency',
+          'create_campaign',
+          'edit_campaign',
+          'create_emergency',
+          'resolve_emergency',
           'create_policy',
-          'view_analytics'
+          'view_analytics',
         ];
       case 'resident':
       default:
         return [
-          'vote', 'view_campaigns', 'view_emergencies',
-          'propose_policy', 'vote_policy'
+          'vote',
+          'view_campaigns',
+          'view_emergencies',
+          'propose_policy',
+          'vote_policy',
         ];
     }
   };
 
   const contextValue: GovernanceContextType = {
     state,
-    setLoading: (loading: boolean) => dispatch({ type: 'SET_LOADING', payload: loading }),
-    setError: (error: string | null) => dispatch({ type: 'SET_ERROR', payload: error }),
+    setLoading: (loading: boolean) =>
+      dispatch({ type: 'SET_LOADING', payload: loading }),
+    setError: (error: string | null) =>
+      dispatch({ type: 'SET_ERROR', payload: error }),
     loadVotingCampaigns,
     createVotingCampaign,
     voteInCampaign,
@@ -713,7 +787,7 @@ export const GovernanceProvider: React.FC<GovernanceProviderProps> = ({ children
     refreshAllData,
     updateUserPreferences,
     canUserPerformAction,
-    getUserPermissions
+    getUserPermissions,
   };
 
   return (
