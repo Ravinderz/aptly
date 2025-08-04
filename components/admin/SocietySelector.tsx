@@ -15,7 +15,7 @@ import {
   Users,
   Settings,
 } from 'lucide-react-native';
-import { useAdmin } from '@/contexts/AdminContext';
+import { useAdminMigration } from '@/hooks/useAdminMigration';
 import { Society } from '@/types/admin';
 import { useAlert } from '@/components/ui/AlertCard';
 
@@ -36,7 +36,7 @@ const SocietySelector: React.FC<SocietySelectorProps> = ({
     switchSociety,
     adminUser,
     currentMode,
-  } = useAdmin();
+  } = useAdminMigration();
   const { showAlert, AlertComponent } = useAlert();
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [isLoading, setIsLoading] = useState(false);

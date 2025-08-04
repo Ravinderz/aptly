@@ -307,6 +307,50 @@ export const FEATURE_FLAG_METADATA: Record<
     description: 'Indian festival and holiday calendar',
     group: 'regional',
   },
+
+  // Migration Feature Flags for Zustand Migration
+  USE_AUTH_STORE: {
+    name: 'Use Auth Store',
+    description: 'Enable Zustand AuthStore instead of AuthContext',
+    group: 'migration',
+    environments: ['development', 'staging'],
+    rolloutPercentage: 0,
+  },
+  USE_SOCIETY_STORE: {
+    name: 'Use Society Store',
+    description: 'Enable Zustand SocietyStore instead of SocietyContext',
+    group: 'migration',
+    environments: ['development', 'staging'],
+    rolloutPercentage: 0,
+  },
+  USE_ADMIN_STORE: {
+    name: 'Use Admin Store',
+    description: 'Enable Zustand AdminStore instead of AdminContext',
+    group: 'migration',
+    environments: ['development', 'staging'],
+    rolloutPercentage: 0,
+  },
+  USE_THEME_STORE: {
+    name: 'Use Theme Store',
+    description: 'Enable Zustand ThemeStore instead of ThemeContext',
+    group: 'migration',
+    environments: ['development', 'staging'],
+    rolloutPercentage: 0,
+  },
+  USE_NOTIFICATION_STORE: {
+    name: 'Use Notification Store',
+    description: 'Enable Zustand NotificationStore instead of NotificationContext',
+    group: 'migration',
+    environments: ['development', 'staging'],
+    rolloutPercentage: 0,
+  },
+  USE_FEATURE_FLAG_STORE: {
+    name: 'Use Feature Flag Store',
+    description: 'Enable Zustand FeatureFlagStore instead of FeatureFlagContext',
+    group: 'migration',
+    environments: ['development', 'staging'],
+    rolloutPercentage: 0,
+  },
 };
 
 /**
@@ -471,6 +515,14 @@ export const FEATURE_FLAG_PRESETS = {
     indian_payment_methods: true,
     local_language_support: true,
     regional_holidays: true,
+    
+    // Migration flags for development (start disabled for safety)
+    USE_AUTH_STORE: false,
+    USE_SOCIETY_STORE: false,
+    USE_ADMIN_STORE: false,
+    USE_THEME_STORE: false,
+    USE_NOTIFICATION_STORE: false,
+    USE_FEATURE_FLAG_STORE: false,
   },
 };
 

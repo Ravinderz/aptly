@@ -20,14 +20,14 @@ import { WithFeatureFlag } from '@/contexts/FeatureFlagContext';
 import LucideIcons from '@/components/ui/LucideIcons';
 import AuthService from '@/services/auth.service';
 import BiometricService from '@/services/biometric.service';
-import { useAuth } from '@/contexts/AuthContext';
+import { useAuthMigration } from '@/hooks/useAuthMigration';
 import { showErrorAlert } from '@/utils/alert';
 import { responsive, responsiveClasses, layoutUtils } from '@/utils/responsive';
 
 export default function PhoneRegistration() {
   const router = useRouter();
   const { mode } = useLocalSearchParams<{ mode?: string }>();
-  const { authenticateWithBiometrics } = useAuth();
+  const { authenticateWithBiometrics } = useAuthMigration();
   const isSignIn = mode === 'signin';
   const [phoneNumber, setPhoneNumber] = useState('');
   const [societyCode, setSocietyCode] = useState('');

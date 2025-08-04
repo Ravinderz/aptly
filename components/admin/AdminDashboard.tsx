@@ -18,7 +18,7 @@ import {
   CheckCircle,
   XCircle,
 } from 'lucide-react-native';
-import { useAdmin } from '@/contexts/AdminContext';
+import { useAdminMigration } from '@/hooks/useAdminMigration';
 import { adminTheme, adminStyles } from '@/utils/adminTheme';
 import { AdminRole } from '@/types/admin';
 
@@ -50,7 +50,7 @@ interface QuickAction {
 }
 
 export const AdminDashboard: React.FC = () => {
-  const { adminUser, activeSociety, checkPermission, currentMode } = useAdmin();
+  const { adminUser, activeSociety, checkPermission, currentMode } = useAdminMigration();
 
   // Mock dashboard stats - replace with actual API call
   const stats: DashboardStats = {

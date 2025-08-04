@@ -1,6 +1,6 @@
 import React, { ReactNode } from 'react';
 import { View, Text, TouchableOpacity } from 'react-native';
-import { useAdmin } from '@/contexts/AdminContext';
+import { useAdminMigration } from '@/hooks/useAdminMigration';
 import { AdminRole } from '@/types/admin';
 
 interface RoleBasedRendererProps {
@@ -32,7 +32,7 @@ export const RoleBasedRenderer: React.FC<RoleBasedRendererProps> = ({
   fallback,
   showFallback = false,
 }) => {
-  const { adminUser, currentMode } = useAdmin();
+  const { adminUser, currentMode } = useAdminMigration();
 
   if (currentMode !== 'admin' || !adminUser) {
     return showFallback ? fallback || null : null;
@@ -53,7 +53,7 @@ export const RoleBasedRenderer: React.FC<RoleBasedRendererProps> = ({
  * RoleVariants - Renders different content based on specific roles
  */
 export const RoleVariants: React.FC<RoleVariantProps> = (props) => {
-  const { adminUser, currentMode } = useAdmin();
+  const { adminUser, currentMode } = useAdminMigration();
   const { default: defaultContent, ...roleContent } = props;
 
   if (currentMode !== 'admin' || !adminUser) {
@@ -74,7 +74,7 @@ export const ConditionalRender: React.FC<ConditionalRenderProps> = ({
   condition,
   fallback,
 }) => {
-  const { adminUser, currentMode } = useAdmin();
+  const { adminUser, currentMode } = useAdminMigration();
 
   if (currentMode !== 'admin' || !adminUser) {
     return fallback ? <>{fallback}</> : null;
@@ -131,7 +131,7 @@ export const withRoleContext = <P extends object>(
   Component: React.ComponentType<P & { userRole: AdminRole; isAdmin: boolean }>,
 ) => {
   return (props: P) => {
-    const { adminUser, currentMode } = useAdmin();
+    const { adminUser, currentMode } = useAdminMigration();
 
     return (
       <Component
@@ -165,7 +165,7 @@ export const PermissionButton: React.FC<PermissionButtonProps> = ({
   className = '',
   children,
 }) => {
-  const { checkPermission, adminUser } = useAdmin();
+  const { checkPermission, adminUser } = useAdminMigration();
 
   // Check role requirements
   if (roles && adminUser && !roles.includes(adminUser.role)) {
@@ -203,7 +203,7 @@ export const RoleBadge: React.FC<RoleBadgeProps> = ({
   size = 'md',
   showIcon = true,
 }) => {
-  const { adminUser } = useAdmin();
+  const { adminUser } = useAdminMigration();
   const displayRole = role || adminUser?.role;
 
   if (!displayRole) return null;
@@ -280,7 +280,7 @@ export const EscalationPath: React.FC<EscalationPathProps> = ({
   issue,
   currentRole,
 }) => {
-  const { getEscalationPath, adminUser } = useAdmin();
+  const { getEscalationPath, adminUser } = useAdminMigration();
   const role = currentRole || adminUser?.role;
 
   if (!role) return null;
@@ -326,7 +326,7 @@ interface MultiSocietyRoleProps {
 export const MultiSocietyRole: React.FC<MultiSocietyRoleProps> = ({
   societyId,
 }) => {
-  const { adminUser, activeSociety } = useAdmin();
+  const { adminUser, activeSociety } = useAdminMigration();
 
   if (!adminUser) return null;
 

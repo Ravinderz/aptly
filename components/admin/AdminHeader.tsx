@@ -9,7 +9,7 @@ import {
   Search,
   AlertTriangle,
 } from 'lucide-react-native';
-import { useAdmin } from '@/contexts/AdminContext';
+import { useAdminMigration } from '@/hooks/useAdminMigration';
 import { adminTheme, adminStyles } from '@/utils/adminTheme';
 import { AdminRole } from '@/types/admin';
 
@@ -43,7 +43,7 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({
   emergencyAlerts = 0,
 }) => {
   const { adminUser, activeSociety, availableSocieties, currentMode } =
-    useAdmin();
+    useAdminMigration();
 
   const [societySelectorOpen, setSocietySelectorOpen] = React.useState(false);
 
@@ -361,7 +361,7 @@ export const SimpleAdminHeader: React.FC<{
   onBack?: () => void;
   rightAction?: React.ReactNode;
 }> = ({ title, onBack, rightAction }) => {
-  const { currentMode } = useAdmin();
+  const { currentMode } = useAdminMigration();
 
   if (currentMode !== 'admin') {
     return null;

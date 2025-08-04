@@ -30,7 +30,8 @@ import {
   ResponsiveRow,
   ResponsiveText,
 } from '@/components/ui/ResponsiveContainer';
-import { useFeatureFlags, FeatureGroup } from '@/contexts/FeatureFlagContext';
+import { useFeatureFlagMigration } from '@/hooks/useFeatureFlagMigration';
+import { FeatureGroup } from '@/contexts/FeatureFlagContext';
 import {
   FEATURE_FLAG_METADATA,
   getFeaturesByGroup,
@@ -49,7 +50,7 @@ const FeatureGroupSection: React.FC<FeatureGroupSectionProps> = ({
   onToggleExpanded,
 }) => {
   const { flags, isFeatureEnabled, enableFeature, disableFeature } =
-    useFeatureFlags();
+    useFeatureFlagMigration();
   const features = getFeaturesByGroup(group);
 
   const groupTitles = {
@@ -235,7 +236,7 @@ const FeatureGroupSection: React.FC<FeatureGroupSectionProps> = ({
 
 export default function FeatureFlagSettings() {
   const router = useRouter();
-  const { flags, updateFlags, resetToDefaults, isLoading } = useFeatureFlags();
+  const { flags, updateFlags, resetToDefaults, isLoading } = useFeatureFlagMigration();
   const [expandedGroups, setExpandedGroups] = useState<Set<FeatureGroup>>(
     new Set(['billing', 'maintenance']),
   );

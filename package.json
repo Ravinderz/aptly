@@ -50,6 +50,7 @@
     "expo-symbols": "~0.4.5",
     "expo-system-ui": "~5.0.10",
     "expo-web-browser": "~14.2.0",
+    "immer": "^10.1.1",
     "lucide-react-native": "^0.511.0",
     "nativewind": "^4.1.23",
     "react": "19.0.0",
@@ -65,7 +66,8 @@
     "react-native-swiper": "^1.6.0",
     "react-native-web": "~0.20.0",
     "react-native-webview": "13.13.5",
-    "tailwindcss": "^3.4.17"
+    "tailwindcss": "^3.4.17",
+    "zustand": "^5.0.7"
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",

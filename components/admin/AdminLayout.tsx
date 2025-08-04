@@ -2,7 +2,7 @@ import React, { ReactNode } from 'react';
 import { View, ScrollView, SafeAreaView } from 'react-native';
 import { AdminHeader, SimpleAdminHeader } from './AdminHeader';
 import { QuickAdminNav } from './AdminNavigation';
-import { useAdmin } from '@/contexts/AdminContext';
+import { useAdminMigration } from '@/hooks/useAdminMigration';
 import { adminStyles } from '@/utils/adminTheme';
 
 // Import TouchableOpacity and Text for the custom components
@@ -47,7 +47,7 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({
   customHeaderActions,
   emergencyAlerts = 0,
 }) => {
-  const { currentMode } = useAdmin();
+  const { currentMode } = useAdminMigration();
 
   // Don't render admin layout in resident mode
   if (currentMode !== 'admin') {

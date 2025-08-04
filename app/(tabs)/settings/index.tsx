@@ -1,7 +1,7 @@
 import React from 'react';
 import { ScrollView, SafeAreaView, View } from 'react-native';
 import { useRouter } from 'expo-router';
-import { useAuth } from '@/contexts/AuthContext';
+import { useAuthMigration } from '@/hooks/useAuthMigration';
 import {
   showErrorAlert,
   showSuccessAlert,
@@ -30,7 +30,7 @@ import * as ImagePicker from 'expo-image-picker';
 
 export default function Profile() {
   const router = useRouter();
-  const { user, logout } = useAuth();
+  const { user, logout } = useAuthMigration();
 
   // Use real user data from auth context, fallback to mock data
   const userData = {

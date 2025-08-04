@@ -83,6 +83,14 @@ export interface FeatureFlags {
   indian_payment_methods: boolean;
   local_language_support: boolean;
   regional_holidays: boolean;
+
+  // Migration Feature Flags for Zustand Migration
+  USE_AUTH_STORE: boolean;
+  USE_SOCIETY_STORE: boolean;
+  USE_ADMIN_STORE: boolean;
+  USE_THEME_STORE: boolean;
+  USE_NOTIFICATION_STORE: boolean;
+  USE_FEATURE_FLAG_STORE: boolean;
 }
 
 // Default feature flag configuration
@@ -153,6 +161,14 @@ const DEFAULT_FEATURE_FLAGS: FeatureFlags = {
   indian_payment_methods: true,
   local_language_support: false,
   regional_holidays: true,
+
+  // Migration Feature Flags for Zustand Migration (enabled for development)
+  USE_AUTH_STORE: true,
+  USE_SOCIETY_STORE: true,
+  USE_ADMIN_STORE: true,
+  USE_THEME_STORE: true,
+  USE_NOTIFICATION_STORE: true,
+  USE_FEATURE_FLAG_STORE: true,
 };
 
 // Environment-specific overrides
@@ -195,7 +211,8 @@ export type FeatureGroup =
   | 'notifications'
   | 'advanced'
   | 'experimental'
-  | 'regional';
+  | 'regional'
+  | 'migration';
 
 const FEATURE_GROUPS: Record<FeatureGroup, (keyof FeatureFlags)[]> = {
   analytics: [
@@ -259,6 +276,14 @@ const FEATURE_GROUPS: Record<FeatureGroup, (keyof FeatureFlags)[]> = {
     'indian_payment_methods',
     'local_language_support',
     'regional_holidays',
+  ],
+  migration: [
+    'USE_AUTH_STORE',
+    'USE_SOCIETY_STORE',
+    'USE_ADMIN_STORE',
+    'USE_THEME_STORE',
+    'USE_NOTIFICATION_STORE',
+    'USE_FEATURE_FLAG_STORE',
   ],
 };
 

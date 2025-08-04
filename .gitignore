@@ -7,6 +7,8 @@ docs/
 .pnp
 .pnp.js
 
+.claude/
+
 # Expo
 .expo/
 dist/

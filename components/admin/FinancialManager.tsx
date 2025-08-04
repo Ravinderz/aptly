@@ -22,8 +22,8 @@ import {
   CreditCard,
   Calendar,
 } from 'lucide-react-native';
-import { useAdmin } from '@/contexts/AdminContext';
-import { useSociety } from '@/contexts/SocietyContext';
+import { useAdminMigration } from '@/hooks/useAdminMigration';
+import { useSocietyMigration } from '@/hooks/useSocietyMigration';
 import {
   StatWidget,
   QuickActionWidget,
@@ -70,8 +70,8 @@ interface BulkBillingAction {
 }
 
 const FinancialManager: React.FC = () => {
-  const { checkPermission, activeSociety, availableSocieties } = useAdmin();
-  const { getSocietyStats, bulkOperation } = useSociety();
+  const { checkPermission, activeSociety, availableSocieties } = useAdminMigration();
+  const { getSocietyStats, bulkOperation } = useSocietyMigration();
   const { showAlert, AlertComponent } = useAlert();
 
   const [billingStats, setBillingStats] = useState<BillingStats | null>(null);

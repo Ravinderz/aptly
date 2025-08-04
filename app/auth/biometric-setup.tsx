@@ -1,6 +1,6 @@
 import { Button } from '@/components/ui/Button';
 import LucideIcons from '@/components/ui/LucideIcons';
-import { useAuth } from '@/contexts/AuthContext';
+import { useAuthMigration } from '@/hooks/useAuthMigration';
 import BiometricService from '@/services/biometric.service';
 import { useRouter } from 'expo-router';
 import React, { useEffect, useState } from 'react';
@@ -14,7 +14,7 @@ import {
 
 export default function BiometricSetup() {
   const router = useRouter();
-  const { user } = useAuth();
+  const { user } = useAuthMigration();
   const [biometricConfig, setBiometricConfig] = useState({
     hasHardware: false,
     isEnrolled: false,

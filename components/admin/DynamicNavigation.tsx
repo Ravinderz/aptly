@@ -18,7 +18,7 @@ import {
   Vote,
   Gavel,
 } from 'lucide-react-native';
-import { useAdmin } from '@/contexts/AdminContext';
+import { useAdminMigration } from '@/hooks/useAdminMigration';
 import { AdminRole } from '@/types/admin';
 
 interface NavigationItem {
@@ -52,7 +52,7 @@ const DynamicNavigation: React.FC<DynamicNavigationProps> = ({
   showCategories = true,
   compactMode = false,
 }) => {
-  const { checkPermission, adminUser, currentMode } = useAdmin();
+  const { checkPermission, adminUser, currentMode } = useAdminMigration();
 
   const allNavigationItems: NavigationItem[] = [
     // Primary Dashboard

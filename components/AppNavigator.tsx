@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { View, ActivityIndicator } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useAuth } from '@/contexts/AuthContext';
+import { useAuthMigration } from '@/hooks/useAuthMigration';
 import { useRouter, useSegments } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 
@@ -10,7 +10,7 @@ const AppNavigator: React.FC<{ children: React.ReactNode }> = ({
 }) => {
   const [isFirstLaunch, setIsFirstLaunch] = useState<boolean | null>(null);
   const [isCheckingFirstLaunch, setIsCheckingFirstLaunch] = useState(true);
-  const { isAuthenticated, isLoading } = useAuth();
+  const { isAuthenticated, isLoading } = useAuthMigration();
   const router = useRouter();
   const segments = useSegments();
 

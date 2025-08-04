@@ -1,4 +1,4 @@
-import { useAuth } from '@/contexts/AuthContext';
+import { useAuthMigration } from '@/hooks/useAuthMigration';
 import { ArrowLeft, Bell, HelpCircle, MapPin } from 'lucide-react-native';
 import React, { useEffect, useRef, useState } from 'react';
 import { Animated, Text, View } from 'react-native';
@@ -27,7 +27,7 @@ export default function TabHeader({
   showBackButton = false,
   onBackPress,
 }: TabHeaderProps) {
-  const { user } = useAuth();
+  const { user } = useAuthMigration();
   const [mounted, setMounted] = useState(false);
 
   // Animations

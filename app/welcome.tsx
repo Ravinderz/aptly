@@ -1,7 +1,7 @@
 import { Button } from '@/components/ui/Button';
 import HighlightCard from '@/components/ui/HighlightCard';
 import LucideIcons from '@/components/ui/LucideIcons';
-import { useAuth } from '@/contexts/AuthContext';
+import { useAuthMigration } from '@/hooks/useAuthMigration';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useRouter } from 'expo-router';
 import React from 'react';
@@ -15,7 +15,7 @@ import {
 
 export default function Welcome() {
   const router = useRouter();
-  const { login } = useAuth();
+  const { login } = useAuthMigration();
 
   const handleDevSkip = async () => {
     try {
