@@ -936,8 +936,10 @@ export const useAdminStore = create<AdminStore>()(
         enableMaintenanceMode: async (reason: string) => {
           await get().updateAdminSettings({
             system: {
-              ...get().settings?.system,
               maintenanceMode: true,
+              debugMode: get().settings?.system?.debugMode ?? false,
+              logLevel: get().settings?.system?.logLevel ?? 'info',
+              cacheExpiry: get().settings?.system?.cacheExpiry ?? 60,
             },
           });
         },
@@ -945,8 +947,10 @@ export const useAdminStore = create<AdminStore>()(
         disableMaintenanceMode: async () => {
           await get().updateAdminSettings({
             system: {
-              ...get().settings?.system,
               maintenanceMode: false,
+              debugMode: get().settings?.system?.debugMode ?? false,
+              logLevel: get().settings?.system?.logLevel ?? 'info',
+              cacheExpiry: get().settings?.system?.cacheExpiry ?? 60,
             },
           });
         },

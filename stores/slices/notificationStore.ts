@@ -127,7 +127,10 @@ export interface NotificationSchedule {
 }
 
 // Notification store state
-interface NotificationState extends BaseStore {
+interface NotificationState {
+  // Base store properties (without methods)
+  loading: boolean;
+  error: string | null;
   // Core data
   notifications: Notification[];
   settings: NotificationSettings | null;
@@ -159,7 +162,7 @@ interface NotificationState extends BaseStore {
 }
 
 // Store actions
-interface NotificationActions {
+interface NotificationActions extends Omit<BaseStore, 'loading' | 'error'> {
   // Notification management
   loadNotifications: (force?: boolean) => Promise<void>;
   loadNotificationStats: () => Promise<void>;

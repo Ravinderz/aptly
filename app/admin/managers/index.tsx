@@ -322,11 +322,12 @@ const AssignManagerModal: React.FC<AssignManagerModalProps> = ({
           </View>
 
           <Button
-            title="Assign Manager"
             onPress={handleAssign}
             variant="primary"
             disabled={!selectedManager || !selectedSociety}
-          />
+          >
+            Assign Manager
+          </Button>
         </ScrollView>
       </View>
     </Modal>
@@ -530,10 +531,11 @@ export default function ManagerAssignment() {
                 }
               </Text>
               <Button
-                title="Assign Manager"
                 onPress={() => setShowAssignModal(true)}
                 variant="primary"
-              />
+              >
+                Assign Manager
+              </Button>
             </Card>
           )}
         </View>

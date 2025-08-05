@@ -225,24 +225,22 @@ export const OnboardingRequestCard: React.FC<OnboardingRequestCardProps> = ({
         </View>
 
         <View className="flex-row space-x-2">
-          <Button title="View" onPress={onView} variant="outline" size="sm" />
+          <Button onPress={onView} variant="outline" size="sm">
+            View
+          </Button>
 
           {request?.status === 'pending' && (
             <>
               <Button
-                title="Reject"
                 onPress={onReject}
                 variant="outline"
                 size="sm"
-                className="border-red-300 bg-red-50"
-                textClassName="text-red-700"
-              />
-              <Button
-                title="Approve"
-                onPress={onApprove}
-                variant="primary"
-                size="sm"
-              />
+                className="border-red-300 bg-red-50 text-red-700">
+                Reject
+              </Button>
+              <Button onPress={onApprove} variant="primary" size="sm">
+                Approve
+              </Button>
             </>
           )}
         </View>

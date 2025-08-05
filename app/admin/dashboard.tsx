@@ -172,11 +172,12 @@ function AdminDashboard() {
           Super admin privileges required to access this area.
         </Text>
         <Button
-          title="Return to Dashboard"
           onPress={() => router.replace('/(tabs)/')}
           variant="primary"
           className="mt-6"
-        />
+        >
+          Return to Dashboard
+        </Button>
       </View>
     );
   }

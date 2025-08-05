@@ -326,13 +326,14 @@ function SocietyManagement() {
                 }
               </Text>
               <Button
-                title={localSearchQuery ? 'Clear Search' : 'Review Applications'}
                 onPress={localSearchQuery ? () => {
                   setLocalSearchQuery('');
                   setSearchQuery?.('');
                 } : handleCreateSociety}
                 variant="primary"
-              />
+              >
+                {localSearchQuery ? 'Clear Search' : 'Review Applications'}
+              </Button>
             </Card>
           )}
         </View>

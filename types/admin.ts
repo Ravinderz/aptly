@@ -1,5 +1,8 @@
 // Admin system comprehensive TypeScript definitions
 
+import { NavigationItem } from './ui';
+import { EmergencyContact } from './storage';
+
 export type AdminRole =
   | 'super_admin'
   | 'community_manager'

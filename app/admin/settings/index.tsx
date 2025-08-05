@@ -441,12 +441,12 @@ export default function AdminSettings() {
         {hasUnsavedChanges && (
           <View className="mt-4 mb-6">
             <Button
-              title="Save Changes"
               onPress={handleSaveSettings}
               variant="primary"
-              icon={<Save size={16} color="white" />}
               disabled={loading}
-            />
+            >
+              Save Changes
+            </Button>
           </View>
         )}
       </ScrollView>

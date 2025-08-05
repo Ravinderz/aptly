@@ -94,12 +94,12 @@ export default function AdminAnalytics() {
               Time Period
             </Text>
             <Button
-              title="Export"
               onPress={handleExportData}
               variant="outline"
               size="sm"
-              icon={<Download size={16} color="#374151" />}
-            />
+            >
+              Export
+            </Button>
           </View>
           
           <ScrollView horizontal showsHorizontalScrollIndicator={false}>
@@ -315,11 +315,12 @@ export default function AdminAnalytics() {
                 {error}
               </Text>
               <Button
-                title="Retry"
                 onPress={() => loadAnalytics?.()}
                 variant="outline"
                 className="mt-3"
-              />
+              >
+                Retry
+              </Button>
             </Card>
           </View>
         )}

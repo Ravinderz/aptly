@@ -128,19 +128,20 @@ const ApprovalModal: React.FC<ApprovalModalProps> = ({
 
           <View className="flex-row space-x-3 mt-6">
             <Button
-              title="Cancel"
               onPress={onClose}
               variant="outline"
               className="flex-1"
-            />
+            >
+              Cancel
+            </Button>
             <Button
-              title={type === 'approve' ? 'Approve' : 'Reject'}
               onPress={handleConfirm}
               variant={type === 'approve' ? 'primary' : 'outline'}
               className={`flex-1 ${type === 'reject' ? 'border-red-300 bg-red-50' : ''}`}
-              textClassName={type === 'reject' ? 'text-red-700' : ''}
               disabled={type === 'reject' && !notes.trim()}
-            />
+            >
+              {type === 'approve' ? 'Approve' : 'Reject'}
+            </Button>
           </View>
         </View>
       </View>
@@ -452,20 +453,19 @@ export default function OnboardingRequestDetail() {
         <View className="p-4 bg-white border-t border-gray-200">
           <View className="flex-row space-x-3">
             <Button
-              title="Reject"
               onPress={handleReject}
               variant="outline"
               className="flex-1 border-red-300 bg-red-50"
-              textClassName="text-red-700"
-              icon={<XCircle size={16} color="#dc2626" />}
-            />
+            >
+              Reject
+            </Button>
             <Button
-              title="Approve"
               onPress={handleApprove}
               variant="primary"
               className="flex-1"
-              icon={<CheckCircle size={16} color="white" />}
-            />
+            >
+              Approve
+            </Button>
           </View>
         </View>
       )}
