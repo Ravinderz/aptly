@@ -49,13 +49,16 @@ export const SuperAdminGate: React.FC<SuperAdminGateProps> = ({
 
   // Check role permissions
   const hasRequiredRole = () => {
+    const userRole = user?.role;
+    if (!userRole) return false;
+    
     switch (requireRole) {
       case 'super_admin':
-        return user.role === 'super_admin';
+        return userRole === 'super_admin';
       case 'admin':
-        return ['super_admin', 'admin'].includes(user.role);
+        return ['super_admin', 'admin'].includes(userRole);
       case 'community_manager':
-        return ['super_admin', 'admin', 'community_manager'].includes(user.role);
+        return ['super_admin', 'admin', 'community_manager'].includes(userRole);
       default:
         return false;
     }
@@ -75,7 +78,7 @@ export const SuperAdminGate: React.FC<SuperAdminGateProps> = ({
           }
         </Text>
         <Text className="text-sm text-gray-500 text-center mt-1">
-          Current role: {user.role?.replace('_', ' ') || 'user'}
+          Current role: {user?.role?.replace('_', ' ') || 'user'}
         </Text>
         <Button
           title="Return to Dashboard"

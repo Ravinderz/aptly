@@ -1,32 +1,31 @@
-import React, { useEffect, useState } from 'react';
-import {
-  View,
-  Text,
-  ScrollView,
-  RefreshControl,
-  TextInput,
-  TouchableOpacity,
-} from 'react-native';
+import { AdminHeader } from '@/components/admin/AdminHeader';
+import { Button } from '@/components/ui/Button';
+import { Card } from '@/components/ui/Card';
+import PillFilter from '@/components/ui/PillFilter';
+import { cn } from '@/utils/cn';
 import { useRouter } from 'expo-router';
 import {
-  Search,
-  Clock,
-  CheckCircle,
-  XCircle,
   AlertTriangle,
-  Eye,
   Building2,
-  User,
-  MapPin,
   Calendar,
-  Phone,
+  CheckCircle,
+  Clock,
+  Eye,
   Mail,
+  MapPin,
+  Phone,
+  Search,
+  User,
+  XCircle,
 } from 'lucide-react-native';
-import { AdminHeader } from '@/components/admin/AdminHeader';
-import { Card } from '@/components/ui/Card';
-import { Button } from '@/components/ui/Button';
-import { PillFilter } from '@/components/ui/PillFilter';
-import { cn } from '@/utils/cn';
+import React, { useState } from 'react';
+import {
+  RefreshControl,
+  ScrollView,
+  Text,
+  TextInput,
+  View,
+} from 'react-native';
 
 // Mock data for onboarding requests
 const mockOnboardingRequests = [
@@ -40,7 +39,11 @@ const mockOnboardingRequests = [
     societyAddress: '123 Green Valley Road, Sector 45, Gurgaon',
     totalFlats: 120,
     status: 'pending',
-    submittedDocuments: ['society_registration.pdf', 'noc_certificate.pdf', 'admin_id_proof.pdf'],
+    submittedDocuments: [
+      'society_registration.pdf',
+      'noc_certificate.pdf',
+      'admin_id_proof.pdf',
+    ],
     verificationNotes: null,
     createdAt: '2024-01-15T10:30:00Z',
     updatedAt: '2024-01-15T10:30:00Z',
@@ -70,7 +73,12 @@ const mockOnboardingRequests = [
     societyAddress: '789 Sunrise Avenue, Sector 22, Delhi',
     totalFlats: 200,
     status: 'approved',
-    submittedDocuments: ['society_registration.pdf', 'noc_certificate.pdf', 'admin_id_proof.pdf', 'bank_details.pdf'],
+    submittedDocuments: [
+      'society_registration.pdf',
+      'noc_certificate.pdf',
+      'admin_id_proof.pdf',
+      'bank_details.pdf',
+    ],
     verificationNotes: 'All documents verified successfully',
     createdAt: '2024-01-10T11:45:00Z',
     updatedAt: '2024-01-17T16:30:00Z',
@@ -84,7 +92,7 @@ interface OnboardingRequestCardProps {
   onReject: () => void;
 }
 
-const OnboardingRequestCard: React.FC<OnboardingRequestCardProps> = ({
+export const OnboardingRequestCard: React.FC<OnboardingRequestCardProps> = ({
   request,
   onView,
   onApprove,
@@ -120,9 +128,10 @@ const OnboardingRequestCard: React.FC<OnboardingRequestCardProps> = ({
     }
   };
 
-  const statusConfig = getStatusConfig(request.status);
+  const statusConfig = getStatusConfig(request?.status || 'pending');
   const daysSinceSubmission = Math.floor(
-    (Date.now() - new Date(request.createdAt).getTime()) / (1000 * 60 * 60 * 24)
+    (Date.now() - new Date(request?.createdAt || Date.now()).getTime()) /
+      (1000 * 60 * 60 * 24),
   );
 
   return (
@@ -130,20 +139,21 @@ const OnboardingRequestCard: React.FC<OnboardingRequestCardProps> = ({
       <View className="flex-row items-start justify-between mb-3">
         <View className="flex-1">
           <Text className="text-lg font-semibold text-gray-900 mb-1">
-            {request.societyName}
+            {request?.societyName || 'Unknown Society'}
           </Text>
           <Text className="text-sm text-gray-600">
-            Code: {request.societyCode}
+            Code: {request?.societyCode || 'N/A'}
           </Text>
         </View>
-        
-        <View className={cn(
-          'flex-row items-center px-2 py-1 rounded-full',
-          statusConfig.color
-        )}>
+
+        <View
+          className={cn(
+            'flex-row items-center px-2 py-1 rounded-full',
+            statusConfig.color,
+          )}>
           {statusConfig.icon}
           <Text className="text-xs font-medium ml-1 capitalize">
-            {request.status.replace('_', ' ')}
+            {(request?.status || 'pending').replace('_', ' ')}
           </Text>
         </View>
       </View>
@@ -153,19 +163,19 @@ const OnboardingRequestCard: React.FC<OnboardingRequestCardProps> = ({
         <View className="flex-row items-center mb-1">
           <User size={14} color="#6b7280" />
           <Text className="text-sm text-gray-700 ml-2">
-            {request.adminName}
+            {request?.adminName || 'Unknown Admin'}
           </Text>
         </View>
         <View className="flex-row items-center mb-1">
           <Mail size={14} color="#6b7280" />
           <Text className="text-sm text-gray-600 ml-2">
-            {request.adminEmail}
+            {request?.adminEmail || 'No email provided'}
           </Text>
         </View>
         <View className="flex-row items-center">
           <Phone size={14} color="#6b7280" />
           <Text className="text-sm text-gray-600 ml-2">
-            {request.adminPhone}
+            {request?.adminPhone || 'No phone provided'}
           </Text>
         </View>
       </View>
@@ -175,13 +185,13 @@ const OnboardingRequestCard: React.FC<OnboardingRequestCardProps> = ({
         <View className="flex-row items-center mb-1">
           <MapPin size={14} color="#6b7280" />
           <Text className="text-sm text-gray-600 ml-2 flex-1">
-            {request.societyAddress}
+            {request?.societyAddress || 'No address provided'}
           </Text>
         </View>
         <View className="flex-row items-center">
           <Building2 size={14} color="#6b7280" />
           <Text className="text-sm text-gray-600 ml-2">
-            {request.totalFlats} units
+            {request?.totalFlats || 0} units
           </Text>
         </View>
       </View>
@@ -189,18 +199,18 @@ const OnboardingRequestCard: React.FC<OnboardingRequestCardProps> = ({
       {/* Documents */}
       <View className="mb-3">
         <Text className="text-sm font-medium text-gray-900 mb-1">
-          Documents ({request.submittedDocuments.length})
+          Documents ({request?.submittedDocuments?.length || 0})
         </Text>
         <Text className="text-xs text-gray-600">
-          {request.submittedDocuments.join(', ')}
+          {request?.submittedDocuments?.join(', ') || 'No documents'}
         </Text>
       </View>
 
       {/* Notes */}
-      {request.verificationNotes && (
+      {request?.verificationNotes && (
         <View className="mb-3 p-2 bg-amber-50 rounded-lg">
           <Text className="text-xs text-amber-800">
-            Note: {request.verificationNotes}
+            Note: {request?.verificationNotes}
           </Text>
         </View>
       )}
@@ -215,14 +225,9 @@ const OnboardingRequestCard: React.FC<OnboardingRequestCardProps> = ({
         </View>
 
         <View className="flex-row space-x-2">
-          <Button
-            title="View"
-            onPress={onView}
-            variant="outline"
-            size="sm"
-          />
-          
-          {request.status === 'pending' && (
+          <Button title="View" onPress={onView} variant="outline" size="sm" />
+
+          {request?.status === 'pending' && (
             <>
               <Button
                 title="Reject"
@@ -246,9 +251,12 @@ const OnboardingRequestCard: React.FC<OnboardingRequestCardProps> = ({
   );
 };
 
+// Add displayName for debugging purposes
+OnboardingRequestCard.displayName = 'OnboardingRequestCard';
+
 /**
  * Society Onboarding Management - Review and approve society applications
- * 
+ *
  * Features:
  * - List all onboarding requests with status filtering
  * - Quick approve/reject actions
@@ -278,20 +286,20 @@ export default function OnboardingManagement() {
     { label: 'Rejected', value: 'rejected' },
   ];
 
-  const filteredRequests = requests.filter((request) => {
+  const filteredRequests = (requests || []).filter((request) => {
     // Apply search filter
     if (searchQuery) {
       const query = searchQuery.toLowerCase();
-      const matches = 
-        request.societyName.toLowerCase().includes(query) ||
-        request.societyCode.toLowerCase().includes(query) ||
-        request.adminName.toLowerCase().includes(query);
+      const matches =
+        (request?.societyName || '').toLowerCase().includes(query) ||
+        (request?.societyCode || '').toLowerCase().includes(query) ||
+        (request?.adminName || '').toLowerCase().includes(query);
       if (!matches) return false;
     }
 
     // Apply status filter
     if (statusFilter !== 'all') {
-      return request.status === statusFilter;
+      return request?.status === statusFilter;
     }
 
     return true;
@@ -302,31 +310,33 @@ export default function OnboardingManagement() {
   };
 
   const handleApproveRequest = (requestId: string) => {
-    setRequests(prev => 
-      prev.map(req => 
-        req.id === requestId 
+    setRequests((prev) =>
+      prev.map((req) =>
+        req.id === requestId
           ? { ...req, status: 'approved', updatedAt: new Date().toISOString() }
-          : req
-      )
+          : req,
+      ),
     );
   };
 
   const handleRejectRequest = (requestId: string) => {
-    setRequests(prev => 
-      prev.map(req => 
-        req.id === requestId 
+    setRequests((prev) =>
+      prev.map((req) =>
+        req.id === requestId
           ? { ...req, status: 'rejected', updatedAt: new Date().toISOString() }
-          : req
-      )
+          : req,
+      ),
     );
   };
 
   const getStatusCounts = () => {
+    const safeRequests = requests || [];
     return {
-      pending: requests.filter(r => r.status === 'pending').length,
-      under_review: requests.filter(r => r.status === 'under_review').length,
-      approved: requests.filter(r => r.status === 'approved').length,
-      rejected: requests.filter(r => r.status === 'rejected').length,
+      pending: safeRequests.filter((r) => r?.status === 'pending').length,
+      under_review: safeRequests.filter((r) => r?.status === 'under_review')
+        .length,
+      approved: safeRequests.filter((r) => r?.status === 'approved').length,
+      rejected: safeRequests.filter((r) => r?.status === 'rejected').length,
     };
   };
 
@@ -334,8 +344,8 @@ export default function OnboardingManagement() {
 
   return (
     <View className="flex-1 bg-gray-50">
-      <AdminHeader 
-        title="Society Onboarding" 
+      <AdminHeader
+        title="Society Onboarding"
         subtitle={`${filteredRequests.length} applications`}
         showBack
         showNotifications
@@ -346,8 +356,7 @@ export default function OnboardingManagement() {
         refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />
         }
-        showsVerticalScrollIndicator={false}
-      >
+        showsVerticalScrollIndicator={false}>
         {/* Search and Filters */}
         <View className="px-4 py-4 bg-white border-b border-gray-200">
           <View className="flex-row items-center bg-gray-50 rounded-lg px-3 py-2 mb-4">
@@ -425,10 +434,9 @@ export default function OnboardingManagement() {
                 {searchQuery ? 'No applications found' : 'No applications yet'}
               </Text>
               <Text className="text-gray-600 text-center mt-2">
-                {searchQuery 
+                {searchQuery
                   ? 'Try adjusting your search or filters'
-                  : 'Society onboarding applications will appear here'
-                }
+                  : 'Society onboarding applications will appear here'}
               </Text>
             </Card>
           )}

@@ -32,7 +32,7 @@ export const useDirectSociety = () => {
 
   // Get current society
   const currentSociety = useSocietyStore((state) => state.currentSociety);
-  const selectedSociety = useSocietyStore((state) => state.selectedSociety);
+  const selectedSocietyIds = useSocietyStore((state) => state.selectedSocietyIds);
 
   // Get additional society store actions with stable callbacks
   const loadSocietyMetrics = useCallback(useSocietyStore.getState().loadSocietyMetrics, []);
@@ -51,7 +51,7 @@ export const useDirectSociety = () => {
   // Get UI state
   const searchQuery = useSocietyStore((state) => state.searchQuery);
   const filterStatus = useSocietyStore((state) => state.filterStatus);
-  const selectedSocietyIds = useSocietyStore((state) => state.selectedSocietyIds);
+  const additionalSelectedIds = useSocietyStore((state) => state.selectedSocietyIds);
   const selectSocietyIds = useCallback(useSocietyStore.getState().selectSocietyIds, []);
   const toggleSocietySelection = useCallback(useSocietyStore.getState().toggleSocietySelection, []);
   const selectAllSocieties = useCallback(useSocietyStore.getState().selectAllSocieties, []);
@@ -63,10 +63,10 @@ export const useDirectSociety = () => {
     if (!society) return null;
     
     return {
-      totalUnits: society.totalUnits,
-      occupiedUnits: society.occupiedUnits,
-      occupancyRate: (society.occupiedUnits / society.totalUnits) * 100,
-      totalAmenities: society.amenities.length,
+      totalUnits: society?.totalUnits || 0,
+      occupiedUnits: society?.occupiedUnits || 0,
+      occupancyRate: (society?.totalUnits > 0) ? ((society?.occupiedUnits || 0) / society.totalUnits) * 100 : 0,
+      totalAmenities: society?.amenities?.length || 0,
     };
   }, [getSocietyById]);
 
@@ -86,23 +86,13 @@ export const useDirectSociety = () => {
   const filterNotificationsForSociety = useCallback((societyId: string, notifications: any[]) => {
     // This would filter notifications for a specific society
     // For now, just return all notifications as a mock
-    return notifications.filter(notification => 
-      !notification.societyId || notification.societyId === societyId
+    return (notifications || []).filter(notification => 
+      !notification?.societyId || notification.societyId === societyId
     );
   }, []);
 
-  // Memoize the return object to prevent infinite re-renders
-  return useMemo(() => ({
-    // Core data
-    societies,
-    currentSociety,
-    selectedSociety,
-    metrics: societyMetrics,
-    
-    // State
-    loading,
-    error,
-    
+  // Fixed: Create stable actions object to prevent re-renders
+  const stableActions = useMemo(() => ({
     // Basic operations
     loadSocieties,
     selectSociety,
@@ -117,8 +107,6 @@ export const useDirectSociety = () => {
     bulkDeleteSocieties,
     
     // Search and filtering
-    searchQuery,
-    filterStatus,
     setSearchQuery,
     setFilterStatus,
     clearFilters,
@@ -132,7 +120,6 @@ export const useDirectSociety = () => {
     filterNotificationsForSociety,
     
     // Selection management
-    selectedSocietyIds,
     selectSocietyIds,
     toggleSocietySelection,
     selectAllSocieties,
@@ -141,17 +128,7 @@ export const useDirectSociety = () => {
     // Cache management
     refreshCache,
     clearCache,
-    
-    // Metadata
-    isUsingStore: true,
-    migrationStatus: 'active' as const,
   }), [
-    societies,
-    currentSociety,
-    selectedSociety,
-    societyMetrics,
-    loading,
-    error,
     loadSocieties,
     selectSociety,
     createSociety,
@@ -161,8 +138,6 @@ export const useDirectSociety = () => {
     duplicateSociety,
     bulkUpdateSocieties,
     bulkDeleteSocieties,
-    searchQuery,
-    filterStatus,
     setSearchQuery,
     setFilterStatus,
     clearFilters,
@@ -172,7 +147,6 @@ export const useDirectSociety = () => {
     getSocietyStats,
     bulkOperation,
     filterNotificationsForSociety,
-    selectedSocietyIds,
     selectSocietyIds,
     toggleSocietySelection,
     selectAllSocieties,
@@ -180,6 +154,43 @@ export const useDirectSociety = () => {
     refreshCache,
     clearCache,
   ]);
+
+  // Fixed: Create stable state object to prevent re-renders
+  const stableState = useMemo(() => ({
+    // Core data
+    societies,
+    currentSociety,
+    selectedSociety: null, // Legacy compatibility
+    metrics: societyMetrics,
+    
+    // State
+    loading,
+    error,
+    
+    // Search and filtering state
+    searchQuery,
+    filterStatus,
+    selectedSocietyIds: additionalSelectedIds,
+    
+    // Metadata
+    isUsingStore: true,
+    migrationStatus: 'active' as const,
+  }), [
+    societies,
+    currentSociety,
+    societyMetrics,
+    loading,
+    error,
+    searchQuery,
+    filterStatus,
+    additionalSelectedIds,
+  ]);
+
+  // Return stable combined object to prevent infinite re-renders
+  return useMemo(() => ({
+    ...stableState,
+    ...stableActions,
+  }), [stableState, stableActions]);
 };
 
 /**

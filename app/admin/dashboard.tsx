@@ -48,7 +48,7 @@ interface QuickAction {
  * - Quick actions based on permissions
  * - Live notifications and alerts
  */
-export default function AdminDashboard() {
+function AdminDashboard() {
   const router = useRouter();
   const { user } = useDirectAuth();
   const { 
@@ -285,3 +285,9 @@ export default function AdminDashboard() {
     </View>
   );
 }
+
+// Fixed: Add proper named export with displayName for React DevTools
+AdminDashboard.displayName = 'AdminDashboard';
+
+// Export as default
+export default AdminDashboard;

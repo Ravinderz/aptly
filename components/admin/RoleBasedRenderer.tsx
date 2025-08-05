@@ -38,7 +38,11 @@ export const RoleBasedRenderer: React.FC<RoleBasedRendererProps> = ({
     return showFallback ? fallback || null : null;
   }
 
-  const userRole = adminUser.role;
+  const userRole = adminUser?.role;
+  if (!userRole) {
+    return showFallback ? fallback || null : null;
+  }
+  
   const hasAccess =
     mode === 'include' ? roles.includes(userRole) : !roles.includes(userRole);
 
@@ -60,7 +64,11 @@ export const RoleVariants: React.FC<RoleVariantProps> = (props) => {
     return defaultContent ? <>{defaultContent}</> : null;
   }
 
-  const userRole = adminUser.role;
+  const userRole = adminUser?.role;
+  if (!userRole) {
+    return defaultContent ? <>{defaultContent}</> : null;
+  }
+  
   const content = roleContent[userRole] || defaultContent;
 
   return content ? <>{content}</> : null;
@@ -80,7 +88,12 @@ export const ConditionalRender: React.FC<ConditionalRenderProps> = ({
     return fallback ? <>{fallback}</> : null;
   }
 
-  const shouldRender = condition(adminUser.role);
+  const userRole = adminUser?.role;
+  if (!userRole) {
+    return fallback ? <>{fallback}</> : null;
+  }
+  
+  const shouldRender = condition(userRole);
   return shouldRender ? <>{children}</> : fallback ? <>{fallback}</> : null;
 };
 
@@ -168,7 +181,7 @@ export const PermissionButton: React.FC<PermissionButtonProps> = ({
   const { checkPermission, adminUser } = useDirectAdmin();
 
   // Check role requirements
-  if (roles && adminUser && !roles.includes(adminUser.role)) {
+  if (roles && adminUser && !roles.includes(adminUser?.role)) {
     return null;
   }
 
@@ -287,7 +300,7 @@ export const EscalationPath: React.FC<EscalationPathProps> = ({
 
   const escalationRoles = getEscalationPath(issue);
 
-  if (escalationRoles.length === 0) {
+  if (!escalationRoles || escalationRoles.length === 0) {
     return (
       <View className="p-3 bg-green-50 rounded-lg border border-green-200">
         <Text className="text-green-600 text-sm font-medium">
@@ -332,14 +345,14 @@ export const MultiSocietyRole: React.FC<MultiSocietyRoleProps> = ({
 
   const targetSocietyId = societyId || activeSociety?.id;
   // Note: AdminUser.assignedSocieties is an array of IDs, not objects
-  const hasAccessToSociety = adminUser.assignedSocieties.includes(targetSocietyId || '');
+  const hasAccessToSociety = adminUser?.assignedSocieties?.includes(targetSocietyId || '') || false;
 
   if (!hasAccessToSociety) return null;
 
   return (
     <View className="flex-row items-center">
-      <RoleBadge role={adminUser.role} size="sm" />
-      {adminUser.assignedSocieties.length > 1 && (
+      <RoleBadge role={adminUser?.role} size="sm" />
+      {(adminUser?.assignedSocieties?.length || 0) > 1 && (
         <Text className="text-text-secondary text-xs ml-2">
           in {activeSociety?.name || 'Current Society'}
         </Text>

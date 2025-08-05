@@ -9,16 +9,19 @@ import { useStoreWithSelector } from '@/stores/utils/storeHooks';
  * This replaces useAuthMigration to avoid circular dependencies during initialization
  */
 export const useDirectAuth = () => {
+  // Fixed: Create stable selector outside component to prevent infinite loops
+  const stableAuthSelector = useCallback((state: any) => ({
+    isAuthenticated: state.isAuthenticated,
+    isLoading: state.isLoading,
+    user: state.user,
+    error: state.error,
+    isBiometricEnabled: state.isBiometricEnabled,
+  }), []);
+
   // Use stable store selector to prevent getSnapshot infinite loops
   const authState = useStoreWithSelector(
     useAuthStore,
-    useCallback((state) => ({
-      isAuthenticated: state.isAuthenticated,
-      isLoading: state.isLoading,
-      user: state.user,
-      error: state.error,
-      isBiometricEnabled: state.isBiometricEnabled,
-    }), [])
+    stableAuthSelector
   );
 
   // Fixed: Get actions with stable references using proper memoization

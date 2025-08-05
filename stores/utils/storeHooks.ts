@@ -46,7 +46,7 @@ export function createStableSelector<TState extends object, TSlice>(
  * Prevents getSnapshot infinite loops by using stable selectors
  * Fixed: Proper selector caching and stable references
  */
-export function useStoreWithSelector<TState, TSlice>(
+export function useStoreWithSelector<TState extends object, TSlice>(
   store: {
     getState: () => TState;
     subscribe: (listener: () => void) => () => void;
@@ -176,7 +176,7 @@ export function deepEqual<T>(a: T, b: T): boolean {
 /**
  * Store subscription hook with built-in error boundary
  */
-export function useSafeStoreSelector<TState, TSlice>(
+export function useSafeStoreSelector<TState extends object, TSlice>(
   store: {
     getState: () => TState;
     subscribe: (listener: () => void) => () => void;
@@ -196,7 +196,7 @@ export function useSafeStoreSelector<TState, TSlice>(
 /**
  * Hook to check if store is hydrated (for persistence)
  */
-export function useStoreHydration<TState>(
+export function useStoreHydration<TState extends object>(
   store: {
     getState: () => TState;
     subscribe: (listener: () => void) => () => void;

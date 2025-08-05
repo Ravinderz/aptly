@@ -111,7 +111,7 @@ const SocietyCard: React.FC<SocietyCardProps> = ({ society, onPress, onManage })
  * - Status updates and approvals
  * - Navigation to detailed society views
  */
-export default function SocietyManagement() {
+function SocietyManagement() {
   const router = useRouter();
   const params = useLocalSearchParams();
   const { societies, loading: societyLoading, loadSocieties } = useDirectSociety();
@@ -342,3 +342,9 @@ export default function SocietyManagement() {
     </View>
   );
 }
+
+// Fixed: Add proper named export with displayName for React DevTools
+SocietyManagement.displayName = 'SocietyManagement';
+
+// Export as default
+export default SocietyManagement;

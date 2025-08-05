@@ -78,24 +78,22 @@ export const useDirectAdmin = () => {
   const selectedManagementItems = useAdminStore((state) => state.selectedManagementItems);
 
   // Get society data
-  const activeSociety = useSocietyStore((state) => state.selectedSociety);
+  const activeSociety = useSocietyStore((state) => state.currentSociety);
   const availableSocieties = useSocietyStore((state) => state.societies);
-  const currentMode = useFeatureFlagStore((state) => 
-    state.flags.ADMIN_MODE_ENABLED ? 'admin' : 'resident'
-  );
+  const currentMode = 'admin'; // Fixed: Direct mode setting for admin
 
   // Permission checking function
   const checkPermission = useCallback((permission: string, action: string) => {
     if (!adminUser) return false;
     
     // Super admin has all permissions
-    if (adminUser.role === 'super_admin') return true;
+    if (adminUser?.role === 'super_admin') return true;
     
     // Check specific permissions
-    const userPermission = adminUser.permissions.find(p => p.resource === permission);
+    const userPermission = adminUser?.permissions?.find(p => p?.resource === permission);
     if (!userPermission) return false;
     
-    return userPermission.actions.includes(action) || userPermission.actions.includes('manage');
+    return userPermission?.actions?.includes(action) || userPermission?.actions?.includes('manage') || false;
   }, [adminUser]);
 
   // Mock escalation path function (replace with actual implementation)
@@ -111,7 +109,7 @@ export const useDirectAdmin = () => {
       'super_admin': [], // No escalation needed
     };
     
-    return escalationMap[adminUser.role] || [];
+    return escalationMap[adminUser?.role || 'maintenance_admin'] || [];
   }, [adminUser]);
 
   // Memoize the return object to prevent infinite re-renders

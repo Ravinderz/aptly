@@ -68,11 +68,11 @@ export const AdminDashboard: React.FC = () => {
 
   // Dashboard stats from AdminStore analytics or fallback to mock data
   const stats: DashboardStats = {
-    totalResidents: activeSociety?.totalFlats || analytics?.overview.totalUsers || 120,
-    activeResidents: activeSociety?.activeResidents || analytics?.users.totalActiveUsers || 95,
-    pendingRequests: analytics?.societies.pendingApprovals || 12,
+    totalResidents: activeSociety?.totalFlats || analytics?.overview?.totalUsers || 120,
+    activeResidents: activeSociety?.activeResidents || analytics?.users?.totalActiveUsers || 95,
+    pendingRequests: analytics?.societies?.pendingApprovals || 12,
     emergencyAlerts: 0,
-    monthlyCollection: analytics?.revenue.monthlyRevenue || 284750,
+    monthlyCollection: analytics?.revenue?.monthlyRevenue || 284750,
     collectionRate: 87.5,
     maintenanceRequests: {
       pending: 8,
@@ -171,7 +171,7 @@ export const AdminDashboard: React.FC = () => {
     // Filter actions based on permissions
     return baseActions.filter(
       (action) =>
-        !action.permission || checkPermission(action.permission, 'read'),
+        !action.permission || checkPermission?.(action.permission, 'read'),
     );
   };
 

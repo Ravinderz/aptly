@@ -496,7 +496,7 @@ export const MultiSocietyComparison: React.FC<MultiSocietyComparisonProps> = ({
   showTrend = true,
   onSocietyPress,
 }) => {
-  const maxValue = Math.max(...societies.map((s) => s.value));
+  const maxValue = societies?.length > 0 ? Math.max(...societies.map((s) => s?.value || 0)) : 0;
 
   return (
     <View style={adminStyles.adminCard}>
@@ -505,15 +505,15 @@ export const MultiSocietyComparison: React.FC<MultiSocietyComparisonProps> = ({
       </Text>
 
       <View style={{ gap: 12 }}>
-        {societies.map((society) => {
+        {(societies || []).map((society) => {
           const percentage =
-            maxValue > 0 ? (society.value / maxValue) * 100 : 0;
+            maxValue > 0 ? ((society?.value || 0) / maxValue) * 100 : 0;
           const Component = onSocietyPress ? TouchableOpacity : View;
 
           return (
             <Component
-              key={society.id}
-              onPress={() => onSocietyPress?.(society.id)}
+              key={society?.id || Math.random()}
+              onPress={() => onSocietyPress?.(society?.id)}
               activeOpacity={onSocietyPress ? 0.7 : 1}>
               <View
                 style={{
@@ -525,30 +525,30 @@ export const MultiSocietyComparison: React.FC<MultiSocietyComparisonProps> = ({
                 <Text
                   style={[adminStyles.adminBody, { flex: 1 }]}
                   numberOfLines={1}>
-                  {society.name}
+                  {society?.name || 'Unknown Society'}
                 </Text>
                 <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                   <Text
                     style={[
                       adminStyles.adminLabel,
                       {
-                        color: society.color || adminTheme.textPrimary,
+                        color: society?.color || adminTheme.textPrimary,
                         fontWeight: '600',
                       },
                     ]}>
-                    {society.value}
+                    {society?.value || 0}
                     {unit}
                   </Text>
-                  {showTrend && society.change !== undefined && (
+                  {showTrend && society?.change !== undefined && (
                     <View
                       style={{
                         flexDirection: 'row',
                         alignItems: 'center',
                         marginLeft: 8,
                       }}>
-                      {society.change > 0 ? (
+                      {(society?.change || 0) > 0 ? (
                         <TrendingUp size={12} color={adminTheme.success} />
-                      ) : society.change < 0 ? (
+                      ) : (society?.change || 0) < 0 ? (
                         <TrendingDown size={12} color={adminTheme.error} />
                       ) : (
                         <Minus size={12} color={adminTheme.slate} />
@@ -558,17 +558,17 @@ export const MultiSocietyComparison: React.FC<MultiSocietyComparisonProps> = ({
                           adminStyles.adminCaption,
                           {
                             color:
-                              society.change > 0
+                              (society?.change || 0) > 0
                                 ? adminTheme.success
-                                : society.change < 0
+                                : (society?.change || 0) < 0
                                   ? adminTheme.error
                                   : adminTheme.slate,
                             marginLeft: 2,
                             fontSize: 11,
                           },
                         ]}>
-                        {society.change > 0 ? '+' : ''}
-                        {society.change}%
+                        {(society?.change || 0) > 0 ? '+' : ''}
+                        {society?.change || 0}%
                       </Text>
                     </View>
                   )}
@@ -585,7 +585,7 @@ export const MultiSocietyComparison: React.FC<MultiSocietyComparisonProps> = ({
                 }}>
                 <View
                   style={{
-                    backgroundColor: society.color || adminTheme.primary,
+                    backgroundColor: society?.color || adminTheme.primary,
                     height: '100%',
                     width: `${Math.min(percentage, 100)}%`,
                   }}
@@ -618,8 +618,8 @@ export const SocietySelectorWidget: React.FC<SocietySelectorWidgetProps> = ({
   onSwitchPress,
 }) => {
   const occupancyRate =
-    currentSociety.totalUsers > 0
-      ? (currentSociety.activeUsers / currentSociety.totalUsers) * 100
+    (currentSociety?.totalUsers || 0) > 0
+      ? ((currentSociety?.activeUsers || 0) / (currentSociety?.totalUsers || 1)) * 100
       : 0;
 
   return (
@@ -643,14 +643,14 @@ export const SocietySelectorWidget: React.FC<SocietySelectorWidgetProps> = ({
             Current Society
           </Text>
           <Text style={[adminStyles.adminSubheading, { marginBottom: 4 }]}>
-            {currentSociety.name}
+            {currentSociety?.name || 'Unknown Society'}
           </Text>
           <Text
             style={[
               adminStyles.adminCaption,
               { color: adminTheme.textTertiary },
             ]}>
-            {currentSociety.code}
+            {currentSociety?.code || 'N/A'}
           </Text>
         </View>
 
@@ -752,7 +752,7 @@ export const CrossSocietyAlert: React.FC<CrossSocietyAlertProps> = ({
     }
   };
 
-  if (alerts.length === 0) {
+  if (!alerts || alerts.length === 0) {
     return (
       <View style={adminStyles.adminCard}>
         <View style={{ alignItems: 'center', padding: 16 }}>
@@ -805,9 +805,9 @@ export const CrossSocietyAlert: React.FC<CrossSocietyAlertProps> = ({
       </View>
 
       <View style={{ gap: 12 }}>
-        {alerts.slice(0, 3).map((alert) => (
+        {(alerts || []).slice(0, 3).map((alert) => (
           <View
-            key={alert.id}
+            key={alert?.id || Math.random()}
             style={{
               flexDirection: 'row',
               alignItems: 'flex-start',
@@ -815,17 +815,17 @@ export const CrossSocietyAlert: React.FC<CrossSocietyAlertProps> = ({
               backgroundColor: adminTheme.surfaceElevated,
               borderRadius: 8,
               borderLeftWidth: 3,
-              borderLeftColor: getSeverityColor(alert.severity),
+              borderLeftColor: getSeverityColor(alert?.severity || 'low'),
             }}>
             <AlertCircle
               size={16}
-              color={getSeverityColor(alert.severity)}
+              color={getSeverityColor(alert?.severity || 'low')}
               style={{ marginRight: 8, marginTop: 2 }}
             />
 
             <View style={{ flex: 1 }}>
               <Text style={[adminStyles.adminLabel, { fontWeight: '600' }]}>
-                {alert.title}
+                {alert?.title || 'Unknown Alert'}
               </Text>
               <Text
                 style={[
@@ -835,9 +835,9 @@ export const CrossSocietyAlert: React.FC<CrossSocietyAlertProps> = ({
                     marginTop: 2,
                   },
                 ]}>
-                Affects {alert.affectedSocieties}{' '}
-                {alert.affectedSocieties === 1 ? 'society' : 'societies'} •{' '}
-                {alert.severity.toUpperCase()}
+                Affects {alert?.affectedSocieties || 0}{' '}
+                {(alert?.affectedSocieties || 0) === 1 ? 'society' : 'societies'} •{' '}
+                {(alert?.severity || 'low').toUpperCase()}
               </Text>
             </View>
           </View>
@@ -910,7 +910,7 @@ export const MultiSocietyPerformance: React.FC<
       </View>
 
       <View style={{ gap: 16 }}>
-        {metrics.map((metric, index) => (
+        {(metrics || []).map((metric, index) => (
           <View key={index}>
             <Text
               style={[
@@ -920,18 +920,18 @@ export const MultiSocietyPerformance: React.FC<
                   marginBottom: 8,
                 },
               ]}>
-              {metric.label}
+              {metric?.label || 'Unknown Metric'}
             </Text>
 
             <View style={{ gap: 6 }}>
-              {metric.societies.map((society) => {
-                const achievement = society.target
-                  ? (society.value / society.target) * 100
+              {(metric?.societies || []).map((society) => {
+                const achievement = society?.target
+                  ? ((society?.value || 0) / society.target) * 100
                   : 100;
 
                 return (
                   <View
-                    key={society.id}
+                    key={society?.id || Math.random()}
                     style={{
                       flexDirection: 'row',
                       justifyContent: 'space-between',
@@ -940,7 +940,7 @@ export const MultiSocietyPerformance: React.FC<
                     <Text
                       style={[adminStyles.adminBody, { flex: 1 }]}
                       numberOfLines={1}>
-                      {society.name}
+                      {society?.name || 'Unknown Society'}
                     </Text>
 
                     <View
@@ -960,10 +960,10 @@ export const MultiSocietyPerformance: React.FC<
                             textAlign: 'right',
                           },
                         ]}>
-                        {formatValue(society.value, metric.type, metric.unit)}
+                        {formatValue(society?.value || 0, metric?.type || 'number', metric?.unit)}
                       </Text>
 
-                      {society.target && (
+                      {society?.target && (
                         <Text
                           style={[
                             adminStyles.adminCaption,
@@ -974,9 +974,9 @@ export const MultiSocietyPerformance: React.FC<
                           ]}>
                           /{' '}
                           {formatValue(
-                            society.target,
-                            metric.type,
-                            metric.unit,
+                            society?.target || 0,
+                            metric?.type || 'number',
+                            metric?.unit,
                           )}
                         </Text>
                       )}

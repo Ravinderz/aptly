@@ -18,7 +18,7 @@ export const useDirectNotification = () => {
   const stats = useNotificationStore((state) => state.stats);
   const loading = useNotificationStore((state) => state.loading);
   const error = useNotificationStore((state) => state.error);
-  const unreadCount = useNotificationStore((state) => state.unreadCount);
+  const unreadCount = useNotificationStore((state) => state.getUnreadCount());
   const permissionStatus = useNotificationStore((state) => state.permissionStatus);
 
   // Get notification actions with stable callbacks
@@ -52,19 +52,8 @@ export const useDirectNotification = () => {
     return notifications.filter(n => n.priority === priority);
   }, [notifications]);
 
-  // Memoize the return object to prevent infinite re-renders
-  return useMemo(() => ({
-    // Core data
-    notifications,
-    settings,
-    stats,
-    
-    // State
-    loading,
-    error,
-    unreadCount,
-    permissionStatus,
-    
+  // Fixed: Create stable actions object to prevent re-renders
+  const stableActions = useMemo(() => ({
     // Basic operations
     loadNotifications,
     markAsRead,
@@ -87,18 +76,7 @@ export const useDirectNotification = () => {
     getNotificationsByCategory,
     getUnreadNotifications,
     getNotificationsByPriority,
-    
-    // Metadata
-    isUsingStore: true,
-    migrationStatus: 'active' as const,
   }), [
-    notifications,
-    settings,
-    stats,
-    loading,
-    error,
-    unreadCount,
-    permissionStatus,
     loadNotifications,
     markAsRead,
     markAllAsRead,
@@ -117,6 +95,38 @@ export const useDirectNotification = () => {
     getUnreadNotifications,
     getNotificationsByPriority,
   ]);
+
+  // Fixed: Create stable state object to prevent re-renders
+  const stableState = useMemo(() => ({
+    // Core data
+    notifications,
+    settings,
+    stats,
+    
+    // State
+    loading,
+    error,
+    unreadCount,
+    permissionStatus,
+    
+    // Metadata
+    isUsingStore: true,
+    migrationStatus: 'active' as const,
+  }), [
+    notifications,
+    settings,
+    stats,
+    loading,
+    error,
+    unreadCount,
+    permissionStatus,
+  ]);
+
+  // Return stable combined object to prevent infinite re-renders
+  return useMemo(() => ({
+    ...stableState,
+    ...stableActions,
+  }), [stableState, stableActions]);
 };
 
 /**

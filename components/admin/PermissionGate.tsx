@@ -47,7 +47,7 @@ const PermissionGate: React.FC<PermissionGateProps> = ({
   }
 
   // Check role-based access first
-  if (role && adminUser) {
+  if (role && adminUser?.role) {
     const hasRole = role.includes(adminUser.role);
     if (!hasRole) {
       return renderEmpty
@@ -59,7 +59,7 @@ const PermissionGate: React.FC<PermissionGateProps> = ({
   }
 
   // Check permission-based access
-  const hasPermission = checkPermission(resource, action, societyId);
+  const hasPermission = checkPermission?.(resource, action, societyId) || false;
 
   if (!hasPermission) {
     return renderEmpty
