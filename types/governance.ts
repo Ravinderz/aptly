@@ -9,6 +9,7 @@ export interface VotingCampaign {
   status: VotingStatus;
   createdBy: string;
   society_id: string;
+  allowMultipleChoices?: boolean;
 
   // Voting configuration
   startDate: string;
@@ -139,6 +140,10 @@ export interface EmergencyAlert {
   type: EmergencyType;
   status: EmergencyStatus;
   society_id: string;
+  category?: string;
+  instructions?: string;
+  estimatedDuration?: string;
+  isResolved?: boolean;
 
   // Alert details
   location?: string;
@@ -148,6 +153,7 @@ export interface EmergencyAlert {
 
   // Escalation chain
   declaredBy: string;
+  createdBy?: string;
   escalationLevel: number;
   escalationChain: EscalationStep[];
   currentResponder?: string;
@@ -697,6 +703,12 @@ export interface GovernanceDashboard {
   lastEmergencyDate?: string;
   pendingPolicies: number;
   implementedPoliciesThisYear: number;
+  recentActivities: Array<{
+    id: string;
+    type: string;
+    description: string;
+    timestamp: string;
+  }>;
   communityEngagement: {
     eventsThisMonth: number;
     averageAttendance: number;
@@ -748,4 +760,49 @@ export interface EmergencyAnalytics {
     drillParticipation: number;
     equipmentStatus: 'good' | 'needs_attention' | 'critical';
   };
+}
+
+// Component Props Types
+export interface VotingSystemProps {
+  campaigns: VotingCampaign[];
+  userVotes: any[];
+  analytics: VotingAnalytics[];
+  onCreateCampaign: (campaign: Partial<VotingCampaign>) => Promise<void>;
+  onVote: (campaignId: string, candidateId: string) => Promise<void>;
+  currentUserId: string;
+  userRole: 'resident' | 'admin';
+}
+
+export interface EmergencyManagementProps {
+  alerts: EmergencyAlert[];
+  emergencyContacts: any[];
+  analytics?: EmergencyAnalytics;
+  onCreateAlert: (alert: Partial<EmergencyAlert>) => Promise<void>;
+  onResolveEmergency: (alertId: string) => Promise<void>;
+  onEmergencyCall: (contact: any) => Promise<void>;
+  currentUserId: string;
+  userRole: 'resident' | 'admin';
+}
+
+export interface SuccessionManagementProps {
+  successionPlans: SuccessionPlan[];
+  deputies: any[];
+  handoverTasks: any[];
+  onCreatePlan: (plan: Partial<SuccessionPlan>) => Promise<void>;
+  onUpdatePlan: (planId: string, updates: Partial<SuccessionPlan>) => Promise<void>;
+  onActivatePlan: (planId: string) => Promise<void>;
+  onCompleteTask: (taskId: string) => Promise<void>;
+  currentUserId: string;
+  userRole: 'resident' | 'admin';
+}
+
+export interface PolicyGovernanceProps {
+  proposals: PolicyProposal[];
+  activePolicies: any[];
+  consultations: any[];
+  onCreateProposal: (proposal: Partial<PolicyProposal>) => Promise<void>;
+  onVoteOnPolicy: (proposalId: string, vote: 'approve' | 'reject') => Promise<void>;
+  onSubmitFeedback: (proposalId: string, feedback: string) => Promise<void>;
+  currentUserId: string;
+  userRole: 'resident' | 'admin';
 }

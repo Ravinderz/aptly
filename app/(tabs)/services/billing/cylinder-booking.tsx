@@ -18,6 +18,7 @@ import {
   Clock,
 } from 'lucide-react-native';
 import { router } from 'expo-router';
+import { DeliverySlot } from '@/types/billing';
 import { Button } from '../../../../components/ui/Button';
 import { Card } from '../../../../components/ui/Card';
 import HighlightCard from '../../../../components/ui/HighlightCard';
@@ -39,13 +40,7 @@ interface Provider {
   cylinders: CylinderOption[];
 }
 
-interface DeliverySlot {
-  id: string;
-  date: string;
-  timeSlot: string;
-  available: boolean;
-  premium?: boolean;
-}
+// DeliverySlot imported from @/types/billing
 
 export default function CylinderBooking() {
   const [customerId, setCustomerId] = useState('');
@@ -117,34 +112,43 @@ export default function CylinderBooking() {
       id: '1',
       date: 'Today',
       timeSlot: '2:00 PM - 6:00 PM',
-      available: true,
-      premium: true,
+      isAvailable: true,
+      isExpress: true,
+      additionalCharge: 50,
     },
-    { id: '2', date: 'Today', timeSlot: '6:00 PM - 9:00 PM', available: false },
+    { id: '2', date: 'Today', timeSlot: '6:00 PM - 9:00 PM', isAvailable: false, isExpress: false, additionalCharge: 0 },
     {
       id: '3',
       date: 'Tomorrow',
       timeSlot: '9:00 AM - 12:00 PM',
-      available: true,
+      isAvailable: true,
       popular: true,
+      isExpress: false,
+      additionalCharge: 0,
     },
     {
       id: '4',
       date: 'Tomorrow',
       timeSlot: '2:00 PM - 6:00 PM',
-      available: true,
+      isAvailable: true,
+      isExpress: false,
+      additionalCharge: 0,
     },
     {
       id: '5',
       date: 'Day After',
       timeSlot: '9:00 AM - 12:00 PM',
-      available: true,
+      isAvailable: true,
+      isExpress: false,
+      additionalCharge: 0,
     },
     {
       id: '6',
       date: 'Day After',
       timeSlot: '2:00 PM - 6:00 PM',
-      available: true,
+      isAvailable: true,
+      isExpress: false,
+      additionalCharge: 0,
     },
   ];
 
@@ -195,7 +199,7 @@ export default function CylinderBooking() {
     }
 
     const totalAmount =
-      selectedCylinder.price + (selectedSlot.premium ? 50 : 0); // Premium delivery charge
+      selectedCylinder.price + (selectedSlot.isExpress ? selectedSlot.additionalCharge : 0); // Premium delivery charge
 
     // Navigate to payment page with transaction details
     router.push({
@@ -380,10 +384,10 @@ export default function CylinderBooking() {
               {deliverySlots.map((slot) => (
                 <TouchableOpacity
                   key={slot.id}
-                  onPress={() => slot.available && setSelectedSlot(slot)}
-                  disabled={!slot.available}
+                  onPress={() => slot.isAvailable && setSelectedSlot(slot)}
+                  disabled={!slot.isAvailable}
                   className={`bg-surface rounded-xl p-4 border ${
-                    !slot.available
+                    !slot.isAvailable
                       ? 'border-divider opacity-50'
                       : selectedSlot?.id === slot.id
                         ? 'border-primary bg-primary/5'
@@ -393,17 +397,17 @@ export default function CylinderBooking() {
                     <View className="flex-row items-center">
                       <Calendar
                         size={16}
-                        color={slot.available ? '#6366f1' : '#757575'}
+                        color={slot.isAvailable ? '#6366f1' : '#757575'}
                       />
                       <Text
                         className={`font-semibold text-body-large ml-2 ${
-                          slot.available
+                          slot.isAvailable
                             ? 'text-text-primary'
                             : 'text-text-secondary'
                         }`}>
                         {slot.date}
                       </Text>
-                      {slot.premium && (
+                      {slot.isExpress && (
                         <View className="bg-warning/10 rounded-full px-2 py-1 ml-2">
                           <Text className="text-warning text-label-large font-bold">
                             EXPRESS
@@ -423,19 +427,19 @@ export default function CylinderBooking() {
                     <View>
                       <Text
                         className={`text-body-medium ${
-                          slot.available
+                          slot.isAvailable
                             ? 'text-text-primary'
                             : 'text-text-secondary'
                         }`}>
-                        {slot.premium
+                        {slot.isExpress
                           ? 'Express Delivery (+₹50)'
                           : 'Standard Delivery (Free)'}
                       </Text>
                       <Text className="text-text-secondary text-body-medium">
-                        {slot.available ? 'Available' : 'Fully Booked'}
+                        {slot.isAvailable ? 'Available' : 'Fully Booked'}
                       </Text>
                     </View>
-                    {selectedSlot?.id === slot.id && slot.available && (
+                    {selectedSlot?.id === slot.id && slot.isAvailable && (
                       <View className="bg-primary rounded-full w-6 h-6 items-center justify-center">
                         <Text className="text-white text-label-large">✓</Text>
                       </View>
@@ -509,10 +513,10 @@ export default function CylinderBooking() {
             <View className="items-end">
               <Text className="text-text-primary font-bold text-display-small">
                 {formatCurrency(
-                  selectedCylinder.price + (selectedSlot.premium ? 50 : 0),
+                  selectedCylinder.price + (selectedSlot.isExpress ? selectedSlot.additionalCharge : 0),
                 )}
               </Text>
-              {selectedSlot.premium && (
+              {selectedSlot.isExpress && (
                 <Text className="text-text-secondary text-body-medium">
                   (Incl. ₹50 express delivery)
                 </Text>
@@ -527,7 +531,7 @@ export default function CylinderBooking() {
             <Text className="text-white font-semibold ml-2 text-body-medium">
               Book Cylinder -{' '}
               {formatCurrency(
-                selectedCylinder.price + (selectedSlot.premium ? 50 : 0),
+                selectedCylinder.price + (selectedSlot.isExpress ? selectedSlot.additionalCharge : 0),
               )}
             </Text>
           </Button>

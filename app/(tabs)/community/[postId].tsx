@@ -44,12 +44,6 @@ export default function PostDetail() {
   const [refreshing, setRefreshing] = useState(false);
   const [liking, setLiking] = useState(false);
 
-  useEffect(() => {
-    if (postId) {
-      loadPostData();
-    }
-  }, [postId, loadPostData]);
-
   const loadPostData = useCallback(async () => {
     try {
       setLoading(true);
@@ -73,6 +67,12 @@ export default function PostDetail() {
       setLoading(false);
     }
   }, [postId]);
+
+  useEffect(() => {
+    if (postId) {
+      loadPostData();
+    }
+  }, [postId, loadPostData]);
 
   const refreshData = async () => {
     try {

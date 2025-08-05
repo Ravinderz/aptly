@@ -310,7 +310,7 @@ export class AuthService {
     await AsyncStorage.setItem('tokenExpiresAt', tokens.expiresAt.toString());
   }
 
-  private async getAccessToken(): Promise<string | null> {
+  public async getAccessToken(): Promise<string | null> {
     try {
       const token = await SecureStore.getItemAsync('accessToken');
       const expiresAt = await AsyncStorage.getItem('tokenExpiresAt');

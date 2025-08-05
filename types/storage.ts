@@ -80,10 +80,12 @@ export interface Notice {
 export interface UserProfile {
   id: string;
   name: string;
+  fullName: string;
   email?: string;
   phoneNumber: string;
   flatNumber: string;
   societyCode: string;
+  societyId: string;
   avatar?: string;
   bio?: string;
   joinedAt: string;
@@ -141,6 +143,9 @@ export interface MaintenanceRequest {
   actualCost?: number;
   assignedTo?: string;
   assignedToPhone?: string;
+  date: string;
+  affectedResidents?: string[];
+  submittedBy?: string;
   createdAt: string;
   updatedAt: string;
   completedAt?: string;

@@ -190,7 +190,9 @@ export type IconName =
   | 'zap'
   | 'fingerprint'
   | 'fuel'
-  | 'wifi';
+  | 'wifi'
+  | 'heart-outline'
+  | 'userPlus';
 
 interface IconProps {
   name: IconName;
@@ -307,6 +309,8 @@ const LucideIcons = ({ name, color = '#000', size = 24 }: IconProps) => {
     fingerprint: Fingerprint,
     fuel: Fuel,
     wifi: Wifi,
+    'heart-outline': Heart,
+    userPlus: UserPlus,
   };
 
   const IconComponent = iconMap[name];

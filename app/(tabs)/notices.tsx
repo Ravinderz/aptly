@@ -45,10 +45,6 @@ export default function NoticesPage() {
     loadNotices();
   }, []);
 
-  useEffect(() => {
-    filterNotices();
-  }, [notices, selectedFilter, searchQuery, filterNotices]);
-
   const loadNotices = async () => {
     try {
       // In production, this would be an API call
@@ -168,6 +164,10 @@ export default function NoticesPage() {
 
     setFilteredNotices(filtered);
   };
+
+  useEffect(() => {
+    filterNotices();
+  }, [notices, selectedFilter, searchQuery]);
 
   const onRefresh = async () => {
     setRefreshing(true);

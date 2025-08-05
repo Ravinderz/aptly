@@ -32,12 +32,6 @@ export default function UserProfile() {
   const [refreshing, setRefreshing] = useState(false);
   const [currentUser, setCurrentUser] = useState<User | null>(null);
 
-  useEffect(() => {
-    if (userId) {
-      loadUserProfile();
-    }
-  }, [userId, loadUserProfile]);
-
   const loadUserProfile = async () => {
     try {
       setLoading(true);
@@ -57,6 +51,12 @@ export default function UserProfile() {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    if (userId) {
+      loadUserProfile();
+    }
+  }, [userId, loadUserProfile]);
 
   const onRefresh = async () => {
     setRefreshing(true);
@@ -165,7 +165,7 @@ export default function UserProfile() {
               <View className="flex-row items-center mt-1">
                 <Calendar size={16} color="#757575" />
                 <Text className="text-text-secondary text-body-small ml-1">
-                  Member since {formatTimeAgo(user.joinedDate)}
+                  Member since {formatTimeAgo(new Date(user.joinedDate))}
                 </Text>
               </View>
             )}

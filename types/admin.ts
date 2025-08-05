@@ -3,12 +3,22 @@
 import { NavigationItem } from './ui';
 import { EmergencyContact } from './storage';
 
-export type AdminRole =
+export type AdminRoleType =
   | 'super_admin'
   | 'community_manager'
   | 'financial_manager'
   | 'security_admin'
   | 'maintenance_admin';
+
+export interface AdminRole {
+  id: string;
+  name: string;
+  description: string;
+  permissions: Permission[];
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
 
 export type AppMode = 'resident' | 'admin';
 
@@ -18,7 +28,7 @@ export interface AdminUser {
   name: string;
   email: string;
   phoneNumber: string;
-  role: AdminRole;
+  role: AdminRoleType;
   societies: AdminSocietyAccess[];
   isActive: boolean;
   createdAt: string;
@@ -31,7 +41,7 @@ export interface AdminUser {
 export interface AdminSocietyAccess {
   societyId: string;
   societyName: string;
-  role: AdminRole;
+  role: AdminRoleType;
   assignedBy: string; // User ID who assigned this role
   assignedAt: string;
   isActive: boolean;
@@ -102,7 +112,7 @@ export type AdminResource =
 export interface PermissionLimitation {
   type: 'amount_limit' | 'time_limit' | 'approval_required';
   value: number | string;
-  approver?: AdminRole;
+  approver?: AdminRoleType;
 }
 
 // Admin session management
@@ -111,7 +121,7 @@ export interface AdminSession {
   userId: string;
   currentMode: AppMode;
   activeSocietyId?: string;
-  adminRole?: AdminRole;
+  adminRole?: AdminRoleType;
   permissions: Permission[];
   startTime: string;
   lastActivity: string;
@@ -128,7 +138,7 @@ export interface DeviceInfo {
 
 // Role-based dashboard configuration
 export interface AdminDashboardConfig {
-  role: AdminRole;
+  role: AdminRoleType;
   widgets: DashboardWidget[];
   layout: DashboardLayout;
   theme: 'resident' | 'admin';
@@ -234,7 +244,7 @@ export type AuditCategory =
 
 export interface AuditActor {
   userId: string;
-  role: AdminRole;
+  role: AdminRoleType;
   name: string;
   ipAddress: string;
   deviceInfo: DeviceInfo;
@@ -295,7 +305,7 @@ export type EmergencyStatus =
 
 export interface EmergencyResponder {
   userId: string;
-  role: AdminRole;
+  role: AdminRoleType;
   responseTime?: string;
   status: 'notified' | 'acknowledged' | 'responding' | 'on_site';
 }
@@ -310,8 +320,8 @@ export interface EmergencyUpdate {
 }
 
 export interface EmergencyEscalation {
-  from: AdminRole;
-  to: AdminRole;
+  from: AdminRoleType;
+  to: AdminRoleType;
   reason: string;
   timestamp: string;
   autoEscalation: boolean;
@@ -380,7 +390,7 @@ export interface RoleAssignment {
   id: string;
   societyId: string;
   userId: string;
-  role: AdminRole;
+  role: AdminRoleType;
   assignedBy: string;
   assignedAt: string;
   validUntil?: string;
@@ -404,7 +414,7 @@ export interface AdminNotification {
   title: string;
   message: string;
   priority: 'low' | 'normal' | 'high' | 'urgent';
-  recipientRole: AdminRole[];
+  recipientRole: AdminRoleType[];
   societyId?: string;
   createdBy: string;
   createdAt: string;
@@ -463,7 +473,7 @@ export interface AdminError {
   message: string;
   field?: string;
   requiredPermission?: Permission;
-  escalationPath?: AdminRole[];
+  escalationPath?: AdminRoleType[];
 }
 
 // Form validation for admin operations
