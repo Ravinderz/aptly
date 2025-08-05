@@ -1,5 +1,5 @@
 import { Button } from '@/components/ui/Button';
-import { useAuthMigration } from '@/hooks/useAuthMigration';
+import { useDirectAuth } from '@/hooks/useDirectAuth';
 import { UserProfile } from '@/services/auth.service';
 import { showErrorAlert, showSuccessAlert } from '@/utils/alert';
 import { useLocalSearchParams, useRouter } from 'expo-router';
@@ -25,7 +25,7 @@ interface ProfileData {
 
 export default function ProfileSetup() {
   const router = useRouter();
-  const { login } = useAuthMigration();
+  const { login } = useDirectAuth();
   const { phoneNumber, societyCode, societyId, societyName } =
     useLocalSearchParams<{
       phoneNumber: string;

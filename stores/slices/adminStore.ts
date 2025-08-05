@@ -1,12 +1,13 @@
 /**
  * AdminStore - Zustand store for admin panel functionality
- * 
+ *
  * Handles administrative features, permissions, society management,
  * analytics, and admin-specific operations.
  */
 import { create } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
 import { immer } from 'zustand/middleware/immer';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import type { BaseStore } from '../types';
 
 // Admin types
@@ -110,7 +111,11 @@ export interface SocietyManagementItem {
   id: string;
   societyId: string;
   societyName: string;
-  action: 'approval_pending' | 'payment_overdue' | 'compliance_review' | 'technical_issue';
+  action:
+    | 'approval_pending'
+    | 'payment_overdue'
+    | 'compliance_review'
+    | 'technical_issue';
   priority: 'low' | 'medium' | 'high' | 'critical';
   assignedTo?: string;
   dueDate?: string;
@@ -126,20 +131,20 @@ interface AdminState extends BaseStore {
   adminUser: AdminUser | null;
   analytics: AdminAnalytics | null;
   settings: AdminSettings | null;
-  
+
   // Management data
   societyManagementItems: SocietyManagementItem[];
   actionHistory: AdminAction[];
-  
+
   // UI state
   selectedManagementItems: string[];
   dashboardView: 'overview' | 'societies' | 'analytics' | 'support';
   analyticsTimeRange: '7d' | '30d' | '90d' | '1y';
-  
+
   // Filters and search
   managementFilter: 'all' | 'pending' | 'in_progress' | 'high_priority';
   searchQuery: string;
-  
+
   // Cache
   lastAnalyticsUpdate: number | null;
   lastManagementItemsUpdate: number | null;
@@ -151,50 +156,61 @@ interface AdminActions {
   loadAdminProfile: () => Promise<void>;
   updateAdminProfile: (updates: Partial<AdminUser>) => Promise<void>;
   updateAdminSettings: (settings: Partial<AdminSettings>) => Promise<void>;
-  
+
   // Dashboard and analytics
   loadDashboard: () => Promise<void>;
-  loadAnalytics: (timeRange?: AdminState['analyticsTimeRange']) => Promise<void>;
+  loadAnalytics: (
+    timeRange?: AdminState['analyticsTimeRange'],
+  ) => Promise<void>;
   setDashboardView: (view: AdminState['dashboardView']) => void;
   setAnalyticsTimeRange: (range: AdminState['analyticsTimeRange']) => void;
-  
+
   // Society management
   loadManagementItems: () => Promise<void>;
   manageSociety: (societyId: string, action: AdminAction) => Promise<void>;
   approveSociety: (societyId: string, reason?: string) => Promise<void>;
   suspendSociety: (societyId: string, reason: string) => Promise<void>;
   activateSociety: (societyId: string, reason?: string) => Promise<void>;
-  
+
   // Bulk operations
-  bulkManageSocieties: (societyIds: string[], action: Omit<AdminAction, 'id' | 'targetId' | 'performedAt'>) => Promise<void>;
-  assignManagementItems: (itemIds: string[], assignedTo: string) => Promise<void>;
-  
+  bulkManageSocieties: (
+    societyIds: string[],
+    action: Omit<AdminAction, 'id' | 'targetId' | 'performedAt'>,
+  ) => Promise<void>;
+  assignManagementItems: (
+    itemIds: string[],
+    assignedTo: string,
+  ) => Promise<void>;
+
   // Action history
   loadActionHistory: (targetId?: string) => Promise<void>;
-  
+
   // Management item operations
-  updateManagementItem: (itemId: string, updates: Partial<SocietyManagementItem>) => Promise<void>;
+  updateManagementItem: (
+    itemId: string,
+    updates: Partial<SocietyManagementItem>,
+  ) => Promise<void>;
   resolveManagementItem: (itemId: string, resolution: string) => Promise<void>;
   closeManagementItem: (itemId: string) => Promise<void>;
-  
+
   // Search and filtering
   setSearchQuery: (query: string) => void;
   setManagementFilter: (filter: AdminState['managementFilter']) => void;
   clearFilters: () => void;
-  
+
   // Selection management
   selectManagementItems: (ids: string[]) => void;
   toggleManagementItemSelection: (id: string) => void;
   selectAllManagementItems: () => void;
   clearSelection: () => void;
-  
+
   // Utility methods
   getManagementItemById: (id: string) => SocietyManagementItem | undefined;
   getFilteredManagementItems: () => SocietyManagementItem[];
   getPendingApprovalsCount: () => number;
   getHighPriorityItemsCount: () => number;
   getAssignedItemsCount: (adminId: string) => number;
-  
+
   // System operations
   enableMaintenanceMode: (reason: string) => Promise<void>;
   disableMaintenanceMode: () => Promise<void>;
@@ -208,35 +224,44 @@ const initialState: AdminState = {
   // Base store
   loading: false,
   error: null,
-  
+
   // Core data
   adminUser: null,
   analytics: null,
   settings: null,
-  
+
   // Management data
   societyManagementItems: [],
   actionHistory: [],
-  
+
   // UI state
   selectedManagementItems: [],
   dashboardView: 'overview',
   analyticsTimeRange: '30d',
-  
+
   // Filters
   managementFilter: 'all',
   searchQuery: '',
-  
+
   // Cache
   lastAnalyticsUpdate: null,
   lastManagementItemsUpdate: null,
+  setLoading: function (loading: boolean): void {
+    throw new Error('Function not implemented.');
+  },
+  setError: function (error: string | null): void {
+    throw new Error('Function not implemented.');
+  },
+  reset: function (): void {
+    throw new Error('Function not implemented.');
+  },
 };
 
 // Mock admin service (replace with actual service)
 const adminService = {
   async getAdminProfile(): Promise<AdminUser> {
-    await new Promise(resolve => setTimeout(resolve, 600));
-    
+    await new Promise((resolve) => setTimeout(resolve, 600));
+
     return {
       id: 'admin_123',
       email: 'admin@aptly.com',
@@ -270,8 +295,8 @@ const adminService = {
   },
 
   async getAnalytics(timeRange: string): Promise<AdminAnalytics> {
-    await new Promise(resolve => setTimeout(resolve, 800));
-    
+    await new Promise((resolve) => setTimeout(resolve, 800));
+
     return {
       overview: {
         totalSocieties: 145,
@@ -310,8 +335,8 @@ const adminService = {
   },
 
   async getManagementItems(): Promise<SocietyManagementItem[]> {
-    await new Promise(resolve => setTimeout(resolve, 500));
-    
+    await new Promise((resolve) => setTimeout(resolve, 500));
+
     return [
       {
         id: 'mgmt_1',
@@ -340,13 +365,19 @@ const adminService = {
     ];
   },
 
-  async performSocietyAction(societyId: string, action: AdminAction): Promise<void> {
-    await new Promise(resolve => setTimeout(resolve, 700));
+  async performSocietyAction(
+    societyId: string,
+    action: AdminAction,
+  ): Promise<void> {
+    await new Promise((resolve) => setTimeout(resolve, 700));
     // In real implementation, would make API call
   },
 
-  async updateManagementItem(itemId: string, updates: Partial<SocietyManagementItem>): Promise<SocietyManagementItem> {
-    await new Promise(resolve => setTimeout(resolve, 400));
+  async updateManagementItem(
+    itemId: string,
+    updates: Partial<SocietyManagementItem>,
+  ): Promise<SocietyManagementItem> {
+    await new Promise((resolve) => setTimeout(resolve, 400));
     // Mock updated item
     return {
       id: itemId,
@@ -363,8 +394,8 @@ const adminService = {
   },
 
   async getSettings(): Promise<AdminSettings> {
-    await new Promise(resolve => setTimeout(resolve, 300));
-    
+    await new Promise((resolve) => setTimeout(resolve, 300));
+
     return {
       notifications: {
         emailNotifications: true,
@@ -393,8 +424,10 @@ const adminService = {
     };
   },
 
-  async updateSettings(settings: Partial<AdminSettings>): Promise<AdminSettings> {
-    await new Promise(resolve => setTimeout(resolve, 500));
+  async updateSettings(
+    settings: Partial<AdminSettings>,
+  ): Promise<AdminSettings> {
+    await new Promise((resolve) => setTimeout(resolve, 500));
     const currentSettings = await this.getSettings();
     return { ...currentSettings, ...settings };
   },
@@ -408,17 +441,20 @@ export const useAdminStore = create<AdminStore>()(
         ...initialState,
 
         // Base store methods
-        setLoading: (loading: boolean) => set((state) => {
-          state.loading = loading;
-        }),
+        setLoading: (loading: boolean) =>
+          set((state) => {
+            state.loading = loading;
+          }),
 
-        setError: (error: string | null) => set((state) => {
-          state.error = error;
-        }),
+        setError: (error: string | null) =>
+          set((state) => {
+            state.error = error;
+          }),
 
-        reset: () => set((state) => {
-          Object.assign(state, initialState);
-        }),
+        reset: () =>
+          set((state) => {
+            Object.assign(state, initialState);
+          }),
 
         // Authentication and profile
         loadAdminProfile: async () => {
@@ -429,7 +465,7 @@ export const useAdminStore = create<AdminStore>()(
 
           try {
             const adminUser = await adminService.getAdminProfile();
-            
+
             set((state) => {
               state.adminUser = adminUser;
               state.loading = false;
@@ -452,8 +488,8 @@ export const useAdminStore = create<AdminStore>()(
 
           try {
             // In real implementation, would make API call
-            await new Promise(resolve => setTimeout(resolve, 500));
-            
+            await new Promise((resolve) => setTimeout(resolve, 500));
+
             set((state) => {
               if (state.adminUser) {
                 Object.assign(state.adminUser, updates);
@@ -469,15 +505,18 @@ export const useAdminStore = create<AdminStore>()(
           }
         },
 
-        updateAdminSettings: async (settingsUpdates: Partial<AdminSettings>) => {
+        updateAdminSettings: async (
+          settingsUpdates: Partial<AdminSettings>,
+        ) => {
           set((state) => {
             state.loading = true;
             state.error = null;
           });
 
           try {
-            const updatedSettings = await adminService.updateSettings(settingsUpdates);
-            
+            const updatedSettings =
+              await adminService.updateSettings(settingsUpdates);
+
             set((state) => {
               state.settings = updatedSettings;
               state.loading = false;
@@ -503,7 +542,7 @@ export const useAdminStore = create<AdminStore>()(
               adminService.getManagementItems(),
               adminService.getSettings(),
             ]);
-            
+
             set((state) => {
               state.analytics = analytics;
               state.societyManagementItems = managementItems;
@@ -533,8 +572,10 @@ export const useAdminStore = create<AdminStore>()(
           });
 
           try {
-            const analytics = await adminService.getAnalytics(get().analyticsTimeRange);
-            
+            const analytics = await adminService.getAnalytics(
+              get().analyticsTimeRange,
+            );
+
             set((state) => {
               state.analytics = analytics;
               state.lastAnalyticsUpdate = Date.now();
@@ -548,13 +589,15 @@ export const useAdminStore = create<AdminStore>()(
           }
         },
 
-        setDashboardView: (view: AdminState['dashboardView']) => set((state) => {
-          state.dashboardView = view;
-        }),
+        setDashboardView: (view: AdminState['dashboardView']) =>
+          set((state) => {
+            state.dashboardView = view;
+          }),
 
-        setAnalyticsTimeRange: (range: AdminState['analyticsTimeRange']) => set((state) => {
-          state.analyticsTimeRange = range;
-        }),
+        setAnalyticsTimeRange: (range: AdminState['analyticsTimeRange']) =>
+          set((state) => {
+            state.analyticsTimeRange = range;
+          }),
 
         // Society management
         loadManagementItems: async () => {
@@ -565,7 +608,7 @@ export const useAdminStore = create<AdminStore>()(
 
           try {
             const items = await adminService.getManagementItems();
-            
+
             set((state) => {
               state.societyManagementItems = items;
               state.lastManagementItemsUpdate = Date.now();
@@ -587,7 +630,7 @@ export const useAdminStore = create<AdminStore>()(
 
           try {
             await adminService.performSocietyAction(societyId, action);
-            
+
             set((state) => {
               // Add to action history
               state.actionHistory.unshift({
@@ -595,7 +638,7 @@ export const useAdminStore = create<AdminStore>()(
                 id: `action_${Date.now()}`,
                 performedAt: new Date().toISOString(),
               });
-              
+
               state.loading = false;
             });
           } catch (error: any) {
@@ -617,7 +660,7 @@ export const useAdminStore = create<AdminStore>()(
             performedBy: get().adminUser?.id || '',
             performedAt: '',
           };
-          
+
           await get().manageSociety(societyId, action);
         },
 
@@ -631,7 +674,7 @@ export const useAdminStore = create<AdminStore>()(
             performedBy: get().adminUser?.id || '',
             performedAt: '',
           };
-          
+
           await get().manageSociety(societyId, action);
         },
 
@@ -645,30 +688,35 @@ export const useAdminStore = create<AdminStore>()(
             performedBy: get().adminUser?.id || '',
             performedAt: '',
           };
-          
+
           await get().manageSociety(societyId, action);
         },
 
         // Bulk operations
-        bulkManageSocieties: async (societyIds: string[], actionTemplate: Omit<AdminAction, 'id' | 'targetId' | 'performedAt'>) => {
+        bulkManageSocieties: async (
+          societyIds: string[],
+          actionTemplate: Omit<AdminAction, 'id' | 'targetId' | 'performedAt'>,
+        ) => {
           set((state) => {
             state.loading = true;
             state.error = null;
           });
 
           try {
-            const actions = societyIds.map(societyId => ({
+            const actions = societyIds.map((societyId) => ({
               ...actionTemplate,
               id: `action_${Date.now()}_${societyId}`,
               targetId: societyId,
               performedAt: new Date().toISOString(),
             }));
-            
+
             // Perform all actions
             await Promise.all(
-              actions.map(action => adminService.performSocietyAction(action.targetId, action))
+              actions.map((action) =>
+                adminService.performSocietyAction(action.targetId, action),
+              ),
             );
-            
+
             set((state) => {
               // Add all actions to history
               state.actionHistory.unshift(...actions);
@@ -676,14 +724,18 @@ export const useAdminStore = create<AdminStore>()(
             });
           } catch (error: any) {
             set((state) => {
-              state.error = error.message || 'Failed to perform bulk operations';
+              state.error =
+                error.message || 'Failed to perform bulk operations';
               state.loading = false;
             });
             throw error;
           }
         },
 
-        assignManagementItems: async (itemIds: string[], assignedTo: string) => {
+        assignManagementItems: async (
+          itemIds: string[],
+          assignedTo: string,
+        ) => {
           set((state) => {
             state.loading = true;
             state.error = null;
@@ -692,12 +744,16 @@ export const useAdminStore = create<AdminStore>()(
           try {
             // Update each item
             await Promise.all(
-              itemIds.map(id => adminService.updateManagementItem(id, { assignedTo }))
+              itemIds.map((id) =>
+                adminService.updateManagementItem(id, { assignedTo }),
+              ),
             );
-            
+
             set((state) => {
-              itemIds.forEach(id => {
-                const item = state.societyManagementItems.find(item => item.id === id);
+              itemIds.forEach((id) => {
+                const item = state.societyManagementItems.find(
+                  (item) => item.id === id,
+                );
                 if (item) {
                   item.assignedTo = assignedTo;
                   item.updatedAt = new Date().toISOString();
@@ -707,7 +763,8 @@ export const useAdminStore = create<AdminStore>()(
             });
           } catch (error: any) {
             set((state) => {
-              state.error = error.message || 'Failed to assign management items';
+              state.error =
+                error.message || 'Failed to assign management items';
               state.loading = false;
             });
             throw error;
@@ -721,17 +778,25 @@ export const useAdminStore = create<AdminStore>()(
         },
 
         // Management item operations
-        updateManagementItem: async (itemId: string, updates: Partial<SocietyManagementItem>) => {
+        updateManagementItem: async (
+          itemId: string,
+          updates: Partial<SocietyManagementItem>,
+        ) => {
           set((state) => {
             state.loading = true;
             state.error = null;
           });
 
           try {
-            const updatedItem = await adminService.updateManagementItem(itemId, updates);
-            
+            const updatedItem = await adminService.updateManagementItem(
+              itemId,
+              updates,
+            );
+
             set((state) => {
-              const index = state.societyManagementItems.findIndex(item => item.id === itemId);
+              const index = state.societyManagementItems.findIndex(
+                (item) => item.id === itemId,
+              );
               if (index !== -1) {
                 state.societyManagementItems[index] = updatedItem;
               }
@@ -760,45 +825,54 @@ export const useAdminStore = create<AdminStore>()(
         },
 
         // Search and filtering
-        setSearchQuery: (query: string) => set((state) => {
-          state.searchQuery = query;
-        }),
+        setSearchQuery: (query: string) =>
+          set((state) => {
+            state.searchQuery = query;
+          }),
 
-        setManagementFilter: (filter: AdminState['managementFilter']) => set((state) => {
-          state.managementFilter = filter;
-        }),
+        setManagementFilter: (filter: AdminState['managementFilter']) =>
+          set((state) => {
+            state.managementFilter = filter;
+          }),
 
-        clearFilters: () => set((state) => {
-          state.searchQuery = '';
-          state.managementFilter = 'all';
-        }),
+        clearFilters: () =>
+          set((state) => {
+            state.searchQuery = '';
+            state.managementFilter = 'all';
+          }),
 
         // Selection management
-        selectManagementItems: (ids: string[]) => set((state) => {
-          state.selectedManagementItems = ids;
-        }),
+        selectManagementItems: (ids: string[]) =>
+          set((state) => {
+            state.selectedManagementItems = ids;
+          }),
 
-        toggleManagementItemSelection: (id: string) => set((state) => {
-          const index = state.selectedManagementItems.indexOf(id);
-          if (index === -1) {
-            state.selectedManagementItems.push(id);
-          } else {
-            state.selectedManagementItems.splice(index, 1);
-          }
-        }),
+        toggleManagementItemSelection: (id: string) =>
+          set((state) => {
+            const index = state.selectedManagementItems.indexOf(id);
+            if (index === -1) {
+              state.selectedManagementItems.push(id);
+            } else {
+              state.selectedManagementItems.splice(index, 1);
+            }
+          }),
 
-        selectAllManagementItems: () => set((state) => {
-          const filteredItems = get().getFilteredManagementItems();
-          state.selectedManagementItems = filteredItems.map(item => item.id);
-        }),
+        selectAllManagementItems: () =>
+          set((state) => {
+            const filteredItems = get().getFilteredManagementItems();
+            state.selectedManagementItems = filteredItems.map(
+              (item) => item.id,
+            );
+          }),
 
-        clearSelection: () => set((state) => {
-          state.selectedManagementItems = [];
-        }),
+        clearSelection: () =>
+          set((state) => {
+            state.selectedManagementItems = [];
+          }),
 
         // Utility methods
         getManagementItemById: (id: string) => {
-          return get().societyManagementItems.find(item => item.id === id);
+          return get().societyManagementItems.find((item) => item.id === id);
         },
 
         getFilteredManagementItems: () => {
@@ -808,23 +882,29 @@ export const useAdminStore = create<AdminStore>()(
           // Apply search filter
           if (state.searchQuery) {
             const query = state.searchQuery.toLowerCase();
-            filtered = filtered.filter(item =>
-              item.societyName.toLowerCase().includes(query) ||
-              item.description.toLowerCase().includes(query) ||
-              item.action.toLowerCase().includes(query)
+            filtered = filtered.filter(
+              (item) =>
+                item.societyName.toLowerCase().includes(query) ||
+                item.description.toLowerCase().includes(query) ||
+                item.action.toLowerCase().includes(query),
             );
           }
 
           // Apply status filter
           switch (state.managementFilter) {
             case 'pending':
-              filtered = filtered.filter(item => item.status === 'open');
+              filtered = filtered.filter((item) => item.status === 'open');
               break;
             case 'in_progress':
-              filtered = filtered.filter(item => item.status === 'in_progress');
+              filtered = filtered.filter(
+                (item) => item.status === 'in_progress',
+              );
               break;
             case 'high_priority':
-              filtered = filtered.filter(item => item.priority === 'high' || item.priority === 'critical');
+              filtered = filtered.filter(
+                (item) =>
+                  item.priority === 'high' || item.priority === 'critical',
+              );
               break;
           }
 
@@ -832,21 +912,23 @@ export const useAdminStore = create<AdminStore>()(
         },
 
         getPendingApprovalsCount: () => {
-          return get().societyManagementItems.filter(item => 
-            item.action === 'approval_pending' && item.status === 'open'
+          return get().societyManagementItems.filter(
+            (item) =>
+              item.action === 'approval_pending' && item.status === 'open',
           ).length;
         },
 
         getHighPriorityItemsCount: () => {
-          return get().societyManagementItems.filter(item => 
-            (item.priority === 'high' || item.priority === 'critical') && 
-            item.status !== 'closed'
+          return get().societyManagementItems.filter(
+            (item) =>
+              (item.priority === 'high' || item.priority === 'critical') &&
+              item.status !== 'closed',
           ).length;
         },
 
         getAssignedItemsCount: (adminId: string) => {
-          return get().societyManagementItems.filter(item => 
-            item.assignedTo === adminId && item.status !== 'closed'
+          return get().societyManagementItems.filter(
+            (item) => item.assignedTo === adminId && item.status !== 'closed',
           ).length;
         },
 
@@ -876,8 +958,8 @@ export const useAdminStore = create<AdminStore>()(
 
           try {
             // Simulate cache refresh
-            await new Promise(resolve => setTimeout(resolve, 1000));
-            
+            await new Promise((resolve) => setTimeout(resolve, 1000));
+
             // Reload all data
             await get().loadDashboard();
           } catch (error: any) {
@@ -890,33 +972,95 @@ export const useAdminStore = create<AdminStore>()(
       })),
       {
         name: 'admin-storage',
+        storage: {
+          getItem: async (name: string) => {
+            try {
+              const value = await AsyncStorage.getItem(name);
+              return value ? JSON.parse(value) : null;
+            } catch (error) {
+              console.warn(`Unable to get admin item '${name}', storage unavailable:`, error);
+              return null;
+            }
+          },
+          setItem: async (name: string, value: any) => {
+            try {
+              // Properly serialize objects to strings for AsyncStorage
+              const serialized = JSON.stringify(value);
+              await AsyncStorage.setItem(name, serialized);
+            } catch (error) {
+              console.warn(`Unable to set admin item '${name}', storage unavailable:`, error);
+            }
+          },
+          removeItem: async (name: string) => {
+            try {
+              await AsyncStorage.removeItem(name);
+            } catch (error) {
+              console.warn(`Unable to remove admin item '${name}', storage unavailable:`, error);
+            }
+          },
+        },
         partialize: (state) => ({
           adminUser: state.adminUser,
           settings: state.settings,
           dashboardView: state.dashboardView,
           analyticsTimeRange: state.analyticsTimeRange,
         }),
-      }
+        onRehydrateStorage: () => (state, error) => {
+          if (error) {
+            console.warn('⚠️ AdminStore rehydration failed:', error);
+          } else {
+            console.log('✅ AdminStore rehydrated successfully');
+          }
+        },
+      },
     ),
-    { name: 'AdminStore' }
-  )
+    { name: 'AdminStore' },
+  ),
 );
 
-// Selector hooks for optimized re-renders
-export const useAdminUser = () => useAdminStore(state => state.adminUser);
-export const useAdminLoading = () => useAdminStore(state => state.loading);
-export const useAdminError = () => useAdminStore(state => state.error);
-export const useAdminAnalytics = () => useAdminStore(state => state.analytics);
-export const useAdminSettings = () => useAdminStore(state => state.settings);
-export const useAdminManagementItems = () => useAdminStore(state => state.getFilteredManagementItems());
-export const useAdminActions = () => useAdminStore(state => ({
-  loadDashboard: state.loadDashboard,
-  loadAnalytics: state.loadAnalytics,
-  manageSociety: state.manageSociety,
-  approveSociety: state.approveSociety,
-  suspendSociety: state.suspendSociety,
-  activateSociety: state.activateSociety,
-  updateManagementItem: state.updateManagementItem,
-  setSearchQuery: state.setSearchQuery,
-  setManagementFilter: state.setManagementFilter,
-}));
+// Selector hooks for optimized re-renders with proper caching
+export const useAdminUser = () => useAdminStore((state) => state.adminUser);
+export const useAdminLoading = () => useAdminStore((state) => state.loading);
+export const useAdminError = () => useAdminStore((state) => state.error);
+export const useAdminAnalytics = () => useAdminStore((state) => state.analytics);
+export const useAdminSettings = () => useAdminStore((state) => state.settings);
+
+// Fixed: Cache filtered items to prevent new array creation on every call
+const filteredItemsCache = new WeakMap();
+export const useAdminManagementItems = () =>
+  useAdminStore((state) => {
+    const cacheKey = `${state.searchQuery}-${state.managementFilter}-${state.societyManagementItems.length}`;
+    
+    if (!filteredItemsCache.has(state)) {
+      filteredItemsCache.set(state, new Map());
+    }
+    
+    const stateCache = filteredItemsCache.get(state);
+    if (stateCache.has(cacheKey)) {
+      return stateCache.get(cacheKey);
+    }
+    
+    const filtered = state.getFilteredManagementItems();
+    stateCache.set(cacheKey, filtered);
+    return filtered;
+  });
+
+// Fixed: Create stable action object to prevent re-renders
+let cachedActions: any = null;
+export const useAdminActions = () => {
+  if (!cachedActions) {
+    const state = useAdminStore.getState();
+    cachedActions = {
+      loadDashboard: state.loadDashboard,
+      loadAnalytics: state.loadAnalytics,
+      manageSociety: state.manageSociety,
+      approveSociety: state.approveSociety,
+      suspendSociety: state.suspendSociety,
+      activateSociety: state.activateSociety,
+      updateManagementItem: state.updateManagementItem,
+      setSearchQuery: state.setSearchQuery,
+      setManagementFilter: state.setManagementFilter,
+    };
+  }
+  return cachedActions;
+};

@@ -1,7 +1,7 @@
 import React, { ReactNode } from 'react';
 import { View, Text } from 'react-native';
 import { AlertCircle, Lock, Shield } from 'lucide-react-native';
-import { useAdminMigration } from '@/hooks/useAdminMigration';
+import { useDirectAdmin } from '@/hooks/useDirectAdmin';
 import { AdminRole, Permission } from '@/types/admin';
 
 interface PermissionGateProps {
@@ -35,7 +35,7 @@ const PermissionGate: React.FC<PermissionGateProps> = ({
   showFallback = true,
   renderEmpty = false,
 }) => {
-  const { checkPermission, adminUser, currentMode } = useAdminMigration();
+  const { checkPermission, adminUser, currentMode } = useDirectAdmin();
 
   // Check if user is in admin mode
   if (currentMode !== 'admin') {

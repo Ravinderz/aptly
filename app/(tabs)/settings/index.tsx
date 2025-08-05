@@ -1,36 +1,37 @@
-import React from 'react';
-import { ScrollView, SafeAreaView, View } from 'react-native';
-import { useRouter } from 'expo-router';
-import { useAuthMigration } from '@/hooks/useAuthMigration';
+import { useDirectAuth } from '@/hooks/useDirectAuth';
+import { useFeatureFlagStore } from '@/stores/slices/featureFlagStore';
 import {
+  showConfirmAlert,
   showErrorAlert,
   showSuccessAlert,
-  showConfirmAlert,
 } from '@/utils/alert';
+import * as ImagePicker from 'expo-image-picker';
+import { useRouter } from 'expo-router';
 import {
-  User,
-  Users,
+  BarChart3,
+  Bell,
   Car,
   FileText,
-  Bell,
-  Phone,
-  Shield,
-  LogOut,
   HelpCircle,
+  LogOut,
+  Phone,
   Settings as SettingsIcon,
-  Camera,
+  Shield,
+  User,
+  Users,
   Vote,
-  BarChart3,
 } from 'lucide-react-native';
+import React from 'react';
+import { SafeAreaView, ScrollView, View } from 'react-native';
 import ProfileHeader from '../../../components/ui/ProfileHeader';
 import ProfileSection, {
   ProfileItem,
 } from '../../../components/ui/ProfileSection';
-import * as ImagePicker from 'expo-image-picker';
 
 export default function Profile() {
   const router = useRouter();
-  const { user, logout } = useAuthMigration();
+  const { user, logout } = useDirectAuth();
+  const governanceCenterEnabled = useFeatureFlagStore((state) => state.flags.governance_center);
 
   // Use real user data from auth context, fallback to mock data
   const userData = {
@@ -183,13 +184,22 @@ export default function Profile() {
             onPress={handleEmergencyContacts}
           />
           <View className="h-px bg-divider mx-4" />
-          <ProfileItem
-            icon={<Vote size={20} color="#6366f1" />}
-            title="Governance Settings"
-            subtitle="Voting preferences, emergency alerts"
-            onPress={() => router.push('/(tabs)/settings/governance-settings')}
-          />
-          <View className="h-px bg-divider mx-4" />
+
+          {/* Conditional rendering based on feature flags */}
+          {governanceCenterEnabled && (
+            <>
+              <ProfileItem
+                icon={<Vote size={20} color="#6366f1" />}
+                title="Governance Center"
+                subtitle="Policies, voting, emergency alerts"
+                onPress={() =>
+                  router.push('/(tabs)/settings/governance-settings')
+                }
+              />
+              <View className="h-px bg-divider mx-4" />
+            </>
+          )}
+
           <ProfileItem
             icon={<BarChart3 size={20} color="#8B5CF6" />}
             title="Analytics Settings"

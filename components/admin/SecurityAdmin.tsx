@@ -27,8 +27,8 @@ import {
   Activity,
   Bell,
 } from 'lucide-react-native';
-import { useAdminMigration } from '@/hooks/useAdminMigration';
-import { useSocietyMigration } from '@/hooks/useSocietyMigration';
+import { useDirectAdmin } from '@/hooks/useDirectAdmin';
+import { useDirectSociety } from '@/hooks/useDirectSociety';
 import { StatWidget, QuickActionWidget, AlertWidget } from './DashboardWidgets';
 import { useAlert } from '@/components/ui/AlertCard';
 
@@ -88,8 +88,8 @@ interface VisitorFilter {
 }
 
 const SecurityAdmin: React.FC = () => {
-  const { checkPermission, activeSociety, availableSocieties } = useAdminMigration();
-  const { bulkOperation, filterNotificationsForSociety } = useSocietyMigration();
+  const { checkPermission, activeSociety, availableSocieties } = useDirectAdmin();
+  const { bulkOperation, filterNotificationsForSociety } = useDirectSociety();
   const { showAlert, AlertComponent } = useAlert();
 
   const [securityStats, setSecurityStats] =

@@ -18,7 +18,9 @@ import {
   CheckCircle,
   XCircle,
 } from 'lucide-react-native';
-import { useAdminMigration } from '@/hooks/useAdminMigration';
+import { useDirectAdmin } from '@/hooks/useDirectAdmin';
+import { useDirectAuth } from '@/hooks/useDirectAuth';
+import { useDirectSociety } from '@/hooks/useDirectSociety';
 import { adminTheme, adminStyles } from '@/utils/adminTheme';
 import { AdminRole } from '@/types/admin';
 
@@ -50,15 +52,27 @@ interface QuickAction {
 }
 
 export const AdminDashboard: React.FC = () => {
-  const { adminUser, activeSociety, checkPermission, currentMode } = useAdminMigration();
+  const { user: authUser, checkPermission } = useDirectAuth();
+  const { adminUser, analytics, loadDashboard } = useDirectAdmin();
+  const { currentSociety } = useDirectSociety();
 
-  // Mock dashboard stats - replace with actual API call
+  // Use authUser for current user info, adminUser for admin-specific data
+  const currentUser = adminUser || authUser;
+  const activeSociety = currentSociety;
+  const currentMode = currentUser?.role === 'super_admin' ? 'admin' : 'user';
+
+  // Load dashboard data on mount
+  React.useEffect(() => {
+    loadDashboard?.();
+  }, []);
+
+  // Dashboard stats from AdminStore analytics or fallback to mock data
   const stats: DashboardStats = {
-    totalResidents: activeSociety?.totalFlats || 120,
-    activeResidents: activeSociety?.activeResidents || 95,
-    pendingRequests: 12,
+    totalResidents: activeSociety?.totalFlats || analytics?.overview.totalUsers || 120,
+    activeResidents: activeSociety?.activeResidents || analytics?.users.totalActiveUsers || 95,
+    pendingRequests: analytics?.societies.pendingApprovals || 12,
     emergencyAlerts: 0,
-    monthlyCollection: 284750,
+    monthlyCollection: analytics?.revenue.monthlyRevenue || 284750,
     collectionRate: 87.5,
     maintenanceRequests: {
       pending: 8,
@@ -86,8 +100,8 @@ export const AdminDashboard: React.FC = () => {
 
     // Role-specific actions
     if (
-      adminUser?.role === 'community_manager' ||
-      adminUser?.role === 'super_admin'
+      currentUser?.role === 'community_manager' ||
+      currentUser?.role === 'super_admin'
     ) {
       baseActions.push(
         {
@@ -110,9 +124,9 @@ export const AdminDashboard: React.FC = () => {
     }
 
     if (
-      adminUser?.role === 'financial_manager' ||
-      adminUser?.role === 'community_manager' ||
-      adminUser?.role === 'super_admin'
+      currentUser?.role === 'financial_manager' ||
+      currentUser?.role === 'community_manager' ||
+      currentUser?.role === 'super_admin'
     ) {
       baseActions.push({
         id: 'billing',
@@ -125,9 +139,9 @@ export const AdminDashboard: React.FC = () => {
     }
 
     if (
-      adminUser?.role === 'security_admin' ||
-      adminUser?.role === 'community_manager' ||
-      adminUser?.role === 'super_admin'
+      currentUser?.role === 'security_admin' ||
+      currentUser?.role === 'community_manager' ||
+      currentUser?.role === 'super_admin'
     ) {
       baseActions.push({
         id: 'visitors',
@@ -140,9 +154,9 @@ export const AdminDashboard: React.FC = () => {
     }
 
     if (
-      adminUser?.role === 'maintenance_admin' ||
-      adminUser?.role === 'community_manager' ||
-      adminUser?.role === 'super_admin'
+      currentUser?.role === 'maintenance_admin' ||
+      currentUser?.role === 'community_manager' ||
+      currentUser?.role === 'super_admin'
     ) {
       baseActions.push({
         id: 'maintenance',
@@ -161,13 +175,14 @@ export const AdminDashboard: React.FC = () => {
     );
   };
 
-  const getRoleDisplayName = (role: AdminRole): string => {
-    const roleNames = {
+  const getRoleDisplayName = (role: string): string => {
+    const roleNames: Record<string, string> = {
       super_admin: 'Super Administrator',
       community_manager: 'Community Manager',
       financial_manager: 'Financial Manager',
       security_admin: 'Security Administrator',
       maintenance_admin: 'Maintenance Administrator',
+      admin: 'Administrator',
     };
     return roleNames[role] || role;
   };
@@ -189,14 +204,14 @@ export const AdminDashboard: React.FC = () => {
           }}>
           <View>
             <Text style={[adminStyles.adminHeading, { fontSize: 20 }]}>
-              Welcome back, {adminUser?.name}
+              Welcome back, {currentUser?.fullName || currentUser?.name || 'Admin'}
             </Text>
             <Text
               style={[
                 adminStyles.adminCaption,
                 { color: adminTheme.secondary },
               ]}>
-              {getRoleDisplayName(adminUser?.role || 'community_manager')}
+              {getRoleDisplayName(currentUser?.role || 'admin')}
             </Text>
             <Text style={[adminStyles.adminCaption, { marginTop: 2 }]}>
               Managing {activeSociety?.name}
@@ -360,9 +375,9 @@ export const AdminDashboard: React.FC = () => {
       </View>
 
       {/* Maintenance Overview - visible to maintenance admins and CMs */}
-      {(adminUser?.role === 'maintenance_admin' ||
-        adminUser?.role === 'community_manager' ||
-        adminUser?.role === 'super_admin') && (
+      {(currentUser?.role === 'maintenance_admin' ||
+        currentUser?.role === 'community_manager' ||
+        currentUser?.role === 'super_admin') && (
         <View style={{ paddingHorizontal: 16, marginTop: 24 }}>
           <Text style={[adminStyles.adminSubheading, { marginBottom: 12 }]}>
             Maintenance Status
@@ -436,9 +451,9 @@ export const AdminDashboard: React.FC = () => {
       )}
 
       {/* Visitor Overview - visible to security admins and CMs */}
-      {(adminUser?.role === 'security_admin' ||
-        adminUser?.role === 'community_manager' ||
-        adminUser?.role === 'super_admin') && (
+      {(currentUser?.role === 'security_admin' ||
+        currentUser?.role === 'community_manager' ||
+        currentUser?.role === 'super_admin') && (
         <View
           style={{ paddingHorizontal: 16, marginTop: 24, marginBottom: 24 }}>
           <Text style={[adminStyles.adminSubheading, { marginBottom: 12 }]}>

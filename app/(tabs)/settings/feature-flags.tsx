@@ -30,7 +30,7 @@ import {
   ResponsiveRow,
   ResponsiveText,
 } from '@/components/ui/ResponsiveContainer';
-import { useFeatureFlagMigration } from '@/hooks/useFeatureFlagMigration';
+import { useFeatureFlagStore } from '@/stores/slices/featureFlagStore';
 import { FeatureGroup } from '@/contexts/FeatureFlagContext';
 import {
   FEATURE_FLAG_METADATA,
@@ -49,8 +49,10 @@ const FeatureGroupSection: React.FC<FeatureGroupSectionProps> = ({
   expanded,
   onToggleExpanded,
 }) => {
-  const { flags, isFeatureEnabled, enableFeature, disableFeature } =
-    useFeatureFlagMigration();
+  const flags = useFeatureFlagStore((state) => state.flags);
+  const isFeatureEnabled = useFeatureFlagStore((state) => state.isFeatureEnabled);
+  const enableFeature = useFeatureFlagStore((state) => state.enableFeature);
+  const disableFeature = useFeatureFlagStore((state) => state.disableFeature);
   const features = getFeaturesByGroup(group);
 
   const groupTitles = {
@@ -236,7 +238,10 @@ const FeatureGroupSection: React.FC<FeatureGroupSectionProps> = ({
 
 export default function FeatureFlagSettings() {
   const router = useRouter();
-  const { flags, updateFlags, resetToDefaults, isLoading } = useFeatureFlagMigration();
+  const flags = useFeatureFlagStore((state) => state.flags);
+  const updateFlags = useFeatureFlagStore((state) => state.updateFlags);
+  const resetToDefaults = useFeatureFlagStore((state) => state.resetToDefaults);
+  const isLoading = useFeatureFlagStore((state) => state.loading);
   const [expandedGroups, setExpandedGroups] = useState<Set<FeatureGroup>>(
     new Set(['billing', 'maintenance']),
   );

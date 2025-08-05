@@ -3,7 +3,7 @@ import {
   ResponsiveContainer,
   ResponsiveText,
 } from '@/components/ui/ResponsiveContainer';
-import { WithFeatureFlag, useFeature } from '@/contexts/FeatureFlagContext';
+import { useFeatureFlagStore } from '@/stores/slices/featureFlagStore';
 import { useRouter } from 'expo-router';
 import {
   BarChart3,
@@ -20,6 +20,7 @@ import { SafeAreaView, Text, TouchableOpacity, View } from 'react-native';
 
 export default function Services() {
   const router = useRouter();
+  const maintenanceTrackingEnabled = useFeatureFlagStore((state) => state.flags.maintenance_tracking);
 
   // Mock data for recent activities
   const recentRequests = [
@@ -93,7 +94,7 @@ export default function Services() {
         {/* Header was moved to TabHeader */}
 
         {/* Quick Actions */}
-        <WithFeatureFlag feature="maintenance_tracking">
+        {maintenanceTrackingEnabled && (
           <View className="mb-8">
             <ResponsiveText
               variant="headline"
@@ -112,7 +113,7 @@ export default function Services() {
               </ResponsiveText>
             </TouchableOpacity>
           </View>
-        </WithFeatureFlag>
+        )}
 
         {/* Main Services Grid */}
         <View className="mb-8">

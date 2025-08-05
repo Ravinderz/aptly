@@ -1,9 +1,10 @@
 // AuthStore - Zustand implementation for authentication state management
+import AuthService, { UserProfile } from '@/services/auth.service';
+import BiometricService from '@/services/biometric.service';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { create } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
 import { immer } from 'zustand/middleware/immer';
-import AuthService, { UserProfile, AuthResult } from '@/services/auth.service';
-import BiometricService from '@/services/biometric.service';
 import { BaseStore } from '../types';
 
 // State interface matching the existing AuthContext
@@ -12,10 +13,10 @@ interface AuthState extends BaseStore {
   user: UserProfile | null;
   isAuthenticated: boolean;
   isLoading: boolean;
-  
+
   // Biometric state
   biometricEnabled: boolean;
-  
+
   // Session information
   sessionId: string | null;
   lastLoginTime: number | null;
@@ -27,20 +28,20 @@ interface AuthActions {
   login: (user: UserProfile) => void;
   logout: () => Promise<void>;
   checkAuthStatus: () => Promise<void>;
-  
+
   // Biometric methods
   authenticateWithBiometrics: () => Promise<boolean>;
   isBiometricEnabled: () => Promise<boolean>;
   enableBiometric: () => Promise<void>;
   disableBiometric: () => Promise<void>;
-  
+
   // Profile methods
   updateProfile: (profile: Partial<UserProfile>) => Promise<void>;
   refreshUserData: () => Promise<void>;
-  
+
   // Token management
   refreshToken: () => Promise<void>;
-  
+
   // Utility methods
   clearError: () => void;
   setUser: (user: UserProfile | null) => void;
@@ -58,11 +59,20 @@ const initialState: AuthState = {
   biometricEnabled: false,
   sessionId: null,
   lastLoginTime: null,
+  setLoading: function (loading: boolean): void {
+    throw new Error('Function not implemented.');
+  },
+  setError: function (error: string | null): void {
+    throw new Error('Function not implemented.');
+  },
+  reset: function (): void {
+    throw new Error('Function not implemented.');
+  },
 };
 
 /**
  * AuthStore - Zustand store for authentication state management
- * 
+ *
  * Features:
  * - Automatic token refresh
  * - Biometric authentication support
@@ -70,12 +80,13 @@ const initialState: AuthState = {
  * - Error handling with automatic recovery
  * - DevTools integration for debugging
  */
+
 export const useAuthStore = create<AuthStore>()(
   devtools(
     persist(
       immer((set, get) => ({
         ...initialState,
-        
+
         // Authentication methods
         login: (userData: UserProfile) => {
           set((state) => {
@@ -87,18 +98,18 @@ export const useAuthStore = create<AuthStore>()(
             state.lastLoginTime = Date.now();
           });
         },
-        
+
         logout: async () => {
           try {
             set((state) => {
               state.loading = true;
               state.error = null;
             });
-            
+
             // Call service logout
             await AuthService.logout();
             await BiometricService.disableBiometricAuth();
-            
+
             // Reset state
             set((state) => {
               Object.assign(state, {
@@ -120,7 +131,7 @@ export const useAuthStore = create<AuthStore>()(
             });
           }
         },
-        
+
         checkAuthStatus: async () => {
           try {
             set((state) => {
@@ -128,23 +139,41 @@ export const useAuthStore = create<AuthStore>()(
               state.loading = true;
               state.error = null;
             });
-            
-            // Check if user has valid tokens
-            const isAuth = await AuthService.isAuthenticated();
-            
+
+            // Add timeout for auth check
+            const authCheckPromise = AuthService.isAuthenticated();
+            const timeoutPromise = new Promise((_, reject) => 
+              setTimeout(() => reject(new Error('Auth check timeout')), 10000)
+            );
+
+            const isAuth = await Promise.race([authCheckPromise, timeoutPromise]) as boolean;
+
             if (isAuth) {
-              // Try to get user profile
-              const storedProfile = await AuthService.getStoredProfile();
-              if (storedProfile) {
-                set((state) => {
-                  state.user = storedProfile;
-                  state.isAuthenticated = true;
-                  state.isLoading = false;
-                  state.loading = false;
-                });
-              } else {
-                // Try to fetch current user from API
-                const currentUser = await AuthService.getCurrentUser();
+              // Try to get user profile with timeout
+              try {
+                const storedProfile = await AuthService.getStoredProfile();
+                if (storedProfile) {
+                  set((state) => {
+                    state.user = storedProfile;
+                    state.isAuthenticated = true;
+                    state.isLoading = false;
+                    state.loading = false;
+                  });
+                  return;
+                }
+              } catch (profileError) {
+                console.warn('⚠️ Failed to get stored profile:', profileError);
+              }
+
+              // Try to fetch current user from API with timeout
+              try {
+                const userPromise = AuthService.getCurrentUser();
+                const userTimeoutPromise = new Promise((_, reject) => 
+                  setTimeout(() => reject(new Error('User fetch timeout')), 8000)
+                );
+                
+                const currentUser = await Promise.race([userPromise, userTimeoutPromise]) as any;
+                
                 if (currentUser) {
                   set((state) => {
                     state.user = currentUser;
@@ -160,6 +189,14 @@ export const useAuthStore = create<AuthStore>()(
                     state.loading = false;
                   });
                 }
+              } catch (userError) {
+                console.warn('⚠️ Failed to fetch current user, using authenticated state without profile:', userError);
+                set((state) => {
+                  state.isAuthenticated = true; // Keep authenticated but without user profile
+                  state.user = null;
+                  state.isLoading = false;
+                  state.loading = false;
+                });
               }
             } else {
               set((state) => {
@@ -170,17 +207,17 @@ export const useAuthStore = create<AuthStore>()(
               });
             }
           } catch (error: any) {
-            console.error('Auth check failed:', error);
+            console.warn('⚠️ Auth check failed, assuming unauthenticated:', error);
             set((state) => {
               state.isAuthenticated = false;
               state.user = null;
               state.isLoading = false;
               state.loading = false;
-              state.error = error.message || 'Authentication check failed';
+              state.error = null; // Don't set error for auth check failures
             });
           }
         },
-        
+
         // Biometric authentication methods
         authenticateWithBiometrics: async (): Promise<boolean> => {
           try {
@@ -188,9 +225,10 @@ export const useAuthStore = create<AuthStore>()(
               state.loading = true;
               state.error = null;
             });
-            
-            const biometricResult = await BiometricService.authenticateWithBiometrics();
-            
+
+            const biometricResult =
+              await BiometricService.authenticateWithBiometrics();
+
             if (biometricResult.success) {
               const userId = await BiometricService.getBiometricUserId();
               if (userId) {
@@ -210,7 +248,7 @@ export const useAuthStore = create<AuthStore>()(
                 }
               }
             }
-            
+
             set((state) => {
               state.loading = false;
             });
@@ -224,7 +262,7 @@ export const useAuthStore = create<AuthStore>()(
             return false;
           }
         },
-        
+
         isBiometricEnabled: async (): Promise<boolean> => {
           try {
             const enabled = await BiometricService.isBiometricEnabled();
@@ -237,15 +275,17 @@ export const useAuthStore = create<AuthStore>()(
             return false;
           }
         },
-        
+
         enableBiometric: async () => {
           try {
             set((state) => {
               state.loading = true;
               state.error = null;
             });
-            
-            const success = await BiometricService.enableBiometricAuth(get().user?.id || '');
+
+            const success = await BiometricService.enableBiometricAuth(
+              get().user?.id || '',
+            );
             if (success) {
               set((state) => {
                 state.biometricEnabled = true;
@@ -261,18 +301,19 @@ export const useAuthStore = create<AuthStore>()(
             console.error('Failed to enable biometric:', error);
             set((state) => {
               state.loading = false;
-              state.error = error.message || 'Failed to enable biometric authentication';
+              state.error =
+                error.message || 'Failed to enable biometric authentication';
             });
           }
         },
-        
+
         disableBiometric: async () => {
           try {
             set((state) => {
               state.loading = true;
               state.error = null;
             });
-            
+
             await BiometricService.disableBiometricAuth();
             set((state) => {
               state.biometricEnabled = false;
@@ -282,11 +323,12 @@ export const useAuthStore = create<AuthStore>()(
             console.error('Failed to disable biometric:', error);
             set((state) => {
               state.loading = false;
-              state.error = error.message || 'Failed to disable biometric authentication';
+              state.error =
+                error.message || 'Failed to disable biometric authentication';
             });
           }
         },
-        
+
         // Profile management
         updateProfile: async (profileUpdates: Partial<UserProfile>) => {
           try {
@@ -294,14 +336,14 @@ export const useAuthStore = create<AuthStore>()(
               state.loading = true;
               state.error = null;
             });
-            
+
             const currentUser = get().user;
             if (!currentUser) {
               throw new Error('No user logged in');
             }
-            
+
             const updatedProfile = { ...currentUser, ...profileUpdates };
-            
+
             // In a real app, this would make an API call
             // For now, just update local state
             set((state) => {
@@ -316,14 +358,14 @@ export const useAuthStore = create<AuthStore>()(
             });
           }
         },
-        
+
         refreshUserData: async () => {
           try {
             set((state) => {
               state.loading = true;
               state.error = null;
             });
-            
+
             const currentUser = await AuthService.getCurrentUser();
             if (currentUser) {
               set((state) => {
@@ -344,14 +386,14 @@ export const useAuthStore = create<AuthStore>()(
             });
           }
         },
-        
+
         // Token management
         refreshToken: async () => {
           try {
             set((state) => {
               state.error = null;
             });
-            
+
             const newTokens = await AuthService.refreshToken();
             if (!newTokens) {
               // Token refresh failed, logout user
@@ -366,21 +408,21 @@ export const useAuthStore = create<AuthStore>()(
             await get().logout();
           }
         },
-        
+
         // Utility methods
         clearError: () => {
           set((state) => {
             state.error = null;
           });
         },
-        
+
         setUser: (user: UserProfile | null) => {
           set((state) => {
             state.user = user;
             state.isAuthenticated = !!user;
           });
         },
-        
+
         // BaseStore methods
         setLoading: (loading: boolean) => {
           set((state) => {
@@ -388,13 +430,13 @@ export const useAuthStore = create<AuthStore>()(
             state.isLoading = loading;
           });
         },
-        
+
         setError: (error: string | null) => {
           set((state) => {
             state.error = error;
           });
         },
-        
+
         reset: () => {
           set((state) => {
             Object.assign(state, initialState);
@@ -403,6 +445,31 @@ export const useAuthStore = create<AuthStore>()(
       })),
       {
         name: 'auth-storage',
+        storage: {
+          getItem: async (name: string) => {
+            try {
+              const value = await AsyncStorage.getItem(name);
+              return value ? JSON.parse(value) : null;
+            } catch (error) {
+              console.warn(`Unable to get auth item '${name}', storage unavailable:`, error);
+              return null;
+            }
+          },
+          setItem: async (name: string, value: any) => {
+            try {
+              await AsyncStorage.setItem(name, JSON.stringify(value));
+            } catch (error) {
+              console.warn(`Unable to set auth item '${name}', storage unavailable:`, error);
+            }
+          },
+          removeItem: async (name: string) => {
+            try {
+              await AsyncStorage.removeItem(name);
+            } catch (error) {
+              console.warn(`Unable to remove auth item '${name}', storage unavailable:`, error);
+            }
+          },
+        },
         partialize: (state) => ({
           user: state.user,
           isAuthenticated: state.isAuthenticated,
@@ -410,40 +477,85 @@ export const useAuthStore = create<AuthStore>()(
           lastLoginTime: state.lastLoginTime,
         }),
         version: 1,
-      }
+        onRehydrateStorage: () => {
+          console.log('🔄 Starting rehydration for: auth-storage');
+          return (state, error) => {
+            if (error) {
+              console.error('❌ Error rehydrating auth-storage:', error);
+              // Clear any corrupted auth state
+              useAuthStore.setState({
+                user: null,
+                isAuthenticated: false,
+                biometricEnabled: false,
+                lastLoginTime: null,
+              });
+            } else {
+              console.log('✅ Successfully rehydrated: auth-storage');
+            }
+          };
+        },
+        // Handle migration errors gracefully
+        migrate: (persistedState: any, version: number) => {
+          try {
+            if (version === 0) {
+              // Migration from version 0 to 1
+              return {
+                ...persistedState,
+                biometricEnabled: persistedState.biometricEnabled || false,
+                lastLoginTime: persistedState.lastLoginTime || null,
+              };
+            }
+            return persistedState;
+          } catch (error) {
+            console.warn('Auth migration failed, using clean state:', error);
+            return {
+              user: null,
+              isAuthenticated: false,
+              biometricEnabled: false,
+              lastLoginTime: null,
+            };
+          }
+        },
+      },
     ),
-    { name: 'AuthStore' }
-  )
+    { name: 'AuthStore' },
+  ),
 );
 
 // Selectors for optimized subscriptions
 export const useAuthUser = () => useAuthStore((state) => state.user);
 export const useAuthLoading = () => useAuthStore((state) => state.isLoading);
 export const useAuthError = () => useAuthStore((state) => state.error);
-export const useIsAuthenticated = () => useAuthStore((state) => state.isAuthenticated);
-export const useIsBiometricEnabled = () => useAuthStore((state) => state.biometricEnabled);
+export const useIsAuthenticated = () =>
+  useAuthStore((state) => state.isAuthenticated);
+export const useIsBiometricEnabled = () =>
+  useAuthStore((state) => state.biometricEnabled);
 
-export const useAuthActions = () => useAuthStore((state) => ({
-  login: state.login,
-  logout: state.logout,
-  checkAuthStatus: state.checkAuthStatus,
-  authenticateWithBiometrics: state.authenticateWithBiometrics,
-  isBiometricEnabled: state.isBiometricEnabled,
-  enableBiometric: state.enableBiometric,
-  disableBiometric: state.disableBiometric,
-  updateProfile: state.updateProfile,
-  refreshUserData: state.refreshUserData,
-  refreshToken: state.refreshToken,
-  clearError: state.clearError,
-}));
+export const useAuthActions = () =>
+  useAuthStore((state) => ({
+    login: state.login,
+    logout: state.logout,
+    checkAuthStatus: state.checkAuthStatus,
+    authenticateWithBiometrics: state.authenticateWithBiometrics,
+    isBiometricEnabled: state.isBiometricEnabled,
+    enableBiometric: state.enableBiometric,
+    disableBiometric: state.disableBiometric,
+    updateProfile: state.updateProfile,
+    refreshUserData: state.refreshUserData,
+    refreshToken: state.refreshToken,
+    clearError: state.clearError,
+  }));
 
 // Computed selectors
-export const useAuthComputed = () => useAuthStore((state) => ({
-  isAuthenticated: state.isAuthenticated,
-  hasUser: !!state.user,
-  hasProfile: !!state.user?.fullName,
-  canAccessAdmin: state.user?.role === 'society_admin' || state.user?.role === 'committee_member',
-  isResident: state.user?.role === 'resident',
-  isLoading: state.isLoading,
-  hasError: !!state.error,
-}));
+export const useAuthComputed = () =>
+  useAuthStore((state) => ({
+    isAuthenticated: state.isAuthenticated,
+    hasUser: !!state.user,
+    hasProfile: !!state.user?.fullName,
+    canAccessAdmin:
+      state.user?.role === 'society_admin' ||
+      state.user?.role === 'committee_member',
+    isResident: state.user?.role === 'resident',
+    isLoading: state.isLoading,
+    hasError: !!state.error,
+  }));

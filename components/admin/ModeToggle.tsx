@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, Animated } from 'react-native';
 import { Shield, Home, ChevronDown } from 'lucide-react-native';
-import { useAdminMigration } from '@/hooks/useAdminMigration';
+import { useDirectAdmin } from '@/hooks/useDirectAdmin';
 import { adminTheme, adminStyles } from '@/utils/adminTheme';
 import { AdminRole } from '@/types/admin';
 
@@ -26,7 +26,7 @@ export const ModeToggle: React.FC<ModeToggleProps> = ({
     switchToAdminMode,
     switchToResidentMode,
     switchSociety,
-  } = useAdminMigration();
+  } = useDirectAdmin();
 
   const [societySelectorOpen, setSocietySelectorOpen] = React.useState(false);
   const scaleAnim = React.useRef(new Animated.Value(1)).current;
@@ -344,7 +344,7 @@ export const ModeToggle: React.FC<ModeToggleProps> = ({
 export const HeaderModeIndicator: React.FC<{ compact?: boolean }> = ({
   compact = true,
 }) => {
-  const { currentMode, isAdmin, adminUser } = useAdminMigration();
+  const { currentMode, isAdmin, adminUser } = useDirectAdmin();
 
   if (!isAdmin || currentMode === 'resident') {
     return null;

@@ -81,6 +81,4 @@ export const CardFooter: React.FC<ViewProps & { className?: string }> = ({
 
 CardFooter.displayName = 'CardFooter';
 
-Card.displayName = 'Card';
-
 export default Card;

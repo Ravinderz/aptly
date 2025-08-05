@@ -18,7 +18,7 @@ import {
   BarChart3,
   Clock,
 } from 'lucide-react-native';
-import { useAdminMigration } from '@/hooks/useAdminMigration';
+import { useDirectAdmin } from '@/hooks/useDirectAdmin';
 import { Society, AdminRole } from '@/types/admin';
 import SocietySelector from './SocietySelector';
 import { StatWidget, QuickActionWidget, AlertWidget } from './DashboardWidgets';
@@ -52,7 +52,7 @@ const MultiSocietyDashboard: React.FC = () => {
     availableSocieties,
     currentMode,
     checkPermission,
-  } = useAdminMigration();
+  } = useDirectAdmin();
 
   const [societyStats, setSocietyStats] = useState<MultiSocietyStats[]>([]);
   const [crossSocietyAlerts, setCrossSocietyAlerts] = useState<

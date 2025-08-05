@@ -1,8 +1,10 @@
-// Phase 7: Sub-Admin System & Multi-Society Support - Component Exports
+// Admin Module Component Exports - Enhanced with Zustand Integration
 
-// Core Admin Components (Phase 6)
+// Core Admin Components (Updated for Zustand)
 export { AdminDashboard } from './AdminDashboard';
-export { AdminHeader, SimpleAdminHeader } from './AdminHeader';
+export { AdminHeader } from './AdminHeader';
+export { DashboardMetrics } from './DashboardMetrics';
+export { SuperAdminGate } from './SuperAdminGate';
 export { AdminNavigation, QuickAdminNav } from './AdminNavigation';
 export {
   AdminLayout,

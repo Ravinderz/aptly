@@ -201,6 +201,15 @@ const initialState: SocietyState = {
   // Cache
   lastFetchTime: null,
   cacheExpiry: 5 * 60 * 1000, // 5 minutes
+  setLoading: function (loading: boolean): void {
+    throw new Error('Function not implemented.');
+  },
+  setError: function (error: string | null): void {
+    throw new Error('Function not implemented.');
+  },
+  reset: function (): void {
+    throw new Error('Function not implemented.');
+  },
 };
 
 // Mock society service (replace with actual service)

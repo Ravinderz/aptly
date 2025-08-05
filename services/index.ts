@@ -1,47 +1,56 @@
 // Main services exports for easy imports across the application
 
 // Core API service
+// Service instances for direct use
+import APIService from './api.service';
+import AuthService from './auth.service';
+import BillingService from './billing.service';
+import { communityApi } from './communityApi';
+import GovernanceService from './governance.service';
+import MaintenanceService from './maintenance.service';
+import NotificationService from './notification.service';
+
 export { APIService } from './api.service';
-export type { APIError, UploadResult, NetworkState } from './api.service';
+export type { APIError, NetworkState, UploadResult } from './api.service';
 
 // Authentication service
 export { AuthService } from './auth.service';
 export type { AuthResult, TokenPair, UserProfile } from './auth.service';
 
 // Community service
-export { communityApi } from './communityApi';
 export type {
-  Post,
   Comment,
-  CreatePostRequest,
   CreateCommentRequest,
+  CreatePostRequest,
+  Post,
   User,
 } from '@/types/community';
+export { communityApi } from './communityApi';
 
 // Billing service
 export { BillingService } from './billing.service';
 export type {
   Bill,
-  PaymentRecord,
-  BillPaymentRequest,
-  RechargeRequest,
   BillerInfo,
+  BillPaymentRequest,
   GSTCalculation,
+  PaymentRecord,
+  RechargeRequest,
 } from './billing.service';
 
 // Governance service
 export { GovernanceService } from './governance.service';
 export type {
-  Proposal,
-  VotingResults,
-  Vote,
-  Meeting,
   AgendaItem,
+  Announcement,
   Attendee,
   Committee,
   CommitteeMember,
-  Announcement,
   Complaint,
+  Meeting,
+  Proposal,
+  Vote,
+  VotingResults,
 } from './governance.service';
 
 // Notification service
@@ -56,30 +65,21 @@ export type {
 // Maintenance service
 export { MaintenanceService } from './maintenance.service';
 export type {
+  ChecklistItem,
+  MaintenanceAnalytics,
   MaintenanceRequest,
   MaintenanceStaff,
-  Vendor,
-  MaintenanceAnalytics,
   ScheduledMaintenance,
-  ChecklistItem,
+  Vendor,
 } from './maintenance.service';
 
 // Biometric service (existing)
 export { BiometricService } from './biometric.service';
 
 // Admin services (existing)
-export * from './admin/adminAuthService';
+// export * from './admin/adminAuthService';
 export * from './admin/authService';
 export * from './admin/roleManager';
-
-// Service instances for direct use
-import APIService from './api.service';
-import AuthService from './auth.service';
-import { communityApi } from './communityApi';
-import BillingService from './billing.service';
-import GovernanceService from './governance.service';
-import NotificationService from './notification.service';
-import MaintenanceService from './maintenance.service';
 
 export const services = {
   api: APIService,

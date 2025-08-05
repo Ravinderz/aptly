@@ -30,8 +30,8 @@ export interface SyncAction<T = void> {
   (payload: T): void;
 }
 
-// Import the actual FeatureFlags type from context
-export type { FeatureFlags, FeatureGroup } from '@/contexts/FeatureFlagContext';
+// Import the actual FeatureFlags type from the separate types file
+export type { FeatureFlags, FeatureGroup } from '../types/featureFlags';
 
 // Migration feature flag keys - these will be added to the existing FeatureFlags
 export const MIGRATION_FEATURE_FLAGS = {

@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback, useRef } from 'react';
 import { View, ActivityIndicator } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useAuthMigration } from '@/hooks/useAuthMigration';
+import { useDirectAuth } from '@/hooks/useDirectAuth';
 import { useRouter, useSegments } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 
@@ -10,80 +10,122 @@ const AppNavigator: React.FC<{ children: React.ReactNode }> = ({
 }) => {
   const [isFirstLaunch, setIsFirstLaunch] = useState<boolean | null>(null);
   const [isCheckingFirstLaunch, setIsCheckingFirstLaunch] = useState(true);
-  const { isAuthenticated, isLoading } = useAuthMigration();
+  const [hasNavigated, setHasNavigated] = useState(false);
+  
+  // Use the hook only once to prevent multiple subscriptions
+  const auth = useDirectAuth();
+  const { isAuthenticated, isLoading } = auth;
+  
   const router = useRouter();
   const segments = useSegments();
+  const navigationTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-  // Check if this is the first launch
-  useEffect(() => {
-    const checkFirstLaunch = async () => {
-      try {
-        const hasLaunchedBefore =
-          await AsyncStorage.getItem('hasLaunchedBefore');
+  // Memoize first launch check to prevent re-runs
+  const checkFirstLaunch = useCallback(async () => {
+    try {
+      const hasLaunchedBefore = await AsyncStorage.getItem('hasLaunchedBefore');
 
-        if (hasLaunchedBefore === null) {
-          // First launch
-          setIsFirstLaunch(true);
-          await AsyncStorage.setItem('hasLaunchedBefore', 'true');
-        } else {
-          // Not first launch
-          setIsFirstLaunch(false);
-        }
-      } catch (error) {
-        console.error('Error checking first launch:', error);
+      if (hasLaunchedBefore === null) {
+        // First launch
+        setIsFirstLaunch(true);
+        await AsyncStorage.setItem('hasLaunchedBefore', 'true');
+      } else {
+        // Not first launch
         setIsFirstLaunch(false);
-      } finally {
-        setIsCheckingFirstLaunch(false);
       }
-    };
-
-    checkFirstLaunch();
+    } catch (error) {
+      console.error('Error checking first launch:', error);
+      setIsFirstLaunch(false);
+    } finally {
+      setIsCheckingFirstLaunch(false);
+    }
   }, []);
 
-  // Handle navigation based on auth status and first launch
+  // Check if this is the first launch (only run once)
   useEffect(() => {
-    if (isCheckingFirstLaunch || isLoading) return;
-
-    // Hide splash screen when we're done loading
-    SplashScreen.hideAsync();
-
-    const inAuthGroup = segments[0] === 'auth';
-    const inTabsGroup = segments[0] === '(tabs)';
-    const onWelcomePage = segments[0] === 'welcome';
-    const onIndexPage = segments.length === 0 || segments[0] === 'index';
-
-    // If first launch and not on index (onboarding), navigate to onboarding
-    if (isFirstLaunch && !onIndexPage) {
-      router.replace('/');
-      return;
-    }
-
-    // If not first launch and not authenticated
-    if (!isFirstLaunch && !isAuthenticated) {
-      if (!inAuthGroup && !onWelcomePage) {
-        router.replace('/welcome');
+    let isMounted = true;
+    
+    const runCheck = async () => {
+      if (isMounted) {
+        await checkFirstLaunch();
       }
-      return;
+    };
+    
+    runCheck();
+    
+    return () => {
+      isMounted = false;
+    };
+  }, [checkFirstLaunch]);
+
+  // Stable navigation handler to prevent infinite loops
+  const handleNavigation = useCallback(() => {
+    // Prevent multiple navigation attempts
+    if (hasNavigated || isCheckingFirstLaunch || isLoading) return;
+
+    // Clear any existing timeout
+    if (navigationTimeoutRef.current) {
+      clearTimeout(navigationTimeoutRef.current);
     }
 
-    // If authenticated and in auth group or welcome, navigate to tabs
-    if (isAuthenticated && (inAuthGroup || onWelcomePage || onIndexPage)) {
-      router.replace('/(tabs)');
-      return;
-    }
+    // Use timeout to prevent rapid navigation calls
+    navigationTimeoutRef.current = setTimeout(() => {
+      // Hide splash screen when we're done loading
+      SplashScreen.hideAsync().catch(console.error);
 
-    // If not first launch, not authenticated, and on index page, go to welcome
-    if (!isFirstLaunch && !isAuthenticated && onIndexPage) {
-      router.replace('/welcome');
-      return;
-    }
+      const inAuthGroup = segments[0] === 'auth';
+      const inTabsGroup = segments[0] === '(tabs)';
+      const onWelcomePage = segments[0] === 'welcome';
+      const onIndexPage = segments.length === 0 || segments[0] === 'index';
+
+      let shouldNavigate = false;
+      let targetRoute = '';
+
+      // Determine navigation target
+      if (isFirstLaunch && !onIndexPage) {
+        shouldNavigate = true;
+        targetRoute = '/';
+      } else if (!isFirstLaunch && !isAuthenticated && !inAuthGroup && !onWelcomePage) {
+        shouldNavigate = true;
+        targetRoute = '/welcome';
+      } else if (isAuthenticated && (inAuthGroup || onWelcomePage || onIndexPage)) {
+        shouldNavigate = true;
+        targetRoute = '/(tabs)';
+      } else if (!isFirstLaunch && !isAuthenticated && onIndexPage) {
+        shouldNavigate = true;
+        targetRoute = '/welcome';
+      }
+
+      // Perform navigation if needed
+      if (shouldNavigate && targetRoute) {
+        setHasNavigated(true);
+        router.replace(targetRoute);
+        
+        // Reset navigation flag after a delay to allow for future navigation if needed
+        setTimeout(() => setHasNavigated(false), 2000);
+      }
+    }, 100);
   }, [
-    isAuthenticated,
+    hasNavigated,
+    isCheckingFirstLaunch,
     isLoading,
     isFirstLaunch,
-    isCheckingFirstLaunch,
+    isAuthenticated,
     segments,
+    router,
   ]);
+
+  // Handle navigation with debouncing
+  useEffect(() => {
+    handleNavigation();
+
+    // Cleanup timeout on unmount
+    return () => {
+      if (navigationTimeoutRef.current) {
+        clearTimeout(navigationTimeoutRef.current);
+      }
+    };
+  }, [handleNavigation]);
 
   // Show loading spinner while checking auth or first launch
   if (isCheckingFirstLaunch || isLoading) {

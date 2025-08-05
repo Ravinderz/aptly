@@ -1,8 +1,8 @@
 // ThemeStore - Zustand implementation for theme management
+import { adminTheme } from '@/utils/adminTheme';
 import { create } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
 import { immer } from 'zustand/middleware/immer';
-import { adminTheme, residentTheme, type AdminThemeColors } from '@/utils/adminTheme';
 import { BaseStore } from '../types';
 
 // Theme mode type
@@ -135,12 +135,12 @@ interface ThemeState extends BaseStore {
   userMode: UserMode;
   colors: ColorScheme;
   systemThemeDetected: ThemeMode;
-  
+
   // Theme preferences
   followSystemTheme: boolean;
   adminThemeEnabled: boolean;
   highContrastMode: boolean;
-  
+
   // Custom theme support
   customColors: Partial<ColorScheme>;
   hasCustomTheme: boolean;
@@ -152,20 +152,20 @@ interface ThemeActions {
   setThemeMode: (mode: ThemeMode) => void;
   toggleTheme: () => void;
   setSystemTheme: (systemMode: ThemeMode) => void;
-  
+
   // User mode control
   setUserMode: (mode: UserMode) => void;
   toggleUserMode: () => void;
-  
+
   // Theme preferences
   setFollowSystemTheme: (follow: boolean) => void;
   setHighContrastMode: (enabled: boolean) => void;
-  
+
   // Custom theme support
   updateCustomColors: (colors: Partial<ColorScheme>) => void;
   resetCustomColors: () => void;
   applyPresetTheme: (preset: 'light' | 'dark' | 'admin') => void;
-  
+
   // Utility methods
   getCurrentColors: () => ColorScheme;
   getStatusColor: (status: string) => string;
@@ -176,30 +176,31 @@ type ThemeStore = ThemeState & ThemeActions;
 
 // Get colors based on current theme settings
 const getColorsForTheme = (
-  themeMode: ThemeMode, 
-  userMode: UserMode, 
+  themeMode: ThemeMode,
+  userMode: UserMode,
   systemTheme: ThemeMode,
   followSystem: boolean,
-  customColors: Partial<ColorScheme>
+  customColors: Partial<ColorScheme>,
 ): ColorScheme => {
   let baseColors: ColorScheme;
-  
+
   // Determine effective theme mode
   const effectiveMode = followSystem ? systemTheme : themeMode;
-  
+
   // Select base color scheme
   if (userMode === 'admin') {
     baseColors = adminColorScheme;
   } else {
     baseColors = effectiveMode === 'dark' ? darkColorScheme : lightColorScheme;
   }
-  
+
   // Apply custom colors if any
   return { ...baseColors, ...customColors };
 };
 
 // Initial state
-const getInitialColors = () => getColorsForTheme('light', 'resident', 'light', false, {});
+const getInitialColors = () =>
+  getColorsForTheme('light', 'resident', 'light', false, {});
 
 const initialState: ThemeState = {
   themeMode: 'system',
@@ -213,11 +214,20 @@ const initialState: ThemeState = {
   hasCustomTheme: false,
   loading: false,
   error: null,
+  setLoading: function (loading: boolean): void {
+    throw new Error('Function not implemented.');
+  },
+  setError: function (error: string | null): void {
+    throw new Error('Function not implemented.');
+  },
+  reset: function (): void {
+    throw new Error('Function not implemented.');
+  },
 };
 
 /**
  * ThemeStore - Zustand store for theme management
- * 
+ *
  * Features:
  * - Light/Dark theme support
  * - Admin/Resident theme modes
@@ -231,7 +241,7 @@ export const useThemeStore = create<ThemeStore>()(
     persist(
       immer((set, get) => ({
         ...initialState,
-        
+
         // Theme mode control
         setThemeMode: (mode: ThemeMode) => {
           set((state) => {
@@ -242,17 +252,17 @@ export const useThemeStore = create<ThemeStore>()(
               state.userMode,
               state.systemThemeDetected,
               state.followSystemTheme,
-              state.customColors
+              state.customColors,
             );
           });
         },
-        
+
         toggleTheme: () => {
           const currentMode = get().themeMode;
           const newMode = currentMode === 'light' ? 'dark' : 'light';
           get().setThemeMode(newMode);
         },
-        
+
         setSystemTheme: (systemMode: ThemeMode) => {
           set((state) => {
             state.systemThemeDetected = systemMode;
@@ -262,12 +272,12 @@ export const useThemeStore = create<ThemeStore>()(
                 state.userMode,
                 systemMode,
                 state.followSystemTheme,
-                state.customColors
+                state.customColors,
               );
             }
           });
         },
-        
+
         // User mode control
         setUserMode: (mode: UserMode) => {
           set((state) => {
@@ -278,17 +288,17 @@ export const useThemeStore = create<ThemeStore>()(
               mode,
               state.systemThemeDetected,
               state.followSystemTheme,
-              state.customColors
+              state.customColors,
             );
           });
         },
-        
+
         toggleUserMode: () => {
           const currentMode = get().userMode;
           const newMode = currentMode === 'resident' ? 'admin' : 'resident';
           get().setUserMode(newMode);
         },
-        
+
         // Theme preferences
         setFollowSystemTheme: (follow: boolean) => {
           set((state) => {
@@ -301,11 +311,11 @@ export const useThemeStore = create<ThemeStore>()(
               state.userMode,
               state.systemThemeDetected,
               follow,
-              state.customColors
+              state.customColors,
             );
           });
         },
-        
+
         setHighContrastMode: (enabled: boolean) => {
           set((state) => {
             state.highContrastMode = enabled;
@@ -314,8 +324,14 @@ export const useThemeStore = create<ThemeStore>()(
               // Apply high contrast modifications
               state.colors = {
                 ...state.colors,
-                textPrimary: state.colors.textPrimary === lightColorScheme.textPrimary ? '#000000' : '#ffffff',
-                border: state.colors.border === lightColorScheme.border ? '#000000' : '#ffffff',
+                textPrimary:
+                  state.colors.textPrimary === lightColorScheme.textPrimary
+                    ? '#000000'
+                    : '#ffffff',
+                border:
+                  state.colors.border === lightColorScheme.border
+                    ? '#000000'
+                    : '#ffffff',
               };
             } else {
               // Restore normal colors
@@ -324,12 +340,12 @@ export const useThemeStore = create<ThemeStore>()(
                 state.userMode,
                 state.systemThemeDetected,
                 state.followSystemTheme,
-                state.customColors
+                state.customColors,
               );
             }
           });
         },
-        
+
         // Custom theme support
         updateCustomColors: (colors: Partial<ColorScheme>) => {
           set((state) => {
@@ -340,11 +356,11 @@ export const useThemeStore = create<ThemeStore>()(
               state.userMode,
               state.systemThemeDetected,
               state.followSystemTheme,
-              state.customColors
+              state.customColors,
             );
           });
         },
-        
+
         resetCustomColors: () => {
           set((state) => {
             state.customColors = {};
@@ -354,11 +370,11 @@ export const useThemeStore = create<ThemeStore>()(
               state.userMode,
               state.systemThemeDetected,
               state.followSystemTheme,
-              {}
+              {},
             );
           });
         },
-        
+
         applyPresetTheme: (preset: 'light' | 'dark' | 'admin') => {
           set((state) => {
             switch (preset) {
@@ -377,7 +393,7 @@ export const useThemeStore = create<ThemeStore>()(
                 state.adminThemeEnabled = true;
                 break;
             }
-            
+
             state.customColors = {};
             state.hasCustomTheme = false;
             state.colors = getColorsForTheme(
@@ -385,16 +401,16 @@ export const useThemeStore = create<ThemeStore>()(
               state.userMode,
               state.systemThemeDetected,
               state.followSystemTheme,
-              state.customColors
+              state.customColors,
             );
           });
         },
-        
+
         // Utility methods
         getCurrentColors: (): ColorScheme => {
           return get().colors;
         },
-        
+
         getStatusColor: (status: string): string => {
           const colors = get().colors;
           const statusColors: Record<string, string> = {
@@ -402,26 +418,26 @@ export const useThemeStore = create<ThemeStore>()(
             approved: colors.success,
             completed: colors.success,
             published: colors.success,
-            
+
             warning: colors.warning,
             pending: colors.warning,
             in_progress: colors.warning,
             high_priority: colors.warning,
-            
+
             error: colors.error,
             danger: colors.error,
             rejected: colors.error,
             overdue: colors.error,
             emergency: colors.error,
-            
+
             info: colors.info,
             draft: colors.info,
             normal: colors.textSecondary,
           };
-          
+
           return statusColors[status] || colors.textSecondary;
         },
-        
+
         refreshTheme: () => {
           const state = get();
           set((draft) => {
@@ -430,24 +446,24 @@ export const useThemeStore = create<ThemeStore>()(
               state.userMode,
               state.systemThemeDetected,
               state.followSystemTheme,
-              state.customColors
+              state.customColors,
             );
           });
         },
-        
+
         // BaseStore methods
         setLoading: (loading: boolean) => {
           set((state) => {
             state.loading = loading;
           });
         },
-        
+
         setError: (error: string | null) => {
           set((state) => {
             state.error = error;
           });
         },
-        
+
         reset: () => {
           set((state) => {
             Object.assign(state, initialState);
@@ -466,45 +482,53 @@ export const useThemeStore = create<ThemeStore>()(
           hasCustomTheme: state.hasCustomTheme,
         }),
         version: 1,
-      }
+      },
     ),
-    { name: 'ThemeStore' }
-  )
+    { name: 'ThemeStore' },
+  ),
 );
 
 // Selectors for optimized subscriptions
 export const useThemeMode = () => useThemeStore((state) => state.themeMode);
 export const useUserMode = () => useThemeStore((state) => state.userMode);
 export const useThemeColors = () => useThemeStore((state) => state.colors);
-export const useIsAdminTheme = () => useThemeStore((state) => state.userMode === 'admin');
-export const useIsDarkTheme = () => useThemeStore((state) => {
-  const { themeMode, systemThemeDetected, followSystemTheme } = state;
-  const effectiveMode = followSystemTheme ? systemThemeDetected : themeMode;
-  return effectiveMode === 'dark';
-});
+export const useIsAdminTheme = () =>
+  useThemeStore((state) => state.userMode === 'admin');
+export const useIsDarkTheme = () =>
+  useThemeStore((state) => {
+    const { themeMode, systemThemeDetected, followSystemTheme } = state;
+    const effectiveMode = followSystemTheme ? systemThemeDetected : themeMode;
+    return effectiveMode === 'dark';
+  });
 
-export const useThemeActions = () => useThemeStore((state) => ({
-  setThemeMode: state.setThemeMode,
-  toggleTheme: state.toggleTheme,
-  setUserMode: state.setUserMode,
-  toggleUserMode: state.toggleUserMode,
-  setFollowSystemTheme: state.setFollowSystemTheme,
-  setHighContrastMode: state.setHighContrastMode,
-  updateCustomColors: state.updateCustomColors,
-  resetCustomColors: state.resetCustomColors,
-  applyPresetTheme: state.applyPresetTheme,
-  getStatusColor: state.getStatusColor,
-  refreshTheme: state.refreshTheme,
-}));
+export const useThemeActions = () =>
+  useThemeStore((state) => ({
+    setThemeMode: state.setThemeMode,
+    toggleTheme: state.toggleTheme,
+    setUserMode: state.setUserMode,
+    toggleUserMode: state.toggleUserMode,
+    setFollowSystemTheme: state.setFollowSystemTheme,
+    setHighContrastMode: state.setHighContrastMode,
+    updateCustomColors: state.updateCustomColors,
+    resetCustomColors: state.resetCustomColors,
+    applyPresetTheme: state.applyPresetTheme,
+    getStatusColor: state.getStatusColor,
+    refreshTheme: state.refreshTheme,
+  }));
 
 // Computed selectors
-export const useThemeComputed = () => useThemeStore((state) => ({
-  isDarkMode: (() => {
-    const effectiveMode = state.followSystemTheme ? state.systemThemeDetected : state.themeMode;
-    return effectiveMode === 'dark';
-  })(),
-  isAdminMode: state.userMode === 'admin',
-  isSystemTheme: state.themeMode === 'system',
-  hasCustomization: state.hasCustomTheme || state.highContrastMode,
-  effectiveTheme: state.followSystemTheme ? state.systemThemeDetected : state.themeMode,
-}));
+export const useThemeComputed = () =>
+  useThemeStore((state) => ({
+    isDarkMode: (() => {
+      const effectiveMode = state.followSystemTheme
+        ? state.systemThemeDetected
+        : state.themeMode;
+      return effectiveMode === 'dark';
+    })(),
+    isAdminMode: state.userMode === 'admin',
+    isSystemTheme: state.themeMode === 'system',
+    hasCustomization: state.hasCustomTheme || state.highContrastMode,
+    effectiveTheme: state.followSystemTheme
+      ? state.systemThemeDetected
+      : state.themeMode,
+  }));

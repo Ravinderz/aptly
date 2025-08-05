@@ -16,18 +16,19 @@ import {
   ResponsiveRow,
   ResponsiveText,
 } from '@/components/ui/ResponsiveContainer';
-import { WithFeatureFlag } from '@/contexts/FeatureFlagContext';
 import LucideIcons from '@/components/ui/LucideIcons';
 import AuthService from '@/services/auth.service';
 import BiometricService from '@/services/biometric.service';
-import { useAuthMigration } from '@/hooks/useAuthMigration';
+import { useDirectAuth } from '@/hooks/useDirectAuth';
+import { useFeatureFlagStore } from '@/stores/slices/featureFlagStore';
 import { showErrorAlert } from '@/utils/alert';
 import { responsive, responsiveClasses, layoutUtils } from '@/utils/responsive';
 
 export default function PhoneRegistration() {
   const router = useRouter();
   const { mode } = useLocalSearchParams<{ mode?: string }>();
-  const { authenticateWithBiometrics } = useAuthMigration();
+  const { authenticateWithBiometrics } = useDirectAuth();
+  const biometricAuthEnabled = useFeatureFlagStore((state) => state.flags.biometric_auth);
   const isSignIn = mode === 'signin';
   const [phoneNumber, setPhoneNumber] = useState('');
   const [societyCode, setSocietyCode] = useState('');
@@ -371,8 +372,7 @@ export default function PhoneRegistration() {
           </Button>
 
           {/* Biometric Login Option */}
-          <WithFeatureFlag feature="biometric_auth">
-            {showBiometricOption && (
+          {biometricAuthEnabled && showBiometricOption && (
               <View className="mb-6">
                 <View className="flex-row items-center mb-4">
                   <View className="flex-1 h-px bg-divider" />
@@ -404,7 +404,6 @@ export default function PhoneRegistration() {
                 </TouchableOpacity>
               </View>
             )}
-          </WithFeatureFlag>
 
           {/* Help Section */}
           <View className="bg-primary/5 rounded-xl p-4 mt-4">

@@ -1,6 +1,6 @@
 import React, { ReactNode } from 'react';
 import { View, Text, TouchableOpacity } from 'react-native';
-import { useAdminMigration } from '@/hooks/useAdminMigration';
+import { useDirectAdmin } from '@/hooks/useDirectAdmin';
 import { AdminRole } from '@/types/admin';
 
 interface RoleBasedRendererProps {
@@ -32,7 +32,7 @@ export const RoleBasedRenderer: React.FC<RoleBasedRendererProps> = ({
   fallback,
   showFallback = false,
 }) => {
-  const { adminUser, currentMode } = useAdminMigration();
+  const { adminUser, currentMode } = useDirectAdmin();
 
   if (currentMode !== 'admin' || !adminUser) {
     return showFallback ? fallback || null : null;
@@ -53,7 +53,7 @@ export const RoleBasedRenderer: React.FC<RoleBasedRendererProps> = ({
  * RoleVariants - Renders different content based on specific roles
  */
 export const RoleVariants: React.FC<RoleVariantProps> = (props) => {
-  const { adminUser, currentMode } = useAdminMigration();
+  const { adminUser, currentMode } = useDirectAdmin();
   const { default: defaultContent, ...roleContent } = props;
 
   if (currentMode !== 'admin' || !adminUser) {
@@ -74,7 +74,7 @@ export const ConditionalRender: React.FC<ConditionalRenderProps> = ({
   condition,
   fallback,
 }) => {
-  const { adminUser, currentMode } = useAdminMigration();
+  const { adminUser, currentMode } = useDirectAdmin();
 
   if (currentMode !== 'admin' || !adminUser) {
     return fallback ? <>{fallback}</> : null;
@@ -131,7 +131,7 @@ export const withRoleContext = <P extends object>(
   Component: React.ComponentType<P & { userRole: AdminRole; isAdmin: boolean }>,
 ) => {
   return (props: P) => {
-    const { adminUser, currentMode } = useAdminMigration();
+    const { adminUser, currentMode } = useDirectAdmin();
 
     return (
       <Component
@@ -165,7 +165,7 @@ export const PermissionButton: React.FC<PermissionButtonProps> = ({
   className = '',
   children,
 }) => {
-  const { checkPermission, adminUser } = useAdminMigration();
+  const { checkPermission, adminUser } = useDirectAdmin();
 
   // Check role requirements
   if (roles && adminUser && !roles.includes(adminUser.role)) {
@@ -203,7 +203,7 @@ export const RoleBadge: React.FC<RoleBadgeProps> = ({
   size = 'md',
   showIcon = true,
 }) => {
-  const { adminUser } = useAdminMigration();
+  const { adminUser } = useDirectAdmin();
   const displayRole = role || adminUser?.role;
 
   if (!displayRole) return null;
@@ -280,7 +280,7 @@ export const EscalationPath: React.FC<EscalationPathProps> = ({
   issue,
   currentRole,
 }) => {
-  const { getEscalationPath, adminUser } = useAdminMigration();
+  const { getEscalationPath, adminUser } = useDirectAdmin();
   const role = currentRole || adminUser?.role;
 
   if (!role) return null;
@@ -326,23 +326,22 @@ interface MultiSocietyRoleProps {
 export const MultiSocietyRole: React.FC<MultiSocietyRoleProps> = ({
   societyId,
 }) => {
-  const { adminUser, activeSociety } = useAdminMigration();
+  const { adminUser, activeSociety } = useDirectAdmin();
 
   if (!adminUser) return null;
 
   const targetSocietyId = societyId || activeSociety?.id;
-  const societyAccess = adminUser.societies.find(
-    (s) => s.societyId === targetSocietyId,
-  );
+  // Note: AdminUser.assignedSocieties is an array of IDs, not objects
+  const hasAccessToSociety = adminUser.assignedSocieties.includes(targetSocietyId || '');
 
-  if (!societyAccess) return null;
+  if (!hasAccessToSociety) return null;
 
   return (
     <View className="flex-row items-center">
-      <RoleBadge role={societyAccess.role} size="sm" />
-      {adminUser.societies.length > 1 && (
+      <RoleBadge role={adminUser.role} size="sm" />
+      {adminUser.assignedSocieties.length > 1 && (
         <Text className="text-text-secondary text-xs ml-2">
-          in {societyAccess.societyName}
+          in {activeSociety?.name || 'Current Society'}
         </Text>
       )}
     </View>

@@ -11,8 +11,8 @@ import {
   AlertTriangle,
   X,
 } from 'lucide-react-native';
-import { useAdminMigration } from '@/hooks/useAdminMigration';
-import { useSocietyMigration } from '@/hooks/useSocietyMigration';
+import { useDirectAdmin } from '@/hooks/useDirectAdmin';
+import { useDirectSociety } from '@/hooks/useDirectSociety';
 import { AdminRole } from '@/types/admin';
 import SocietySelector from './SocietySelector';
 import { RoleBadge, MultiSocietyRole } from './RoleBasedRenderer';
@@ -56,9 +56,9 @@ const AdaptiveAdminLayout: React.FC<AdaptiveAdminLayoutProps> = ({
     switchToResidentMode,
     activeSociety,
     checkPermission,
-  } = useAdminMigration();
+  } = useDirectAdmin();
 
-  const { currentSociety } = useSocietyMigration();
+  const { currentSociety } = useDirectSociety();
   const [showNotificationPanel, setShowNotificationPanel] = useState(false);
   const [showUserMenu, setShowUserMenu] = useState(false);
 

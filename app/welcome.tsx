@@ -1,7 +1,7 @@
 import { Button } from '@/components/ui/Button';
 import HighlightCard from '@/components/ui/HighlightCard';
 import LucideIcons from '@/components/ui/LucideIcons';
-import { useAuthMigration } from '@/hooks/useAuthMigration';
+import { useDirectAuth } from '@/hooks/useDirectAuth';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useRouter } from 'expo-router';
 import React from 'react';
@@ -15,7 +15,7 @@ import {
 
 export default function Welcome() {
   const router = useRouter();
-  const { login } = useAuthMigration();
+  const { login } = useDirectAuth();
 
   const handleDevSkip = async () => {
     try {
@@ -56,6 +56,99 @@ export default function Welcome() {
     }
   };
 
+  const handleAdminLogin = async () => {
+    try {
+      // Create mock super admin user data for development
+      const mockAdminProfile = {
+        id: 'super-admin-123',
+        name: 'Admin Smith',
+        phone: '9876543210',
+        email: 'admin@aptly.app',
+        role: 'super_admin',
+        permissions: [
+          'system.admin',
+          'societies.create',
+          'societies.update', 
+          'societies.delete',
+          'societies.view_all',
+          'managers.assign',
+          'managers.remove',
+          'managers.view_performance',
+          'onboarding.review',
+          'onboarding.approve',
+          'reports.view_all'
+        ],
+        isVerified: true,
+        avatar: null,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      };
+
+      const mockTokens = {
+        accessToken: 'mock-admin-token-123',
+        refreshToken: 'mock-admin-refresh-123',
+      };
+
+      // Store mock admin data in AsyncStorage
+      await AsyncStorage.multiSet([
+        ['auth_tokens', JSON.stringify(mockTokens)],
+        ['user_profile', JSON.stringify(mockAdminProfile)],
+      ]);
+
+      // Update auth context
+      login(mockAdminProfile);
+
+      // Navigate to admin dashboard
+      router.replace('/admin/dashboard');
+    } catch (error) {
+      console.error('Error setting up admin mode:', error);
+    }
+  };
+
+  const handleCommunityManagerLogin = async () => {
+    try {
+      // Create mock community manager user data for development
+      const mockManagerProfile = {
+        id: 'manager-123',
+        name: 'Manager Johnson',
+        phone: '9876543210',
+        email: 'manager@aptly.app',
+        role: 'community_manager',
+        assignedSocieties: ['dev-society-123', 'society-456'],
+        permissions: [
+          'society.manage',
+          'residents.view',
+          'notices.create',
+          'billing.manage',
+          'maintenance.handle'
+        ],
+        isVerified: true,
+        avatar: null,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      };
+
+      const mockTokens = {
+        accessToken: 'mock-manager-token-123',
+        refreshToken: 'mock-manager-refresh-123',
+      };
+
+      // Store mock manager data in AsyncStorage
+      await AsyncStorage.multiSet([
+        ['auth_tokens', JSON.stringify(mockTokens)],
+        ['user_profile', JSON.stringify(mockManagerProfile)],
+      ]);
+
+      // Update auth context
+      login(mockManagerProfile);
+
+      // Navigate to home (managers use regular app with elevated permissions)
+      router.replace('/(tabs)');
+    } catch (error) {
+      console.error('Error setting up manager mode:', error);
+    }
+  };
+
   const features = [
     {
       icon: <LucideIcons name="building" size={32} color="#6366f1" />,
@@ -81,17 +174,37 @@ export default function Welcome() {
 
   return (
     <SafeAreaView className="flex-1 bg-background">
-      {/* Development Skip Button */}
+      {/* Development Login Buttons */}
       {/* {__DEV__ && ( */}
       {
-        <View className="absolute top-12 right-4 z-10">
+        <View className="absolute top-12 right-4 z-10 space-y-2">
+          <TouchableOpacity
+            onPress={handleAdminLogin}
+            className="bg-red-500/90 rounded-full px-3 py-2 flex-row items-center shadow-sm"
+            activeOpacity={0.8}>
+            <LucideIcons name="shield-outline" size={16} color="white" />
+            <Text className="text-white text-label-large font-bold ml-1">
+              ADMIN LOGIN
+            </Text>
+          </TouchableOpacity>
+          
+          <TouchableOpacity
+            onPress={handleCommunityManagerLogin}
+            className="bg-blue-500/90 rounded-full px-3 py-2 flex-row items-center shadow-sm"
+            activeOpacity={0.8}>
+            <LucideIcons name="people" size={16} color="white" />
+            <Text className="text-white text-label-large font-bold ml-1">
+              MANAGER
+            </Text>
+          </TouchableOpacity>
+          
           <TouchableOpacity
             onPress={handleDevSkip}
             className="bg-warning/90 rounded-full px-3 py-2 flex-row items-center shadow-sm"
             activeOpacity={0.8}>
             <LucideIcons name="zap" size={16} color="white" />
             <Text className="text-white text-label-large font-bold ml-1">
-              DEV SKIP
+              RESIDENT
             </Text>
           </TouchableOpacity>
         </View>

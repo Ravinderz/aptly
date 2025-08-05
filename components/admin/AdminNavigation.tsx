@@ -18,7 +18,7 @@ import {
   Eye,
   ChevronRight,
 } from 'lucide-react-native';
-import { useAdminMigration } from '@/hooks/useAdminMigration';
+import { useDirectAdmin } from '@/hooks/useDirectAdmin';
 import { adminTheme, adminStyles } from '@/utils/adminTheme';
 import { AdminRole } from '@/types/admin';
 
@@ -42,7 +42,7 @@ interface NavigationSection {
 export const AdminNavigation: React.FC<{
   onNavigate?: (screen: string) => void;
 }> = ({ onNavigate }) => {
-  const { adminUser, checkPermission, currentMode } = useAdminMigration();
+  const { adminUser, checkPermission, currentMode } = useDirectAdmin();
 
   if (currentMode !== 'admin') {
     return null;
@@ -414,7 +414,7 @@ export const AdminNavigation: React.FC<{
 export const QuickAdminNav: React.FC<{
   onNavigate?: (screen: string) => void;
 }> = ({ onNavigate }) => {
-  const { adminUser, checkPermission, currentMode } = useAdminMigration();
+  const { adminUser, checkPermission, currentMode } = useDirectAdmin();
 
   if (currentMode !== 'admin') {
     return null;
