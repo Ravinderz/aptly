@@ -210,11 +210,15 @@ export const useDirectAdmin = () => {
   ]);
 };
 
+// Stable selector for admin store feature flag (prevents displayName errors)
+const adminStoreFlagSelector = (state: any) => state.flags.USE_ADMIN_STORE;
+adminStoreFlagSelector.displayName = 'adminStoreFlagSelector';
+
 /**
  * Hook to check if admin store is active
  */
 export const useIsAdminStoreActive = (): boolean => {
-  return useFeatureFlagStore((state) => state.flags.USE_ADMIN_STORE);
+  return useFeatureFlagStore(adminStoreFlagSelector);
 };
 
 /**

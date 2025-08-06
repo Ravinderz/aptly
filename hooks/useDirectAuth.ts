@@ -12,6 +12,8 @@ const authSelector = (state: any) => ({
   error: state.error,
   isBiometricEnabled: state.isBiometricEnabled,
 });
+// Assign displayName to prevent React DevTools issues
+authSelector.displayName = 'authSelector';
 
 // Fallback auth state for error scenarios
 const authFallbackState = {
@@ -83,10 +85,15 @@ export const useDirectAuth = () => {
   }), [authState, actions]);
 };
 
+// Stable selector for auth store feature flag (prevents displayName errors)
+const authStoreFlagSelector = (state: any) => state.flags.USE_AUTH_STORE;
+// Assign displayName to prevent React DevTools issues
+authStoreFlagSelector.displayName = 'authStoreFlagSelector';
+
 /**
  * Hook to check if auth store is active
  */
 export const useIsAuthStoreActive = (): boolean => {
-  return useFeatureFlagStore((state) => state.flags.USE_AUTH_STORE);
+  return useFeatureFlagStore(authStoreFlagSelector);
 };
 

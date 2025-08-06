@@ -193,11 +193,15 @@ export const useDirectSociety = () => {
   }), [stableState, stableActions]);
 };
 
+// Stable selector for society store feature flag (prevents displayName errors)
+const societyStoreFlagSelector = (state: any) => state.flags.USE_SOCIETY_STORE;
+societyStoreFlagSelector.displayName = 'societyStoreFlagSelector';
+
 /**
  * Hook to check if society store is active
  */
 export const useIsSocietyStoreActive = (): boolean => {
-  return useFeatureFlagStore((state) => state.flags.USE_SOCIETY_STORE);
+  return useFeatureFlagStore(societyStoreFlagSelector);
 };
 
 /**

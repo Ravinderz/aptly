@@ -1,28 +1,21 @@
-import React, { useState, useEffect } from 'react';
-import {
-  View,
-  Text,
-  ScrollView,
-  TouchableOpacity,
-  RefreshControl,
-} from 'react-native';
+import { AdminHeader } from '@/components/admin/AdminHeader';
+import { RequireManager } from '@/components/auth/RoleGuard';
+import { Button } from '@/components/ui/Button';
+import { Card } from '@/components/ui/Card';
+import FilterPill from '@/components/ui/FilterPill';
+import { useDirectAuth } from '@/hooks/useDirectAuth';
+import { cn } from '@/utils/cn';
 import { useRouter } from 'expo-router';
 import {
-  MessageSquare,
   AlertTriangle,
-  Clock,
-  User,
   Building2,
   CheckCircle,
-  X,
+  Clock,
+  MessageSquare,
+  User,
 } from 'lucide-react-native';
-import { useDirectAuth } from '@/hooks/useDirectAuth';
-import { RequireManager } from '@/components/auth/RoleGuard';
-import { AdminHeader } from '@/components/admin/AdminHeader';
-import { Card } from '@/components/ui/Card';
-import { Button } from '@/components/ui/Button';
-import { FilterPill } from '@/components/ui/FilterPill';
-import { cn } from '@/utils/cn';
+import { useEffect, useState } from 'react';
+import { RefreshControl, ScrollView, Text, View } from 'react-native';
 
 interface SupportTicket {
   id: string;
@@ -40,12 +33,17 @@ interface SupportTicket {
   responseTime?: number; // hours
 }
 
-type FilterStatus = 'all' | 'open' | 'in_progress' | 'pending_response' | 'resolved';
+type FilterStatus =
+  | 'all'
+  | 'open'
+  | 'in_progress'
+  | 'pending_response'
+  | 'resolved';
 
-function ManagerSupport() {
+const ManagerSupport = () => {
   const router = useRouter();
   const { user, logout } = useDirectAuth();
-  
+
   const [refreshing, setRefreshing] = useState(false);
   const [tickets, setTickets] = useState<SupportTicket[]>([]);
   const [filteredTickets, setFilteredTickets] = useState<SupportTicket[]>([]);
@@ -108,7 +106,7 @@ function ManagerSupport() {
           responseTime: 12,
         },
       ];
-      
+
       setTickets(mockTickets);
     } catch (error) {
       console.error('Failed to load support tickets:', error);
@@ -119,7 +117,7 @@ function ManagerSupport() {
     let filtered = [...tickets];
 
     if (filterStatus !== 'all') {
-      filtered = filtered.filter(ticket => ticket.status === filterStatus);
+      filtered = filtered.filter((ticket) => ticket.status === filterStatus);
     }
 
     setFilteredTickets(filtered);
@@ -145,57 +143,70 @@ function ManagerSupport() {
 
   const getPriorityColor = (priority: SupportTicket['priority']) => {
     switch (priority) {
-      case 'high': return 'text-red-600';
-      case 'medium': return 'text-yellow-600';
-      case 'low': return 'text-green-600';
-      default: return 'text-gray-600';
+      case 'high':
+        return 'text-red-600';
+      case 'medium':
+        return 'text-yellow-600';
+      case 'low':
+        return 'text-green-600';
+      default:
+        return 'text-gray-600';
     }
   };
 
   const getStatusColor = (status: SupportTicket['status']) => {
     switch (status) {
-      case 'open': return 'text-red-600';
-      case 'in_progress': return 'text-blue-600';
-      case 'pending_response': return 'text-yellow-600';
-      case 'resolved': return 'text-green-600';
-      default: return 'text-gray-600';
+      case 'open':
+        return 'text-red-600';
+      case 'in_progress':
+        return 'text-blue-600';
+      case 'pending_response':
+        return 'text-yellow-600';
+      case 'resolved':
+        return 'text-green-600';
+      default:
+        return 'text-gray-600';
     }
   };
 
   const getStatusIcon = (status: SupportTicket['status']) => {
     switch (status) {
-      case 'open': return <AlertTriangle size={16} color="#dc2626" />;
-      case 'in_progress': return <Clock size={16} color="#0284c7" />;
-      case 'pending_response': return <MessageSquare size={16} color="#d97706" />;
-      case 'resolved': return <CheckCircle size={16} color="#059669" />;
-      default: return <Clock size={16} color="#6b7280" />;
+      case 'open':
+        return <AlertTriangle size={16} color="#dc2626" />;
+      case 'in_progress':
+        return <Clock size={16} color="#0284c7" />;
+      case 'pending_response':
+        return <MessageSquare size={16} color="#d97706" />;
+      case 'resolved':
+        return <CheckCircle size={16} color="#059669" />;
+      default:
+        return <Clock size={16} color="#6b7280" />;
     }
   };
 
   const getFilterCount = (status: FilterStatus) => {
     if (status === 'all') return tickets.length;
-    return tickets.filter(t => t.status === status).length;
+    return tickets.filter((t) => t.status === status).length;
   };
 
   return (
     <RequireManager>
       <View className="flex-1 bg-gray-50">
-        <AdminHeader 
-          title="Support Queue" 
-          subtitle={`${tickets.filter(t => t.status !== 'resolved').length} active tickets`}
+        <AdminHeader
+          title="Support Queue"
+          subtitle={`${tickets.filter((t) => t.status !== 'resolved').length} active tickets`}
           showBack
           showNotifications
           showLogout
           onLogout={handleLogout}
         />
-        
+
         <ScrollView
           className="flex-1"
           refreshControl={
             <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />
           }
-          showsVerticalScrollIndicator={false}
-        >
+          showsVerticalScrollIndicator={false}>
           {/* Summary Stats */}
           <View className="px-4 py-2">
             <View className="flex-row flex-wrap gap-3 mb-4">
@@ -205,14 +216,14 @@ function ManagerSupport() {
                 </Text>
                 <Text className="text-sm text-gray-600">Open</Text>
               </Card>
-              
+
               <Card className="flex-1 min-w-[120px] p-3">
                 <Text className="text-lg font-bold text-blue-600">
                   {getFilterCount('in_progress')}
                 </Text>
                 <Text className="text-sm text-gray-600">In Progress</Text>
               </Card>
-              
+
               <Card className="flex-1 min-w-[120px] p-3">
                 <Text className="text-lg font-bold text-yellow-600">
                   {getFilterCount('pending_response')}
@@ -227,7 +238,7 @@ function ManagerSupport() {
             <Text className="text-base font-semibold text-gray-900 mb-3">
               Filter by Status
             </Text>
-            
+
             <ScrollView horizontal showsHorizontalScrollIndicator={false}>
               <View className="flex-row space-x-2 pb-2">
                 <FilterPill
@@ -279,14 +290,22 @@ function ManagerSupport() {
                         {ticket.description}
                       </Text>
                     </View>
-                    
+
                     <View className="items-end">
-                      <Text className={cn("text-xs font-medium mb-1", getPriorityColor(ticket.priority))}>
+                      <Text
+                        className={cn(
+                          'text-xs font-medium mb-1',
+                          getPriorityColor(ticket.priority),
+                        )}>
                         {ticket.priority.toUpperCase()}
                       </Text>
                       <View className="flex-row items-center">
                         {getStatusIcon(ticket.status)}
-                        <Text className={cn("text-xs ml-1", getStatusColor(ticket.status))}>
+                        <Text
+                          className={cn(
+                            'text-xs ml-1',
+                            getStatusColor(ticket.status),
+                          )}>
                           {ticket.status.replace('_', ' ')}
                         </Text>
                       </View>
@@ -301,7 +320,7 @@ function ManagerSupport() {
                         {ticket.societyName}
                       </Text>
                     </View>
-                    
+
                     <View className="flex-row items-center">
                       <User size={14} color="#6b7280" />
                       <Text className="text-sm text-gray-600 ml-1">
@@ -325,8 +344,9 @@ function ManagerSupport() {
                       variant="outline"
                       size="sm"
                       className="flex-1"
-                      onPress={() => {/* Handle view details */}}
-                    >
+                      onPress={() => {
+                        /* Handle view details */
+                      }}>
                       View Details
                     </Button>
                     {ticket.status !== 'resolved' && (
@@ -334,8 +354,9 @@ function ManagerSupport() {
                         variant="primary"
                         size="sm"
                         className="flex-1"
-                        onPress={() => {/* Handle respond */}}
-                      >
+                        onPress={() => {
+                          /* Handle respond */
+                        }}>
                         Respond
                       </Button>
                     )}
@@ -359,8 +380,7 @@ function ManagerSupport() {
                   <Button
                     onPress={() => setFilterStatus('all')}
                     variant="outline"
-                    className="mt-4"
-                  >
+                    className="mt-4">
                     Clear Filters
                   </Button>
                 )}
@@ -371,7 +391,7 @@ function ManagerSupport() {
       </View>
     </RequireManager>
   );
-}
+};
 
 // Add proper named export with displayName for React DevTools
 ManagerSupport.displayName = 'ManagerSupport';

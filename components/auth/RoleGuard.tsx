@@ -132,7 +132,7 @@ export const RequireRole = (allowedRoles: UserRole[], fallbackRoute?: string) =>
       </RoleGuard>
     );
     
-    WrappedComponent.displayName = `RequireRole(${Component.displayName || Component.name})`;
+    WrappedComponent.displayName = `RequireRole(${Component?.displayName || Component?.name || 'Unknown'})`;
     return WrappedComponent;
   };
 };
