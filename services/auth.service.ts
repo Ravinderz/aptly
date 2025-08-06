@@ -23,7 +23,7 @@ export interface UserProfile {
   ownershipType: 'owner' | 'tenant';
   familySize: number;
   emergencyContact: string;
-  role: 'resident' | 'committee_member' | 'society_admin';
+  role: 'resident' | 'committee_member' | 'society_admin' | 'security_guard';
   societyId: string;
   societyCode: string;
   isVerified: boolean;
@@ -352,6 +352,69 @@ export class AuthService {
       console.error('Failed to get stored profile:', error);
       return null;
     }
+  }
+
+  // Security Guard specific methods
+  async validateSecurityGuardRole(user: UserProfile): Promise<boolean> {
+    return user.role === 'security_guard';
+  }
+
+  async getSecurityGuardPermissions(userId: string): Promise<any> {
+    try {
+      const token = await this.getAccessToken();
+      if (!token) {
+        throw new Error('Authentication required');
+      }
+
+      // For demo purposes, return default permissions
+      // In production, this would fetch from API
+      return {
+        canCreateVisitor: true,
+        canCheckInOut: true,
+        canViewHistory: true,
+        canHandleEmergency: true,
+        canManageVehicles: true,
+        canAccessReports: false,
+        canModifyVisitorData: true,
+        canOverrideApprovals: false,
+      };
+    } catch (error) {
+      console.error('Failed to get security guard permissions:', error);
+      return null;
+    }
+  }
+
+  async updateSecurityGuardShift(userId: string, shiftData: any): Promise<AuthResult> {
+    try {
+      const token = await this.getAccessToken();
+      if (!token) {
+        return { success: false, error: 'Authentication required' };
+      }
+
+      // For demo purposes, simulate API call
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+
+      return {
+        success: true,
+        data: { message: 'Shift updated successfully', shift: shiftData },
+      };
+    } catch (error) {
+      return {
+        success: false,
+        error: 'Failed to update shift information',
+      };
+    }
+  }
+
+  // Role-based authentication helpers
+  async isSecurityGuard(): Promise<boolean> {
+    const user = await this.getCurrentUser();
+    return user?.role === 'security_guard';
+  }
+
+  async hasSecurityAccess(): Promise<boolean> {
+    const user = await this.getCurrentUser();
+    return user?.role === 'security_guard' && user?.isVerified === true;
   }
 }
 

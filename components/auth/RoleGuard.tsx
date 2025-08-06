@@ -6,7 +6,7 @@ import { useDirectAuth } from '@/hooks/useDirectAuth';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 
-export type UserRole = 'super_admin' | 'community_manager' | 'society_admin' | 'resident' | 'guest';
+export type UserRole = 'super_admin' | 'community_manager' | 'society_admin' | 'resident' | 'security_guard' | 'guest';
 
 interface RoleGuardProps {
   children: React.ReactNode;
@@ -164,12 +164,50 @@ export const RequireStaff: React.FC<{ children: React.ReactNode }> = ({ children
   </RoleGuard>
 );
 
+export const RequireSecurityGuard: React.FC<{ 
+  children: React.ReactNode;
+  requireVerification?: boolean;
+  customFallback?: React.ReactNode;
+}> = ({ children, requireVerification = true, customFallback }) => {
+  const { user } = useDirectAuth();
+  const router = useRouter();
+
+  // Additional verification check for security guards
+  if (requireVerification && user?.role === 'security_guard' && !user?.isVerified) {
+    return customFallback || (
+      <View className="flex-1 justify-center items-center p-4 bg-gray-50">
+        <AlertTriangle size={48} color="#f59e0b" />
+        <Text className="text-lg font-semibold text-gray-900 mt-4 text-center">
+          Account Verification Required
+        </Text>
+        <Text className="text-gray-600 text-center mt-2">
+          Your security guard account needs verification to access this area.
+        </Text>
+        <Button
+          onPress={() => router.replace('/welcome')}
+          variant="primary"
+          className="mt-6"
+        >
+          Contact Administrator
+        </Button>
+      </View>
+    );
+  }
+
+  return (
+    <RoleGuard allowedRoles={['security_guard']} fallbackRoute="/welcome" customFallback={customFallback}>
+      {children}
+    </RoleGuard>
+  );
+};
+
 // Add displayName to role guard components for React DevTools
 RoleGuard.displayName = 'RoleGuard';
 RequireSuperAdmin.displayName = 'RequireSuperAdmin';
 RequireManager.displayName = 'RequireManager';  
 RequireAdmin.displayName = 'RequireAdmin';
 RequireStaff.displayName = 'RequireStaff';
+RequireSecurityGuard.displayName = 'RequireSecurityGuard';
 
 /**
  * Permission-based visibility component
@@ -194,7 +232,34 @@ export const PermissionGate: React.FC<PermissionGateProps> = ({
   return <>{children}</>;
 };
 
+/**
+ * Security-specific permission gate
+ */
+interface SecurityPermissionGateProps {
+  children: React.ReactNode;
+  requiredPermissions?: string[];
+  fallback?: React.ReactNode;
+}
+
+export const SecurityPermissionGate: React.FC<SecurityPermissionGateProps> = ({
+  children,
+  requiredPermissions = [],
+  fallback = null,
+}) => {
+  const { user } = useDirectAuth();
+
+  // Only allow security guards
+  if (!user || user.role !== 'security_guard') {
+    return <>{fallback}</>;
+  }
+
+  // For now, security guards have all permissions
+  // In future, implement actual permission checking
+  return <>{children}</>;
+};
+
 PermissionGate.displayName = 'PermissionGate';
+SecurityPermissionGate.displayName = 'SecurityPermissionGate';
 
 /**
  * Role-based navigation helper
@@ -211,6 +276,8 @@ export const useRoleNavigation = () => {
         return '/admin/dashboard';
       case 'community_manager':
         return '/manager/dashboard';
+      case 'security_guard':
+        return '/security/dashboard';
       case 'society_admin':
       case 'resident':
         return '/(tabs)/';
@@ -229,6 +296,9 @@ export const useRoleNavigation = () => {
       case 'community_manager':
         router.replace('/manager/dashboard');
         break;
+      case 'security_guard':
+        router.replace('/security/dashboard');
+        break;
       case 'society_admin':
       case 'resident':
         router.replace('/(tabs)/');
@@ -245,6 +315,7 @@ export const useRoleNavigation = () => {
     const routePermissions: Record<string, UserRole[]> = {
       '/admin': ['super_admin'],
       '/manager': ['community_manager'],
+      '/security': ['security_guard'],
       '/register': ['guest'], // Public registration
       '/(tabs)': ['super_admin', 'community_manager', 'society_admin', 'resident'],
     };

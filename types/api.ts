@@ -69,7 +69,7 @@ export interface AuthUser {
   avatar?: string;
   societyCode?: string;
   flatNumber?: string;
-  role: 'resident' | 'admin' | 'security' | 'maintenance';
+  role: 'resident' | 'admin' | 'security_guard' | 'maintenance';
   isVerified: boolean;
   createdAt: string;
   lastLoginAt: string;

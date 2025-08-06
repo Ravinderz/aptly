@@ -3,7 +3,7 @@ import { TouchableOpacity, Text, ActivityIndicator } from 'react-native';
 import { cn } from '@/utils/cn';
 
 export interface ButtonProps {
-  variant?: 'primary' | 'secondary' | 'success' | 'outline' | 'ghost';
+  variant?: 'primary' | 'secondary' | 'success' | 'destructive' | 'outline' | 'ghost';
   size?: 'sm' | 'md' | 'lg';
   disabled?: boolean;
   loading?: boolean;
@@ -21,6 +21,7 @@ const buttonVariants = {
   primary: 'bg-primary border-primary',
   secondary: 'bg-secondary border-secondary',
   success: 'bg-secondary border-secondary',
+  destructive: 'bg-red-600 border-red-600',
   outline: 'bg-transparent border-primary border-2',
   ghost: 'bg-transparent border-transparent',
 };
@@ -35,6 +36,7 @@ const textVariants = {
   primary: 'text-white',
   secondary: 'text-white',
   success: 'text-white',
+  destructive: 'text-white',
   outline: 'text-primary',
   ghost: 'text-primary',
 };

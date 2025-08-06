@@ -6,6 +6,7 @@ import { create } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
 import { immer } from 'zustand/middleware/immer';
 import { BaseStore } from '../types';
+import { SecurityGuardProfile, SecurityPermissions } from '@/types/security';
 
 // State interface matching the existing AuthContext
 interface AuthState extends BaseStore {
@@ -13,6 +14,10 @@ interface AuthState extends BaseStore {
   user: UserProfile | null;
   isAuthenticated: boolean;
   isLoading: boolean;
+
+  // Security guard specific state
+  securityProfile: SecurityGuardProfile | null;
+  securityPermissions: SecurityPermissions | null;
 
   // Biometric state
   biometricEnabled: boolean;
@@ -42,6 +47,13 @@ interface AuthActions {
   // Token management
   refreshToken: () => Promise<void>;
 
+  // Security guard methods
+  setSecurityProfile: (profile: SecurityGuardProfile | null) => void;
+  updateSecurityPermissions: (permissions: SecurityPermissions) => void;
+  getSecurityPermissions: () => SecurityPermissions | null;
+  initializeSecurityGuard: (user: UserProfile) => void;
+  updateSecurityShift: (shiftData: any) => Promise<void>;
+
   // Utility methods
   clearError: () => void;
   setUser: (user: UserProfile | null) => void;
@@ -56,6 +68,8 @@ const initialState: AuthState = {
   isLoading: true,
   loading: true, // BaseStore property
   error: null,
+  securityProfile: null,
+  securityPermissions: null,
   biometricEnabled: false,
   sessionId: null,
   lastLoginTime: null,
@@ -96,6 +110,16 @@ export const useAuthStore = create<AuthStore>()(
             state.loading = false;
             state.error = null;
             state.lastLoginTime = Date.now();
+            
+            // Initialize security profile and permissions if user is security guard
+            if (userData.role === 'security_guard') {
+              // Initialize full security guard profile
+              get().initializeSecurityGuard(userData);
+            } else {
+              // Clear security data for non-security users
+              state.securityProfile = null;
+              state.securityPermissions = null;
+            }
           });
         },
 
@@ -116,6 +140,8 @@ export const useAuthStore = create<AuthStore>()(
                 ...initialState,
                 isLoading: false,
                 loading: false,
+                securityProfile: null,
+                securityPermissions: null,
               });
             });
           } catch (error: any) {
@@ -127,6 +153,8 @@ export const useAuthStore = create<AuthStore>()(
                 isLoading: false,
                 loading: false,
                 error: error.message || 'Logout failed',
+                securityProfile: null,
+                securityPermissions: null,
               });
             });
           }
@@ -420,7 +448,123 @@ export const useAuthStore = create<AuthStore>()(
           set((state) => {
             state.user = user;
             state.isAuthenticated = !!user;
+            
+            // Initialize security permissions for security guards
+            if (user?.role === 'security_guard') {
+              state.securityPermissions = {
+                canCreateVisitor: true,
+                canCheckInOut: true,
+                canViewHistory: true,
+                canHandleEmergency: true,
+                canManageVehicles: true,
+                canAccessReports: false,
+                canModifyVisitorData: true,
+                canOverrideApprovals: false,
+              };
+            } else {
+              state.securityProfile = null;
+              state.securityPermissions = null;
+            }
           });
+        },
+
+        // Security guard methods
+        setSecurityProfile: (profile: SecurityGuardProfile | null) => {
+          set((state) => {
+            state.securityProfile = profile;
+          });
+        },
+
+        updateSecurityPermissions: (permissions: SecurityPermissions) => {
+          set((state) => {
+            state.securityPermissions = { ...state.securityPermissions, ...permissions };
+          });
+        },
+
+        getSecurityPermissions: (): SecurityPermissions | null => {
+          return get().securityPermissions;
+        },
+
+        initializeSecurityGuard: (user: UserProfile) => {
+          if (user.role === 'security_guard') {
+            set((state) => {
+              // Create default security profile
+              state.securityProfile = {
+                id: user.id,
+                userId: user.id,
+                employeeId: `SG-${user.id.slice(-6).toUpperCase()}`,
+                shiftPattern: 'MORNING', // Default shift
+                department: 'SECURITY',
+                permissions: {
+                  canCreateVisitor: true,
+                  canCheckInOut: true,
+                  canViewHistory: true,
+                  canHandleEmergency: true,
+                  canManageVehicles: true,
+                  canAccessReports: false,
+                  canModifyVisitorData: true,
+                  canOverrideApprovals: false,
+                },
+                currentShift: null,
+                emergencyContacts: [],
+                certifications: [],
+                trainingRecords: [],
+                performanceMetrics: {
+                  totalVisitors: 0,
+                  emergencyResponses: 0,
+                  incidentsReported: 0,
+                  rating: 0,
+                },
+                createdAt: new Date().toISOString(),
+                updatedAt: new Date().toISOString(),
+              };
+
+              // Set default permissions in state
+              state.securityPermissions = {
+                canCreateVisitor: true,
+                canCheckInOut: true,
+                canViewHistory: true,
+                canHandleEmergency: true,
+                canManageVehicles: true,
+                canAccessReports: false,
+                canModifyVisitorData: true,
+                canOverrideApprovals: false,
+              };
+            });
+          }
+        },
+
+        updateSecurityShift: async (shiftData: any) => {
+          try {
+            set((state) => {
+              state.loading = true;
+              state.error = null;
+            });
+
+            // Update security profile with shift data
+            const result = await AuthService.updateSecurityGuardShift(get().user?.id || '', shiftData);
+            
+            if (result.success) {
+              set((state) => {
+                if (state.securityProfile) {
+                  state.securityProfile.currentShift = shiftData;
+                  state.securityProfile.updatedAt = new Date().toISOString();
+                }
+                state.loading = false;
+              });
+            } else {
+              set((state) => {
+                state.loading = false;
+                state.error = result.error || 'Failed to update shift';
+              });
+            }
+          } catch (error: any) {
+            console.error('Failed to update security shift:', error);
+            set((state) => {
+              state.loading = false;
+              state.error = error.message || 'Failed to update shift';
+            });
+          }
         },
 
         // BaseStore methods
@@ -473,6 +617,8 @@ export const useAuthStore = create<AuthStore>()(
         partialize: (state) => ({
           user: state.user,
           isAuthenticated: state.isAuthenticated,
+          securityProfile: state.securityProfile,
+          securityPermissions: state.securityPermissions,
           biometricEnabled: state.biometricEnabled,
           lastLoginTime: state.lastLoginTime,
         }),
@@ -486,6 +632,8 @@ export const useAuthStore = create<AuthStore>()(
               useAuthStore.setState({
                 user: null,
                 isAuthenticated: false,
+                securityProfile: null,
+                securityPermissions: null,
                 biometricEnabled: false,
                 lastLoginTime: null,
               });
@@ -501,6 +649,8 @@ export const useAuthStore = create<AuthStore>()(
               // Migration from version 0 to 1
               return {
                 ...persistedState,
+                securityProfile: persistedState.securityProfile || null,
+                securityPermissions: persistedState.securityPermissions || null,
                 biometricEnabled: persistedState.biometricEnabled || false,
                 lastLoginTime: persistedState.lastLoginTime || null,
               };
@@ -511,6 +661,8 @@ export const useAuthStore = create<AuthStore>()(
             return {
               user: null,
               isAuthenticated: false,
+              securityProfile: null,
+              securityPermissions: null,
               biometricEnabled: false,
               lastLoginTime: null,
             };
@@ -546,6 +698,20 @@ export const useAuthActions = () =>
     clearError: state.clearError,
   }));
 
+// Security-specific selectors
+export const useSecurityProfile = () => useAuthStore((state) => state.securityProfile);
+export const useSecurityPermissions = () => useAuthStore((state) => state.securityPermissions);
+export const useIsSecurityGuard = () => useAuthStore((state) => state.user?.role === 'security_guard');
+
+export const useSecurityActions = () =>
+  useAuthStore((state) => ({
+    setSecurityProfile: state.setSecurityProfile,
+    updateSecurityPermissions: state.updateSecurityPermissions,
+    getSecurityPermissions: state.getSecurityPermissions,
+    initializeSecurityGuard: state.initializeSecurityGuard,
+    updateSecurityShift: state.updateSecurityShift,
+  }));
+
 // Computed selectors
 export const useAuthComputed = () =>
   useAuthStore((state) => ({
@@ -556,6 +722,8 @@ export const useAuthComputed = () =>
       state.user?.role === 'society_admin' ||
       state.user?.role === 'committee_member',
     isResident: state.user?.role === 'resident',
+    isSecurityGuard: state.user?.role === 'security_guard',
+    hasSecurityPermissions: !!state.securityPermissions,
     isLoading: state.isLoading,
     hasError: !!state.error,
   }));
