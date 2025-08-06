@@ -166,17 +166,20 @@ export default function CylinderBooking() {
     // Simulate provider detection based on customer ID pattern
     setTimeout(() => {
       const prefix = customerId.substring(0, 2).toUpperCase();
-      let detectedProvider;
+      let detectedProvider: Provider | null = null;
 
-      if (prefix.startsWith('IN') || prefix.startsWith('10'))
+      if ((prefix.startsWith('IN') || prefix.startsWith('10')) && providers[0])
         detectedProvider = providers[0]; // Indane
-      else if (prefix.startsWith('HP') || prefix.startsWith('20'))
+      else if ((prefix.startsWith('HP') || prefix.startsWith('20')) && providers[1])
         detectedProvider = providers[1]; // HP
-      else if (prefix.startsWith('BH') || prefix.startsWith('30'))
+      else if ((prefix.startsWith('BH') || prefix.startsWith('30')) && providers[2])
         detectedProvider = providers[2]; // Bharat
-      else detectedProvider = providers[0]; // Default to Indane
+      else if (providers[0])
+        detectedProvider = providers[0]; // Default to Indane
 
-      setSelectedProvider(detectedProvider);
+      if (detectedProvider) {
+        setSelectedProvider(detectedProvider);
+      }
       setDeliveryAddress(
         'A-101, Green Valley Apartments, Sector 12, Gurgaon - 122001',
       ); // Mock address

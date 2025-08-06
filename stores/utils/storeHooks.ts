@@ -62,18 +62,36 @@ export function useStoreWithSelector<TState extends object, TSlice>(
   
   const subscribe = useCallback(
     (onStoreChange: () => void) => {
-      return store.subscribe(onStoreChange);
+      try {
+        return store.subscribe(onStoreChange);
+      } catch (error) {
+        console.error('Store subscription error:', error);
+        // Return a no-op unsubscribe function
+        return () => {};
+      }
     },
     [store]
   );
   
   const getSnapshot = useCallback(() => {
-    return stableSelector(store.getState());
+    try {
+      return stableSelector(store.getState());
+    } catch (error) {
+      console.error('Store getSnapshot error:', error);
+      // Return a safe fallback - this might need to be adjusted based on the selector
+      return undefined as any;
+    }
   }, [store, stableSelector]);
   
   const getServerSnapshot = useCallback(() => {
-    // For SSR compatibility, return the current state
-    return stableSelector(store.getState());
+    try {
+      // For SSR compatibility, return the current state
+      return stableSelector(store.getState());
+    } catch (error) {
+      console.error('Store getServerSnapshot error:', error);
+      // Return a safe fallback
+      return undefined as any;
+    }
   }, [store, stableSelector]);
   
   return useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);

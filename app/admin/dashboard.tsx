@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import {
   View,
   Text,
@@ -21,6 +21,7 @@ import {
 } from 'lucide-react-native';
 import { useDirectAdmin } from '@/hooks/useDirectAdmin';
 import { useDirectAuth } from '@/hooks/useDirectAuth';
+import { RequireSuperAdmin } from '@/components/auth/RoleGuard';
 import { AdminHeader } from '@/components/admin/AdminHeader';
 import { DashboardMetrics } from '@/components/admin/DashboardMetrics';
 import { Card } from '@/components/ui/Card';
@@ -50,7 +51,7 @@ interface QuickAction {
  */
 function AdminDashboard() {
   const router = useRouter();
-  const { user } = useDirectAuth();
+  const { user, logout } = useDirectAuth();
   const { 
     analytics, 
     loading, 
@@ -76,7 +77,16 @@ function AdminDashboard() {
     }
   };
 
-  const getQuickActions = (): QuickAction[] => {
+  const handleLogout = async () => {
+    try {
+      await logout();
+      router.replace('/welcome');
+    } catch (error) {
+      console.error('Logout failed:', error);
+    }
+  };
+
+  const quickActions = useMemo((): QuickAction[] => {
     const actions: QuickAction[] = [];
 
     // Society Onboarding
@@ -130,19 +140,23 @@ function AdminDashboard() {
       });
     }
 
-    // High Priority Items
-    const highPriorityCount = getHighPriorityItemsCount?.() || 0;
-    if (highPriorityCount > 0) {
-      actions.push({
-        id: 'priority',
-        title: 'Priority Items',
-        subtitle: 'Urgent tasks requiring attention',
-        icon: <AlertTriangle size={24} color="#dc2626" />,
-        onPress: () => router.push('/admin/societies/?filter=high_priority'),
-        color: 'bg-red-50',
-        textColor: 'text-red-900',
-        badge: highPriorityCount,
-      });
+    // High Priority Items - use the correct function
+    try {
+      const highPriorityCount = getHighPriorityItemsCount?.() || 0;
+      if (highPriorityCount > 0) {
+        actions.push({
+          id: 'priority',
+          title: 'Priority Items',
+          subtitle: 'Urgent tasks requiring attention',
+          icon: <AlertTriangle size={24} color="#dc2626" />,
+          onPress: () => router.push('/admin/onboarding/?filter=high_priority'),
+          color: 'bg-red-50',
+          textColor: 'text-red-900',
+          badge: highPriorityCount,
+        });
+      }
+    } catch (error) {
+      console.error('Error getting high priority count:', error);
     }
 
     // System Settings
@@ -159,7 +173,12 @@ function AdminDashboard() {
     }
 
     return actions;
-  };
+  }, [
+    router,
+    getPendingApprovalsCount,
+    getHighPriorityItemsCount,
+    checkPermission,
+  ]);
 
   if (!user || user.role !== 'super_admin') {
     return (
@@ -183,11 +202,14 @@ function AdminDashboard() {
   }
 
   return (
-    <View className="flex-1 bg-gray-50">
+    <RequireSuperAdmin>
+      <View className="flex-1 bg-gray-50">
       <AdminHeader 
         title="Admin Dashboard" 
         subtitle={`Welcome back, ${user?.fullName || user?.name || 'Admin'}`}
         showNotifications
+        showLogout
+        onLogout={handleLogout}
       />
       
       <ScrollView
@@ -217,7 +239,7 @@ function AdminDashboard() {
           </View>
           
           <View className="flex-row flex-wrap gap-3">
-            {getQuickActions().map((action) => (
+            {quickActions.map((action) => (
               <TouchableOpacity
                 key={action.id}
                 onPress={action.onPress}
@@ -232,7 +254,7 @@ function AdminDashboard() {
                   {action.badge && action.badge > 0 && (
                     <View className="bg-red-500 rounded-full min-w-[20px] h-5 px-1 items-center justify-center">
                       <Text className="text-white text-xs font-semibold">
-                        {action.badge > 99 ? '99+' : action.badge}
+                        {action.badge > 99 ? '99+' : String(action.badge)}
                       </Text>
                     </View>
                   )}
@@ -283,7 +305,8 @@ function AdminDashboard() {
           </View>
         )}
       </ScrollView>
-    </View>
+      </View>
+    </RequireSuperAdmin>
   );
 }
 

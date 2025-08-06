@@ -127,13 +127,18 @@ export default function GovernancePage() {
           description:
             'Water supply will be disrupted from 2 PM to 6 PM for maintenance',
           severity: 'medium',
-          category: 'utilities',
+          type: 'water_shortage',
           status: 'active',
-          affectedAreas: ['Block A', 'Block B'],
+          society_id: 'society-1',
+          category: 'utilities',
           instructions: 'Please store water in advance',
           estimatedDuration: '4 hours',
+          isResolved: false,
+          affectedAreas: ['Block A', 'Block B'],
           contactPerson: 'Maintenance Team',
           contactNumber: '+91-9876543210',
+          declaredBy: 'admin-1',
+          escalationLevel: 1,
           escalationChain: [
             {
               level: 1,
@@ -146,7 +151,8 @@ export default function GovernancePage() {
               acknowledgedAt: '2024-01-20T08:15:00Z',
             },
           ],
-          isResolved: false,
+          notifications: [],
+          acknowledgments: [],
           createdBy: 'admin-1',
           createdAt: '2024-01-20T08:00:00Z',
           updatedAt: '2024-01-20T08:00:00Z',
@@ -181,17 +187,6 @@ export default function GovernancePage() {
             type: 'vote_cast',
             description: 'New vote cast in Committee Election 2024',
             timestamp: '2024-01-20T10:30:00Z',
-            userId: 'user-456',
-            metadata: { campaignId: 'campaign-1' },
-          },
-        ],
-        upcomingEvents: [
-          {
-            id: 'event-1',
-            title: 'Committee Meeting',
-            date: '2024-01-25T18:00:00Z',
-            type: 'meeting',
-            location: 'Community Hall',
           },
         ],
       };
@@ -355,7 +350,7 @@ export default function GovernancePage() {
               onCreateCampaign={handleCreateCampaign}
               onVote={handleVote}
               currentUserId={currentUserId}
-              userRole={userRole}
+              userRole={userRole === 'committee_member' ? 'admin' : userRole}
             />
           );
 
@@ -372,7 +367,7 @@ export default function GovernancePage() {
                 console.log('Emergency call to:', contact);
               }}
               currentUserId={currentUserId}
-              userRole={userRole}
+              userRole={userRole === 'committee_member' ? 'admin' : userRole}
             />
           );
 
@@ -383,15 +378,17 @@ export default function GovernancePage() {
               deputies={[]} // Would come from API
               handoverTasks={[]} // Would come from API
               onCreatePlan={handleCreateSuccessionPlan}
-              onTriggerSuccession={handleTriggerSuccession}
-              onAssignDeputy={async (assignment: any) => {
-                console.log('Assigning deputy:', assignment);
+              onUpdatePlan={async (planId: string, updates: Partial<SuccessionPlan>) => {
+                console.log('Updating succession plan:', planId, updates);
               }}
-              onCompleteHandover={async (taskId: any) => {
+              onActivatePlan={async (planId: string) => {
+                console.log('Activating succession plan:', planId);
+              }}
+              onCompleteTask={async (taskId: string) => {
                 console.log('Completing handover task:', taskId);
               }}
               currentUserId={currentUserId}
-              userRole={userRole}
+              userRole={userRole === 'committee_member' ? 'admin' : userRole}
             />
           );
 
@@ -407,7 +404,7 @@ export default function GovernancePage() {
                 console.log('Submitting feedback:', { proposalId, feedback });
               }}
               currentUserId={currentUserId}
-              userRole={userRole}
+              userRole={userRole === 'committee_member' ? 'admin' : userRole}
             />
           );
 

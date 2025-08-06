@@ -1,447 +1,381 @@
-import { AdminHeader } from '@/components/admin/AdminHeader';
-import { Button } from '@/components/ui/Button';
-import { Card } from '@/components/ui/Card';
-import PillFilter from '@/components/ui/PillFilter';
-import { cn } from '@/utils/cn';
-import { useRouter } from 'expo-router';
-import {
-  AlertTriangle,
-  Building2,
-  Calendar,
-  CheckCircle,
-  Clock,
-  Eye,
-  Mail,
-  MapPin,
-  Phone,
-  Search,
-  User,
-  XCircle,
-} from 'lucide-react-native';
 import React, { useState } from 'react';
-import {
-  RefreshControl,
-  ScrollView,
-  Text,
-  TextInput,
-  View,
-} from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity, Alert, Modal } from 'react-native'; 
+import { Clock, CheckCircle, X, AlertTriangle, FileText, Users, Building2 } from 'lucide-react-native';
+import { RequireSuperAdmin } from '@/components/auth/RoleGuard';
+import { AdminHeader } from '@/components/admin/AdminHeader';
+import { Card } from '@/components/ui/Card';
+import { Button } from '@/components/ui/Button';
+import { cn } from '@/utils/cn';
 
-// Mock data for onboarding requests
-const mockOnboardingRequests = [
-  {
-    id: 'req-1',
-    societyName: 'Green Valley Apartments',
-    societyCode: 'GVA001',
-    adminName: 'Rajesh Kumar',
-    adminEmail: 'rajesh@greenvalley.com',
-    adminPhone: '+91-9876543210',
-    societyAddress: '123 Green Valley Road, Sector 45, Gurgaon',
-    totalFlats: 120,
-    status: 'pending',
-    submittedDocuments: [
-      'society_registration.pdf',
-      'noc_certificate.pdf',
-      'admin_id_proof.pdf',
-    ],
-    verificationNotes: null,
-    createdAt: '2024-01-15T10:30:00Z',
-    updatedAt: '2024-01-15T10:30:00Z',
-  },
-  {
-    id: 'req-2',
-    societyName: 'Blue Ridge Society',
-    societyCode: 'BRS002',
-    adminName: 'Priya Sharma',
-    adminEmail: 'priya@blueridge.com',
-    adminPhone: '+91-9876543211',
-    societyAddress: '456 Blue Ridge Lane, Sector 12, Noida',
-    totalFlats: 80,
-    status: 'under_review',
-    submittedDocuments: ['society_registration.pdf', 'admin_id_proof.pdf'],
-    verificationNotes: 'Missing NOC certificate',
-    createdAt: '2024-01-14T14:20:00Z',
-    updatedAt: '2024-01-16T09:15:00Z',
-  },
-  {
-    id: 'req-3',
-    societyName: 'Sunrise Towers',
-    societyCode: 'ST003',
-    adminName: 'Amit Patel',
-    adminEmail: 'amit@sunrisetowers.com',
-    adminPhone: '+91-9876543212',
-    societyAddress: '789 Sunrise Avenue, Sector 22, Delhi',
-    totalFlats: 200,
-    status: 'approved',
-    submittedDocuments: [
-      'society_registration.pdf',
-      'noc_certificate.pdf',
-      'admin_id_proof.pdf',
-      'bank_details.pdf',
-    ],
-    verificationNotes: 'All documents verified successfully',
-    createdAt: '2024-01-10T11:45:00Z',
-    updatedAt: '2024-01-17T16:30:00Z',
-  },
-];
-
-interface OnboardingRequestCardProps {
-  request: any;
-  onView: () => void;
-  onApprove: () => void;
-  onReject: () => void;
+interface OnboardingRequest {
+  id: string;
+  societyName: string;
+  city: string;
+  state: string;
+  totalUnits: number;
+  subscriptionPlan: 'basic' | 'premium' | 'enterprise';
+  contactPerson: {
+    name: string;
+    email: string;
+    phone: string;
+    role: string;
+  };
+  status: 'pending' | 'under_review' | 'approved' | 'rejected';
+  submittedAt: string;
+  priority: 'high' | 'medium' | 'low';
+  documents: {
+    registrationCertificate: boolean;
+    taxDocuments: boolean;
+    societyBylaws: boolean;
+    ownershipProof: boolean;
+  };
+  reviewNotes?: string;
 }
 
-export const OnboardingRequestCard: React.FC<OnboardingRequestCardProps> = ({
-  request,
-  onView,
-  onApprove,
-  onReject,
-}) => {
-  const getStatusConfig = (status: string) => {
+function AdminOnboarding() {
+  const [onboardingRequests, setOnboardingRequests] = useState<OnboardingRequest[]>([
+    {
+      id: 'req_001',
+      societyName: 'Emerald Heights Society',
+      city: 'Mumbai',
+      state: 'Maharashtra', 
+      totalUnits: 180,
+      subscriptionPlan: 'premium',
+      contactPerson: {
+        name: 'Rajesh Kumar',
+        email: 'rajesh@emeraldheights.com',
+        phone: '+91 98765 43210',
+        role: 'Society Secretary',
+      },
+      status: 'pending',
+      submittedAt: '2024-03-01T10:30:00Z',
+      priority: 'high',
+      documents: {
+        registrationCertificate: true,
+        taxDocuments: true,
+        societyBylaws: false,
+        ownershipProof: true,
+      },
+    },
+    {
+      id: 'req_002',
+      societyName: 'Garden View Apartments',
+      city: 'Bangalore',
+      state: 'Karnataka',
+      totalUnits: 120,
+      subscriptionPlan: 'basic',
+      contactPerson: {
+        name: 'Priya Sharma',
+        email: 'priya@gardenview.com',
+        phone: '+91 87654 32109',
+        role: 'President',
+      },
+      status: 'under_review',
+      submittedAt: '2024-02-28T14:15:00Z',
+      priority: 'medium',
+      documents: {
+        registrationCertificate: true,
+        taxDocuments: true,
+        societyBylaws: true,
+        ownershipProof: true,
+      },
+    },
+  ]);
+
+  const [selectedRequest, setSelectedRequest] = useState<OnboardingRequest | null>(null);
+  const [showModal, setShowModal] = useState(false);
+  const [filter, setFilter] = useState<'all' | 'pending' | 'under_review' | 'approved' | 'rejected'>('all');
+
+  const getStatusColor = (status: OnboardingRequest['status']) => {
     switch (status) {
-      case 'pending':
-        return {
-          color: 'bg-yellow-100 text-yellow-800',
-          icon: <Clock size={16} color="#d97706" />,
-        };
-      case 'under_review':
-        return {
-          color: 'bg-blue-100 text-blue-800',
-          icon: <Eye size={16} color="#2563eb" />,
-        };
-      case 'approved':
-        return {
-          color: 'bg-green-100 text-green-800',
-          icon: <CheckCircle size={16} color="#059669" />,
-        };
-      case 'rejected':
-        return {
-          color: 'bg-red-100 text-red-800',
-          icon: <XCircle size={16} color="#dc2626" />,
-        };
-      default:
-        return {
-          color: 'bg-gray-100 text-gray-800',
-          icon: <AlertTriangle size={16} color="#6b7280" />,
-        };
+      case 'pending': return 'text-yellow-600';
+      case 'under_review': return 'text-blue-600';
+      case 'approved': return 'text-green-600';
+      case 'rejected': return 'text-red-600';
+      default: return 'text-gray-600';
     }
   };
 
-  const statusConfig = getStatusConfig(request?.status || 'pending');
-  const daysSinceSubmission = Math.floor(
-    (Date.now() - new Date(request?.createdAt || Date.now()).getTime()) /
-      (1000 * 60 * 60 * 24),
+  const getStatusIcon = (status: OnboardingRequest['status']) => {
+    switch (status) {
+      case 'pending': return <Clock size={16} color="#d97706" />;
+      case 'under_review': return <AlertTriangle size={16} color="#0284c7" />;
+      case 'approved': return <CheckCircle size={16} color="#059669" />;
+      case 'rejected': return <X size={16} color="#dc2626" />;
+      default: return <Clock size={16} color="#6b7280" />;
+    }
+  };
+
+  const getPriorityColor = (priority: string) => {
+    switch (priority) {
+      case 'high': return 'text-red-600';
+      case 'medium': return 'text-yellow-600';
+      default: return 'text-green-600';
+    }
+  };
+
+  const handleViewDetails = (request: OnboardingRequest) => {
+    setSelectedRequest(request);
+    setShowModal(true);
+  };
+
+  const handleApprove = async (requestId: string) => {
+    setOnboardingRequests(prev => prev.map(req => 
+      req.id === requestId 
+        ? { ...req, status: 'approved' as const }
+        : req
+    ));
+    setShowModal(false);
+    Alert.alert('Success', 'Society onboarding request approved!');
+  };
+
+  const handleReject = async (requestId: string) => {
+    setOnboardingRequests(prev => prev.map(req => 
+      req.id === requestId 
+        ? { ...req, status: 'rejected' as const }
+        : req
+    ));
+    setShowModal(false);
+    Alert.alert('Success', 'Society onboarding request rejected!');
+  };
+
+  const handleStartReview = async (requestId: string) => {
+    setOnboardingRequests(prev => prev.map(req => 
+      req.id === requestId 
+        ? { ...req, status: 'under_review' as const }
+        : req
+    ));
+    setShowModal(false);
+  };
+
+  const filteredRequests = onboardingRequests.filter(request => 
+    filter === 'all' || request.status === filter
   );
 
-  return (
-    <Card className="p-4 mb-3">
-      <View className="flex-row items-start justify-between mb-3">
-        <View className="flex-1">
-          <Text className="text-lg font-semibold text-gray-900 mb-1">
-            {request?.societyName || 'Unknown Society'}
-          </Text>
-          <Text className="text-sm text-gray-600">
-            Code: {request?.societyCode || 'N/A'}
-          </Text>
-        </View>
-
-        <View
-          className={cn(
-            'flex-row items-center px-2 py-1 rounded-full',
-            statusConfig.color,
-          )}>
-          {statusConfig.icon}
-          <Text className="text-xs font-medium ml-1 capitalize">
-            {(request?.status || 'pending').replace('_', ' ')}
-          </Text>
-        </View>
-      </View>
-
-      {/* Admin Details */}
-      <View className="mb-3">
-        <View className="flex-row items-center mb-1">
-          <User size={14} color="#6b7280" />
-          <Text className="text-sm text-gray-700 ml-2">
-            {request?.adminName || 'Unknown Admin'}
-          </Text>
-        </View>
-        <View className="flex-row items-center mb-1">
-          <Mail size={14} color="#6b7280" />
-          <Text className="text-sm text-gray-600 ml-2">
-            {request?.adminEmail || 'No email provided'}
-          </Text>
-        </View>
-        <View className="flex-row items-center">
-          <Phone size={14} color="#6b7280" />
-          <Text className="text-sm text-gray-600 ml-2">
-            {request?.adminPhone || 'No phone provided'}
-          </Text>
-        </View>
-      </View>
-
-      {/* Society Details */}
-      <View className="mb-3">
-        <View className="flex-row items-center mb-1">
-          <MapPin size={14} color="#6b7280" />
-          <Text className="text-sm text-gray-600 ml-2 flex-1">
-            {request?.societyAddress || 'No address provided'}
-          </Text>
-        </View>
-        <View className="flex-row items-center">
-          <Building2 size={14} color="#6b7280" />
-          <Text className="text-sm text-gray-600 ml-2">
-            {request?.totalFlats || 0} units
-          </Text>
-        </View>
-      </View>
-
-      {/* Documents */}
-      <View className="mb-3">
-        <Text className="text-sm font-medium text-gray-900 mb-1">
-          Documents ({request?.submittedDocuments?.length || 0})
-        </Text>
-        <Text className="text-xs text-gray-600">
-          {request?.submittedDocuments?.join(', ') || 'No documents'}
-        </Text>
-      </View>
-
-      {/* Notes */}
-      {request?.verificationNotes && (
-        <View className="mb-3 p-2 bg-amber-50 rounded-lg">
-          <Text className="text-xs text-amber-800">
-            Note: {request?.verificationNotes}
-          </Text>
-        </View>
-      )}
-
-      {/* Footer */}
-      <View className="flex-row items-center justify-between pt-3 border-t border-gray-200">
-        <View className="flex-row items-center">
-          <Calendar size={14} color="#6b7280" />
-          <Text className="text-xs text-gray-600 ml-1">
-            {daysSinceSubmission} days ago
-          </Text>
-        </View>
-
-        <View className="flex-row space-x-2">
-          <Button onPress={onView} variant="outline" size="sm">
-            View
-          </Button>
-
-          {request?.status === 'pending' && (
-            <>
-              <Button
-                onPress={onReject}
-                variant="outline"
-                size="sm"
-                className="border-red-300 bg-red-50 text-red-700">
-                Reject
-              </Button>
-              <Button onPress={onApprove} variant="primary" size="sm">
-                Approve
-              </Button>
-            </>
-          )}
-        </View>
-      </View>
-    </Card>
-  );
-};
-
-// Add displayName for debugging purposes
-OnboardingRequestCard.displayName = 'OnboardingRequestCard';
-
-/**
- * Society Onboarding Management - Review and approve society applications
- *
- * Features:
- * - List all onboarding requests with status filtering
- * - Quick approve/reject actions
- * - Detailed document verification
- * - Search and filter capabilities
- */
-export default function OnboardingManagement() {
-  const router = useRouter();
-  const [requests, setRequests] = useState(mockOnboardingRequests);
-  const [refreshing, setRefreshing] = useState(false);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [statusFilter, setStatusFilter] = useState('all');
-
-  const handleRefresh = async () => {
-    setRefreshing(true);
-    // Simulate API call
-    setTimeout(() => {
-      setRefreshing(false);
-    }, 1000);
+  const getDocumentCompletionRate = (docs: OnboardingRequest['documents']) => {
+    const total = Object.keys(docs).length;
+    const completed = Object.values(docs).filter(Boolean).length;
+    return Math.round((completed / total) * 100);
   };
-
-  const filterOptions = [
-    { label: 'All', value: 'all' },
-    { label: 'Pending', value: 'pending' },
-    { label: 'Under Review', value: 'under_review' },
-    { label: 'Approved', value: 'approved' },
-    { label: 'Rejected', value: 'rejected' },
-  ];
-
-  const filteredRequests = (requests || []).filter((request) => {
-    // Apply search filter
-    if (searchQuery) {
-      const query = searchQuery.toLowerCase();
-      const matches =
-        (request?.societyName || '').toLowerCase().includes(query) ||
-        (request?.societyCode || '').toLowerCase().includes(query) ||
-        (request?.adminName || '').toLowerCase().includes(query);
-      if (!matches) return false;
-    }
-
-    // Apply status filter
-    if (statusFilter !== 'all') {
-      return request?.status === statusFilter;
-    }
-
-    return true;
-  });
-
-  const handleViewRequest = (requestId: string) => {
-    router.push(`/admin/onboarding/${requestId}`);
-  };
-
-  const handleApproveRequest = (requestId: string) => {
-    setRequests((prev) =>
-      prev.map((req) =>
-        req.id === requestId
-          ? { ...req, status: 'approved', updatedAt: new Date().toISOString() }
-          : req,
-      ),
-    );
-  };
-
-  const handleRejectRequest = (requestId: string) => {
-    setRequests((prev) =>
-      prev.map((req) =>
-        req.id === requestId
-          ? { ...req, status: 'rejected', updatedAt: new Date().toISOString() }
-          : req,
-      ),
-    );
-  };
-
-  const getStatusCounts = () => {
-    const safeRequests = requests || [];
-    return {
-      pending: safeRequests.filter((r) => r?.status === 'pending').length,
-      under_review: safeRequests.filter((r) => r?.status === 'under_review')
-        .length,
-      approved: safeRequests.filter((r) => r?.status === 'approved').length,
-      rejected: safeRequests.filter((r) => r?.status === 'rejected').length,
-    };
-  };
-
-  const statusCounts = getStatusCounts();
 
   return (
-    <View className="flex-1 bg-gray-50">
-      <AdminHeader
-        title="Society Onboarding"
-        subtitle={`${filteredRequests.length} applications`}
-        showBack
-        showNotifications
-      />
-
-      <ScrollView
-        className="flex-1"
-        refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />
-        }
-        showsVerticalScrollIndicator={false}>
-        {/* Search and Filters */}
-        <View className="px-4 py-4 bg-white border-b border-gray-200">
-          <View className="flex-row items-center bg-gray-50 rounded-lg px-3 py-2 mb-4">
-            <Search size={20} color="#6b7280" />
-            <TextInput
-              value={searchQuery}
-              onChangeText={setSearchQuery}
-              placeholder="Search applications..."
-              className="flex-1 ml-2 text-gray-900"
-            />
+    <RequireSuperAdmin>
+      <View className="flex-1 bg-gray-50">
+        <AdminHeader title="Society Onboarding" showBack />
+        
+        <ScrollView className="flex-1 px-4 py-2">
+          {/* Filter Pills */}
+          <View className="flex-row flex-wrap gap-2 mb-4">
+            {(['all', 'pending', 'under_review', 'approved', 'rejected'] as const).map((status) => (
+              <TouchableOpacity
+                key={status}
+                onPress={() => setFilter(status)}
+                className={cn(
+                  "px-3 py-2 rounded-full border",
+                  filter === status 
+                    ? "bg-blue-100 border-blue-300" 
+                    : "bg-white border-gray-300"
+                )}
+              >
+                <Text className={cn(
+                  "text-sm font-medium capitalize",
+                  filter === status ? "text-blue-800" : "text-gray-700"
+                )}>
+                  {status.replace('_', ' ')} ({onboardingRequests.filter(r => status === 'all' || r.status === status).length})
+                </Text>
+              </TouchableOpacity>
+            ))}
           </View>
 
-          <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-            <View className="flex-row space-x-2">
-              {filterOptions.map((option) => (
-                <PillFilter
-                  key={option.value}
-                  label={option.label}
-                  selected={statusFilter === option.value}
-                  onPress={() => setStatusFilter(option.value)}
-                />
-              ))}
-            </View>
-          </ScrollView>
-        </View>
-
-        {/* Statistics */}
-        <View className="px-4 py-4 bg-white mb-2">
-          <View className="flex-row justify-between">
-            <View className="items-center">
-              <Text className="text-xl font-bold text-yellow-600">
-                {statusCounts.pending}
-              </Text>
-              <Text className="text-sm text-gray-600">Pending</Text>
-            </View>
-            <View className="items-center">
-              <Text className="text-xl font-bold text-blue-600">
-                {statusCounts.under_review}
-              </Text>
-              <Text className="text-sm text-gray-600">Under Review</Text>
-            </View>
-            <View className="items-center">
-              <Text className="text-xl font-bold text-green-600">
-                {statusCounts.approved}
-              </Text>
-              <Text className="text-sm text-gray-600">Approved</Text>
-            </View>
-            <View className="items-center">
-              <Text className="text-xl font-bold text-red-600">
-                {statusCounts.rejected}
-              </Text>
-              <Text className="text-sm text-gray-600">Rejected</Text>
-            </View>
-          </View>
-        </View>
-
-        {/* Request List */}
-        <View className="px-4">
-          {filteredRequests.length > 0 ? (
-            <View>
-              {filteredRequests.map((request) => (
-                <OnboardingRequestCard
-                  key={request.id}
-                  request={request}
-                  onView={() => handleViewRequest(request.id)}
-                  onApprove={() => handleApproveRequest(request.id)}
-                  onReject={() => handleRejectRequest(request.id)}
-                />
-              ))}
-            </View>
-          ) : (
-            <Card className="p-8 items-center">
-              <Building2 size={48} color="#6b7280" />
-              <Text className="text-lg font-semibold text-gray-900 mt-4 text-center">
-                {searchQuery ? 'No applications found' : 'No applications yet'}
-              </Text>
-              <Text className="text-gray-600 text-center mt-2">
-                {searchQuery
-                  ? 'Try adjusting your search or filters'
-                  : 'Society onboarding applications will appear here'}
-              </Text>
+          {/* Summary Stats */}
+          <View className="flex-row gap-3 mb-6">
+            <Card className="flex-1 p-4">
+              <View className="flex-row items-center justify-between">
+                <Building2 size={24} color="#0284c7" />
+                <Text className="text-2xl font-bold text-gray-900">
+                  {onboardingRequests.filter(r => r.status === 'pending').length}
+                </Text>
+              </View>
+              <Text className="text-sm font-medium text-gray-900 mt-1">Pending Review</Text>
             </Card>
-          )}
-        </View>
+            
+            <Card className="flex-1 p-4">
+              <View className="flex-row items-center justify-between">
+                <CheckCircle size={24} color="#059669" />
+                <Text className="text-2xl font-bold text-gray-900">
+                  {onboardingRequests.filter(r => r.status === 'approved').length}
+                </Text>
+              </View>
+              <Text className="text-sm font-medium text-gray-900 mt-1">Approved</Text>
+            </Card>
+          </View>
 
-        <View className="h-6" />
-      </ScrollView>
-    </View>
+          {/* Onboarding Requests */}
+          <View className="space-y-3">
+            {filteredRequests.map((request) => (
+              <TouchableOpacity
+                key={request.id}
+                onPress={() => handleViewDetails(request)}
+              >
+                <Card className="p-4">
+                  <View className="flex-row items-start justify-between mb-3">
+                    <View className="flex-1">
+                      <Text className="text-base font-semibold text-gray-900">
+                        {request.societyName}
+                      </Text>
+                      <Text className="text-sm text-gray-600">
+                        {request.city}, {request.state} • {request.totalUnits} units
+                      </Text>
+                      <Text className="text-sm text-gray-600 capitalize">
+                        {request.subscriptionPlan} plan
+                      </Text>
+                    </View>
+                    <View className="items-end">
+                      <View className="flex-row items-center mb-1">
+                        {getStatusIcon(request.status)}
+                        <Text className={cn("text-sm font-medium ml-1 capitalize", getStatusColor(request.status))}>
+                          {request.status.replace('_', ' ')}
+                        </Text>
+                      </View>
+                      <Text className={cn("text-xs font-medium", getPriorityColor(request.priority))}>
+                        {request.priority.toUpperCase()}
+                      </Text>
+                    </View>
+                  </View>
+                  
+                  <View className="flex-row justify-between items-center">
+                    <Text className="text-xs text-gray-600">
+                      Documents: {getDocumentCompletionRate(request.documents)}% complete
+                    </Text>
+                    <Text className="text-xs text-gray-500">
+                      {new Date(request.submittedAt).toLocaleDateString()}
+                    </Text>
+                  </View>
+                </Card>
+              </TouchableOpacity>
+            ))}
+          </View>
+        </ScrollView>
+
+        {/* Detail Modal */}
+        <Modal visible={showModal} transparent animationType="slide">
+          <View className="flex-1 bg-black bg-opacity-50 justify-end">
+            <View className="bg-white rounded-t-xl max-h-4/5">
+              <View className="flex-row items-center justify-between p-4 border-b border-gray-200">
+                <Text className="text-lg font-semibold">
+                  {selectedRequest?.societyName}
+                </Text>
+                <TouchableOpacity onPress={() => setShowModal(false)}>
+                  <X size={24} color="#6b7280" />
+                </TouchableOpacity>
+              </View>
+              
+              {selectedRequest && (
+                <ScrollView className="p-4">
+                  {/* Society Details */}
+                  <Card className="p-4 mb-4">
+                    <Text className="text-sm font-semibold text-gray-900 mb-3">Society Information</Text>
+                    <View className="space-y-2">
+                      <View className="flex-row justify-between">
+                        <Text className="text-sm text-gray-600">Location:</Text>
+                        <Text className="text-sm text-gray-900">{selectedRequest.city}, {selectedRequest.state}</Text>
+                      </View>
+                      <View className="flex-row justify-between">
+                        <Text className="text-sm text-gray-600">Total Units:</Text>
+                        <Text className="text-sm text-gray-900">{selectedRequest.totalUnits}</Text>
+                      </View>
+                      <View className="flex-row justify-between">
+                        <Text className="text-sm text-gray-600">Plan:</Text>
+                        <Text className="text-sm text-gray-900 capitalize">{selectedRequest.subscriptionPlan}</Text>
+                      </View>
+                    </View>
+                  </Card>
+
+                  {/* Contact Person */}
+                  <Card className="p-4 mb-4">
+                    <Text className="text-sm font-semibold text-gray-900 mb-3">Contact Person</Text>
+                    <View className="space-y-2">
+                      <View className="flex-row justify-between">
+                        <Text className="text-sm text-gray-600">Name:</Text>
+                        <Text className="text-sm text-gray-900">{selectedRequest.contactPerson.name}</Text>
+                      </View>
+                      <View className="flex-row justify-between">
+                        <Text className="text-sm text-gray-600">Role:</Text>
+                        <Text className="text-sm text-gray-900">{selectedRequest.contactPerson.role}</Text>
+                      </View>
+                      <View className="flex-row justify-between">
+                        <Text className="text-sm text-gray-600">Email:</Text>
+                        <Text className="text-sm text-blue-600">{selectedRequest.contactPerson.email}</Text>
+                      </View>
+                      <View className="flex-row justify-between">
+                        <Text className="text-sm text-gray-600">Phone:</Text>
+                        <Text className="text-sm text-gray-900">{selectedRequest.contactPerson.phone}</Text>
+                      </View>
+                    </View>
+                  </Card>
+
+                  {/* Documents */}
+                  <Card className="p-4 mb-4">
+                    <Text className="text-sm font-semibold text-gray-900 mb-3">Document Status</Text>
+                    <View className="space-y-2">
+                      {Object.entries(selectedRequest.documents).map(([doc, status]) => (
+                        <View key={doc} className="flex-row items-center justify-between">
+                          <Text className="text-sm text-gray-600 capitalize">
+                            {doc.replace(/([A-Z])/g, ' $1').trim()}:
+                          </Text>
+                          <View className="flex-row items-center">
+                            {status ? (
+                              <CheckCircle size={16} color="#059669" />
+                            ) : (
+                              <X size={16} color="#dc2626" />
+                            )}
+                            <Text className={cn("text-sm ml-1", status ? "text-green-600" : "text-red-600")}>
+                              {status ? 'Uploaded' : 'Missing'}
+                            </Text>
+                          </View>
+                        </View>
+                      ))}
+                    </View>
+                  </Card>
+
+                  {/* Action Buttons */}
+                  <View className="space-y-3">
+                    {selectedRequest.status === 'pending' && (
+                      <Button
+                        onPress={() => handleStartReview(selectedRequest.id)}
+                        variant="outline"
+                      >
+                        Start Review
+                      </Button>
+                    )}
+                    
+                    {(selectedRequest.status === 'pending' || selectedRequest.status === 'under_review') && (
+                      <View className="flex-row gap-3">
+                        <Button
+                          onPress={() => handleApprove(selectedRequest.id)}
+                          variant="primary"
+                          className="flex-1"
+                        >
+                          Approve
+                        </Button>
+                        <Button
+                          onPress={() => handleReject(selectedRequest.id)}
+                          variant="destructive"
+                          className="flex-1"
+                        >
+                          Reject
+                        </Button>
+                      </View>
+                    )}
+                  </View>
+                </ScrollView>
+              )}
+            </View>
+          </View>
+        </Modal>
+      </View>
+    </RequireSuperAdmin>
   );
 }
+
+export default AdminOnboarding;

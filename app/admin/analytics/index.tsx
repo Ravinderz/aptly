@@ -18,7 +18,7 @@ import { AdminHeader } from '@/components/admin/AdminHeader';
 import { DashboardMetrics } from '@/components/admin/DashboardMetrics';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
-import { PillFilter } from '@/components/ui/PillFilter';
+import FilterPill from '@/components/ui/FilterPill';
 
 /**
  * Admin Analytics - Detailed analytics and reporting
@@ -105,7 +105,7 @@ export default function AdminAnalytics() {
           <ScrollView horizontal showsHorizontalScrollIndicator={false}>
             <View className="flex-row space-x-2">
               {timeRangeOptions.map((option) => (
-                <PillFilter
+                <FilterPill
                   key={option.value}
                   label={option.label}
                   selected={analyticsTimeRange === option.value}

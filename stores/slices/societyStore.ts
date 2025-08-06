@@ -7,6 +7,7 @@
 import { create } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
 import { immer } from 'zustand/middleware/immer';
+import { createStorageManager } from '../utils/storageManager';
 import type { BaseStore } from '../types';
 
 // Society types
@@ -856,7 +857,8 @@ export const useSocietyStore = create<SocietyStore>()(
       })),
       {
         name: 'society-storage',
-        partialize: (state) => ({
+        storage: createStorageManager('SocietyStore') as any,
+        partialize: (state: SocietyStore) => ({
           currentSociety: state.currentSociety,
           // Don't persist the full societies array to save space
           // Will be loaded fresh on app start
@@ -874,7 +876,19 @@ export const useSocietyLoading = () =>
   useSocietyStore((state) => state.loading);
 export const useSocietyError = () => useSocietyStore((state) => state.error);
 export const useSocietyList = () =>
-  useSocietyStore((state) => state.getPaginatedSocieties());
+  useSocietyStore((state) => {
+    // Get filtered societies without pagination function call to prevent infinite loops
+    const filtered = state.societies.filter((society) => {
+      if (!state.searchQuery) return true;
+      return society.name.toLowerCase().includes(state.searchQuery.toLowerCase()) ||
+             society.address.toLowerCase().includes(state.searchQuery.toLowerCase());
+    });
+    
+    // Apply pagination
+    const startIndex = (state.currentPage - 1) * state.itemsPerPage;
+    const endIndex = startIndex + state.itemsPerPage;
+    return filtered.slice(startIndex, endIndex);
+  });
 export const useSocietyMetrics = () =>
   useSocietyStore((state) => state.metrics);
 export const useSocietyActions = () =>

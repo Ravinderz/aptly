@@ -11,6 +11,10 @@ export interface ButtonProps {
   children: React.ReactNode;
   className?: string;
   fullWidth?: boolean;
+  testID?: string;
+  accessible?: boolean;
+  accessibilityLabel?: string;
+  accessibilityHint?: string;
 }
 
 const buttonVariants = {
@@ -50,11 +54,19 @@ export const Button: React.FC<ButtonProps> = ({
   children,
   className,
   fullWidth = false,
+  testID,
+  accessible,
+  accessibilityLabel,
+  accessibilityHint,
 }) => {
   const isDisabled = disabled || loading;
 
   return (
     <TouchableOpacity
+      testID={testID}
+      accessible={accessible}
+      accessibilityLabel={accessibilityLabel}
+      accessibilityHint={accessibilityHint}
       className={cn(
         'rounded-lg flex-row items-center justify-center',
         buttonVariants[variant],

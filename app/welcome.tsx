@@ -142,8 +142,8 @@ export default function Welcome() {
       // Update auth context
       login(mockManagerProfile);
 
-      // Navigate to home (managers use regular app with elevated permissions)
-      router.replace('/(tabs)');
+      // Navigate to manager dashboard
+      router.replace('/manager/dashboard');
     } catch (error) {
       console.error('Error setting up manager mode:', error);
     }
@@ -192,7 +192,7 @@ export default function Welcome() {
             onPress={handleCommunityManagerLogin}
             className="bg-blue-500/90 rounded-full px-3 py-2 flex-row items-center shadow-sm"
             activeOpacity={0.8}>
-            <LucideIcons name="people" size={16} color="white" />
+            <LucideIcons name="users" size={16} color="white" />
             <Text className="text-white text-label-large font-bold ml-1">
               MANAGER
             </Text>

@@ -1,556 +1,306 @@
-import React, { useEffect, useState } from 'react';
-import {
-  View,
-  Text,
-  ScrollView,
-  RefreshControl,
-  TextInput,
-  TouchableOpacity,
-  Modal,
-} from 'react-native';
-import { useRouter } from 'expo-router';
-import {
-  Search,
-  Plus,
-  UserCheck,
-  Users,
-  Building2,
-  Calendar,
-  Star,
-  MoreVertical,
-  X,
-  User,
-  Mail,
-  Phone,
-} from 'lucide-react-native';
+import React, { useState } from 'react';
+import { View, Text, ScrollView, TouchableOpacity, Alert, Modal } from 'react-native';
+import { Building2, Plus, X, CheckCircle, AlertTriangle } from 'lucide-react-native';
+import { RequireSuperAdmin } from '@/components/auth/RoleGuard';
 import { AdminHeader } from '@/components/admin/AdminHeader';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
-import { PillFilter } from '@/components/ui/PillFilter';
 import { cn } from '@/utils/cn';
+import { 
+  calculateSocietyHealthScore, 
+  getSampleHealthMetrics,
+  getHealthScoreColor,
+  formatHealthScore 
+} from '@/utils/societyHealthScoring';
 
-// Mock data for manager assignments
-const mockAssignments = [
-  {
-    id: 'assign-1',
-    societyId: 'society-1',
-    societyName: 'Green Valley Apartments',
-    managerId: 'manager-1',
-    managerName: 'Rajesh Kumar',
-    managerEmail: 'rajesh@aptly.com',
-    managerPhone: '+91-9876543210',
-    assignmentType: 'permanent',
-    startDate: '2024-01-01',
-    isActive: true,
-    performanceScore: 4.8,
-    totalSocieties: 3,
-    assignedBy: 'admin-1',
-    createdAt: '2024-01-01T00:00:00Z',
-  },
-  {
-    id: 'assign-2',
-    societyId: 'society-2',
-    societyName: 'Blue Ridge Society',
-    managerId: 'manager-2',
-    managerName: 'Priya Sharma',
-    managerEmail: 'priya@aptly.com',
-    managerPhone: '+91-9876543211',
-    assignmentType: 'temporary',
-    startDate: '2024-01-15',
-    endDate: '2024-03-15',
-    isActive: true,
-    performanceScore: 4.6,
-    totalSocieties: 2,
-    assignedBy: 'admin-1',
-    createdAt: '2024-01-15T00:00:00Z',
-  },
-];
-
-const mockAvailableManagers = [
-  {
-    id: 'manager-3',
-    name: 'Amit Patel',
-    email: 'amit@aptly.com',
-    phone: '+91-9876543212',
-    experience: '5 years',
-    currentSocieties: 1,
-    maxSocieties: 5,
-    performanceScore: 4.9,
-    specializations: ['Financial Management', 'Maintenance'],
-    availability: 'available',
-  },
-  {
-    id: 'manager-4',
-    name: 'Sneha Gupta',
-    email: 'sneha@aptly.com',
-    phone: '+91-9876543213',
-    experience: '3 years',
-    currentSocieties: 2,
-    maxSocieties: 4,
-    performanceScore: 4.7,
-    specializations: ['Community Relations', 'Event Management'],
-    availability: 'available',
-  },
-];
-
-interface AssignmentCardProps {
-  assignment: any;
-  onViewDetails: () => void;
-  onManage: () => void;
+interface AssignedSocietyDetail {
+  id: string;
+  name: string;
+  totalUnits: number;
+  assignedAt: string;
+  healthScore: number;
+  status: 'healthy' | 'attention_needed' | 'critical';
+  lastActivity?: string;
+  activeIssues?: number;
 }
 
-const AssignmentCard: React.FC<AssignmentCardProps> = ({
-  assignment,
-  onViewDetails,
-  onManage,
-}) => {
-  const getAssignmentTypeColor = (type: string) => {
-    switch (type) {
-      case 'permanent':
-        return 'bg-green-100 text-green-800';
-      case 'temporary':
-        return 'bg-blue-100 text-blue-800';
-      case 'interim':
-        return 'bg-yellow-100 text-yellow-800';
-      default:
-        return 'bg-gray-100 text-gray-800';
-    }
+interface CommunityManager {
+  id: string;
+  name: string;
+  email: string;
+  workload: { current: number; capacity: number; utilizationRate: number };
+  assignedSocieties: AssignedSocietyDetail[];
+  performance: {
+    averageResponseTime: number;
+    satisfactionScore: number;
+    ticketsResolved: number;
   };
-
-  return (
-    <Card className="p-4 mb-3">
-      <TouchableOpacity onPress={onViewDetails}>
-        <View className="flex-row items-start justify-between mb-3">
-          <View className="flex-1">
-            <Text className="text-lg font-semibold text-gray-900 mb-1">
-              {assignment.societyName}
-            </Text>
-            <Text className="text-sm text-gray-600">
-              Manager: {assignment.managerName}
-            </Text>
-          </View>
-          
-          <View className="flex-row items-center space-x-2">
-            <View className={cn(
-              'px-2 py-1 rounded-full',
-              getAssignmentTypeColor(assignment.assignmentType)
-            )}>
-              <Text className="text-xs font-medium capitalize">
-                {assignment.assignmentType}
-              </Text>
-            </View>
-            
-            <TouchableOpacity onPress={onManage} className="p-1">
-              <MoreVertical size={16} color="#6b7280" />
-            </TouchableOpacity>
-          </View>
-        </View>
-
-        <View className="flex-row items-center mb-2">
-          <Mail size={14} color="#6b7280" />
-          <Text className="text-sm text-gray-600 ml-2">
-            {assignment.managerEmail}
-          </Text>
-        </View>
-
-        <View className="flex-row items-center mb-3">
-          <Phone size={14} color="#6b7280" />
-          <Text className="text-sm text-gray-600 ml-2">
-            {assignment.managerPhone}
-          </Text>
-        </View>
-
-        <View className="flex-row justify-between items-center">
-          <View className="flex-row items-center">
-            <Star size={14} color="#f59e0b" />
-            <Text className="text-sm text-gray-600 ml-1">
-              {assignment.performanceScore}/5.0
-            </Text>
-          </View>
-          
-          <View className="flex-row items-center">
-            <Building2 size={14} color="#6b7280" />
-            <Text className="text-sm text-gray-600 ml-1">
-              {assignment.totalSocieties} societies
-            </Text>
-          </View>
-          
-          <View className="flex-row items-center">
-            <Calendar size={14} color="#6b7280" />
-            <Text className="text-sm text-gray-600 ml-1">
-              Since {new Date(assignment.startDate).toLocaleDateString()}
-            </Text>
-          </View>
-        </View>
-
-        {assignment.endDate && (
-          <View className="mt-2 p-2 bg-blue-50 rounded-lg">
-            <Text className="text-xs text-blue-800">
-              Temporary assignment ends on {new Date(assignment.endDate).toLocaleDateString()}
-            </Text>
-          </View>
-        )}
-      </TouchableOpacity>
-    </Card>
-  );
-};
-
-interface AssignManagerModalProps {
-  visible: boolean;
-  onClose: () => void;
-  onAssign: (managerId: string, societyId: string, assignmentType: string) => void;
-  availableManagers: any[];
-  societies: any[];
 }
 
-const AssignManagerModal: React.FC<AssignManagerModalProps> = ({
-  visible,
-  onClose,
-  onAssign,
-  availableManagers,
-  societies,
-}) => {
-  const [selectedManager, setSelectedManager] = useState<string>('');
-  const [selectedSociety, setSelectedSociety] = useState<string>('');
-  const [assignmentType, setAssignmentType] = useState<string>('permanent');
+interface UnassignedSociety {
+  id: string;
+  name: string;
+  city: string;
+  state: string;
+  totalUnits: number;
+  priority: 'high' | 'medium' | 'low';
+}
 
-  const handleAssign = () => {
-    if (selectedManager && selectedSociety) {
-      onAssign(selectedManager, selectedSociety, assignmentType);
-      setSelectedManager('');
-      setSelectedSociety('');
-      setAssignmentType('permanent');
-      onClose();
-    }
-  };
-
-  return (
-    <Modal visible={visible} animationType="slide" presentationStyle="pageSheet">
-      <View className="flex-1 bg-white">
-        <View className="flex-row items-center justify-between p-4 border-b border-gray-200">
-          <Text className="text-lg font-semibold">Assign Manager</Text>
-          <TouchableOpacity onPress={onClose}>
-            <X size={24} color="#6b7280" />
-          </TouchableOpacity>
-        </View>
-
-        <ScrollView className="flex-1 p-4">
-          {/* Select Manager */}
-          <View className="mb-6">
-            <Text className="text-base font-semibold text-gray-900 mb-3">
-              Select Manager
-            </Text>
-            {availableManagers.map((manager) => (
-              <TouchableOpacity
-                key={manager.id}
-                onPress={() => setSelectedManager(manager.id)}
-                className={cn(
-                  'p-3 rounded-lg border mb-2',
-                  selectedManager === manager.id
-                    ? 'border-blue-500 bg-blue-50'
-                    : 'border-gray-200'
-                )}
-              >
-                <Text className="font-medium text-gray-900">
-                  {manager.name}
-                </Text>
-                <Text className="text-sm text-gray-600">
-                  {manager.email} • {manager.experience}
-                </Text>
-                <View className="flex-row items-center mt-1">
-                  <Star size={12} color="#f59e0b" />
-                  <Text className="text-xs text-gray-600 ml-1">
-                    {manager.performanceScore}/5.0 • {manager.currentSocieties}/{manager.maxSocieties} societies
-                  </Text>
-                </View>
-              </TouchableOpacity>
-            ))}
-          </View>
-
-          {/* Select Society */}
-          <View className="mb-6">
-            <Text className="text-base font-semibold text-gray-900 mb-3">
-              Select Society
-            </Text>
-            {societies.map((society) => (
-              <TouchableOpacity
-                key={society.id}
-                onPress={() => setSelectedSociety(society.id)}
-                className={cn(
-                  'p-3 rounded-lg border mb-2',
-                  selectedSociety === society.id
-                    ? 'border-blue-500 bg-blue-50'
-                    : 'border-gray-200'
-                )}
-              >
-                <Text className="font-medium text-gray-900">
-                  {society.name}
-                </Text>
-                <Text className="text-sm text-gray-600">
-                  {society.code} • {society.totalFlats} units
-                </Text>
-              </TouchableOpacity>
-            ))}
-          </View>
-
-          {/* Assignment Type */}
-          <View className="mb-6">
-            <Text className="text-base font-semibold text-gray-900 mb-3">
-              Assignment Type
-            </Text>
-            <View className="flex-row space-x-2">
-              {['permanent', 'temporary', 'interim'].map((type) => (
-                <TouchableOpacity
-                  key={type}
-                  onPress={() => setAssignmentType(type)}
-                  className={cn(
-                    'px-4 py-2 rounded-lg border',
-                    assignmentType === type
-                      ? 'border-blue-500 bg-blue-50'
-                      : 'border-gray-200'
-                  )}
-                >
-                  <Text className={cn(
-                    'text-sm font-medium capitalize',
-                    assignmentType === type ? 'text-blue-700' : 'text-gray-700'
-                  )}>
-                    {type}
-                  </Text>
-                </TouchableOpacity>
-              ))}
-            </View>
-          </View>
-
-          <Button
-            onPress={handleAssign}
-            variant="primary"
-            disabled={!selectedManager || !selectedSociety}
-          >
-            Assign Manager
-          </Button>
-        </ScrollView>
-      </View>
-    </Modal>
-  );
-};
-
-/**
- * Manager Assignment Management - Assign and manage community managers
- * 
- * Features:
- * - List all manager assignments
- * - Assign managers to societies
- * - Track performance and workload
- * - Manage assignment types and duration
- */
-export default function ManagerAssignment() {
-  const router = useRouter();
-  const [assignments, setAssignments] = useState(mockAssignments);
-  const [refreshing, setRefreshing] = useState(false);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [statusFilter, setStatusFilter] = useState('all');
-  const [showAssignModal, setShowAssignModal] = useState(false);
-
-  const handleRefresh = async () => {
-    setRefreshing(true);
-    // Simulate API call
-    setTimeout(() => {
-      setRefreshing(false);
-    }, 1000);
-  };
-
-  const filterOptions = [
-    { label: 'All', value: 'all' },
-    { label: 'Permanent', value: 'permanent' },
-    { label: 'Temporary', value: 'temporary' },
-    { label: 'Interim', value: 'interim' },
-  ];
-
-  const filteredAssignments = assignments.filter((assignment) => {
-    // Apply search filter
-    if (searchQuery) {
-      const query = searchQuery.toLowerCase();
-      const matches = 
-        assignment.societyName.toLowerCase().includes(query) ||
-        assignment.managerName.toLowerCase().includes(query);
-      if (!matches) return false;
-    }
-
-    // Apply status filter
-    if (statusFilter !== 'all') {
-      return assignment.assignmentType === statusFilter;
-    }
-
-    return true;
-  });
-
-  const handleViewAssignment = (assignmentId: string) => {
-    // Navigate to assignment details
-    console.log('View assignment:', assignmentId);
-  };
-
-  const handleManageAssignment = (assignmentId: string) => {
-    // Open management options
-    console.log('Manage assignment:', assignmentId);
-  };
-
-  const handleAssignManager = (managerId: string, societyId: string, assignmentType: string) => {
-    const newAssignment = {
-      id: `assign-${Date.now()}`,
-      societyId,
-      societyName: 'Selected Society', // This should come from actual society data
-      managerId,
-      managerName: 'Selected Manager', // This should come from actual manager data
-      managerEmail: 'manager@aptly.com',
-      managerPhone: '+91-9876543210',
-      assignmentType,
-      startDate: new Date().toISOString().split('T')[0],
-      isActive: true,
-      performanceScore: 0,
-      totalSocieties: 1,
-      assignedBy: 'current-admin',
-      createdAt: new Date().toISOString(),
-    };
-
-    setAssignments(prev => [...prev, newAssignment]);
-  };
-
-  const getAssignmentTypeCounts = () => {
-    return {
-      permanent: assignments.filter(a => a.assignmentType === 'permanent').length,
-      temporary: assignments.filter(a => a.assignmentType === 'temporary').length,
-      interim: assignments.filter(a => a.assignmentType === 'interim').length,
-    };
-  };
-
-  const typeCounts = getAssignmentTypeCounts();
-
-  return (
-    <View className="flex-1 bg-gray-50">
-      <AdminHeader 
-        title="Manager Assignments" 
-        subtitle={`${filteredAssignments.length} active assignments`}
-        showBack
-        showNotifications
-      />
-
-      <ScrollView
-        className="flex-1"
-        refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />
+function AdminManagers() {
+  const [managers, setManagers] = useState<CommunityManager[]>([
+    {
+      id: 'mgr_001',
+      name: 'Sarah Johnson',
+      email: 'sarah@aptly.com',
+      workload: { current: 150, capacity: 500, utilizationRate: 30 },
+      assignedSocieties: [
+        {
+          id: 'soc_001', 
+          name: 'Green Valley', 
+          totalUnits: 150,
+          assignedAt: '2024-01-15',
+          healthScore: 85,
+          status: 'healthy',
+          lastActivity: '2 hours ago',
+          activeIssues: 2,
         }
-        showsVerticalScrollIndicator={false}
-      >
-        {/* Search and Filters */}
-        <View className="px-4 py-4 bg-white border-b border-gray-200">
-          <View className="flex-row items-center mb-4">
-            <View className="flex-1 flex-row items-center bg-gray-50 rounded-lg px-3 py-2 mr-3">
-              <Search size={20} color="#6b7280" />
-              <TextInput
-                value={searchQuery}
-                onChangeText={setSearchQuery}
-                placeholder="Search assignments..."
-                className="flex-1 ml-2 text-gray-900"
-              />
-            </View>
-            <TouchableOpacity 
-              onPress={() => setShowAssignModal(true)}
-              className="bg-blue-600 p-2 rounded-lg"
-            >
-              <Plus size={20} color="white" />
-            </TouchableOpacity>
-          </View>
+      ],
+      performance: {
+        averageResponseTime: 2.5,
+        satisfactionScore: 94,
+        ticketsResolved: 47,
+      },
+    },
+    {
+      id: 'mgr_002',
+      name: 'Michael Chen',
+      email: 'michael@aptly.com',
+      workload: { current: 280, capacity: 600, utilizationRate: 47 },
+      assignedSocieties: [
+        {
+          id: 'soc_003', 
+          name: 'Sunset Plaza', 
+          totalUnits: 180,
+          assignedAt: '2024-01-10',
+          healthScore: 72,
+          status: 'attention_needed',
+          lastActivity: '5 hours ago',
+          activeIssues: 6,
+        },
+        {
+          id: 'soc_004', 
+          name: 'Royal Gardens', 
+          totalUnits: 100,
+          assignedAt: '2024-02-01',
+          healthScore: 91,
+          status: 'healthy',
+          lastActivity: '1 hour ago',
+          activeIssues: 1,
+        }
+      ],
+      performance: {
+        averageResponseTime: 3.2,
+        satisfactionScore: 88,
+        ticketsResolved: 63,
+      },
+    },
+  ]);
 
-          <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-            <View className="flex-row space-x-2">
-              {filterOptions.map((option) => (
-                <PillFilter
-                  key={option.value}
-                  label={option.label}
-                  selected={statusFilter === option.value}
-                  onPress={() => setStatusFilter(option.value)}
-                />
-              ))}
-            </View>
-          </ScrollView>
-        </View>
+  const [unassignedSocieties, setUnassignedSocieties] = useState<UnassignedSociety[]>([
+    {
+      id: 'soc_002',
+      name: 'Emerald Heights',
+      city: 'Mumbai',
+      state: 'Maharashtra',
+      totalUnits: 180,
+      priority: 'high',
+    },
+  ]);
 
-        {/* Statistics */}
-        <View className="px-4 py-4 bg-white mb-2">
-          <View className="flex-row justify-between">
-            <View className="items-center">
-              <Text className="text-xl font-bold text-green-600">
-                {typeCounts.permanent}
-              </Text>
-              <Text className="text-sm text-gray-600">Permanent</Text>
-            </View>
-            <View className="items-center">
-              <Text className="text-xl font-bold text-blue-600">
-                {typeCounts.temporary}
-              </Text>
-              <Text className="text-sm text-gray-600">Temporary</Text>
-            </View>
-            <View className="items-center">
-              <Text className="text-xl font-bold text-yellow-600">
-                {typeCounts.interim}
-              </Text>
-              <Text className="text-sm text-gray-600">Interim</Text>
-            </View>
-            <View className="items-center">
-              <Text className="text-xl font-bold text-gray-900">
-                {mockAvailableManagers.length}
-              </Text>
-              <Text className="text-sm text-gray-600">Available</Text>
-            </View>
-          </View>
-        </View>
+  const [showModal, setShowModal] = useState(false);
+  const [selectedManager, setSelectedManager] = useState<CommunityManager | null>(null);
 
-        {/* Assignment List */}
-        <View className="px-4">
-          {filteredAssignments.length > 0 ? (
-            <View>
-              {filteredAssignments.map((assignment) => (
-                <AssignmentCard
-                  key={assignment.id}
-                  assignment={assignment}
-                  onViewDetails={() => handleViewAssignment(assignment.id)}
-                  onManage={() => handleManageAssignment(assignment.id)}
-                />
-              ))}
-            </View>
-          ) : (
-            <Card className="p-8 items-center">
-              <UserCheck size={48} color="#6b7280" />
-              <Text className="text-lg font-semibold text-gray-900 mt-4 text-center">
-                {searchQuery ? 'No assignments found' : 'No assignments yet'}
-              </Text>
-              <Text className="text-gray-600 text-center mt-2 mb-4">
-                {searchQuery 
-                  ? 'Try adjusting your search or filters'
-                  : 'Start by assigning managers to societies'
-                }
-              </Text>
-              <Button
-                onPress={() => setShowAssignModal(true)}
-                variant="primary"
-              >
-                Assign Manager
-              </Button>
+  const handleAssign = (manager: CommunityManager) => {
+    setSelectedManager(manager);
+    setShowModal(true);
+  };
+
+  const handleAssignSocietyToManager = async (societyId: string) => {
+    if (!selectedManager) return;
+    
+    const society = unassignedSocieties.find(s => s.id === societyId);
+    if (!society) return;
+
+    // Calculate health score for new society
+    const healthMetrics = {
+      ...getSampleHealthMetrics(),
+      totalResidents: society.totalUnits,
+      activeResidents: Math.floor(society.totalUnits * 0.9),
+      openIssues: society.priority === 'high' ? 8 : society.priority === 'medium' ? 4 : 2,
+      paymentComplianceRate: society.priority === 'high' ? 80 : 90,
+    };
+    
+    const healthResult = calculateSocietyHealthScore(healthMetrics);
+    
+    // Update managers state
+    setManagers(prev => prev.map(mgr => 
+      mgr.id === selectedManager.id 
+        ? {
+            ...mgr,
+            assignedSocieties: [...mgr.assignedSocieties, {
+              id: society.id,
+              name: society.name,
+              totalUnits: society.totalUnits,
+              assignedAt: new Date().toISOString(),
+              healthScore: healthResult.overall,
+              status: healthResult.status,
+              lastActivity: 'Just assigned',
+              activeIssues: healthMetrics.openIssues,
+            }],
+            workload: {
+              ...mgr.workload,
+              current: mgr.workload.current + society.totalUnits,
+              utilizationRate: Math.round(((mgr.workload.current + society.totalUnits) / mgr.workload.capacity) * 100),
+            }
+          }
+        : mgr
+    ));
+
+    // Remove from unassigned
+    setUnassignedSocieties(prev => prev.filter(s => s.id !== societyId));
+    setShowModal(false);
+    Alert.alert('Success', `${society.name} assigned to ${selectedManager.name}!`);
+  };
+
+  const getPriorityColor = (priority: string) => {
+    switch (priority) {
+      case 'high': return 'text-red-600';
+      case 'medium': return 'text-yellow-600';
+      default: return 'text-green-600';
+    }
+  };
+
+  return (
+    <RequireSuperAdmin>
+      <View className="flex-1 bg-gray-50">
+        <AdminHeader title="Manager Assignment" showBack />
+        
+        <ScrollView className="flex-1 px-4 py-2">
+          {unassignedSocieties.length > 0 && (
+            <Card className="p-4 bg-orange-50 border-orange-200 mb-4">
+              <View className="flex-row items-center">
+                <AlertTriangle size={20} color="#d97706" />
+                <Text className="text-orange-800 font-semibold ml-2">
+                  {unassignedSocieties.length} Unassigned Societies
+                </Text>
+              </View>
             </Card>
           )}
-        </View>
 
-        <View className="h-6" />
-      </ScrollView>
+          <View className="space-y-3">
+            {managers.map((manager) => (
+              <Card key={manager.id} className="p-4">
+                <View className="flex-row items-start justify-between mb-3">
+                  <View className="flex-1">
+                    <Text className="text-base font-semibold text-gray-900">
+                      {manager.name}
+                    </Text>
+                    <Text className="text-sm text-gray-600">{manager.email}</Text>
+                  </View>
+                  <Text className="text-lg font-bold text-green-600">
+                    {manager.workload.utilizationRate}%
+                  </Text>
+                </View>
 
-      {/* Assign Manager Modal */}
-      <AssignManagerModal
-        visible={showAssignModal}
-        onClose={() => setShowAssignModal(false)}
-        onAssign={handleAssignManager}
-        availableManagers={mockAvailableManagers}
-        societies={[]} // This should come from actual society data
-      />
-    </View>
+                <View className="border-t border-gray-200 pt-3 mb-3">
+                  <Text className="text-xs text-gray-500 mb-2">
+                    Assigned Societies ({manager.assignedSocieties.length})
+                  </Text>
+                  <View className="space-y-2">
+                    {manager.assignedSocieties.map((society) => (
+                      <View key={society.id} className="flex-row items-center justify-between p-2 bg-gray-50 rounded-lg">
+                        <View className="flex-1">
+                          <Text className="text-sm font-medium text-gray-900">{society.name}</Text>
+                          <Text className="text-xs text-gray-600">{society.totalUnits} units</Text>
+                        </View>
+                        <View className="items-end">
+                          <Text className="text-xs font-medium" style={{ color: getHealthScoreColor(society.healthScore) }}>
+                            {formatHealthScore(society.healthScore)}
+                          </Text>
+                          {society.activeIssues !== undefined && society.activeIssues > 0 && (
+                            <Text className="text-xs text-orange-600">
+                              {society.activeIssues} issues
+                            </Text>
+                          )}
+                        </View>
+                      </View>
+                    ))}
+                  </View>
+                  
+                  <View className="mt-3 p-2 bg-blue-50 rounded-lg">
+                    <Text className="text-xs text-blue-900 font-medium mb-1">Performance</Text>
+                    <View className="flex-row justify-between">
+                      <Text className="text-xs text-blue-800">Response: {manager.performance.averageResponseTime}h</Text>
+                      <Text className="text-xs text-blue-800">Satisfaction: {manager.performance.satisfactionScore}%</Text>
+                    </View>
+                  </View>
+                </View>
+
+                <Button
+                  onPress={() => handleAssign(manager)}
+                  variant="outline"
+                  size="sm"
+                >
+                  <Plus size={14} color="#374151" />
+                  <Text className="text-sm text-gray-700 ml-1">Assign Society</Text>
+                </Button>
+              </Card>
+            ))}
+          </View>
+        </ScrollView>
+
+        <Modal visible={showModal} transparent animationType="slide">
+          <View className="flex-1 bg-black bg-opacity-50 justify-end">
+            <View className="bg-white rounded-t-xl max-h-96">
+              <View className="flex-row items-center justify-between p-4 border-b border-gray-200">
+                <Text className="text-lg font-semibold">
+                  Assign to {selectedManager?.name}
+                </Text>
+                <TouchableOpacity onPress={() => setShowModal(false)}>
+                  <X size={24} color="#6b7280" />
+                </TouchableOpacity>
+              </View>
+              
+              <ScrollView className="p-4">
+                <View className="space-y-3">
+                  {unassignedSocieties.map((society) => (
+                    <TouchableOpacity
+                      key={society.id}
+                      onPress={() => handleAssignSocietyToManager(society.id)}
+                      className="p-3 border border-gray-200 rounded-lg"
+                    >
+                      <View className="flex-row items-start justify-between">
+                        <View className="flex-1">
+                          <Text className="font-medium">{society.name}</Text>
+                          <Text className="text-sm text-gray-600">
+                            {society.city}, {society.state}
+                          </Text>
+                          <Text className={cn("text-sm font-medium", getPriorityColor(society.priority))}>
+                            {society.priority.toUpperCase()} PRIORITY
+                          </Text>
+                        </View>
+                        <CheckCircle size={20} color="#059669" />
+                      </View>
+                    </TouchableOpacity>
+                  ))}
+                </View>
+              </ScrollView>
+            </View>
+          </View>
+        </Modal>
+      </View>
+    </RequireSuperAdmin>
   );
 }
+
+export default AdminManagers;

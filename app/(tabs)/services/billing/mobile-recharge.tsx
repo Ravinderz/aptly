@@ -145,21 +145,25 @@ export default function MobileRecharge() {
 
     // Simulate operator detection
     setTimeout(() => {
-      const firstDigit = phoneNumber[0];
-      let detectedOperator;
+      const firstDigit = phoneNumber.length > 0 ? phoneNumber[0] : '';
+      let detectedOperator: Operator | null = null;
 
       if (['6', '7', '8', '9'].includes(firstDigit)) {
         // Simple logic for demo - in real app would use API
-        if (phoneNumber.startsWith('9'))
+        if (phoneNumber.startsWith('9') && operators[0])
           detectedOperator = operators[0]; // Airtel
-        else if (phoneNumber.startsWith('8'))
+        else if (phoneNumber.startsWith('8') && operators[1])
           detectedOperator = operators[1]; // Jio
-        else if (phoneNumber.startsWith('7'))
+        else if (phoneNumber.startsWith('7') && operators[2])
           detectedOperator = operators[2]; // Vi
-        else detectedOperator = operators[3]; // BSNL
+        else if (operators[3])
+          detectedOperator = operators[3]; // BSNL
       }
 
-      setSelectedOperator(detectedOperator || operators[0]);
+      const operatorToSet = detectedOperator || (operators[0] || null);
+      if (operatorToSet) {
+        setSelectedOperator(operatorToSet);
+      }
       setIsDetecting(false);
     }, 1500);
   };

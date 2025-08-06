@@ -89,15 +89,23 @@ export default function ElectricityRecharge() {
 
     // Simulate provider detection
     setTimeout(() => {
-      const randomProvider =
-        providers[Math.floor(Math.random() * providers.length)];
-      setSelectedProvider(randomProvider);
-      setIsDetecting(false);
-      showAlert({
-        title: 'Provider Detected',
-        message: `Found: ${randomProvider.name} (${randomProvider.state})`,
-        type: 'success',
-      });
+      if (providers.length > 0) {
+        const randomProvider =
+          providers[Math.floor(Math.random() * providers.length)];
+        if (randomProvider) {
+          setSelectedProvider(randomProvider);
+          setIsDetecting(false);
+          showAlert({
+            title: 'Provider Detected',
+            message: `Found: ${randomProvider.name} (${randomProvider.state})`,
+            type: 'success',
+          });
+        } else {
+          setIsDetecting(false);
+        }
+      } else {
+        setIsDetecting(false);
+      }
     }, 2000);
   };
 

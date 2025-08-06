@@ -99,17 +99,20 @@ export default function GasRecharge() {
     // Simulate provider detection based on customer ID pattern
     setTimeout(() => {
       const prefix = customerId.substring(0, 2).toUpperCase();
-      let detectedProvider;
+      let detectedProvider: Provider | null = null;
 
-      if (prefix.startsWith('IG') || customerId.startsWith('11'))
+      if ((prefix.startsWith('IG') || customerId.startsWith('11')) && providers[0])
         detectedProvider = providers[0]; // IGL
-      else if (prefix.startsWith('MG') || customerId.startsWith('22'))
+      else if ((prefix.startsWith('MG') || customerId.startsWith('22')) && providers[1])
         detectedProvider = providers[1]; // MGL
-      else if (prefix.startsWith('GG') || customerId.startsWith('33'))
+      else if ((prefix.startsWith('GG') || customerId.startsWith('33')) && providers[2])
         detectedProvider = providers[2]; // GGL
-      else detectedProvider = providers[0]; // Default to IGL
+      else if (providers[0])
+        detectedProvider = providers[0]; // Default to IGL
 
-      setSelectedProvider(detectedProvider);
+      if (detectedProvider) {
+        setSelectedProvider(detectedProvider);
+      }
       setIsDetecting(false);
     }, 1500);
   };

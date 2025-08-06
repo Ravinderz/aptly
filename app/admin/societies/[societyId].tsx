@@ -46,14 +46,14 @@ interface SocietyDetails {
   };
   createdAt: string;
   lastActivity: string;
-  managerAssignments: Array<{
+  managerAssignments: {
     id: string;
     managerName: string;
     assignmentType: 'permanent' | 'temporary' | 'interim';
     startDate: string;
     endDate?: string;
     isActive: boolean;
-  }>;
+  }[];
   metrics: {
     totalResidents: number;
     activeTickets: number;

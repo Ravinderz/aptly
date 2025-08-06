@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, TouchableOpacity } from 'react-native';
 import { useRouter } from 'expo-router';
-import { Bell, Settings, Menu, ArrowLeft } from 'lucide-react-native';
+import { Bell, Settings, Menu, ArrowLeft, LogOut } from 'lucide-react-native';
 import { useDirectAuth } from '@/hooks/useDirectAuth';
 import { useDirectNotification } from '@/hooks/useDirectNotification';
 
@@ -12,7 +12,9 @@ interface AdminHeaderProps {
   showNotifications?: boolean;
   showSettings?: boolean;
   showMenu?: boolean;
+  showLogout?: boolean;
   onMenuPress?: () => void;
+  onLogout?: () => void;
 }
 
 /**
@@ -31,10 +33,12 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({
   showNotifications = false,
   showSettings = false,
   showMenu = false,
+  showLogout = false,
   onMenuPress,
+  onLogout,
 }) => {
   const router = useRouter();
-  const { user } = useDirectAuth();
+  const { user, logout } = useDirectAuth();
   const { unreadCount } = useDirectNotification();
 
   const handleBack = () => {
@@ -47,6 +51,19 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({
 
   const handleSettings = () => {
     router.push('/admin/settings/');
+  };
+
+  const handleLogout = async () => {
+    try {
+      if (onLogout) {
+        onLogout();
+      } else {
+        await logout();
+        router.replace('/welcome');
+      }
+    } catch (error) {
+      console.error('Logout failed:', error);
+    }
   };
 
   return (
@@ -95,7 +112,7 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({
               {unreadCount > 0 && (
                 <View className="absolute -top-1 -right-1 bg-red-500 rounded-full min-w-[18px] h-[18px] items-center justify-center">
                   <Text className="text-white text-xs font-semibold">
-                    {unreadCount > 9 ? '9+' : unreadCount}
+                    {unreadCount > 9 ? '9+' : String(unreadCount)}
                   </Text>
                 </View>
               )}
@@ -111,21 +128,33 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({
             </TouchableOpacity>
           )}
 
-          {/* User Avatar */}
-          <View className="w-8 h-8 bg-blue-500 rounded-full items-center justify-center ml-2">
-            <Text className="text-white text-sm font-semibold">
-              {(user?.fullName || user?.name || 'A').charAt(0).toUpperCase()}
-            </Text>
-          </View>
+          {showLogout && (
+            <TouchableOpacity
+              onPress={handleLogout}
+              className="p-2"
+            >
+              <LogOut size={24} color="#dc2626" />
+            </TouchableOpacity>
+          )}
         </View>
       </View>
 
-      {/* Admin Mode Indicator */}
+      {/* Role Mode Indicators */}
       {user?.role === 'super_admin' && (
         <View className="mt-3 flex-row items-center">
           <View className="bg-blue-100 px-3 py-1 rounded-full">
             <Text className="text-blue-800 text-xs font-semibold">
               SUPER ADMIN MODE
+            </Text>
+          </View>
+        </View>
+      )}
+      
+      {user?.role === 'community_manager' && (
+        <View className="mt-3 flex-row items-center">
+          <View className="bg-green-100 px-3 py-1 rounded-full">
+            <Text className="text-green-800 text-xs font-semibold">
+              COMMUNITY MANAGER MODE
             </Text>
           </View>
         </View>

@@ -183,19 +183,22 @@ export default function BroadbandRecharge() {
     // Simulate provider detection based on customer ID pattern
     setTimeout(() => {
       const firstChar = customerId.charAt(0).toUpperCase();
-      let detectedProvider;
+      let detectedProvider: Provider | null = null;
 
-      if (firstChar === 'A')
+      if (firstChar === 'A' && providers[0])
         detectedProvider = providers[0]; // Airtel
-      else if (firstChar === 'J')
+      else if (firstChar === 'J' && providers[1])
         detectedProvider = providers[1]; // Jio
-      else if (firstChar === 'B')
+      else if (firstChar === 'B' && providers[2])
         detectedProvider = providers[2]; // BSNL
-      else if (['C', 'D', 'E'].includes(firstChar))
+      else if (['C', 'D', 'E'].includes(firstChar) && providers[3])
         detectedProvider = providers[3]; // ACT
-      else detectedProvider = providers[0]; // Default to Airtel
+      else if (providers[0])
+        detectedProvider = providers[0]; // Default to Airtel
 
-      setSelectedProvider(detectedProvider);
+      if (detectedProvider) {
+        setSelectedProvider(detectedProvider);
+      }
       setIsDetecting(false);
     }, 1500);
   };

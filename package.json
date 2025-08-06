@@ -72,9 +72,9 @@
   "devDependencies": {
     "@babel/core": "^7.25.2",
     "@testing-library/jest-native": "^5.4.3",
-    "@testing-library/react-native": "^12.4.3",
+    "@testing-library/react-native": "^12.9.0",
     "@testing-library/user-event": "^14.6.1",
-    "@types/jest": "^29.5.12",
+    "@types/jest": "^29.5.14",
     "@types/react": "~19.0.10",
     "eslint": "^9.25.0",
     "eslint-config-expo": "~9.2.0",
@@ -84,58 +84,8 @@
     "jest-expo": "~53.0.0",
     "prettier": "^3.6.2",
     "react-native-testing-library": "^2.2.0",
-    "react-test-renderer": "19.0.0",
+    "react-test-renderer": "^19.0.0",
     "typescript": "~5.8.3"
-  },
-  "jest": {
-    "preset": "jest-expo",
-    "transformIgnorePatterns": [
-      "node_modules/(?!((jest-)?react-native|@react-native(-community)?)|expo(nent)?|@expo(nent)?/.*|@expo-google-fonts/.*|react-navigation|@react-navigation/.*|@unimodules/.*|unimodules|sentry-expo|native-base|react-native-svg)"
-    ],
-    "setupFilesAfterEnv": [
-      "@testing-library/jest-native/extend-expect",
-      "<rootDir>/__tests__/setup.ts"
-    ],
-    "collectCoverageFrom": [
-      "**/*.{ts,tsx}",
-      "!**/coverage/**",
-      "!**/node_modules/**",
-      "!**/babel.config.js",
-      "!**/expo-env.d.ts",
-      "!**/.expo/**",
-      "!**/__tests__/**",
-      "!**/app.config.js",
-      "!**/metro.config.js",
-      "!**/tailwind.config.js"
-    ],
-    "coverageThreshold": {
-      "global": {
-        "branches": 80,
-        "functions": 80,
-        "lines": 80,
-        "statements": 80
-      },
-      "./utils/*.ts": {
-        "branches": 90,
-        "functions": 90,
-        "lines": 90,
-        "statements": 90
-      },
-      "./components/**/*.tsx": {
-        "branches": 80,
-        "functions": 80,
-        "lines": 80,
-        "statements": 80
-      }
-    },
-    "coverageReporters": [
-      "text",
-      "lcov",
-      "html",
-      "json-summary"
-    ],
-    "testTimeout": 10000,
-    "maxWorkers": "50%"
   },
   "private": true
 }

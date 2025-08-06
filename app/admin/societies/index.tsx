@@ -23,7 +23,7 @@ import { useDirectSociety } from '@/hooks/useDirectSociety';
 import { AdminHeader } from '@/components/admin/AdminHeader';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
-import { PillFilter } from '@/components/ui/PillFilter';
+import FilterPill from '@/components/ui/FilterPill';
 import { cn } from '@/utils/cn';
 
 interface SocietyCardProps {
@@ -238,7 +238,7 @@ function SocietyManagement() {
           <ScrollView horizontal showsHorizontalScrollIndicator={false}>
             <View className="flex-row space-x-2">
               {filterOptions.map((option) => (
-                <PillFilter
+                <FilterPill
                   key={option.value}
                   label={option.label}
                   selected={managementFilter === option.value}

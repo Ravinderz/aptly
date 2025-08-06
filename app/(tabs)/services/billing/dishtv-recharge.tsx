@@ -212,19 +212,22 @@ export default function DishTVRecharge() {
     // Simulate provider detection based on customer ID pattern
     setTimeout(() => {
       const prefix = customerId.substring(0, 2);
-      let detectedProvider;
+      let detectedProvider: Provider | null = null;
 
-      if (prefix.startsWith('10') || prefix.startsWith('11'))
+      if ((prefix.startsWith('10') || prefix.startsWith('11')) && providers[0])
         detectedProvider = providers[0]; // DishTV
-      else if (prefix.startsWith('20') || prefix.startsWith('21'))
+      else if ((prefix.startsWith('20') || prefix.startsWith('21')) && providers[1])
         detectedProvider = providers[1]; // Tata Play
-      else if (prefix.startsWith('30') || prefix.startsWith('31'))
+      else if ((prefix.startsWith('30') || prefix.startsWith('31')) && providers[2])
         detectedProvider = providers[2]; // Airtel
-      else if (prefix.startsWith('40') || prefix.startsWith('41'))
+      else if ((prefix.startsWith('40') || prefix.startsWith('41')) && providers[3])
         detectedProvider = providers[3]; // Sun Direct
-      else detectedProvider = providers[0]; // Default to DishTV
+      else if (providers[0])
+        detectedProvider = providers[0]; // Default to DishTV
 
-      setSelectedProvider(detectedProvider);
+      if (detectedProvider) {
+        setSelectedProvider(detectedProvider);
+      }
       setIsDetecting(false);
     }, 1500);
   };
