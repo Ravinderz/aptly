@@ -189,4 +189,7 @@ export const StoreInitializer: React.FC<StoreInitializerProps> = ({
   return <>{children}</>;
 };
 
+// Add proper named export with displayName for React DevTools
+StoreInitializer.displayName = 'StoreInitializer';
+
 export default StoreInitializer;

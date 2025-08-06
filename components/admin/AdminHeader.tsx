@@ -162,3 +162,6 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({
     </View>
   );
 };
+
+// Add proper named export with displayName for React DevTools
+AdminHeader.displayName = 'AdminHeader';

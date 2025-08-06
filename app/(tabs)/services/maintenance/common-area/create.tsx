@@ -1,5 +1,5 @@
 import { showErrorAlert, showSuccessAlert } from '@/utils/alert';
-import { Audio } from 'expo-av';
+import { useAudioRecorder, useAudioPlayer, AudioModule } from 'expo-audio';
 import * as ImagePicker from 'expo-image-picker';
 import { useRouter } from 'expo-router';
 import {
@@ -214,7 +214,7 @@ export default function CreateCommonAreaRequest() {
   const [mediaFiles, setMediaFiles] = useState<MediaFile[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
-  const [recording, setRecording] = useState<Audio.Recording | null>(null);
+  const audioRecorder = useAudioRecorder();
 
   // Get selected location details
   const selectedLocationData = commonAreaLocations.find(
@@ -290,8 +290,8 @@ export default function CreateCommonAreaRequest() {
 
   const startRecording = async () => {
     try {
-      const permission = await Audio.requestPermissionsAsync();
-      if (permission.status !== 'granted') {
+      const permission = await AudioModule.requestRecordingPermissionsAsync();
+      if (!permission.granted) {
         showErrorAlert(
           'Permission Required',
           'Audio recording permission is required',
@@ -304,15 +304,7 @@ export default function CreateCommonAreaRequest() {
         return;
       }
 
-      await Audio.setAudioModeAsync({
-        allowsRecordingIOS: true,
-        playsInSilentModeIOS: true,
-      });
-
-      const { recording } = await Audio.Recording.createAsync(
-        Audio.RecordingOptionsPresets.HIGH_QUALITY,
-      );
-      setRecording(recording);
+      await audioRecorder.record({});
       setIsRecording(true);
     } catch (err) {
       console.error('Failed to start recording', err);
@@ -321,14 +313,12 @@ export default function CreateCommonAreaRequest() {
   };
 
   const stopRecording = async () => {
-    if (!recording) return;
+    if (!audioRecorder.isRecording) return;
 
     setIsRecording(false);
-    await recording.stopAndUnloadAsync();
-    const uri = recording.getURI();
-    setRecording(null);
+    const uri = await audioRecorder.stop();
 
-    if (uri) {
+    if (uri && typeof uri === 'string') {
       const newFile: MediaFile = {
         id: Date.now().toString(),
         type: 'audio',

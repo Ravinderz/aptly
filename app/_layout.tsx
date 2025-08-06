@@ -11,7 +11,7 @@ import './globals.css';
 // Keep the splash screen visible while we fetch resources
 SplashScreen.preventAutoHideAsync();
 
-export default function RootLayout() {
+function RootLayout() {
   const { showAlert, AlertComponent } = useAlert();
 
   useEffect(() => {
@@ -41,3 +41,8 @@ export default function RootLayout() {
     </StoreInitializer>
   );
 }
+
+// Add proper named export with displayName for React DevTools
+RootLayout.displayName = 'RootLayout';
+
+export default RootLayout;

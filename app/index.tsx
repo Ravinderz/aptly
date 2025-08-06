@@ -1,6 +1,6 @@
 import { Text, View } from 'react-native';
 
-export default function Index() {
+function Index() {
   // return <Welcome />;
   return (
     <View>
@@ -8,3 +8,8 @@ export default function Index() {
     </View>
   );
 }
+
+// Add proper named export with displayName for React DevTools
+Index.displayName = 'Index';
+
+export default Index;

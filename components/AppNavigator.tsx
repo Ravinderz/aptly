@@ -139,4 +139,7 @@ const AppNavigator: React.FC<{ children: React.ReactNode }> = ({
   return <>{children}</>;
 };
 
+// Add proper named export with displayName for React DevTools
+AppNavigator.displayName = 'AppNavigator';
+
 export default AppNavigator;

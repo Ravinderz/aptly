@@ -164,6 +164,13 @@ export const RequireStaff: React.FC<{ children: React.ReactNode }> = ({ children
   </RoleGuard>
 );
 
+// Add displayName to role guard components for React DevTools
+RoleGuard.displayName = 'RoleGuard';
+RequireSuperAdmin.displayName = 'RequireSuperAdmin';
+RequireManager.displayName = 'RequireManager';  
+RequireAdmin.displayName = 'RequireAdmin';
+RequireStaff.displayName = 'RequireStaff';
+
 /**
  * Permission-based visibility component
  */
@@ -186,6 +193,8 @@ export const PermissionGate: React.FC<PermissionGateProps> = ({
 
   return <>{children}</>;
 };
+
+PermissionGate.displayName = 'PermissionGate';
 
 /**
  * Role-based navigation helper
