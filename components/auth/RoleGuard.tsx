@@ -49,7 +49,13 @@ export const RoleGuard = ({
 
   // User not authenticated
   if (!user) {
-    if (customFallback) return <>{customFallback}</>;
+    if (customFallback) {
+      return (
+        <View style={{ flex: 1 }}>
+          {customFallback}
+        </View>
+      );
+    }
     
     if (showFallback) {
       return (
@@ -81,7 +87,13 @@ export const RoleGuard = ({
   const hasPermission = allowedRoles.includes(user.role as UserRole);
 
   if (!hasPermission) {
-    if (customFallback) return <>{customFallback}</>;
+    if (customFallback) {
+      return (
+        <View style={{ flex: 1 }}>
+          {customFallback}
+        </View>
+      );
+    }
     
     if (showFallback) {
       return (
@@ -118,7 +130,12 @@ export const RoleGuard = ({
   }
 
   // User has permission, render children
-  return <>{children}</>;
+  // Use View wrapper instead of Fragment to maintain stable component references
+  return (
+    <View style={{ flex: 1 }}>
+      {children}
+    </View>
+  );
 };
 
 /**
@@ -126,23 +143,49 @@ export const RoleGuard = ({
  */
 export const RequireRole = (allowedRoles: UserRole[], fallbackRoute?: string) => {
   return <T extends object>(Component: React.ComponentType<T>) => {
-    // Safety check for component
-    if (!Component) {
-      console.warn('RequireRole: Component is undefined');
+    // Enhanced safety check for component
+    if (!Component || typeof Component !== 'function') {
+      console.warn('RequireRole: Component is undefined or not a valid component');
       const EmptyComponent = () => null;
       EmptyComponent.displayName = 'RequireRole(EmptyComponent)';
       return EmptyComponent as any;
     }
 
-    const WrappedComponent = (props: T) => (
-      <RoleGuard allowedRoles={allowedRoles} fallbackRoute={fallbackRoute}>
-        <Component {...props} />
-      </RoleGuard>
-    );
+    const WrappedComponent = (props: T) => {
+      // Additional safety check during render
+      if (!Component) {
+        console.warn('RequireRole: Component became undefined during render');
+        return null;
+      }
+      
+      return (
+        <RoleGuard allowedRoles={allowedRoles} fallbackRoute={fallbackRoute}>
+          <Component {...props} />
+        </RoleGuard>
+      );
+    };
     
-    // Safe displayName assignment
-    const componentName = (Component && (Component.displayName || Component.name)) || 'Unknown';
-    WrappedComponent.displayName = `RequireRole(${componentName})`;
+    // Enhanced safe displayName assignment with multiple fallbacks
+    const getComponentName = () => {
+      try {
+        if (!Component || typeof Component !== 'function') return 'Unknown';
+        // Safe access with explicit checks
+        const displayName = Component && typeof Component.displayName === 'string' ? Component.displayName : null;
+        const componentName = Component && typeof Component.name === 'string' ? Component.name : null;
+        return displayName || componentName || 'Anonymous';
+      } catch (error) {
+        console.warn('getComponentName error:', error);
+        return 'SafeFallback';
+      }
+    };
+    
+    const componentName = getComponentName();
+    try {
+      WrappedComponent.displayName = `RequireRole(${componentName})`;
+    } catch (error) {
+      console.warn('DisplayName assignment error:', error);
+      // Continue without displayName if assignment fails
+    }
     return WrappedComponent;
   };
 };
@@ -150,45 +193,83 @@ export const RequireRole = (allowedRoles: UserRole[], fallbackRoute?: string) =>
 /**
  * Role-specific guards for common use cases
  */
-export const RequireSuperAdmin = ({ children }: { children: React.ReactNode }) => (
-  <RoleGuard allowedRoles={['super_admin']}>
-    {children}
-  </RoleGuard>
-);
+export const RequireSuperAdmin = React.forwardRef<View, { children: React.ReactNode }>(({ children }, ref) => {
+  // Safety check for children
+  if (!children) {
+    console.warn('RequireSuperAdmin: children is undefined');
+    return null;
+  }
+  
+  return (
+    <RoleGuard allowedRoles={['super_admin']}>
+      {children}
+    </RoleGuard>
+  );
+});
 
-export const RequireManager = ({ children }: { children: React.ReactNode }) => (
-  <RoleGuard allowedRoles={['community_manager']}>
-    {children}
-  </RoleGuard>
-);
+export const RequireManager = React.forwardRef<View, { children: React.ReactNode }>(({ children }, ref) => {
+  // Safety check for children
+  if (!children) {
+    console.warn('RequireManager: children is undefined');
+    return null;
+  }
+  
+  return (
+    <RoleGuard allowedRoles={['community_manager']}>
+      {children}
+    </RoleGuard>
+  );
+});
 
-export const RequireAdmin = ({ children }: { children: React.ReactNode }) => (
-  <RoleGuard allowedRoles={['super_admin', 'society_admin']}>
-    {children}
-  </RoleGuard>
-);
+export const RequireAdmin = React.forwardRef<View, { children: React.ReactNode }>(({ children }, ref) => {
+  // Safety check for children
+  if (!children) {
+    console.warn('RequireAdmin: children is undefined');
+    return null;
+  }
+  
+  return (
+    <RoleGuard allowedRoles={['super_admin', 'society_admin']}>
+      {children}
+    </RoleGuard>
+  );
+});
 
-export const RequireStaff = ({ children }: { children: React.ReactNode }) => (
-  <RoleGuard allowedRoles={['super_admin', 'community_manager', 'society_admin']}>
-    {children}
-  </RoleGuard>
-);
+export const RequireStaff = React.forwardRef<View, { children: React.ReactNode }>(({ children }, ref) => {
+  // Safety check for children
+  if (!children) {
+    console.warn('RequireStaff: children is undefined');
+    return null;
+  }
+  
+  return (
+    <RoleGuard allowedRoles={['super_admin', 'community_manager', 'society_admin']}>
+      {children}
+    </RoleGuard>
+  );
+});
 
-export const RequireSecurityGuard = ({ 
-  children, 
-  requireVerification = true, 
-  customFallback 
-}: { 
+export const RequireSecurityGuard = React.forwardRef<View, { 
   children: React.ReactNode;
   requireVerification?: boolean;
   customFallback?: React.ReactNode;
-}) => {
+}>(({ 
+  children, 
+  requireVerification = true, 
+  customFallback 
+}, ref) => {
   const { user } = useDirectAuth();
   const router = useRouter();
 
+  // Safety check for children
+  if (!children) {
+    console.warn('RequireSecurityGuard: children is undefined');
+    return null;
+  }
+
   // Additional verification check for security guards
   if (requireVerification && user?.role === 'security_guard' && !user?.isVerified) {
-    return customFallback || (
+    const fallbackContent = customFallback || (
       <View className="flex-1 justify-center items-center p-4 bg-gray-50">
         <AlertTriangle size={48} color="#f59e0b" />
         <Text className="text-lg font-semibold text-gray-900 mt-4 text-center">
@@ -206,6 +287,12 @@ export const RequireSecurityGuard = ({
         </Button>
       </View>
     );
+    
+    return (
+      <View ref={ref} style={{ flex: 1 }}>
+        {fallbackContent}
+      </View>
+    );
   }
 
   return (
@@ -213,17 +300,19 @@ export const RequireSecurityGuard = ({
       {children}
     </RoleGuard>
   );
-};
+});
 
-// Assign displayName immediately after component definition
-RequireSecurityGuard.displayName = 'RequireSecurityGuard';
-
-// Add displayName to role guard components for React DevTools
-RoleGuard.displayName = 'RoleGuard';
-RequireSuperAdmin.displayName = 'RequireSuperAdmin';
-RequireManager.displayName = 'RequireManager';  
-RequireAdmin.displayName = 'RequireAdmin';
-RequireStaff.displayName = 'RequireStaff';
+// Assign displayName to forwardRef components for React DevTools
+try {
+  RequireSecurityGuard.displayName = 'RequireSecurityGuard';
+  RoleGuard.displayName = 'RoleGuard';
+  RequireSuperAdmin.displayName = 'RequireSuperAdmin';
+  RequireManager.displayName = 'RequireManager';  
+  RequireAdmin.displayName = 'RequireAdmin';
+  RequireStaff.displayName = 'RequireStaff';
+} catch (error) {
+  console.warn('Component displayName assignment error:', error);
+}
 
 /**
  * Permission-based visibility component
@@ -234,19 +323,32 @@ interface PermissionGateProps {
   fallback?: React.ReactNode;
 }
 
-export const PermissionGate = ({
+export const PermissionGate = React.forwardRef<View, PermissionGateProps>(({
   children,
   allowedRoles,
   fallback = null,
-}: PermissionGateProps) => {
+}, ref) => {
   const { user } = useDirectAuth();
 
-  if (!user || !allowedRoles.includes(user.role as UserRole)) {
-    return <>{fallback}</>;
+  // Safety check for children
+  if (!children && !fallback) {
+    return null;
   }
 
-  return <>{children}</>;
-};
+  if (!user || !allowedRoles.includes(user.role as UserRole)) {
+    return fallback ? (
+      <View ref={ref} style={{ flex: 1 }}>
+        {fallback}
+      </View>
+    ) : null;
+  }
+
+  return (
+    <View ref={ref} style={{ flex: 1 }}>
+      {children}
+    </View>
+  );
+});
 
 /**
  * Security-specific permission gate
@@ -257,25 +359,42 @@ interface SecurityPermissionGateProps {
   fallback?: React.ReactNode;
 }
 
-export const SecurityPermissionGate = ({
+export const SecurityPermissionGate = React.forwardRef<View, SecurityPermissionGateProps>(({
   children,
   requiredPermissions = [],
   fallback = null,
-}: SecurityPermissionGateProps) => {
+}, ref) => {
   const { user } = useDirectAuth();
+
+  // Safety check for children
+  if (!children && !fallback) {
+    return null;
+  }
 
   // Only allow security guards
   if (!user || user.role !== 'security_guard') {
-    return <>{fallback}</>;
+    return fallback ? (
+      <View ref={ref} style={{ flex: 1 }}>
+        {fallback}
+      </View>
+    ) : null;
   }
 
   // For now, security guards have all permissions
   // In future, implement actual permission checking
-  return <>{children}</>;
-};
+  return (
+    <View ref={ref} style={{ flex: 1 }}>
+      {children}
+    </View>
+  );
+});
 
-PermissionGate.displayName = 'PermissionGate';
-SecurityPermissionGate.displayName = 'SecurityPermissionGate';
+try {
+  PermissionGate.displayName = 'PermissionGate';
+  SecurityPermissionGate.displayName = 'SecurityPermissionGate';
+} catch (error) {
+  console.warn('Permission component displayName assignment error:', error);
+}
 
 /**
  * Role-based navigation helper
@@ -284,8 +403,9 @@ export const useRoleNavigation = () => {
   const { user } = useDirectAuth();
   const router = useRouter();
 
-  const getDefaultRoute = (): string => {
-    if (!user) return '/welcome';
+  // Memoize the default route calculation to prevent excessive recalculation
+  const getDefaultRoute = React.useCallback((): string => {
+    if (!user || !user.role) return '/welcome';
     
     switch (user.role) {
       case 'super_admin':
@@ -300,10 +420,16 @@ export const useRoleNavigation = () => {
       default:
         return '/welcome';
     }
-  };
+  }, [user]);
 
-  const navigateToRole = (role?: UserRole) => {
+  // Memoize navigation function to prevent unnecessary recreations
+  const navigateToRole = React.useCallback((role?: UserRole) => {
     const targetRole = role || (user?.role as UserRole);
+    
+    if (!targetRole) {
+      router.replace('/welcome');
+      return;
+    }
     
     switch (targetRole) {
       case 'super_admin':
@@ -322,10 +448,11 @@ export const useRoleNavigation = () => {
       default:
         router.replace('/welcome');
     }
-  };
+  }, [router, user?.role]);
 
-  const canAccess = (route: string): boolean => {
-    if (!user) return false;
+  // Memoize canAccess function with proper dependencies
+  const canAccess = React.useCallback((route: string): boolean => {
+    if (!user || !user.role) return false;
 
     // Define route permissions
     const routePermissions: Record<string, UserRole[]> = {
@@ -345,12 +472,13 @@ export const useRoleNavigation = () => {
 
     // Default to allowing access if route not explicitly restricted
     return true;
-  };
+  }, [user]);
 
-  return {
+  // Memoize the return object to prevent unnecessary re-renders
+  return React.useMemo(() => ({
     getDefaultRoute,
     navigateToRole,
     canAccess,
     currentRole: user?.role as UserRole,
-  };
+  }), [getDefaultRoute, navigateToRole, canAccess, user?.role]);
 };

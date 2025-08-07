@@ -22,7 +22,8 @@ import {
   Car,
   AlertTriangle,
   Timer,
-  ArrowRight
+  ArrowRight,
+  ArrowLeft
 } from 'lucide-react-native';
 import type { SecurityVisitor } from '@/types/security';
 
@@ -38,7 +39,7 @@ type FilterType = 'all' | 'inside' | 'pending' | 'overstay' | 'scheduled' | 'che
  * - Overstay alerts
  * - Pending approval management
  */
-const VisitorManagement = () => {
+function VisitorManagement() {
   const params = useLocalSearchParams();
   const initialFilter = (params.filter as FilterType) || 'all';
 
@@ -263,6 +264,9 @@ const VisitorManagement = () => {
       <View className="bg-white px-4 pt-12 pb-4 border-b border-gray-200">
         <View className="flex-row items-center justify-between mb-4">
           <View className="flex-row items-center">
+            <TouchableOpacity onPress={() => router.back()} className="mr-3 p-2">
+              <ArrowLeft size={20} color="#6b7280" />
+            </TouchableOpacity>
             <Users size={24} color="#6366f1" />
             <Text className="text-2xl font-bold text-gray-900 ml-2">
               Visitor Management
@@ -433,7 +437,7 @@ const VisitorManagement = () => {
       </ScrollView>
     </View>
   );
-};
+}
 
 VisitorManagement.displayName = 'VisitorManagement';
 

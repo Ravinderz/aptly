@@ -20,6 +20,7 @@ import {
   MapPin
 } from 'lucide-react-native';
 import { router } from 'expo-router';
+import { cn } from '@/utils/cn';
 import type { SecurityDashboardStats, EmergencyAlert } from '@/types/security';
 
 /**
@@ -33,7 +34,7 @@ import type { SecurityDashboardStats, EmergencyAlert } from '@/types/security';
  * - Overstay visitor tracking
  * - Today's activity summary
  */
-const SecurityDashboard = () => {
+function SecurityDashboard() {
   const { user } = useDirectAuth();
   const { 
     permissions, 
@@ -234,67 +235,91 @@ const SecurityDashboard = () => {
       <Text className="text-lg font-semibold text-gray-900 mb-4">Quick Actions</Text>
       <View className="mb-6">
         <View className="flex-row mb-3">
-          <Button
-            variant={canManageVisitors ? "primary" : "outline"}
-            size="md"
+          <TouchableOpacity
             disabled={!canManageVisitors}
             onPress={() => router.push('/security/visitors/checkin')}
-            className="flex-1 mr-2"
+            className={cn(
+              "flex-1 mr-2 p-4 rounded-lg border",
+              canManageVisitors 
+                ? "bg-indigo-600 border-indigo-600" 
+                : "bg-gray-100 border-gray-300"
+            )}
           >
-            <View className="flex-row items-center">
-              <UserCheck size={16} color={canManageVisitors ? "#ffffff" : "#6b7280"} />
-              <Text className={`ml-2 font-medium ${canManageVisitors ? 'text-white' : 'text-gray-400'}`}>
+            <View className="flex-row items-center justify-center">
+              <UserCheck size={16} color={canManageVisitors ? "#ffffff" : "#9ca3af"} />
+              <Text className={cn(
+                "ml-2 font-medium",
+                canManageVisitors ? "text-white" : "text-gray-500"
+              )}>
                 Check-in Visitor
               </Text>
             </View>
-          </Button>
+          </TouchableOpacity>
 
-          <Button
-            variant={canManageVisitors ? "secondary" : "outline"}
-            size="md"
+          <TouchableOpacity
             disabled={!canManageVisitors}
             onPress={() => router.push('/security/visitors')}
-            className="flex-1 ml-2"
+            className={cn(
+              "flex-1 ml-2 p-4 rounded-lg border",
+              canManageVisitors 
+                ? "bg-white border-indigo-200" 
+                : "bg-gray-100 border-gray-300"
+            )}
           >
-            <View className="flex-row items-center">
-              <Users size={16} color={canManageVisitors ? "#6366f1" : "#6b7280"} />
-              <Text className={`ml-2 font-medium ${canManageVisitors ? 'text-indigo-600' : 'text-gray-400'}`}>
+            <View className="flex-row items-center justify-center">
+              <Users size={16} color={canManageVisitors ? "#6366f1" : "#9ca3af"} />
+              <Text className={cn(
+                "ml-2 font-medium",
+                canManageVisitors ? "text-indigo-600" : "text-gray-500"
+              )}>
                 View All
               </Text>
             </View>
-          </Button>
+          </TouchableOpacity>
         </View>
 
         <View className="flex-row mb-3">
-          <Button
-            variant={canManageVehicles ? "secondary" : "outline"}
-            size="md"
+          <TouchableOpacity
             disabled={!canManageVehicles}
             onPress={() => router.push('/security/vehicles')}
-            className="flex-1 mr-2"
+            className={cn(
+              "flex-1 mr-2 p-4 rounded-lg border",
+              canManageVehicles 
+                ? "bg-white border-indigo-200" 
+                : "bg-gray-100 border-gray-300"
+            )}
           >
-            <View className="flex-row items-center">
-              <Car size={16} color={canManageVehicles ? "#6366f1" : "#6b7280"} />
-              <Text className={`ml-2 font-medium ${canManageVehicles ? 'text-indigo-600' : 'text-gray-400'}`}>
+            <View className="flex-row items-center justify-center">
+              <Car size={16} color={canManageVehicles ? "#6366f1" : "#9ca3af"} />
+              <Text className={cn(
+                "ml-2 font-medium",
+                canManageVehicles ? "text-indigo-600" : "text-gray-500"
+              )}>
                 Vehicles
               </Text>
             </View>
-          </Button>
+          </TouchableOpacity>
 
-          <Button
-            variant={canHandleEmergencies ? "destructive" : "outline"}
-            size="md"
+          <TouchableOpacity
             disabled={!canHandleEmergencies}
             onPress={() => router.push('/security/emergency')}
-            className="flex-1 ml-2"
+            className={cn(
+              "flex-1 ml-2 p-4 rounded-lg border",
+              canHandleEmergencies 
+                ? "bg-red-600 border-red-600" 
+                : "bg-gray-100 border-gray-300"
+            )}
           >
-            <View className="flex-row items-center">
-              <AlertTriangle size={16} color={canHandleEmergencies ? "#ffffff" : "#6b7280"} />
-              <Text className={`ml-2 font-medium ${canHandleEmergencies ? 'text-white' : 'text-gray-400'}`}>
+            <View className="flex-row items-center justify-center">
+              <AlertTriangle size={16} color={canHandleEmergencies ? "#ffffff" : "#9ca3af"} />
+              <Text className={cn(
+                "ml-2 font-medium",
+                canHandleEmergencies ? "text-white" : "text-gray-500"
+              )}>
                 Emergency
               </Text>
             </View>
-          </Button>
+          </TouchableOpacity>
         </View>
       </View>
 

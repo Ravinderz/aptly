@@ -1,23 +1,20 @@
 import React from 'react';
 import { View } from 'react-native';
 import { Slot } from 'expo-router';
-import { RequireSecurityGuard } from '@/components/auth/RoleGuard';
 
 /**
  * Visitor Management Layout
  * 
  * Features:
- * - Role-based access control for security guards
  * - Navigation structure for visitor management
  * - Foundation for visitor check-in/out workflows
+ * - Security access already protected by parent security layout
  */
 const VisitorManagementLayout = () => {
   return (
-    <RequireSecurityGuard>
-      <View className="flex-1">
-        <Slot />
-      </View>
-    </RequireSecurityGuard>
+    <View className="flex-1">
+      <Slot />
+    </View>
   );
 };
 

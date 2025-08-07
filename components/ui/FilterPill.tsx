@@ -3,33 +3,33 @@ import { Text, TouchableOpacity } from 'react-native';
 
 interface FilterPillProps {
   label: string;
-  selected: boolean;
-  count?: number;
+  isActive: boolean;
   onPress: () => void;
 }
 
-const FilterPill: React.FC<FilterPillProps> = ({
+const FilterPill = ({
   label,
-  selected,
-  count,
+  isActive,
   onPress,
-}) => {
+}: FilterPillProps) => {
   return (
     <TouchableOpacity
       onPress={onPress}
       className={`px-4 py-3 rounded-full border ${
-        selected ? 'bg-primary border-primary' : 'bg-background border-divider'
+        isActive ? 'bg-indigo-600 border-indigo-600' : 'bg-white border-gray-200'
       }`}
       activeOpacity={0.7}>
       <Text
         className={`font-medium text-sm ${
-          selected ? 'text-white' : 'text-text-secondary'
+          isActive ? 'text-white' : 'text-gray-600'
         }`}>
         {label}
-        {count !== undefined ? ` (${count})` : ''}
       </Text>
     </TouchableOpacity>
   );
 };
 
+FilterPill.displayName = 'FilterPill';
+
+export { FilterPill };
 export default FilterPill;

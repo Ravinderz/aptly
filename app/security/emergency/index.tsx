@@ -11,19 +11,12 @@ import { router } from 'expo-router';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
+import EmergencyAlertCard from '@/components/security/EmergencyAlertCard';
 import { 
   AlertTriangle, 
   Shield, 
-  Phone, 
-  Clock,
-  MapPin,
-  User,
   Plus,
-  ArrowLeft,
-  CheckCircle,
-  XCircle,
-  Bell,
-  Activity
+  ArrowLeft
 } from 'lucide-react-native';
 import { useDirectAuth } from '@/hooks/useDirectAuth';
 import type { EmergencyAlert } from '@/types/security';
@@ -105,56 +98,6 @@ const EmergencyResponse = () => {
     }, 1000);
   }, []);
 
-  const getSeverityColor = (severity: AlertSeverity) => {
-    switch (severity) {
-      case 'critical': return '#dc2626';
-      case 'high': return '#ea580c';
-      case 'medium': return '#f59e0b';
-      case 'low': return '#16a34a';
-      default: return '#6b7280';
-    }
-  };
-
-  const getSeverityBgColor = (severity: AlertSeverity) => {
-    switch (severity) {
-      case 'critical': return '#fef2f2';
-      case 'high': return '#fff7ed';
-      case 'medium': return '#fffbeb';
-      case 'low': return '#f0fdf4';
-      default: return '#f9fafb';
-    }
-  };
-
-  const getTypeIcon = (type: AlertType) => {
-    switch (type) {
-      case 'security': return <Shield size={20} color="#6b7280" />;
-      case 'medical': return <Plus size={20} color="#6b7280" />;
-      case 'fire': return <AlertTriangle size={20} color="#6b7280" />;
-      case 'evacuation': return <Activity size={20} color="#6b7280" />;
-      default: return <Bell size={20} color="#6b7280" />;
-    }
-  };
-
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'active': return '#dc2626';
-      case 'acknowledged': return '#f59e0b';
-      case 'resolved': return '#16a34a';
-      default: return '#6b7280';
-    }
-  };
-
-  const formatTimeAgo = (date: Date) => {
-    const now = new Date();
-    const diffMs = now.getTime() - date.getTime();
-    const diffHrs = Math.floor(diffMs / (1000 * 60 * 60));
-    const diffMins = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
-    
-    if (diffHrs > 0) {
-      return `${diffHrs}h ${diffMins}m ago`;
-    }
-    return `${diffMins}m ago`;
-  };
 
   const handleCreateAlert = async () => {
     if (!newAlert.title.trim() || !newAlert.description.trim()) {
@@ -240,14 +183,9 @@ const EmergencyResponse = () => {
         {/* Header */}
         <View className="bg-white px-4 pt-12 pb-4 border-b border-gray-200">
           <View className="flex-row items-center mb-2">
-            <Button
-              variant="ghost"
-              size="sm"
-              onPress={() => setShowCreateAlert(false)}
-              className="mr-2 p-2"
-            >
+            <TouchableOpacity onPress={() => setShowCreateAlert(false)} className="mr-2 p-2">
               <ArrowLeft size={20} color="#6b7280" />
-            </Button>
+            </TouchableOpacity>
             <AlertTriangle size={24} color="#dc2626" />
             <Text className="text-2xl font-bold text-gray-900 ml-2">
               Create Emergency Alert
@@ -362,6 +300,9 @@ const EmergencyResponse = () => {
       <View className="bg-white px-4 pt-12 pb-4 border-b border-gray-200">
         <View className="flex-row items-center justify-between mb-2">
           <View className="flex-row items-center">
+            <TouchableOpacity onPress={() => router.back()} className="mr-3 p-2">
+              <ArrowLeft size={20} color="#6b7280" />
+            </TouchableOpacity>
             <AlertTriangle size={24} color="#dc2626" />
             <Text className="text-2xl font-bold text-gray-900 ml-2">
               Emergency Response
@@ -430,10 +371,7 @@ const EmergencyResponse = () => {
             onPress={() => setShowCreateAlert(true)}
             className="flex-1 mr-2"
           >
-            <View className="flex-row items-center">
-              <Plus size={16} color="#ffffff" />
-              <Text className="text-white font-medium ml-2">Create Alert</Text>
-            </View>
+            Create Alert
           </Button>
           
           <Button
@@ -458,10 +396,7 @@ const EmergencyResponse = () => {
             }}
             className="flex-1 ml-2"
           >
-            <View className="flex-row items-center">
-              <Phone size={16} color="#6366f1" />
-              <Text className="text-indigo-600 font-medium ml-2">Emergency Call</Text>
-            </View>
+            Emergency Call
           </Button>
         </View>
 
@@ -485,94 +420,13 @@ const EmergencyResponse = () => {
         ) : (
           <View className="space-y-3">
             {alerts.map((alert) => (
-              <Card key={alert.id} className="p-4 bg-white">
-                <View 
-                  className="flex-row items-start p-3 rounded-lg mb-3"
-                  style={{ backgroundColor: getSeverityBgColor(alert.severity) }}
-                >
-                  <View className="mr-3 mt-1">
-                    {getTypeIcon(alert.type)}
-                  </View>
-                  <View className="flex-1">
-                    <View className="flex-row items-center mb-2">
-                      <View 
-                        className="px-2 py-1 rounded-full mr-2"
-                        style={{ backgroundColor: getSeverityColor(alert.severity) }}
-                      >
-                        <Text className="text-xs font-medium text-white capitalize">
-                          {alert.severity}
-                        </Text>
-                      </View>
-                      <View 
-                        className="px-2 py-1 rounded-full"
-                        style={{ backgroundColor: alert.status === 'resolved' ? '#f0fdf4' : alert.status === 'acknowledged' ? '#fffbeb' : '#fef2f2' }}
-                      >
-                        <Text 
-                          className="text-xs font-medium capitalize"
-                          style={{ color: getStatusColor(alert.status) }}
-                        >
-                          {alert.status}
-                        </Text>
-                      </View>
-                    </View>
-                    
-                    <Text className="text-lg font-semibold text-gray-900 mb-2">
-                      {alert.title}
-                    </Text>
-                    <Text className="text-gray-700 mb-3">
-                      {alert.description}
-                    </Text>
-                    
-                    <View className="flex-row items-center text-sm text-gray-500 mb-2">
-                      <MapPin size={14} color="#6b7280" />
-                      <Text className="ml-1 mr-4">{alert.location}</Text>
-                      <User size={14} color="#6b7280" />
-                      <Text className="ml-1 mr-4">{alert.reportedBy}</Text>
-                      <Clock size={14} color="#6b7280" />
-                      <Text className="ml-1">{formatTimeAgo(alert.reportedAt)}</Text>
-                    </View>
-                    
-                    {alert.resolutionNotes && (
-                      <View className="mt-2 p-2 bg-green-50 rounded">
-                        <Text className="text-sm text-green-800">
-                          Resolution: {alert.resolutionNotes}
-                        </Text>
-                      </View>
-                    )}
-                  </View>
-                </View>
-
-                {/* Action Buttons */}
-                {alert.status !== 'resolved' && (
-                  <View className="flex-row space-x-2">
-                    {alert.status === 'active' && (
-                      <Button
-                        variant="secondary"
-                        size="sm"
-                        onPress={() => handleAcknowledgeAlert(alert.id)}
-                        className="flex-1"
-                      >
-                        <View className="flex-row items-center">
-                          <CheckCircle size={14} color="#6366f1" />
-                          <Text className="text-indigo-600 font-medium ml-1">Acknowledge</Text>
-                        </View>
-                      </Button>
-                    )}
-                    
-                    <Button
-                      variant="success"
-                      size="sm"
-                      onPress={() => handleResolveAlert(alert.id)}
-                      className="flex-1"
-                    >
-                      <View className="flex-row items-center">
-                        <XCircle size={14} color="#ffffff" />
-                        <Text className="text-white font-medium ml-1">Resolve</Text>
-                      </View>
-                    </Button>
-                  </View>
-                )}
-              </Card>
+              <EmergencyAlertCard
+                key={alert.id}
+                alert={alert}
+                onAcknowledge={handleAcknowledgeAlert}
+                onResolve={handleResolveAlert}
+                showActions={true}
+              />
             ))}
           </View>
         )}

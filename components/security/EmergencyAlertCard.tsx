@@ -175,10 +175,7 @@ const EmergencyAlertCard = ({
                 onPress={() => onAcknowledge(alert.id)}
                 className="flex-1"
               >
-                <View className="flex-row items-center">
-                  <CheckCircle size={14} color="#6366f1" />
-                  <Text className="text-indigo-600 font-medium ml-1">Acknowledge</Text>
-                </View>
+                Acknowledge
               </Button>
             )}
             
@@ -189,10 +186,7 @@ const EmergencyAlertCard = ({
                 onPress={() => onResolve(alert.id)}
                 className="flex-1"
               >
-                <View className="flex-row items-center">
-                  <XCircle size={14} color="#ffffff" />
-                  <Text className="text-white font-medium ml-1">Resolve</Text>
-                </View>
+                Resolve
               </Button>
             )}
           </View>

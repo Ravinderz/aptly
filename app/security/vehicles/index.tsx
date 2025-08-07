@@ -24,7 +24,8 @@ import {
   Timer,
   CheckCircle,
   XCircle,
-  ArrowRight
+  ArrowRight,
+  ArrowLeft
 } from 'lucide-react-native';
 import { useDirectAuth } from '@/hooks/useDirectAuth';
 import type { SecurityVehicle } from '@/types/security';
@@ -446,6 +447,9 @@ const VehicleManagement = () => {
       <View className="bg-white px-4 pt-12 pb-4 border-b border-gray-200">
         <View className="flex-row items-center justify-between mb-4">
           <View className="flex-row items-center">
+            <TouchableOpacity onPress={() => router.back()} className="mr-3 p-2">
+              <ArrowLeft size={20} color="#6b7280" />
+            </TouchableOpacity>
             <Car size={24} color="#6366f1" />
             <Text className="text-2xl font-bold text-gray-900 ml-2">
               Vehicle Management
