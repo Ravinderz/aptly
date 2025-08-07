@@ -17,7 +17,8 @@ import {
   Bell,
   ArrowRight,
   RefreshCw,
-  MapPin
+  MapPin,
+  LogOut
 } from 'lucide-react-native';
 import { router } from 'expo-router';
 import { cn } from '@/utils/cn';
@@ -35,7 +36,7 @@ import type { SecurityDashboardStats, EmergencyAlert } from '@/types/security';
  * - Today's activity summary
  */
 function SecurityDashboard() {
-  const { user } = useDirectAuth();
+  const { user, logout } = useDirectAuth();
   const { 
     permissions, 
     permissionLevel,
@@ -91,6 +92,15 @@ function SecurityDashboard() {
     }
   };
 
+  const handleLogout = async () => {
+    try {
+      await logout();
+      router.replace('/welcome');
+    } catch (error) {
+      console.error('Logout failed:', error);
+    }
+  };
+
   return (
     <ScrollView 
       className="flex-1 bg-gray-50"
@@ -108,9 +118,14 @@ function SecurityDashboard() {
               Security Dashboard
             </Text>
           </View>
-          <TouchableOpacity onPress={onRefresh} className="p-2">
-            <RefreshCw size={20} color="#6b7280" />
-          </TouchableOpacity>
+          <View className="flex-row items-center">
+            <TouchableOpacity onPress={onRefresh} className="p-2">
+              <RefreshCw size={20} color="#6b7280" />
+            </TouchableOpacity>
+            <TouchableOpacity onPress={handleLogout} className="p-2">
+              <LogOut size={20} color="#dc2626" />
+            </TouchableOpacity>
+          </View>
         </View>
         <Text className="text-gray-600">
           Welcome back, {user?.fullName || 'Security Guard'}
