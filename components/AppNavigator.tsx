@@ -5,9 +5,9 @@ import { useDirectAuth } from '@/hooks/useDirectAuth';
 import { useRouter, useSegments } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 
-const AppNavigator: React.FC<{ children: React.ReactNode }> = ({
+const AppNavigator = ({
   children,
-}) => {
+}: { children: React.ReactNode }) => {
   const [isFirstLaunch, setIsFirstLaunch] = useState<boolean | null>(null);
   const [isCheckingFirstLaunch, setIsCheckingFirstLaunch] = useState(true);
   const [hasNavigated, setHasNavigated] = useState(false);

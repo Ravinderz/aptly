@@ -1,12 +1,13 @@
-// AuthStore - Zustand implementation for authentication state management
-import AuthService, { UserProfile } from '@/services/auth.service';
+// AuthStore - Zustand implementation for authentication state management with REST API integration
+import { AuthService, UserProfile } from '@/services/auth.service.rest';
 import BiometricService from '@/services/biometric.service';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { SecureTokenStorage, SecureProfileStorage, SecureSessionStorage } from '@/utils/storage.secure';
 import { create } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
 import { immer } from 'zustand/middleware/immer';
 import { BaseStore } from '../types';
 import { SecurityGuardProfile, SecurityPermissions } from '@/types/security';
+import { useApiError } from '@/hooks/useApiError';
 
 // State interface matching the existing AuthContext
 interface AuthState extends BaseStore {
@@ -168,16 +169,11 @@ export const useAuthStore = create<AuthStore>()(
               state.error = null;
             });
 
-            // Add timeout for auth check
-            const authCheckPromise = AuthService.isAuthenticated();
-            const timeoutPromise = new Promise((_, reject) => 
-              setTimeout(() => reject(new Error('Auth check timeout')), 10000)
-            );
-
-            const isAuth = await Promise.race([authCheckPromise, timeoutPromise]) as boolean;
+            // Check authentication status with REST service
+            const isAuth = await AuthService.isAuthenticated();
 
             if (isAuth) {
-              // Try to get user profile with timeout
+              // Try to get stored profile first for faster loading
               try {
                 const storedProfile = await AuthService.getStoredProfile();
                 if (storedProfile) {
@@ -187,20 +183,25 @@ export const useAuthStore = create<AuthStore>()(
                     state.isLoading = false;
                     state.loading = false;
                   });
+                  
+                  // Refresh user data in background
+                  AuthService.getCurrentUser().then((currentUser) => {
+                    if (currentUser && JSON.stringify(currentUser) !== JSON.stringify(storedProfile)) {
+                      set((state) => {
+                        state.user = currentUser;
+                      });
+                    }
+                  }).catch(console.warn);
+                  
                   return;
                 }
               } catch (profileError) {
                 console.warn('⚠️ Failed to get stored profile:', profileError);
               }
 
-              // Try to fetch current user from API with timeout
+              // Fetch current user from API
               try {
-                const userPromise = AuthService.getCurrentUser();
-                const userTimeoutPromise = new Promise((_, reject) => 
-                  setTimeout(() => reject(new Error('User fetch timeout')), 8000)
-                );
-                
-                const currentUser = await Promise.race([userPromise, userTimeoutPromise]) as any;
+                const currentUser = await AuthService.getCurrentUser();
                 
                 if (currentUser) {
                   set((state) => {
@@ -209,6 +210,11 @@ export const useAuthStore = create<AuthStore>()(
                     state.isLoading = false;
                     state.loading = false;
                   });
+                  
+                  // Initialize security profile if user is security guard
+                  if (currentUser.role === 'security_guard') {
+                    get().initializeSecurityGuard(currentUser);
+                  }
                 } else {
                   set((state) => {
                     state.isAuthenticated = false;
@@ -218,12 +224,13 @@ export const useAuthStore = create<AuthStore>()(
                   });
                 }
               } catch (userError) {
-                console.warn('⚠️ Failed to fetch current user, using authenticated state without profile:', userError);
+                console.warn('⚠️ Failed to fetch current user:', userError);
                 set((state) => {
-                  state.isAuthenticated = true; // Keep authenticated but without user profile
+                  state.isAuthenticated = false;
                   state.user = null;
                   state.isLoading = false;
                   state.loading = false;
+                  state.error = 'Failed to load user profile';
                 });
               }
             } else {
@@ -235,7 +242,7 @@ export const useAuthStore = create<AuthStore>()(
               });
             }
           } catch (error: any) {
-            console.warn('⚠️ Auth check failed, assuming unauthenticated:', error);
+            console.warn('⚠️ Auth check failed:', error);
             set((state) => {
               state.isAuthenticated = false;
               state.user = null;
@@ -425,10 +432,13 @@ export const useAuthStore = create<AuthStore>()(
             const newTokens = await AuthService.refreshToken();
             if (!newTokens) {
               // Token refresh failed, logout user
+              console.warn('⚠️ Token refresh failed, logging out user');
               await get().logout();
+            } else {
+              console.log('✅ Token refreshed successfully');
             }
           } catch (error: any) {
-            console.error('Token refresh failed:', error);
+            console.error('❌ Token refresh failed:', error);
             set((state) => {
               state.error = error.message || 'Session expired';
             });
@@ -592,25 +602,46 @@ export const useAuthStore = create<AuthStore>()(
         storage: {
           getItem: async (name: string) => {
             try {
-              const value = await AsyncStorage.getItem(name);
-              return value ? JSON.parse(value) : null;
+              // Get from secure storage first for sensitive data
+              if (name === 'auth-storage') {
+                const profile = SecureProfileStorage.getProfile();
+                const sessionData = {
+                  user: profile,
+                  isAuthenticated: !!profile,
+                  securityProfile: null,
+                  securityPermissions: null,
+                  biometricEnabled: false,
+                  lastLoginTime: SecureSessionStorage.getLastLoginTime(),
+                };
+                return sessionData;
+              }
+              return null;
             } catch (error) {
-              console.warn(`Unable to get auth item '${name}', storage unavailable:`, error);
+              console.warn(`Unable to get auth item '${name}':`, error);
               return null;
             }
           },
           setItem: async (name: string, value: any) => {
             try {
-              await AsyncStorage.setItem(name, JSON.stringify(value));
+              // Store in secure storage for sensitive data
+              if (name === 'auth-storage' && value?.user) {
+                SecureProfileStorage.storeProfile(value.user);
+                if (value.lastLoginTime) {
+                  SecureSessionStorage.storeLastLoginTime(value.lastLoginTime);
+                }
+              }
             } catch (error) {
-              console.warn(`Unable to set auth item '${name}', storage unavailable:`, error);
+              console.warn(`Unable to set auth item '${name}':`, error);
             }
           },
           removeItem: async (name: string) => {
             try {
-              await AsyncStorage.removeItem(name);
+              if (name === 'auth-storage') {
+                SecureProfileStorage.clearProfile();
+                SecureSessionStorage.clearSession();
+              }
             } catch (error) {
-              console.warn(`Unable to remove auth item '${name}', storage unavailable:`, error);
+              console.warn(`Unable to remove auth item '${name}':`, error);
             }
           },
         },

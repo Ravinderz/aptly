@@ -15,6 +15,7 @@ export * from './slices/themeStore';
 export * from './slices/societyStore';
 export * from './slices/adminStore';
 export * from './slices/notificationStore';
+export * from './slices/visitorsStore';
 
 // Migration utilities
 export const STORE_VERSION = '1.0.0';
@@ -43,6 +44,7 @@ export const resetAllStores = async () => {
       const { useSocietyStore } = require('./slices/societyStore');
       const { useAdminStore } = require('./slices/adminStore');
       const { useNotificationStore } = require('./slices/notificationStore');
+      const { useVisitorsStore } = require('./slices/visitorsStore');
       
       useAuthStore.getState().reset();
       useFeatureFlagStore.getState().reset();
@@ -50,15 +52,17 @@ export const resetAllStores = async () => {
       useSocietyStore.getState().reset();
       useAdminStore.getState().reset();
       useNotificationStore.getState().reset();
+      useVisitorsStore.getState().reset();
     } else {
       // Use dynamic imports in production
-      const [authModule, flagModule, themeModule, societyModule, adminModule, notificationModule] = await Promise.all([
+      const [authModule, flagModule, themeModule, societyModule, adminModule, notificationModule, visitorsModule] = await Promise.all([
         import('./slices/authStore'),
         import('./slices/featureFlagStore'),
         import('./slices/themeStore'),
         import('./slices/societyStore'),
         import('./slices/adminStore'),
         import('./slices/notificationStore'),
+        import('./slices/visitorsStore'),
       ]);
       
       authModule.useAuthStore.getState().reset();
@@ -67,6 +71,7 @@ export const resetAllStores = async () => {
       societyModule.useSocietyStore.getState().reset();
       adminModule.useAdminStore.getState().reset();
       notificationModule.useNotificationStore.getState().reset();
+      visitorsModule.useVisitorsStore.getState().reset();
     }
   } catch (error) {
     console.error('Failed to reset stores:', error);

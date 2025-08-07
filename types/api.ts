@@ -444,3 +444,226 @@ export interface APIErrorResponse extends APIResponse {
   error: APIError;
   validationErrors?: ValidationError[];
 }
+
+// Enhanced API types for REST integration
+
+// Authentication token types
+export interface TokenData {
+  accessToken: string;
+  refreshToken: string;
+  expiresAt: number;
+  tokenType: 'Bearer';
+}
+
+export interface RefreshTokenRequest {
+  refreshToken: string;
+}
+
+export interface RefreshTokenResponse {
+  accessToken: string;
+  refreshToken: string;
+  expiresIn: number;
+  tokenType: 'Bearer';
+}
+
+// Enhanced visitor types for REST API
+export interface VisitorListQuery {
+  page?: number;
+  limit?: number;
+  status?: 'pending' | 'approved' | 'rejected' | 'checked_in' | 'checked_out' | 'expired';
+  date?: string;
+  hostFlatNumber?: string;
+  search?: string;
+  sortBy?: 'createdAt' | 'name' | 'checkInTime' | 'expectedDuration';
+  sortOrder?: 'asc' | 'desc';
+}
+
+export interface VisitorCheckInRequest {
+  actualArrivalTime?: string;
+  securityNotes?: string;
+  temperatureCheck?: number;
+  photoAtEntry?: string;
+}
+
+export interface VisitorCheckOutRequest {
+  actualDepartureTime?: string;
+  securityNotes?: string;
+  rating?: number;
+  feedback?: string;
+}
+
+export interface VisitorApprovalRequest {
+  approvedBy: string;
+  approvalNotes?: string;
+  restrictions?: string[];
+  validUntil?: string;
+}
+
+export interface VisitorRejectionRequest {
+  rejectedBy: string;
+  rejectionReason: string;
+  rejectionNotes?: string;
+}
+
+// Visitor statistics
+export interface VisitorStats {
+  totalVisitors: number;
+  pendingApprovals: number;
+  activeVisitors: number;
+  todayVisitors: number;
+  weeklyAverage: number;
+  popularTimes: {
+    hour: number;
+    count: number;
+  }[];
+}
+
+// Enhanced user profile
+export interface UserProfileExtended extends AuthUser {
+  fullName?: string;
+  dateOfBirth?: string;
+  gender?: 'male' | 'female' | 'other';
+  occupation?: string;
+  emergencyContacts?: EmergencyContact[];
+  vehicles?: Vehicle[];
+  familyMembers?: FamilyMember[];
+  preferences?: UserPreferences;
+  socialProfiles?: SocialProfile[];
+  documents?: UserDocument[];
+}
+
+export interface EmergencyContact {
+  id: string;
+  name: string;
+  relationship: string;
+  phoneNumber: string;
+  email?: string;
+  address?: string;
+  isPrimary: boolean;
+}
+
+export interface Vehicle {
+  id: string;
+  type: 'car' | 'bike' | 'bicycle' | 'other';
+  make: string;
+  model: string;
+  color: string;
+  registrationNumber: string;
+  parkingSlot?: string;
+  isActive: boolean;
+}
+
+export interface FamilyMember {
+  id: string;
+  name: string;
+  relationship: string;
+  age?: number;
+  phoneNumber?: string;
+  email?: string;
+  photo?: string;
+  isResident: boolean;
+}
+
+export interface UserPreferences {
+  notifications: NotificationPreferences;
+  privacy: PrivacySettings;
+  theme: 'light' | 'dark' | 'auto';
+  language: string;
+}
+
+export interface PrivacySettings {
+  profileVisibility: 'public' | 'residents' | 'private';
+  showPhoneNumber: boolean;
+  showEmail: boolean;
+  showOnlineStatus: boolean;
+  allowDirectMessages: boolean;
+}
+
+export interface SocialProfile {
+  platform: 'facebook' | 'instagram' | 'twitter' | 'linkedin';
+  username: string;
+  url: string;
+}
+
+export interface UserDocument {
+  id: string;
+  type: 'aadhar' | 'pan' | 'passport' | 'driving_license' | 'voter_id' | 'other';
+  documentNumber: string;
+  expiryDate?: string;
+  fileUrl: string;
+  isVerified: boolean;
+  verifiedAt?: string;
+  verifiedBy?: string;
+}
+
+// Device and session management
+export interface DeviceInfo {
+  deviceId: string;
+  platform: 'ios' | 'android';
+  osVersion: string;
+  appVersion: string;
+  model: string;
+  brand: string;
+  pushToken?: string;
+  isActive: boolean;
+  lastActiveAt: string;
+}
+
+export interface UserSession {
+  id: string;
+  userId: string;
+  deviceId: string;
+  deviceInfo: DeviceInfo;
+  ipAddress: string;
+  userAgent: string;
+  createdAt: string;
+  lastActiveAt: string;
+  expiresAt: string;
+  isActive: boolean;
+}
+
+// API request/response tracking
+export interface RequestLog {
+  id: string;
+  method: string;
+  url: string;
+  statusCode: number;
+  responseTime: number;
+  requestSize: number;
+  responseSize: number;
+  userAgent: string;
+  ipAddress: string;
+  userId?: string;
+  timestamp: string;
+  error?: string;
+}
+
+// Real-time updates
+export interface WebSocketEvent {
+  type: 'visitor_created' | 'visitor_approved' | 'visitor_checked_in' | 'visitor_checked_out' | 
+        'emergency_alert' | 'maintenance_update' | 'notice_published' | 'bill_generated';
+  payload: any;
+  timestamp: string;
+  userId?: string;
+  societyId: string;
+}
+
+// Bulk operations
+export interface BulkOperationRequest {
+  operation: 'approve' | 'reject' | 'delete' | 'update';
+  entityType: 'visitors' | 'posts' | 'maintenance' | 'bills';
+  entityIds: string[];
+  data?: any;
+  reason?: string;
+}
+
+export interface BulkOperationResponse {
+  totalRequested: number;
+  successful: number;
+  failed: number;
+  results: {
+    entityId: string;
+    success: boolean;
+    error?: string;
+  }[];
+}

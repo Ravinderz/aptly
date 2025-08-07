@@ -39,7 +39,7 @@ import type { SecurityVisitor, VisitorCheckOutFormData } from '@/types/security'
  * - Duration tracking and overstay alerts
  * - Automatic calculations
  */
-const VisitorCheckOut: React.FC = () => {
+const VisitorCheckOut = () => {
   const params = useLocalSearchParams();
   const { user } = useDirectAuth();
   const preselectedVisitorId = params.visitorId as string;

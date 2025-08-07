@@ -25,13 +25,13 @@ interface RoleGuardProps {
  * - Automatic redirects
  * - Loading states
  */
-export const RoleGuard: React.FC<RoleGuardProps> = ({
+export const RoleGuard = ({
   children,
   allowedRoles,
   fallbackRoute = '/(tabs)/',
   showFallback = true,
   customFallback,
-}) => {
+}: RoleGuardProps) => {
   const router = useRouter();
   const { user, isLoading } = useDirectAuth();
 
@@ -126,13 +126,23 @@ export const RoleGuard: React.FC<RoleGuardProps> = ({
  */
 export const RequireRole = (allowedRoles: UserRole[], fallbackRoute?: string) => {
   return <T extends object>(Component: React.ComponentType<T>) => {
+    // Safety check for component
+    if (!Component) {
+      console.warn('RequireRole: Component is undefined');
+      const EmptyComponent = () => null;
+      EmptyComponent.displayName = 'RequireRole(EmptyComponent)';
+      return EmptyComponent as any;
+    }
+
     const WrappedComponent = (props: T) => (
       <RoleGuard allowedRoles={allowedRoles} fallbackRoute={fallbackRoute}>
         <Component {...props} />
       </RoleGuard>
     );
     
-    WrappedComponent.displayName = `RequireRole(${Component?.displayName || Component?.name || 'Unknown'})`;
+    // Safe displayName assignment
+    const componentName = (Component && (Component.displayName || Component.name)) || 'Unknown';
+    WrappedComponent.displayName = `RequireRole(${componentName})`;
     return WrappedComponent;
   };
 };
@@ -140,35 +150,39 @@ export const RequireRole = (allowedRoles: UserRole[], fallbackRoute?: string) =>
 /**
  * Role-specific guards for common use cases
  */
-export const RequireSuperAdmin: React.FC<{ children: React.ReactNode }> = ({ children }) => (
+export const RequireSuperAdmin = ({ children }: { children: React.ReactNode }) => (
   <RoleGuard allowedRoles={['super_admin']}>
     {children}
   </RoleGuard>
 );
 
-export const RequireManager: React.FC<{ children: React.ReactNode }> = ({ children }) => (
+export const RequireManager = ({ children }: { children: React.ReactNode }) => (
   <RoleGuard allowedRoles={['community_manager']}>
     {children}
   </RoleGuard>
 );
 
-export const RequireAdmin: React.FC<{ children: React.ReactNode }> = ({ children }) => (
+export const RequireAdmin = ({ children }: { children: React.ReactNode }) => (
   <RoleGuard allowedRoles={['super_admin', 'society_admin']}>
     {children}
   </RoleGuard>
 );
 
-export const RequireStaff: React.FC<{ children: React.ReactNode }> = ({ children }) => (
+export const RequireStaff = ({ children }: { children: React.ReactNode }) => (
   <RoleGuard allowedRoles={['super_admin', 'community_manager', 'society_admin']}>
     {children}
   </RoleGuard>
 );
 
-export const RequireSecurityGuard: React.FC<{ 
+export const RequireSecurityGuard = ({ 
+  children, 
+  requireVerification = true, 
+  customFallback 
+}: { 
   children: React.ReactNode;
   requireVerification?: boolean;
   customFallback?: React.ReactNode;
-}> = ({ children, requireVerification = true, customFallback }) => {
+}) => {
   const { user } = useDirectAuth();
   const router = useRouter();
 
@@ -201,13 +215,15 @@ export const RequireSecurityGuard: React.FC<{
   );
 };
 
+// Assign displayName immediately after component definition
+RequireSecurityGuard.displayName = 'RequireSecurityGuard';
+
 // Add displayName to role guard components for React DevTools
 RoleGuard.displayName = 'RoleGuard';
 RequireSuperAdmin.displayName = 'RequireSuperAdmin';
 RequireManager.displayName = 'RequireManager';  
 RequireAdmin.displayName = 'RequireAdmin';
 RequireStaff.displayName = 'RequireStaff';
-RequireSecurityGuard.displayName = 'RequireSecurityGuard';
 
 /**
  * Permission-based visibility component
@@ -218,11 +234,11 @@ interface PermissionGateProps {
   fallback?: React.ReactNode;
 }
 
-export const PermissionGate: React.FC<PermissionGateProps> = ({
+export const PermissionGate = ({
   children,
   allowedRoles,
   fallback = null,
-}) => {
+}: PermissionGateProps) => {
   const { user } = useDirectAuth();
 
   if (!user || !allowedRoles.includes(user.role as UserRole)) {
@@ -241,11 +257,11 @@ interface SecurityPermissionGateProps {
   fallback?: React.ReactNode;
 }
 
-export const SecurityPermissionGate: React.FC<SecurityPermissionGateProps> = ({
+export const SecurityPermissionGate = ({
   children,
   requiredPermissions = [],
   fallback = null,
-}) => {
+}: SecurityPermissionGateProps) => {
   const { user } = useDirectAuth();
 
   // Only allow security guards

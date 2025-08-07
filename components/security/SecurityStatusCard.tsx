@@ -27,7 +27,7 @@ export interface SecurityStatusCardProps {
  * - Touch interaction support
  * - Icon integration
  */
-const SecurityStatusCard: React.FC<SecurityStatusCardProps> = ({
+const SecurityStatusCard = ({
   title,
   value,
   subtitle,
@@ -36,7 +36,7 @@ const SecurityStatusCard: React.FC<SecurityStatusCardProps> = ({
   trend,
   onPress,
   className
-}) => {
+}: SecurityStatusCardProps) => {
   const colorClasses = {
     green: {
       text: 'text-green-600',

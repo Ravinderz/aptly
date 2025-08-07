@@ -11,10 +11,10 @@ import { RequireSecurityGuard } from '@/components/auth/RoleGuard';
  * - Foundation for security guard module
  * - Prepared for Phase 2 implementation
  */
-const SecurityLayout: React.FC = () => {
+const SecurityLayout = () => {
   return (
     <RequireSecurityGuard>
-      <View style={{ flex: 1 }}>
+      <View className="flex-1">
         <Slot />
       </View>
     </RequireSecurityGuard>

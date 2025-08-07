@@ -33,7 +33,7 @@ import type { SecurityDashboardStats, EmergencyAlert } from '@/types/security';
  * - Overstay visitor tracking
  * - Today's activity summary
  */
-const SecurityDashboard: React.FC = () => {
+const SecurityDashboard = () => {
   const { user } = useDirectAuth();
   const { 
     permissions, 

@@ -26,7 +26,7 @@ interface AdminHeaderProps {
  * - Navigation controls
  * - User context display
  */
-export const AdminHeader: React.FC<AdminHeaderProps> = ({
+export const AdminHeader = ({
   title,
   subtitle,
   showBack = false,
@@ -36,7 +36,7 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({
   showLogout = false,
   onMenuPress,
   onLogout,
-}) => {
+}: AdminHeaderProps) => {
   const router = useRouter();
   const { user, logout } = useDirectAuth();
   const { unreadCount } = useDirectNotification();

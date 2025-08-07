@@ -36,14 +36,14 @@ export interface EmergencyAlertCardProps {
  * - Status indicators
  * - Time tracking
  */
-const EmergencyAlertCard: React.FC<EmergencyAlertCardProps> = ({
+const EmergencyAlertCard = ({
   alert,
   onAcknowledge,
   onResolve,
   onPress,
   showActions = true,
   className
-}) => {
+}: EmergencyAlertCardProps) => {
   const getSeverityColor = (severity: string) => {
     switch (severity) {
       case 'critical': return '#dc2626';

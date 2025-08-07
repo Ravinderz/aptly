@@ -149,6 +149,47 @@ export default function Welcome() {
     }
   };
 
+  const handleSecurityGuardLogin = async () => {
+    try {
+      // Create mock security guard user data for development
+      const mockSecurityProfile = {
+        id: 'security-guard-123',
+        name: 'Guard Singh',
+        phone: '9876543210',
+        email: 'guard@aptly.app',
+        flatNumber: null, // Security guards don't have flat numbers
+        societyId: 'dev-society-123',
+        societyCode: 'DEV001',
+        societyName: 'Green Valley Apartments',
+        role: 'security_guard',
+        fullName: 'Rajesh Singh',
+        isVerified: true,
+        avatar: null,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      };
+
+      const mockTokens = {
+        accessToken: 'mock-security-token-123',
+        refreshToken: 'mock-security-refresh-123',
+      };
+
+      // Store mock security guard data in AsyncStorage
+      await AsyncStorage.multiSet([
+        ['auth_tokens', JSON.stringify(mockTokens)],
+        ['user_profile', JSON.stringify(mockSecurityProfile)],
+      ]);
+
+      // Update auth context
+      login(mockSecurityProfile);
+
+      // Navigate to security dashboard
+      router.replace('/security/dashboard');
+    } catch (error) {
+      console.error('Error setting up security guard mode:', error);
+    }
+  };
+
   const features = [
     {
       icon: <LucideIcons name="building" size={32} color="#6366f1" />,
@@ -195,6 +236,16 @@ export default function Welcome() {
             <LucideIcons name="users" size={16} color="white" />
             <Text className="text-white text-label-large font-bold ml-1">
               MANAGER
+            </Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            onPress={handleSecurityGuardLogin}
+            className="bg-green-600/90 rounded-full px-3 py-2 flex-row items-center shadow-sm"
+            activeOpacity={0.8}>
+            <LucideIcons name="shield" size={16} color="white" />
+            <Text className="text-white text-label-large font-bold ml-1">
+              SECURITY
             </Text>
           </TouchableOpacity>
           
@@ -332,3 +383,5 @@ export default function Welcome() {
     </SafeAreaView>
   );
 }
+
+export default Welcome;

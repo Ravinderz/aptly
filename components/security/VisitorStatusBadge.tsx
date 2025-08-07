@@ -17,11 +17,11 @@ export interface VisitorStatusBadgeProps {
  * - Multiple size variants
  * - Security-specific status types
  */
-const VisitorStatusBadge: React.FC<VisitorStatusBadgeProps> = ({
+const VisitorStatusBadge = ({
   status,
   size = 'md',
   className
-}) => {
+}: VisitorStatusBadgeProps) => {
   const getStatusStyles = (status: string) => {
     switch (status) {
       case 'pending':

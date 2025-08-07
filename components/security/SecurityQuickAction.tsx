@@ -27,7 +27,7 @@ export interface SecurityQuickActionProps {
  * - Disabled state handling
  * - Icon integration
  */
-const SecurityQuickAction: React.FC<SecurityQuickActionProps> = ({
+const SecurityQuickAction = ({
   title,
   description,
   icon,
@@ -36,7 +36,7 @@ const SecurityQuickAction: React.FC<SecurityQuickActionProps> = ({
   disabled = false,
   badge,
   className
-}) => {
+}: SecurityQuickActionProps) => {
   const variantStyles = {
     primary: {
       bg: 'bg-indigo-50',

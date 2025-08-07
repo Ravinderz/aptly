@@ -42,7 +42,7 @@ type AlertSeverity = 'low' | 'medium' | 'high' | 'critical';
  * - Emergency contact integration
  * - Alert resolution tracking
  */
-const EmergencyResponse: React.FC = () => {
+const EmergencyResponse = () => {
   const { user } = useDirectAuth();
   const [refreshing, setRefreshing] = useState(false);
   const [showCreateAlert, setShowCreateAlert] = useState(false);

@@ -1,35 +1,32 @@
-import React, { useState } from 'react';
-import { 
-  View, 
-  Text, 
-  ScrollView, 
-  Alert,
-  Switch,
-  KeyboardAvoidingView,
-  Platform 
-} from 'react-native';
-import { router } from 'expo-router';
-import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
+import { Card } from '@/components/ui/Card';
+import ImagePicker from '@/components/ui/ImagePicker';
 import { Input } from '@/components/ui/Input';
-import { ImagePicker } from '@/components/ui/ImagePicker';
-import { 
-  UserCheck, 
-  Phone, 
-  MapPin, 
-  Clock, 
-  Camera, 
-  Car,
-  AlertTriangle,
-  CheckCircle,
-  ArrowLeft
-} from 'lucide-react-native';
 import { useDirectAuth } from '@/hooks/useDirectAuth';
 import type { VisitorCheckInFormData } from '@/types/security';
+import { router } from 'expo-router';
+import {
+  AlertTriangle,
+  ArrowLeft,
+  Camera,
+  Car,
+  CheckCircle,
+  UserCheck,
+} from 'lucide-react-native';
+import { useState } from 'react';
+import {
+  Alert,
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView,
+  Switch,
+  Text,
+  View,
+} from 'react-native';
 
 /**
  * Visitor Check-in Interface - Phase 2
- * 
+ *
  * Features:
  * - Comprehensive visitor information collection
  * - ID verification and photo capture
@@ -38,10 +35,10 @@ import type { VisitorCheckInFormData } from '@/types/security';
  * - Emergency contact information
  * - Real-time form validation
  */
-const VisitorCheckIn: React.FC = () => {
+const VisitorCheckIn = () => {
   const { user } = useDirectAuth();
   const [loading, setLoading] = useState(false);
-  
+
   const [formData, setFormData] = useState<VisitorCheckInFormData>({
     name: '',
     phoneNumber: '',
@@ -55,31 +52,34 @@ const VisitorCheckIn: React.FC = () => {
       number: '',
       make: '',
       model: '',
-      color: ''
+      color: '',
     },
     photo: '',
     emergencyContactName: '',
     emergencyContactPhone: '',
-    specialInstructions: ''
+    specialInstructions: '',
   });
 
   const [showVehicleForm, setShowVehicleForm] = useState(false);
   const [showEmergencyContact, setShowEmergencyContact] = useState(false);
-  
-  const handleInputChange = (field: keyof VisitorCheckInFormData, value: any) => {
-    setFormData(prev => ({
+
+  const handleInputChange = (
+    field: keyof VisitorCheckInFormData,
+    value: any,
+  ) => {
+    setFormData((prev) => ({
       ...prev,
-      [field]: value
+      [field]: value,
     }));
   };
 
   const handleVehicleChange = (field: string, value: any) => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
       vehicleDetails: {
         ...prev.vehicleDetails!,
-        [field]: value
-      }
+        [field]: value,
+      },
     }));
   };
 
@@ -88,24 +88,27 @@ const VisitorCheckIn: React.FC = () => {
       Alert.alert('Validation Error', 'Visitor name is required');
       return false;
     }
-    
+
     if (!formData.phoneNumber.trim()) {
       Alert.alert('Validation Error', 'Phone number is required');
       return false;
     }
-    
+
     if (!formData.hostFlatNumber.trim()) {
       Alert.alert('Validation Error', 'Host flat number is required');
       return false;
     }
-    
+
     if (!formData.purpose.trim()) {
       Alert.alert('Validation Error', 'Visit purpose is required');
       return false;
     }
 
     if (formData.expectedDuration <= 0) {
-      Alert.alert('Validation Error', 'Expected duration must be greater than 0');
+      Alert.alert(
+        'Validation Error',
+        'Expected duration must be greater than 0',
+      );
       return false;
     }
 
@@ -124,11 +127,11 @@ const VisitorCheckIn: React.FC = () => {
     if (!validateForm()) return;
 
     setLoading(true);
-    
+
     try {
       // Mock API call - replace with actual implementation
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      
+      await new Promise((resolve) => setTimeout(resolve, 2000));
+
       // Success feedback
       Alert.alert(
         'Check-in Successful',
@@ -151,24 +154,23 @@ const VisitorCheckIn: React.FC = () => {
                   number: '',
                   make: '',
                   model: '',
-                  color: ''
+                  color: '',
                 },
                 photo: '',
                 emergencyContactName: '',
                 emergencyContactPhone: '',
-                specialInstructions: ''
+                specialInstructions: '',
               });
               setShowVehicleForm(false);
               setShowEmergencyContact(false);
-            }
+            },
           },
           {
             text: 'View Visitors',
-            onPress: () => router.push('/security/visitors')
-          }
-        ]
+            onPress: () => router.push('/security/visitors'),
+          },
+        ],
       );
-      
     } catch (error) {
       Alert.alert('Error', 'Failed to check in visitor. Please try again.');
     } finally {
@@ -177,10 +179,9 @@ const VisitorCheckIn: React.FC = () => {
   };
 
   return (
-    <KeyboardAvoidingView 
+    <KeyboardAvoidingView
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      className="flex-1"
-    >
+      className="flex-1">
       <View className="flex-1 bg-gray-50">
         {/* Header */}
         <View className="bg-white px-4 pt-12 pb-4 border-b border-gray-200">
@@ -189,8 +190,7 @@ const VisitorCheckIn: React.FC = () => {
               variant="ghost"
               size="sm"
               onPress={() => router.back()}
-              className="mr-2 p-2"
-            >
+              className="mr-2 p-2">
               <ArrowLeft size={20} color="#6b7280" />
             </Button>
             <UserCheck size={24} color="#6366f1" />
@@ -206,14 +206,13 @@ const VisitorCheckIn: React.FC = () => {
         <ScrollView
           className="flex-1"
           contentContainerStyle={{ padding: 16 }}
-          keyboardShouldPersistTaps="handled"
-        >
+          keyboardShouldPersistTaps="handled">
           {/* Basic Information */}
           <Card className="p-4 mb-4 bg-white">
             <Text className="text-lg font-semibold text-gray-900 mb-4">
               Basic Information
             </Text>
-            
+
             <Input
               label="Visitor Name *"
               value={formData.name}
@@ -234,7 +233,9 @@ const VisitorCheckIn: React.FC = () => {
             <Input
               label="Host Flat Number *"
               value={formData.hostFlatNumber}
-              onChangeText={(value) => handleInputChange('hostFlatNumber', value)}
+              onChangeText={(value) =>
+                handleInputChange('hostFlatNumber', value)
+              }
               placeholder="e.g., A-204, B-101"
               className="mb-4"
             />
@@ -250,7 +251,9 @@ const VisitorCheckIn: React.FC = () => {
             <Input
               label="Expected Duration (hours) *"
               value={formData.expectedDuration.toString()}
-              onChangeText={(value) => handleInputChange('expectedDuration', parseInt(value) || 1)}
+              onChangeText={(value) =>
+                handleInputChange('expectedDuration', parseInt(value) || 1)
+              }
               placeholder="2"
               keyboardType="numeric"
             />
@@ -261,22 +264,21 @@ const VisitorCheckIn: React.FC = () => {
             <Text className="text-lg font-semibold text-gray-900 mb-4">
               ID Verification
             </Text>
-            
+
             <Text className="text-sm text-gray-600 mb-2">ID Type</Text>
             <View className="flex-row flex-wrap mb-4">
               {[
                 { key: 'license', label: 'Driving License' },
                 { key: 'passport', label: 'Passport' },
                 { key: 'national_id', label: 'Aadhaar Card' },
-                { key: 'other', label: 'Other' }
+                { key: 'other', label: 'Other' },
               ].map((type) => (
                 <Button
                   key={type.key}
                   variant={formData.idType === type.key ? 'primary' : 'outline'}
                   size="sm"
                   onPress={() => handleInputChange('idType', type.key)}
-                  className="mr-2 mb-2"
-                >
+                  className="mr-2 mb-2">
                   {type.label}
                 </Button>
               ))}
@@ -310,26 +312,34 @@ const VisitorCheckIn: React.FC = () => {
                 onValueChange={setShowVehicleForm}
               />
             </View>
-            
+
             {showVehicleForm && (
               <View>
                 <Text className="text-sm text-gray-600 mb-2">Vehicle Type</Text>
                 <View className="flex-row flex-wrap mb-4">
                   {[
-                    { key: 'car', label: 'Car', icon: <Car size={16} color="#6b7280" /> },
+                    {
+                      key: 'car',
+                      label: 'Car',
+                      icon: <Car size={16} color="#6b7280" />,
+                    },
                     { key: 'bike', label: 'Bike' },
-                    { key: 'bicycle', label: 'Bicycle' }
+                    { key: 'bicycle', label: 'Bicycle' },
                   ].map((type) => (
                     <Button
                       key={type.key}
-                      variant={formData.vehicleDetails?.type === type.key ? 'primary' : 'outline'}
+                      variant={
+                        formData.vehicleDetails?.type === type.key
+                          ? 'primary'
+                          : 'outline'
+                      }
                       size="sm"
                       onPress={() => handleVehicleChange('type', type.key)}
-                      className="mr-2 mb-2"
-                    >
+                      className="mr-2 mb-2">
                       <View className="flex-row items-center">
                         {type.icon}
-                        <Text className={`ml-1 ${formData.vehicleDetails?.type === type.key ? 'text-white' : 'text-gray-700'}`}>
+                        <Text
+                          className={`ml-1 ${formData.vehicleDetails?.type === type.key ? 'text-white' : 'text-gray-700'}`}>
                           {type.label}
                         </Text>
                       </View>
@@ -342,7 +352,9 @@ const VisitorCheckIn: React.FC = () => {
                     <Input
                       label="Vehicle Number *"
                       value={formData.vehicleDetails?.number || ''}
-                      onChangeText={(value) => handleVehicleChange('number', value)}
+                      onChangeText={(value) =>
+                        handleVehicleChange('number', value)
+                      }
                       placeholder="KA-01-AB-1234"
                       className="mb-4"
                     />
@@ -351,14 +363,18 @@ const VisitorCheckIn: React.FC = () => {
                       <Input
                         label="Make"
                         value={formData.vehicleDetails?.make || ''}
-                        onChangeText={(value) => handleVehicleChange('make', value)}
+                        onChangeText={(value) =>
+                          handleVehicleChange('make', value)
+                        }
                         placeholder="Honda"
                         className="flex-1 mr-2"
                       />
                       <Input
                         label="Model"
                         value={formData.vehicleDetails?.model || ''}
-                        onChangeText={(value) => handleVehicleChange('model', value)}
+                        onChangeText={(value) =>
+                          handleVehicleChange('model', value)
+                        }
                         placeholder="City"
                         className="flex-1 ml-2"
                       />
@@ -367,7 +383,9 @@ const VisitorCheckIn: React.FC = () => {
                     <Input
                       label="Color"
                       value={formData.vehicleDetails?.color || ''}
-                      onChangeText={(value) => handleVehicleChange('color', value)}
+                      onChangeText={(value) =>
+                        handleVehicleChange('color', value)
+                      }
                       placeholder="White"
                     />
                   </View>
@@ -387,21 +405,25 @@ const VisitorCheckIn: React.FC = () => {
                 onValueChange={setShowEmergencyContact}
               />
             </View>
-            
+
             {showEmergencyContact && (
               <View>
                 <Input
                   label="Contact Name"
                   value={formData.emergencyContactName || ''}
-                  onChangeText={(value) => handleInputChange('emergencyContactName', value)}
+                  onChangeText={(value) =>
+                    handleInputChange('emergencyContactName', value)
+                  }
                   placeholder="Contact person name"
                   className="mb-4"
                 />
-                
+
                 <Input
                   label="Contact Phone"
                   value={formData.emergencyContactPhone || ''}
-                  onChangeText={(value) => handleInputChange('emergencyContactPhone', value)}
+                  onChangeText={(value) =>
+                    handleInputChange('emergencyContactPhone', value)
+                  }
                   placeholder="+91-XXXXXXXXXX"
                   keyboardType="phone-pad"
                 />
@@ -414,11 +436,13 @@ const VisitorCheckIn: React.FC = () => {
             <Text className="text-lg font-semibold text-gray-900 mb-4">
               Special Instructions
             </Text>
-            
+
             <Input
               label="Notes (Optional)"
               value={formData.specialInstructions || ''}
-              onChangeText={(value) => handleInputChange('specialInstructions', value)}
+              onChangeText={(value) =>
+                handleInputChange('specialInstructions', value)
+              }
               placeholder="Any special instructions or notes..."
               multiline
               numberOfLines={3}
@@ -431,8 +455,7 @@ const VisitorCheckIn: React.FC = () => {
             size="lg"
             fullWidth
             loading={loading}
-            onPress={handleCheckIn}
-          >
+            onPress={handleCheckIn}>
             <View className="flex-row items-center">
               <CheckCircle size={20} color="#ffffff" />
               <Text className="text-white font-semibold ml-2">
@@ -450,9 +473,9 @@ const VisitorCheckIn: React.FC = () => {
                   Security Verification
                 </Text>
                 <Text className="text-blue-700 text-sm">
-                  All visitor information will be verified and logged. 
-                  ID verification is mandatory for security purposes.
-                  Checked in by: {user?.fullName || 'Security Guard'}
+                  All visitor information will be verified and logged. ID
+                  verification is mandatory for security purposes. Checked in
+                  by: {user?.fullName || 'Security Guard'}
                 </Text>
               </View>
             </View>

@@ -11,10 +11,10 @@ import { RequireSecurityGuard } from '@/components/auth/RoleGuard';
  * - Navigation structure for visitor management
  * - Foundation for visitor check-in/out workflows
  */
-const VisitorManagementLayout: React.FC = () => {
+const VisitorManagementLayout = () => {
   return (
     <RequireSecurityGuard>
-      <View style={{ flex: 1 }}>
+      <View className="flex-1">
         <Slot />
       </View>
     </RequireSecurityGuard>

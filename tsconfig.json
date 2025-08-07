@@ -36,6 +36,7 @@
       "@/utils/*": ["./utils/*"],
       "@/services/*": ["./services/*"],
       "@/contexts/*": ["./contexts/*"],
+      "@/config/*": ["./config/*"],
       "@/app/*": ["./app/*"]
     },
     "baseUrl": ".",

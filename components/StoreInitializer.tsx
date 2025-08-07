@@ -17,10 +17,10 @@ interface StoreInitializerProps {
  * StoreInitializer - Handles initialization of all Zustand stores
  * This replaces the old Context providers and ensures stores are ready before app starts
  */
-export const StoreInitializer: React.FC<StoreInitializerProps> = ({
+export const StoreInitializer = ({
   children,
   environment = 'development',
-}) => {
+}: StoreInitializerProps) => {
   const [isInitialized, setIsInitialized] = useState(false);
   const [initError, setInitError] = useState<string | null>(null);
 

@@ -38,7 +38,7 @@ type FilterType = 'all' | 'inside' | 'pending' | 'overstay' | 'scheduled' | 'che
  * - Overstay alerts
  * - Pending approval management
  */
-const VisitorManagement: React.FC = () => {
+const VisitorManagement = () => {
   const params = useLocalSearchParams();
   const initialFilter = (params.filter as FilterType) || 'all';
 

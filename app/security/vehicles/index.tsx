@@ -44,7 +44,7 @@ type VehicleType = 'car' | 'bike' | 'bicycle' | 'truck' | 'other';
  * - Search and filtering
  * - Visitor vehicle integration
  */
-const VehicleManagement: React.FC = () => {
+const VehicleManagement = () => {
   const { user } = useDirectAuth();
   const [refreshing, setRefreshing] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');

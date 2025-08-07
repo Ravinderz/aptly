@@ -85,6 +85,9 @@ export const useDirectAuth = () => {
   }), [authState, actions]);
 };
 
+// Assign displayName to prevent React DevTools issues
+useDirectAuth.displayName = 'useDirectAuth';
+
 // Stable selector for auth store feature flag (prevents displayName errors)
 const authStoreFlagSelector = (state: any) => state.flags.USE_AUTH_STORE;
 // Assign displayName to prevent React DevTools issues
@@ -96,4 +99,7 @@ authStoreFlagSelector.displayName = 'authStoreFlagSelector';
 export const useIsAuthStoreActive = (): boolean => {
   return useFeatureFlagStore(authStoreFlagSelector);
 };
+
+// Assign displayName to prevent React DevTools issues
+useIsAuthStoreActive.displayName = 'useIsAuthStoreActive';
 
