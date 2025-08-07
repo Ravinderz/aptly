@@ -1,6 +1,7 @@
 // AuthStore - Zustand implementation for authentication state management with REST API integration
-import { AuthService, UserProfile } from '@/services/auth.service.rest';
-import BiometricService from '@/services/biometric.service';
+import { AuthService } from '@/services';
+import { BiometricService } from '@/services';
+import type { UserProfileExtended as UserProfile } from '@/types/api';
 import { SecureTokenStorage, SecureProfileStorage, SecureSessionStorage } from '@/utils/storage.secure';
 import { create } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';

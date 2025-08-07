@@ -1,5 +1,6 @@
-import AuthService, { UserProfile } from '@/services/auth.service';
-import BiometricService from '@/services/biometric.service';
+import { AuthService } from '@/services';
+import { BiometricService } from '@/services';
+import type { UserProfileExtended as UserProfile } from '@/types/api';
 import React, {
   createContext,
   ReactNode,

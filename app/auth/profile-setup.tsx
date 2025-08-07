@@ -1,6 +1,6 @@
 import { Button } from '@/components/ui/Button';
 import { useDirectAuth } from '@/hooks/useDirectAuth';
-import { UserProfile } from '@/services/auth.service';
+import type { UserProfileExtended as UserProfile } from '@/types/api';
 import { showErrorAlert, showSuccessAlert } from '@/utils/alert';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { ArrowLeft, User } from 'lucide-react-native';

@@ -17,8 +17,8 @@ import {
   ResponsiveText,
 } from '@/components/ui/ResponsiveContainer';
 import LucideIcons from '@/components/ui/LucideIcons';
-import AuthService from '@/services/auth.service';
-import BiometricService from '@/services/biometric.service';
+import { AuthService } from '@/services';
+import { BiometricService } from '@/services';
 import { useDirectAuth } from '@/hooks/useDirectAuth';
 import { useFeatureFlagStore } from '@/stores/slices/featureFlagStore';
 import { showErrorAlert } from '@/utils/alert';

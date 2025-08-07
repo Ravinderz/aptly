@@ -9,7 +9,7 @@ import {
   View,
 } from 'react-native';
 import { Button } from '@/components/ui/Button';
-import AuthService from '@/services/auth.service';
+import { AuthService } from '@/services';
 import { showErrorAlert, showSuccessAlert } from '@/utils/alert';
 
 export default function OTPVerification() {
