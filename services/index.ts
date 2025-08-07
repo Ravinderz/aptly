@@ -1,21 +1,35 @@
 // Main services exports for easy imports across the application
 
-// Core API service
-// Service instances for direct use
-import APIService from './api.service';
-import AuthService from './auth.service';
-import BillingService from './billing.service';
+// Modern API client and services
+import { apiClient } from './api.client';
+import { RestAuthService } from './auth.service.rest';
+import { RestVisitorsService } from './visitors.service.rest';
 import { communityApi } from './communityApi';
-import GovernanceService from './governance.service';
-import MaintenanceService from './maintenance.service';
-import NotificationService from './notification.service';
 
-export { APIService } from './api.service';
-export type { APIError, NetworkState, UploadResult } from './api.service';
+// Re-export API client
+export { apiClient, APIClientError } from './api.client';
+export type { APIResponse, APIError } from '@/types/api';
 
-// Authentication service
-export { AuthService } from './auth.service';
-export type { AuthResult, TokenPair, UserProfile } from './auth.service';
+// Modern REST-based Authentication service
+export { RestAuthService as AuthService } from './auth.service.rest';
+export type {
+  AuthResult,
+  LoginRequest,
+  LoginResponse,
+  OTPVerificationRequest,
+  AuthTokens,
+  AuthUser,
+  UserProfileExtended,
+} from '@/types/api';
+
+// Modern REST-based Visitors service
+export { RestVisitorsService as VisitorsService } from './visitors.service.rest';
+export type {
+  Visitor,
+  VisitorCreateRequest,
+  VisitorListQuery,
+  VisitorStats,
+} from '@/types/api';
 
 // Community service
 export type {
@@ -27,72 +41,40 @@ export type {
 } from '@/types/community';
 export { communityApi } from './communityApi';
 
-// Billing service
-export { BillingService } from './billing.service';
-export type {
-  Bill,
-  BillerInfo,
-  BillPaymentRequest,
-  GSTCalculation,
-  PaymentRecord,
-  RechargeRequest,
-} from './billing.service';
-
-// Governance service
-export { GovernanceService } from './governance.service';
-export type {
-  AgendaItem,
-  Announcement,
-  Attendee,
-  Committee,
-  CommitteeMember,
-  Complaint,
-  Meeting,
-  Proposal,
-  Vote,
-  VotingResults,
-} from './governance.service';
-
-// Notification service
-export { NotificationService } from './notification.service';
-export type {
-  Notification,
-  NotificationPreferences,
-  NotificationStats,
-  PushTokenInfo,
-} from './notification.service';
-
-// Maintenance service
-export { MaintenanceService } from './maintenance.service';
-export type {
-  ChecklistItem,
-  MaintenanceAnalytics,
-  MaintenanceRequest,
-  MaintenanceStaff,
-  ScheduledMaintenance,
-  Vendor,
-} from './maintenance.service';
-
-// Biometric service (existing)
+// Biometric service (existing - preserved as requested)
 export { BiometricService } from './biometric.service';
 
 // Admin services (existing)
-// export * from './admin/adminAuthService';
 export * from './admin/authService';
 export * from './admin/roleManager';
 
 export const services = {
-  api: APIService,
-  auth: AuthService,
+  api: apiClient,
+  auth: RestAuthService.getInstance(),
+  visitors: RestVisitorsService.getInstance(),
   community: communityApi,
-  billing: BillingService,
-  governance: GovernanceService,
-  notification: NotificationService,
-  maintenance: MaintenanceService,
 } as const;
 
 // Default export for convenience
 export default services;
+
+// Legacy compatibility exports (deprecated - use modern services instead)
+export const LegacyServices = {
+  warning: 'These exports point to deprecated services. Use modern REST services instead.',
+  // For backwards compatibility - these will be removed in future versions
+  get APIService() {
+    console.warn('APIService is deprecated. Use apiClient instead.');
+    return require('./deprecated/api.service').APIService;
+  },
+  get AuthService() {
+    console.warn('Legacy AuthService is deprecated. Use RestAuthService instead.');
+    return require('./deprecated/auth.service').AuthService;
+  },
+  get BillingService() {
+    console.warn('BillingService is deprecated and moved to deprecated folder.');
+    return require('./deprecated/billing.service').BillingService;
+  },
+};
 
 // Service status and health check utilities
 export const ServiceStatus = {
@@ -101,13 +83,10 @@ export const ServiceStatus = {
 
     try {
       // Test each service with a lightweight operation
-      results.auth = await AuthService.isAuthenticated();
-      results.api = true; // API service is always available
+      results.auth = await RestAuthService.getInstance().isAuthenticated();
+      results.api = true; // API client is always available
+      results.visitors = true; // Visitors service is always available
       results.community = true; // Community service is mock-based
-      results.billing = true; // Billing service is mock-based
-      results.governance = true; // Governance service is mock-based
-      results.notification = true; // Notification service is mock-based
-      results.maintenance = true; // Maintenance service is mock-based
     } catch (error) {
       console.error('Service health check failed:', error);
       // Set failed services to false
@@ -123,16 +102,13 @@ export const ServiceStatus = {
 
   async getServiceInfo() {
     return {
-      version: '1.0.0',
+      version: '2.0.0',
       environment: 'development',
       services: {
-        api: { status: 'active', baseURL: 'https://api.aptly.app/v4' },
-        auth: { status: 'active', provider: 'custom' },
+        api: { status: 'active', baseURL: 'https://api.aptly.app/v4', type: 'REST' },
+        auth: { status: 'active', provider: 'REST', type: 'modern' },
+        visitors: { status: 'active', provider: 'REST', type: 'modern' },
         community: { status: 'active', mode: 'mock' },
-        billing: { status: 'active', mode: 'mock' },
-        governance: { status: 'active', mode: 'mock' },
-        notification: { status: 'active', mode: 'mock' },
-        maintenance: { status: 'active', mode: 'mock' },
       },
       lastHealthCheck: new Date().toISOString(),
     };
@@ -145,11 +121,12 @@ export const ServiceHelpers = {
   async initializeServices(userId?: string) {
     try {
       // Initialize auth service
-      const isAuthenticated = await AuthService.isAuthenticated();
+      const authService = RestAuthService.getInstance();
+      const isAuthenticated = await authService.isAuthenticated();
 
       if (isAuthenticated && userId) {
-        // Load user preferences
-        await NotificationService.getUserPreferences(userId);
+        // Load user profile if needed
+        await authService.getCurrentUser();
       }
 
       return true;
@@ -162,7 +139,7 @@ export const ServiceHelpers = {
   // Cleanup services (call this on logout)
   async cleanupServices() {
     try {
-      await AuthService.logout();
+      await RestAuthService.getInstance().logout();
       // Other cleanup operations can be added here
       return true;
     } catch (error) {
@@ -171,23 +148,42 @@ export const ServiceHelpers = {
     }
   },
 
-  // Get unread counts for badges
-  async getUnreadCounts(userId: string) {
+  // Get essential service status
+  async getServiceStatus() {
     try {
-      const [notifications, communityPosts] = await Promise.all([
-        NotificationService.getUnreadCount(userId),
-        // Add other unread count services here
-        Promise.resolve(0), // Placeholder for community unread count
-      ]);
-
+      const authStatus = await RestAuthService.getInstance().isAuthenticated();
       return {
-        notifications,
-        community: communityPosts,
-        total: notifications + communityPosts,
+        auth: authStatus,
+        api: true,
+        visitors: true,
+        community: true,
       };
     } catch (error) {
-      console.error('Failed to get unread counts:', error);
-      return { notifications: 0, community: 0, total: 0 };
+      console.error('Failed to get service status:', error);
+      return { auth: false, api: false, visitors: false, community: false };
     }
   },
+};
+
+// Deprecated services notice - for migration reference
+export const DEPRECATED_SERVICES_NOTICE = {
+  message: 'Legacy services have been moved to services/deprecated folder',
+  migratedServices: [
+    'api.service.ts → api.client.ts (REST-based HTTP client)',
+    'auth.service.ts → auth.service.rest.ts (REST authentication)',
+    'billing.service.ts → deprecated (unused mock service)',
+    'governance.service.ts → deprecated (unused mock service)',
+    'maintenance.service.ts → deprecated (unused mock service)',
+    'notification.service.ts → deprecated (minimal usage mock service)',
+    'admin/adminAuthService.ts → deprecated (unused admin service)',
+  ],
+  currentServices: [
+    'api.client.ts - Modern HTTP client with interceptors',
+    'auth.service.rest.ts - REST-based authentication',
+    'visitors.service.rest.ts - REST-based visitor management',
+    'communityApi.ts - Community features',
+    'biometric.service.ts - Biometric authentication',
+    'admin/authService.ts - Admin authentication',
+    'admin/roleManager.ts - Role-based access control',
+  ],
 };

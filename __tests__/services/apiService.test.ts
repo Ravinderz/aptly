@@ -1,12 +1,23 @@
-import { APIService, APIError, NetworkState } from '../../services/api.service';
+/**
+ * @deprecated This test file tests the deprecated APIService
+ * The deprecated service was moved during services cleanup following KISS/DRY principles
+ * 
+ * For new tests, use:
+ * - apiClient from '../../services/api.client'
+ * - RestAuthService from '../../services/auth.service.rest'
+ * 
+ * This test is kept for legacy compatibility testing only.
+ */
+// Updated test to use deprecated service for testing legacy functionality
+import { APIService, APIError, NetworkState } from '../../services/deprecated/api.service';
 import axios from 'axios';
 
 // Mock axios
 jest.mock('axios');
 const mockedAxios = axios as jest.Mocked<typeof axios>;
 
-// Mock auth service
-jest.mock('../../services/auth.service', () => ({
+// Mock auth service (deprecated)
+jest.mock('../../services/deprecated/auth.service', () => ({
   AuthService: {
     getInstance: jest.fn(() => ({
       getAccessToken: jest.fn().mockResolvedValue('mock-token'),

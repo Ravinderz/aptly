@@ -3,17 +3,19 @@
  */
 import { renderHook, act } from '@testing-library/react-native';
 import { useAuthStore } from '@/stores/slices/authStore';
-import { UserProfile } from '@/services/auth.service';
+// Updated to use types from the new service structure
+import type { UserProfileExtended } from '@/types/api';
 
-// Mock the services
-jest.mock('@/services/auth.service', () => ({
+// Mock the modern REST auth service
+jest.mock('@/services/auth.service.rest', () => ({
   __esModule: true,
-  default: {
-    isAuthenticated: jest.fn(),
-    getStoredProfile: jest.fn(),
-    getCurrentUser: jest.fn(),
-    logout: jest.fn(),
-    refreshToken: jest.fn(),
+  RestAuthService: {
+    getInstance: jest.fn(() => ({
+      isAuthenticated: jest.fn(),
+      getCurrentUser: jest.fn(),
+      logout: jest.fn(),
+      refreshTokens: jest.fn(),
+    })),
   },
 }));
 

@@ -1,12 +1,19 @@
-import { AuthService } from '../../services/auth.service';
+/**
+ * @deprecated This test file tests the deprecated AuthService
+ * The deprecated service was moved during services cleanup following KISS/DRY principles
+ * 
+ * For new tests, use RestAuthService from '../../services/auth.service.rest'
+ * This test is kept for legacy compatibility testing only.
+ */
+import { AuthService } from '../../services/deprecated/auth.service';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 // Mock AsyncStorage
 jest.mock('@react-native-async-storage/async-storage');
 const mockAsyncStorage = AsyncStorage as jest.Mocked<typeof AsyncStorage>;
 
-// Mock API Service
-jest.mock('../../services/api.service', () => ({
+// Mock API Service (deprecated)
+jest.mock('../../services/deprecated/api.service', () => ({
   APIService: {
     getInstance: jest.fn(() => ({
       post: jest.fn(),
