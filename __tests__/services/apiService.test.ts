@@ -6,7 +6,7 @@ jest.mock('axios');
 const mockedAxios = axios as jest.Mocked<typeof axios>;
 
 // Mock auth service
-jest.mock('../../services/auth.service', () => ({
+jest.mock('../../services/auth.service.rest', () => ({
   AuthService: {
     getInstance: jest.fn(() => ({
       getAccessToken: jest.fn().mockResolvedValue('mock-token'),

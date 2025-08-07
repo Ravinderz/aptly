@@ -36,7 +36,7 @@ jest.mock('@/services/biometric.service', () => ({
 }));
 
 // Mock Auth service
-jest.mock('@/services/auth.service', () => ({
+jest.mock('@/services/auth.service.rest', () => ({
   default: {
     isAuthenticated: jest.fn().mockResolvedValue(false),
     getStoredProfile: jest.fn().mockResolvedValue(null),

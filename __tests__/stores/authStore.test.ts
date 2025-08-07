@@ -3,10 +3,10 @@
  */
 import { renderHook, act } from '@testing-library/react-native';
 import { useAuthStore } from '@/stores/slices/authStore';
-import { UserProfile } from '@/services/auth.service';
+import { UserProfile } from '@/services/auth.service.rest';
 
 // Mock the services
-jest.mock('@/services/auth.service', () => ({
+jest.mock('@/services/auth.service.rest', () => ({
   __esModule: true,
   default: {
     isAuthenticated: jest.fn(),
@@ -14,17 +14,6 @@ jest.mock('@/services/auth.service', () => ({
     getCurrentUser: jest.fn(),
     logout: jest.fn(),
     refreshToken: jest.fn(),
-  },
-}));
-
-jest.mock('@/services/biometric.service', () => ({
-  __esModule: true,
-  default: {
-    authenticateWithBiometrics: jest.fn(),
-    getBiometricUserId: jest.fn(),
-    isBiometricEnabled: jest.fn(),
-    enableBiometricAuth: jest.fn(),
-    disableBiometricAuth: jest.fn(),
   },
 }));
 

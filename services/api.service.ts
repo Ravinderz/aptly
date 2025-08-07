@@ -1,5 +1,5 @@
 import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios';
-import { AuthService } from './auth.service';
+import { AuthService } from './auth.service.rest';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export interface APIError {

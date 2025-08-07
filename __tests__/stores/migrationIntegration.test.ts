@@ -8,24 +8,13 @@ import { useThemeStore } from '@/stores/slices/themeStore';
 import { resetAllStores, emergencyRollback } from '@/stores';
 
 // Mock the services
-jest.mock('@/services/auth.service', () => ({
+jest.mock('@/services/auth.service.rest', () => ({
   __esModule: true,
   default: {
     isAuthenticated: jest.fn(),
     getStoredProfile: jest.fn(),
     getCurrentUser: jest.fn(),
     logout: jest.fn(),
-  },
-}));
-
-jest.mock('@/services/biometric.service', () => ({
-  __esModule: true,
-  default: {
-    authenticateWithBiometrics: jest.fn(),
-    getBiometricUserId: jest.fn(),
-    isBiometricEnabled: jest.fn(),
-    enableBiometricAuth: jest.fn(),
-    disableBiometricAuth: jest.fn(),
   },
 }));
 
