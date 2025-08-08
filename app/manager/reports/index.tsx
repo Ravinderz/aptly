@@ -5,402 +5,555 @@ import {
   ScrollView,
   TouchableOpacity,
   RefreshControl,
+  Alert,
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import {
   BarChart3,
   TrendingUp,
   TrendingDown,
-  Clock,
-  User,
-  MessageSquare,
-  CheckCircle,
+  Download,
+  Filter,
+  Calendar,
   Building2,
-  Award,
+  Users,
+  Clock,
+  Star,
+  ArrowLeft,
+  FileText,
+  Target,
+  AlertCircle,
+  CheckCircle,
 } from 'lucide-react-native';
 import { useDirectAuth } from '@/hooks/useDirectAuth';
 import { RequireManager } from '@/components/auth/RoleGuard';
 import { AdminHeader } from '@/components/admin/AdminHeader';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
+import { 
+  LoadingWrapper, 
+  useAsyncState, 
+  LoadingSpinner 
+} from '@/components/ui/LoadingStates';
 import { cn } from '@/utils/cn';
+import { reportsService } from '@/services/reports.service';
+import type {
+  PerformanceMetrics,
+  SocietyPerformance,
+  ManagerStats,
+  ReportFilters,
+  ExportOptions,
+  TeamComparison,
+  ReportRecommendation,
+} from '@/services/reports.service';
 
-interface PerformanceMetrics {
-  period: string;
-  totalTickets: number;
-  resolvedTickets: number;
-  averageResponseTime: number; // hours
-  satisfactionScore: number; // percentage
-  societiesManaged: number;
-  resolutionRate: number; // percentage
-}
-
-interface SocietyPerformance {
-  societyId: string;
-  societyName: string;
-  ticketsHandled: number;
-  averageResponseTime: number;
-  satisfactionScore: number;
-  healthScore: number;
-  trend: 'improving' | 'stable' | 'declining';
-}
-
-function ManagerReports() {
+/**
+ * Manager Reports - Society performance reports with filtering and export functionality
+ * 
+ * Features:
+ * - Performance metrics dashboard with interactive charts
+ * - Society-wise performance breakdown
+ * - Filtering by date range, performance thresholds
+ * - Export functionality (PDF, CSV, Excel)
+ * - Team comparison and benchmarking
+ * - Custom date range selection
+ * - Real-time data updates
+ */
+const ManagerReports = () => {
   const router = useRouter();
   const { user, logout } = useDirectAuth();
   
+  const [reportsState, { setLoading, setData, setError }] = useAsyncState<{
+    metrics: PerformanceMetrics;
+    managerStats: ManagerStats;
+    societies: SocietyPerformance[];
+    teamComparison: TeamComparison[];
+    recommendations: ReportRecommendation[];
+  }>();
+  
   const [refreshing, setRefreshing] = useState(false);
-  const [performanceMetrics, setPerformanceMetrics] = useState<PerformanceMetrics | null>(null);
-  const [societyPerformance, setSocietyPerformance] = useState<SocietyPerformance[]>([]);
-  const [selectedPeriod, setSelectedPeriod] = useState<'week' | 'month' | 'quarter'>('month');
+  const [showFilters, setShowFilters] = useState(false);
+  const [exportingFormat, setExportingFormat] = useState<string | null>(null);
+  
+  const [filters, setFilters] = useState<ReportFilters>({
+    period: 'month',
+    includeResolved: true,
+    includePending: true,
+    performanceThreshold: 75,
+  });
 
+  // Load reports data on mount and when filters change
   useEffect(() => {
-    loadPerformanceData();
-  }, [selectedPeriod]);
+    loadReportsData();
+  }, [filters]);
 
-  const loadPerformanceData = async () => {
+  const loadReportsData = async () => {
     try {
-      // Mock data - replace with actual API call
-      const mockMetrics: PerformanceMetrics = {
-        period: selectedPeriod,
-        totalTickets: 45,
-        resolvedTickets: 38,
-        averageResponseTime: 2.5,
-        satisfactionScore: 94,
-        societiesManaged: 4,
-        resolutionRate: 84,
-      };
-
-      const mockSocietyPerformance: SocietyPerformance[] = [
-        {
-          societyId: '1',
-          societyName: 'Green Valley Society',
-          ticketsHandled: 15,
-          averageResponseTime: 2.1,
-          satisfactionScore: 96,
-          healthScore: 85,
-          trend: 'improving',
-        },
-        {
-          societyId: '2',
-          societyName: 'Sunrise Apartments',
-          ticketsHandled: 18,
-          averageResponseTime: 3.2,
-          satisfactionScore: 88,
-          healthScore: 65,
-          trend: 'stable',
-        },
-        {
-          societyId: '3',
-          societyName: 'Metro Heights',
-          ticketsHandled: 8,
-          averageResponseTime: 1.8,
-          satisfactionScore: 98,
-          healthScore: 92,
-          trend: 'improving',
-        },
-        {
-          societyId: '4',
-          societyName: 'Royal Gardens',
-          ticketsHandled: 4,
-          averageResponseTime: 4.5,
-          satisfactionScore: 75,
-          healthScore: 35,
-          trend: 'declining',
-        },
-      ];
+      setLoading();
       
-      setPerformanceMetrics(mockMetrics);
-      setSocietyPerformance(mockSocietyPerformance);
+      // Load all data in parallel
+      const [
+        metricsResponse,
+        societyResponse,
+        teamResponse,
+        insightsResponse,
+      ] = await Promise.all([
+        reportsService.getPerformanceMetrics(filters),
+        reportsService.getSocietyPerformance(filters),
+        reportsService.getTeamComparison(filters.period),
+        reportsService.getPerformanceInsights(filters.period),
+      ]);
+
+      if (
+        metricsResponse.success && 
+        societyResponse.success && 
+        teamResponse.success && 
+        insightsResponse.success
+      ) {
+        setData({
+          metrics: metricsResponse.data!.metrics,
+          managerStats: metricsResponse.data!.managerStats,
+          societies: societyResponse.data!.societies,
+          teamComparison: teamResponse.data!.teamComparison,
+          recommendations: insightsResponse.data!.recommendations,
+        });
+      } else {
+        const error = metricsResponse.message || societyResponse.message || 
+                     teamResponse.message || insightsResponse.message || 
+                     'Failed to load reports data';
+        setError(new Error(error));
+      }
     } catch (error) {
-      console.error('Failed to load performance data:', error);
+      console.error('Failed to load reports data:', error);
+      setError(error as Error);
     }
   };
 
-  const handleRefresh = async () => {
+  const onRefresh = React.useCallback(async () => {
     setRefreshing(true);
     try {
-      await loadPerformanceData();
+      await loadReportsData();
     } finally {
       setRefreshing(false);
     }
-  };
+  }, [filters]);
 
-  const handleLogout = async () => {
+  const handleExportReport = async (format: 'pdf' | 'csv' | 'xlsx') => {
     try {
-      await logout();
-      router.replace('/welcome');
+      setExportingFormat(format);
+      
+      const exportOptions: ExportOptions = {
+        format,
+        includeCharts: true,
+        includeDetails: true,
+        societyBreakdown: true,
+        timeSeriesData: true,
+      };
+
+      const response = await reportsService.exportReport(filters, exportOptions);
+      
+      if (response.success && response.data?.downloadUrl) {
+        Alert.alert(
+          'Report Generated',
+          `Your ${format.toUpperCase()} report has been generated successfully.`,
+          [
+            { text: 'OK' }
+          ]
+        );
+        console.log('Download URL:', response.data.downloadUrl);
+      } else {
+        throw new Error(response.message || 'Failed to generate report');
+      }
     } catch (error) {
-      console.error('Logout failed:', error);
+      console.error('Failed to export report:', error);
+      Alert.alert(
+        'Export Failed',
+        error instanceof Error ? error.message : 'Failed to export report. Please try again.'
+      );
+    } finally {
+      setExportingFormat(null);
     }
   };
 
-  const getTrendIcon = (trend: SocietyPerformance['trend']) => {
-    switch (trend) {
-      case 'improving': return <TrendingUp size={16} color="#059669" />;
-      case 'declining': return <TrendingDown size={16} color="#dc2626" />;
-      default: return <View className="w-4 h-4" />;
-    }
+  const handlePeriodChange = (newPeriod: ReportFilters['period']) => {
+    setFilters(prev => ({ ...prev, period: newPeriod }));
   };
 
-  const getTrendColor = (trend: SocietyPerformance['trend']) => {
-    switch (trend) {
-      case 'improving': return 'text-green-600';
-      case 'declining': return 'text-red-600';
-      default: return 'text-gray-600';
-    }
+  const getPerformanceColor = (score: number) => {
+    if (score >= 90) return '#16a34a'; // green-600
+    if (score >= 75) return '#f59e0b'; // amber-500
+    if (score >= 60) return '#ea580c'; // orange-600
+    return '#dc2626'; // red-600
   };
 
   const getPerformanceGrade = (score: number) => {
-    if (score >= 90) return { grade: 'A+', color: 'text-green-600' };
-    if (score >= 80) return { grade: 'A', color: 'text-green-600' };
-    if (score >= 70) return { grade: 'B', color: 'text-yellow-600' };
-    if (score >= 60) return { grade: 'C', color: 'text-orange-600' };
-    return { grade: 'D', color: 'text-red-600' };
+    if (score >= 90) return 'A';
+    if (score >= 80) return 'B';
+    if (score >= 70) return 'C';
+    if (score >= 60) return 'D';
+    return 'F';
   };
 
-  if (!performanceMetrics) {
+  const getTrendIcon = (trend: 'improving' | 'stable' | 'declining') => {
+    switch (trend) {
+      case 'improving':
+        return <TrendingUp size={16} color="#16a34a" />;
+      case 'declining':
+        return <TrendingDown size={16} color="#dc2626" />;
+      default:
+        return <Target size={16} color="#6b7280" />;
+    }
+  };
+
+  const getRecommendationIcon = (type: ReportRecommendation['type']) => {
+    switch (type) {
+      case 'critical':
+        return <AlertCircle size={16} color="#dc2626" />;
+      case 'warning':
+        return <AlertCircle size={16} color="#f59e0b" />;
+      case 'improvement':
+        return <TrendingUp size={16} color="#2563eb" />;
+      default:
+        return <CheckCircle size={16} color="#16a34a" />;
+    }
+  };
+
+  // Role check - only community managers can access
+  if (!user || user.role !== 'community_manager') {
     return (
-      <RequireManager>
-        <View className="flex-1 justify-center items-center bg-gray-50">
-          <BarChart3 size={48} color="#6b7280" />
-          <Text className="text-gray-600 mt-4">Loading performance data...</Text>
-        </View>
-      </RequireManager>
+      <View className="flex-1 justify-center items-center p-4 bg-gray-50">
+        <BarChart3 size={48} color="#6b7280" />
+        <Text className="text-lg font-semibold text-gray-900 mt-4 text-center">
+          Manager Access Required
+        </Text>
+        <Text className="text-gray-600 text-center mt-2">
+          This area is restricted to community managers only.
+        </Text>
+        <Button
+          onPress={() => router.replace('/(tabs)/')}
+          variant="primary"
+          className="mt-6"
+        >
+          Return to Dashboard
+        </Button>
+      </View>
     );
   }
 
+  const metrics = reportsState.data?.metrics;
+  const managerStats = reportsState.data?.managerStats;
+  const societies = reportsState.data?.societies || [];
+  const teamComparison = reportsState.data?.teamComparison || [];
+  const recommendations = reportsState.data?.recommendations || [];
+
   return (
     <RequireManager>
-      <View className="flex-1 bg-gray-50">
-        <AdminHeader 
-          title="Performance Reports" 
-          subtitle={`${selectedPeriod.charAt(0).toUpperCase() + selectedPeriod.slice(1)}ly performance overview`}
-          showBack
-          showNotifications
-          showLogout
-          onLogout={handleLogout}
-        />
-        
-        <ScrollView
-          className="flex-1"
-          refreshControl={
-            <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />
-          }
-          showsVerticalScrollIndicator={false}
-        >
-          {/* Period Selection */}
-          <View className="px-4 py-2">
-            <Text className="text-base font-semibold text-gray-900 mb-3">
-              Time Period
-            </Text>
-            
-            <View className="flex-row gap-2 mb-6">
-              {(['week', 'month', 'quarter'] as const).map((period) => (
-                <TouchableOpacity
-                  key={period}
-                  onPress={() => setSelectedPeriod(period)}
-                  className={cn(
-                    "px-4 py-2 rounded-lg border flex-1 items-center",
-                    selectedPeriod === period 
-                      ? "bg-blue-100 border-blue-300" 
-                      : "bg-white border-gray-300"
-                  )}
-                >
-                  <Text className={cn(
-                    "text-sm font-medium capitalize",
-                    selectedPeriod === period ? "text-blue-800" : "text-gray-700"
-                  )}>
-                    {period}
-                  </Text>
-                </TouchableOpacity>
-              ))}
-            </View>
-          </View>
-
-          {/* Overall Performance Metrics */}
-          <View className="px-4 py-2">
-            <Text className="text-lg font-semibold text-gray-900 mb-4">
-              Overall Performance
-            </Text>
-            
-            <View className="flex-row flex-wrap gap-3 mb-6">
-              <Card className="flex-1 min-w-[140px] p-4">
-                <View className="flex-row items-center justify-between mb-2">
-                  <MessageSquare size={24} color="#0284c7" />
-                  <Text className="text-2xl font-bold text-gray-900">
-                    {performanceMetrics.totalTickets}
-                  </Text>
-                </View>
-                <Text className="text-sm font-medium text-gray-900">Total Tickets</Text>
-                <Text className="text-xs text-gray-600">
-                  {performanceMetrics.resolvedTickets} resolved
-                </Text>
-              </Card>
-
-              <Card className="flex-1 min-w-[140px] p-4">
-                <View className="flex-row items-center justify-between mb-2">
-                  <Clock size={24} color="#059669" />
-                  <Text className="text-2xl font-bold text-gray-900">
-                    {performanceMetrics.averageResponseTime}h
-                  </Text>
-                </View>
-                <Text className="text-sm font-medium text-gray-900">Avg Response</Text>
-                <Text className="text-xs text-green-600">Target: 4h</Text>
-              </Card>
-
-              <Card className="flex-1 min-w-[140px] p-4">
-                <View className="flex-row items-center justify-between mb-2">
-                  <Award size={24} color="#7c3aed" />
-                  <Text className="text-2xl font-bold text-gray-900">
-                    {performanceMetrics.satisfactionScore}%
-                  </Text>
-                </View>
-                <Text className="text-sm font-medium text-gray-900">Satisfaction</Text>
-                <Text className="text-xs text-purple-600">Target: 90%</Text>
-              </Card>
-
-              <Card className="flex-1 min-w-[140px] p-4">
-                <View className="flex-row items-center justify-between mb-2">
-                  <CheckCircle size={24} color="#ea580c" />
-                  <Text className="text-2xl font-bold text-gray-900">
-                    {performanceMetrics.resolutionRate}%
-                  </Text>
-                </View>
-                <Text className="text-sm font-medium text-gray-900">Resolution Rate</Text>
-                <Text className="text-xs text-orange-600">Target: 85%</Text>
-              </Card>
-            </View>
-          </View>
-
-          {/* Performance Grade */}
-          <View className="px-4 py-2">
-            <Card className="p-4 bg-gradient-to-r from-blue-50 to-purple-50 border-blue-200">
-              <View className="flex-row items-center justify-between">
-                <View>
-                  <Text className="text-lg font-semibold text-gray-900 mb-1">
-                    Overall Performance Grade
-                  </Text>
-                  <Text className="text-sm text-gray-600">
-                    Based on response time, satisfaction, and resolution rate
-                  </Text>
-                </View>
-                <View className="items-center">
-                  <Text className={cn("text-4xl font-bold", getPerformanceGrade(performanceMetrics.satisfactionScore).color)}>
-                    {getPerformanceGrade(performanceMetrics.satisfactionScore).grade}
-                  </Text>
-                  <Text className="text-sm text-gray-600">Grade</Text>
-                </View>
+      <LoadingWrapper
+        isLoading={reportsState.isLoading}
+        error={reportsState.error}
+        onRetry={loadReportsData}
+        skeletonProps={{ type: 'card', count: 4 }}
+      >
+        <View className="flex-1 bg-gray-50">
+          <AdminHeader 
+            title="Performance Reports" 
+            subtitle="Detailed analytics and performance insights"
+            showBack
+          />
+          
+          <ScrollView
+            className="flex-1"
+            refreshControl={
+              <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+            }
+            showsVerticalScrollIndicator={false}
+          >
+            {/* Period Selector */}
+            <View className="px-4 py-4 bg-white border-b border-gray-200">
+              <Text className="text-sm font-medium text-gray-900 mb-3">Report Period</Text>
+              <View className="flex-row space-x-2">
+                {[
+                  { key: 'week', label: 'Week' },
+                  { key: 'month', label: 'Month' },
+                  { key: 'quarter', label: 'Quarter' },
+                  { key: 'year', label: 'Year' }
+                ].map((period) => (
+                  <Button
+                    key={period.key}
+                    variant={filters.period === period.key ? 'primary' : 'outline'}
+                    size="sm"
+                    onPress={() => handlePeriodChange(period.key as any)}
+                    className="flex-1"
+                  >
+                    {period.label}
+                  </Button>
+                ))}
               </View>
-            </Card>
-          </View>
+              
+              {/* Export Actions */}
+              <View className="flex-row space-x-2 mt-4">
+                {['pdf', 'csv', 'xlsx'].map((format) => (
+                  <Button
+                    key={format}
+                    variant="outline"
+                    size="sm"
+                    onPress={() => handleExportReport(format as any)}
+                    className="flex-1"
+                    disabled={exportingFormat === format}
+                  >
+                    {exportingFormat === format ? (
+                      <View className="flex-row items-center">
+                        <LoadingSpinner size="small" color="#6b7280" className="mr-1" />
+                        <Text className="text-xs text-gray-600">{format.toUpperCase()}</Text>
+                      </View>
+                    ) : (
+                      <View className="flex-row items-center">
+                        <Download size={12} color="#6b7280" />
+                        <Text className="text-xs text-gray-600 ml-1">{format.toUpperCase()}</Text>
+                      </View>
+                    )}
+                  </Button>
+                ))}
+              </View>
+            </View>
 
-          {/* Society-wise Performance */}
-          <View className="px-4 py-2 mb-6">
-            <Text className="text-lg font-semibold text-gray-900 mb-4">
-              Society-wise Performance
-            </Text>
-            
-            <View className="space-y-3">
-              {societyPerformance.map((society) => (
-                <Card key={society.societyId} className="p-4">
-                  {/* Header */}
-                  <View className="flex-row items-start justify-between mb-3">
-                    <View className="flex-1 mr-3">
-                      <Text className="text-base font-semibold text-gray-900 mb-1">
-                        {society.societyName}
-                      </Text>
-                      <Text className="text-sm text-gray-600">
-                        {society.ticketsHandled} tickets handled
+            {/* Performance Overview */}
+            {metrics && managerStats && (
+              <View className="px-4 py-4">
+                <Text className="text-lg font-semibold text-gray-900 mb-4">
+                  Performance Overview
+                </Text>
+                
+                <View className="flex-row flex-wrap gap-3 mb-6">
+                  {/* Total Tickets */}
+                  <Card className="flex-1 min-w-[160px] p-4">
+                    <View className="flex-row items-center justify-between mb-2">
+                      <FileText size={24} color="#0284c7" />
+                      <Text className="text-2xl font-bold text-gray-900">
+                        {metrics.totalTickets}
                       </Text>
                     </View>
-                    
-                    <View className="items-end">
-                      <View className="flex-row items-center mb-1">
-                        {getTrendIcon(society.trend)}
-                        <Text className={cn("text-sm font-medium ml-1", getTrendColor(society.trend))}>
-                          {society.trend}
+                    <Text className="text-sm font-medium text-gray-900">Total Tickets</Text>
+                    <Text className="text-xs text-gray-600">
+                      {metrics.resolvedTickets} resolved ({Math.round((metrics.resolvedTickets / metrics.totalTickets) * 100)}%)
+                    </Text>
+                  </Card>
+
+                  {/* Average Response Time */}
+                  <Card className="flex-1 min-w-[160px] p-4">
+                    <View className="flex-row items-center justify-between mb-2">
+                      <Clock size={24} color="#059669" />
+                      <Text className="text-2xl font-bold text-gray-900">
+                        {metrics.averageResponseTime}h
+                      </Text>
+                    </View>
+                    <Text className="text-sm font-medium text-gray-900">Avg Response</Text>
+                    <Text className="text-xs text-green-600">
+                      Target: 4h
+                    </Text>
+                  </Card>
+
+                  {/* Satisfaction Score */}
+                  <Card className="flex-1 min-w-[160px] p-4">
+                    <View className="flex-row items-center justify-between mb-2">
+                      <Star size={24} color="#7c3aed" />
+                      <Text className="text-2xl font-bold text-gray-900">
+                        {metrics.satisfactionScore}%
+                      </Text>
+                    </View>
+                    <Text className="text-sm font-medium text-gray-900">Satisfaction</Text>
+                    <Text className="text-xs text-purple-600">
+                      Grade: {getPerformanceGrade(metrics.satisfactionScore)}
+                    </Text>
+                  </Card>
+
+                  {/* Societies Managed */}
+                  <Card className="flex-1 min-w-[160px] p-4">
+                    <View className="flex-row items-center justify-between mb-2">
+                      <Building2 size={24} color="#dc2626" />
+                      <Text className="text-2xl font-bold text-gray-900">
+                        {managerStats.totalSocieties}
+                      </Text>
+                    </View>
+                    <Text className="text-sm font-medium text-gray-900">Societies</Text>
+                    <Text className="text-xs text-red-600">
+                      Rank: #{managerStats.rankingPosition} of {managerStats.totalManagers}
+                    </Text>
+                  </Card>
+                </View>
+              </View>
+            )}
+
+            {/* Society Performance */}
+            <View className="px-4 py-4">
+              <View className="flex-row justify-between items-center mb-4">
+                <Text className="text-lg font-semibold text-gray-900">
+                  Society Performance
+                </Text>
+                <TouchableOpacity>
+                  <Text className="text-blue-600 font-medium">View All</Text>
+                </TouchableOpacity>
+              </View>
+              
+              <View className="space-y-3">
+                {societies.slice(0, 5).map((society) => (
+                  <Card key={society.societyId} className="p-4">
+                    <View className="flex-row items-center justify-between mb-3">
+                      <View className="flex-1">
+                        <Text className="text-base font-semibold text-gray-900">
+                          {society.societyName}
+                        </Text>
+                        <Text className="text-sm text-gray-600">
+                          {society.ticketsHandled} tickets • {society.averageResponseTime}h avg response
                         </Text>
                       </View>
+                      <View className="items-end">
+                        <View className="flex-row items-center mb-1">
+                          <Text 
+                            className="text-sm font-bold mr-1"
+                            style={{ color: getPerformanceColor(society.satisfactionScore) }}
+                          >
+                            {society.performanceGrade}
+                          </Text>
+                          {getTrendIcon(society.trend)}
+                        </View>
+                        <Text className="text-xs text-gray-500">
+                          {society.satisfactionScore}% satisfaction
+                        </Text>
+                      </View>
+                    </View>
+                    
+                    <View className="flex-row justify-between">
+                      <Text className="text-xs text-gray-600">
+                        Resolution Rate: {society.resolutionRate}%
+                      </Text>
                       <Text className="text-xs text-gray-500">
-                        Health: {society.healthScore}%
+                        Health Score: {society.healthScore}%
                       </Text>
                     </View>
-                  </View>
+                  </Card>
+                ))}
+              </View>
+            </View>
 
-                  {/* Metrics */}
-                  <View className="flex-row justify-between items-center">
-                    <View className="items-center">
-                      <Text className="text-lg font-bold text-gray-900">
-                        {society.averageResponseTime}h
-                      </Text>
-                      <Text className="text-xs text-gray-600">Response Time</Text>
-                    </View>
-                    
-                    <View className="items-center">
-                      <Text className="text-lg font-bold text-gray-900">
-                        {society.satisfactionScore}%
-                      </Text>
-                      <Text className="text-xs text-gray-600">Satisfaction</Text>
-                    </View>
-                    
-                    <View className="items-center">
-                      <Text className={cn("text-lg font-bold", getPerformanceGrade(society.satisfactionScore).color)}>
-                        {getPerformanceGrade(society.satisfactionScore).grade}
-                      </Text>
-                      <Text className="text-xs text-gray-600">Grade</Text>
-                    </View>
-                  </View>
+            {/* Recommendations */}
+            {recommendations.length > 0 && (
+              <View className="px-4 py-4">
+                <Text className="text-lg font-semibold text-gray-900 mb-4">
+                  Recommendations
+                </Text>
+                
+                <View className="space-y-3">
+                  {recommendations.slice(0, 3).map((rec) => (
+                    <Card key={rec.id} className={cn(
+                      "p-4",
+                      rec.type === 'critical' ? 'bg-red-50 border-red-200' :
+                      rec.type === 'warning' ? 'bg-amber-50 border-amber-200' :
+                      'bg-blue-50 border-blue-200'
+                    )}>
+                      <View className="flex-row items-start">
+                        <View className="mr-3 mt-1">
+                          {getRecommendationIcon(rec.type)}
+                        </View>
+                        <View className="flex-1">
+                          <Text className={cn(
+                            "text-sm font-semibold mb-1",
+                            rec.type === 'critical' ? 'text-red-900' :
+                            rec.type === 'warning' ? 'text-amber-900' :
+                            'text-blue-900'
+                          )}>
+                            {rec.title}
+                          </Text>
+                          <Text className={cn(
+                            "text-xs mb-2",
+                            rec.type === 'critical' ? 'text-red-700' :
+                            rec.type === 'warning' ? 'text-amber-700' :
+                            'text-blue-700'
+                          )}>
+                            {rec.description}
+                          </Text>
+                          
+                          {rec.actionRequired && (
+                            <View className="flex-row items-center">
+                              <Text className={cn(
+                                "text-xs font-medium px-2 py-1 rounded",
+                                rec.priority === 'high' ? 'bg-red-100 text-red-800' :
+                                rec.priority === 'medium' ? 'bg-amber-100 text-amber-800' :
+                                'bg-blue-100 text-blue-800'
+                              )}>
+                                {rec.priority.toUpperCase()} PRIORITY
+                              </Text>
+                            </View>
+                          )}
+                        </View>
+                      </View>
+                    </Card>
+                  ))}
+                </View>
+              </View>
+            )}
 
-                  {/* Action Button */}
-                  <View className="mt-4">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onPress={() => router.push(`/manager/societies/${society.societyId}/`)}
-                    >
-                      View Society Details
-                    </Button>
+            {/* Team Comparison */}
+            {teamComparison.length > 0 && (
+              <View className="px-4 py-4 mb-6">
+                <Text className="text-lg font-semibold text-gray-900 mb-4">
+                  Team Performance Comparison
+                </Text>
+                
+                <Card className="p-4">
+                  <View className="space-y-4">
+                    {teamComparison.slice(0, 5).map((member, index) => (
+                      <View key={member.managerId} className="flex-row items-center justify-between">
+                        <View className="flex-row items-center flex-1">
+                          <View className={cn(
+                            "w-8 h-8 rounded-full flex items-center justify-center mr-3",
+                            index === 0 ? 'bg-yellow-100' :
+                            index === 1 ? 'bg-gray-100' :
+                            index === 2 ? 'bg-orange-100' : 'bg-blue-100'
+                          )}>
+                            <Text className={cn(
+                              "text-sm font-bold",
+                              index === 0 ? 'text-yellow-800' :
+                              index === 1 ? 'text-gray-800' :
+                              index === 2 ? 'text-orange-800' : 'text-blue-800'
+                            )}>
+                              #{index + 1}
+                            </Text>
+                          </View>
+                          <View className="flex-1">
+                            <Text className="text-sm font-semibold text-gray-900">
+                              {member.managerName}
+                              {member.managerId === user?.id && ' (You)'}
+                            </Text>
+                            <Text className="text-xs text-gray-600">
+                              {member.societiesManaged} societies • {member.ticketsHandled} tickets
+                            </Text>
+                          </View>
+                        </View>
+                        <View className="items-end">
+                          <Text 
+                            className="text-sm font-bold"
+                            style={{ color: getPerformanceColor(member.satisfactionScore) }}
+                          >
+                            {member.performanceGrade}
+                          </Text>
+                          <Text className="text-xs text-gray-500">
+                            {member.satisfactionScore}%
+                          </Text>
+                        </View>
+                      </View>
+                    ))}
                   </View>
                 </Card>
-              ))}
-            </View>
-          </View>
-
-          {/* Export Options */}
-          <View className="px-4 py-2 mb-6">
-            <Card className="p-4">
-              <Text className="text-base font-semibold text-gray-900 mb-3">
-                Export Report
-              </Text>
-              <Text className="text-sm text-gray-600 mb-4">
-                Download detailed performance report for the selected period
-              </Text>
-              <View className="flex-row gap-3">
-                <Button
-                  variant="outline"
-                  className="flex-1"
-                  onPress={() => {/* Handle PDF export */}}
-                >
-                  Export PDF
-                </Button>
-                <Button
-                  variant="primary"
-                  className="flex-1"
-                  onPress={() => {/* Handle CSV export */}}
-                >
-                  Export CSV
-                </Button>
               </View>
-            </Card>
-          </View>
-        </ScrollView>
-      </View>
+            )}
+          </ScrollView>
+        </View>
+      </LoadingWrapper>
     </RequireManager>
   );
-}
+};
 
-// Add proper named export with displayName for React DevTools
 ManagerReports.displayName = 'ManagerReports';
 
 export default ManagerReports;

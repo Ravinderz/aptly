@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -26,57 +26,25 @@ import {
 import { AdminHeader } from '@/components/admin/AdminHeader';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
+import { 
+  LoadingWrapper, 
+  useAsyncState, 
+  ErrorMessage,
+  NotFoundError,
+  LoadingSpinner 
+} from '@/components/ui/LoadingStates';
 import { cn } from '@/utils/cn';
+import { onboardingService } from '@/services/onboarding.service';
+import type { OnboardingRequest } from '@/services/onboarding.service';
 
-// Mock data for the specific request
-const mockRequestDetail = {
-  id: 'req-1',
-  societyName: 'Green Valley Apartments',
-  societyCode: 'GVA001',
-  adminName: 'Rajesh Kumar',
-  adminEmail: 'rajesh@greenvalley.com',
-  adminPhone: '+91-9876543210',
-  societyAddress: '123 Green Valley Road, Sector 45, Gurgaon, Haryana 122001',
-  totalFlats: 120,
-  status: 'pending',
-  submittedDocuments: [
-    {
-      name: 'society_registration.pdf',
-      size: '2.4 MB',
-      uploadedAt: '2024-01-15T10:30:00Z',
-      verified: true,
-    },
-    {
-      name: 'noc_certificate.pdf',
-      size: '1.8 MB',
-      uploadedAt: '2024-01-15T10:35:00Z',
-      verified: true,
-    },
-    {
-      name: 'admin_id_proof.pdf',
-      size: '1.2 MB',
-      uploadedAt: '2024-01-15T10:40:00Z',
-      verified: false,
-    },
-  ],
-  verificationNotes: null,
-  createdAt: '2024-01-15T10:30:00Z',
-  updatedAt: '2024-01-15T10:30:00Z',
-  additionalInfo: {
-    societyType: 'Residential',
-    constructionYear: '2018',
-    amenities: ['Swimming Pool', 'Gym', 'Club House', 'Security'],
-    parkingSpaces: 150,
-    securityDeposit: 50000,
-    monthlyMaintenance: 2500,
-  },
-};
+// Remove mock data - using real API
 
 interface ApprovalModalProps {
   visible: boolean;
   onClose: () => void;
   onConfirm: (notes: string) => void;
   type: 'approve' | 'reject';
+  submitting?: boolean;
 }
 
 const ApprovalModal: React.FC<ApprovalModalProps> = ({
@@ -84,6 +52,7 @@ const ApprovalModal: React.FC<ApprovalModalProps> = ({
   onClose,
   onConfirm,
   type,
+  submitting = false,
 }) => {
   const [notes, setNotes] = useState('');
 
@@ -131,6 +100,7 @@ const ApprovalModal: React.FC<ApprovalModalProps> = ({
               onPress={onClose}
               variant="outline"
               className="flex-1"
+              disabled={submitting}
             >
               Cancel
             </Button>
@@ -138,9 +108,18 @@ const ApprovalModal: React.FC<ApprovalModalProps> = ({
               onPress={handleConfirm}
               variant={type === 'approve' ? 'primary' : 'outline'}
               className={`flex-1 ${type === 'reject' ? 'border-red-300 bg-red-50' : ''}`}
-              disabled={type === 'reject' && !notes.trim()}
+              disabled={submitting || (type === 'reject' && !notes.trim())}
             >
-              {type === 'approve' ? 'Approve' : 'Reject'}
+              {submitting ? (
+                <View className="flex-row items-center">
+                  <LoadingSpinner size="small" color="#ffffff" className="mr-2" />
+                  <Text className="text-white">
+                    {type === 'approve' ? 'Approving...' : 'Rejecting...'}
+                  </Text>
+                </View>
+              ) : (
+                type === 'approve' ? 'Approve' : 'Reject'
+              )}
             </Button>
           </View>
         </View>
@@ -161,9 +140,36 @@ const ApprovalModal: React.FC<ApprovalModalProps> = ({
 export default function OnboardingRequestDetail() {
   const router = useRouter();
   const { requestId } = useLocalSearchParams();
-  const [request] = useState(mockRequestDetail);
+  const [requestState, { setLoading, setData, setError }] = useAsyncState<OnboardingRequest>();
   const [showApprovalModal, setShowApprovalModal] = useState(false);
   const [approvalType, setApprovalType] = useState<'approve' | 'reject'>('approve');
+  const [submitting, setSubmitting] = useState(false);
+
+  // Load request data on mount
+  useEffect(() => {
+    loadRequestData();
+  }, [requestId]);
+
+  const loadRequestData = async () => {
+    if (!requestId || Array.isArray(requestId)) {
+      setError(new Error('Invalid request ID'));
+      return;
+    }
+
+    try {
+      setLoading();
+      const response = await onboardingService.getRequest(requestId as string);
+      
+      if (response.success && response.data) {
+        setData(response.data);
+      } else {
+        setError(new Error(response.message || 'Failed to load request'));
+      }
+    } catch (error) {
+      console.error('Failed to load onboarding request:', error);
+      setError(error as Error);
+    }
+  };
 
   const handleApprove = () => {
     setApprovalType('approve');
@@ -175,22 +181,75 @@ export default function OnboardingRequestDetail() {
     setShowApprovalModal(true);
   };
 
-  const handleConfirmAction = (notes: string) => {
-    Alert.alert(
-      'Success',
-      `Application ${approvalType === 'approve' ? 'approved' : 'rejected'} successfully`,
-      [
-        {
-          text: 'OK',
-          onPress: () => router.back(),
-        },
-      ]
-    );
+  const handleConfirmAction = async (notes: string) => {
+    if (!requestState.data?.id) return;
+
+    try {
+      setSubmitting(true);
+      
+      let response;
+      if (approvalType === 'approve') {
+        response = await onboardingService.approveRequest(requestState.data.id, {
+          notes: notes || undefined,
+        });
+      } else {
+        response = await onboardingService.rejectRequest(requestState.data.id, {
+          reason: notes || 'No reason provided',
+        });
+      }
+
+      if (response.success) {
+        Alert.alert(
+          'Success',
+          `Application ${approvalType === 'approve' ? 'approved' : 'rejected'} successfully`,
+          [
+            {
+              text: 'OK',
+              onPress: () => router.back(),
+            },
+          ]
+        );
+      } else {
+        throw new Error(response.message || `Failed to ${approvalType} request`);
+      }
+    } catch (error) {
+      console.error(`Failed to ${approvalType} request:`, error);
+      Alert.alert(
+        'Error',
+        error instanceof Error ? error.message : `Failed to ${approvalType} request. Please try again.`
+      );
+    } finally {
+      setSubmitting(false);
+    }
   };
 
-  const handleDownloadDocument = (documentName: string) => {
-    // Implement document download
-    console.log('Download document:', documentName);
+  const handleDownloadDocument = async (documentName: string) => {
+    if (!requestState.data?.id) return;
+
+    try {
+      const response = await onboardingService.downloadDocument(requestState.data.id, documentName);
+      
+      if (response.success && response.data?.downloadUrl) {
+        // In a real app, you would open the download URL or initiate download
+        // For now, we'll show an alert with the download URL
+        Alert.alert(
+          'Download Ready',
+          `Document download is ready. In a real app, this would start the download.`,
+          [
+            { text: 'OK' }
+          ]
+        );
+        console.log('Document download URL:', response.data.downloadUrl);
+      } else {
+        throw new Error(response.message || 'Failed to get download URL');
+      }
+    } catch (error) {
+      console.error('Failed to download document:', error);
+      Alert.alert(
+        'Download Failed',
+        error instanceof Error ? error.message : 'Failed to download document. Please try again.'
+      );
+    }
   };
 
   const getStatusConfig = (status: string) => {
@@ -218,38 +277,55 @@ export default function OnboardingRequestDetail() {
     }
   };
 
-  const statusConfig = getStatusConfig(request.status);
+  // If no request data yet, statusConfig will be handled by LoadingWrapper
+  const statusConfig = requestState.data ? getStatusConfig(requestState.data.status) : null;
 
   return (
-    <View className="flex-1 bg-gray-50">
-      <AdminHeader 
-        title="Review Application" 
-        subtitle={request.societyName}
-        showBack
-      />
+    <LoadingWrapper
+      isLoading={requestState.isLoading}
+      error={requestState.error}
+      isEmpty={!requestState.data}
+      onRetry={loadRequestData}
+      skeletonProps={{ type: 'card', showAvatar: true }}
+      emptyComponent={
+        <NotFoundError
+          title="Request Not Found"
+          message="The onboarding request you're looking for could not be found."
+          onGoBack={() => router.back()}
+        />
+      }
+    >
+      <View className="flex-1 bg-gray-50">
+        <AdminHeader 
+          title="Review Application" 
+          subtitle={requestState.data?.societyName || 'Loading...'}
+          showBack
+        />
 
-      <ScrollView className="flex-1" showsVerticalScrollIndicator={false}>
+        <ScrollView className="flex-1" showsVerticalScrollIndicator={false}>
         {/* Status Header */}
         <View className="px-4 py-4 bg-white border-b border-gray-200">
           <View className="flex-row items-center justify-between">
             <View>
               <Text className="text-lg font-semibold text-gray-900">
-                {request.societyName}
+                {requestState.data?.societyName}
               </Text>
               <Text className="text-sm text-gray-600">
-                Code: {request.societyCode}
+                Code: {requestState.data?.societyCode}
               </Text>
             </View>
             
-            <View className={cn(
-              'flex-row items-center px-3 py-1 rounded-full',
-              statusConfig.color
-            )}>
-              {statusConfig.icon}
-              <Text className="text-sm font-medium ml-1 capitalize">
-                {request.status.replace('_', ' ')}
-              </Text>
-            </View>
+            {statusConfig && (
+              <View className={cn(
+                'flex-row items-center px-3 py-1 rounded-full',
+                statusConfig.color
+              )}>
+                {statusConfig.icon}
+                <Text className="text-sm font-medium ml-1 capitalize">
+                  {requestState.data?.status.replace('_', ' ')}
+                </Text>
+              </View>
+            )}
           </View>
         </View>
 
@@ -267,21 +343,21 @@ export default function OnboardingRequestDetail() {
               <View className="flex-row items-center">
                 <Text className="text-sm text-gray-600 w-20">Name:</Text>
                 <Text className="text-sm text-gray-900 flex-1">
-                  {request.adminName}
+                  {requestState.data?.adminName}
                 </Text>
               </View>
               
               <View className="flex-row items-center">
                 <Mail size={14} color="#6b7280" />
                 <Text className="text-sm text-gray-900 ml-2">
-                  {request.adminEmail}
+                  {requestState.data?.adminEmail}
                 </Text>
               </View>
               
               <View className="flex-row items-center">
                 <Phone size={14} color="#6b7280" />
                 <Text className="text-sm text-gray-900 ml-2">
-                  {request.adminPhone}
+                  {requestState.data?.adminPhone}
                 </Text>
               </View>
             </View>
@@ -302,40 +378,40 @@ export default function OnboardingRequestDetail() {
               <View className="flex-row items-start">
                 <MapPin size={14} color="#6b7280" className="mt-1" />
                 <Text className="text-sm text-gray-900 ml-2 flex-1">
-                  {request.societyAddress}
+                  {requestState.data?.societyAddress}
                 </Text>
               </View>
               
               <View className="flex-row justify-between">
                 <Text className="text-sm text-gray-600">Total Units:</Text>
-                <Text className="text-sm text-gray-900">{request.totalFlats}</Text>
+                <Text className="text-sm text-gray-900">{requestState.data?.totalFlats}</Text>
               </View>
               
               <View className="flex-row justify-between">
                 <Text className="text-sm text-gray-600">Type:</Text>
                 <Text className="text-sm text-gray-900">
-                  {request.additionalInfo.societyType}
+                  {requestState.data?.additionalInfo.societyType}
                 </Text>
               </View>
               
               <View className="flex-row justify-between">
                 <Text className="text-sm text-gray-600">Built:</Text>
                 <Text className="text-sm text-gray-900">
-                  {request.additionalInfo.constructionYear}
+                  {requestState.data?.additionalInfo.constructionYear}
                 </Text>
               </View>
               
               <View className="flex-row justify-between">
                 <Text className="text-sm text-gray-600">Parking:</Text>
                 <Text className="text-sm text-gray-900">
-                  {request.additionalInfo.parkingSpaces} spaces
+                  {requestState.data?.additionalInfo.parkingSpaces} spaces
                 </Text>
               </View>
               
               <View className="flex-row justify-between">
                 <Text className="text-sm text-gray-600">Monthly Maintenance:</Text>
                 <Text className="text-sm text-gray-900">
-                  ₹{request.additionalInfo.monthlyMaintenance.toLocaleString()}
+                  ₹{requestState.data?.additionalInfo.monthlyMaintenance?.toLocaleString()}
                 </Text>
               </View>
             </View>
@@ -343,7 +419,7 @@ export default function OnboardingRequestDetail() {
             <View className="mt-3 pt-3 border-t border-gray-200">
               <Text className="text-sm font-medium text-gray-900 mb-2">Amenities</Text>
               <View className="flex-row flex-wrap gap-2">
-                {request.additionalInfo.amenities.map((amenity, index) => (
+                {requestState.data?.additionalInfo.amenities?.map((amenity, index) => (
                   <View key={index} className="bg-blue-50 px-2 py-1 rounded">
                     <Text className="text-xs text-blue-700">{amenity}</Text>
                   </View>
@@ -364,7 +440,7 @@ export default function OnboardingRequestDetail() {
             </View>
             
             <View className="space-y-3">
-              {request.submittedDocuments.map((doc, index) => (
+              {requestState.data?.submittedDocuments?.map((doc, index) => (
                 <View key={index} className="flex-row items-center justify-between p-3 bg-gray-50 rounded-lg">
                   <View className="flex-1">
                     <Text className="text-sm font-medium text-gray-900">
@@ -396,7 +472,7 @@ export default function OnboardingRequestDetail() {
         </View>
 
         {/* Verification Notes */}
-        {request.verificationNotes && (
+        {requestState.data?.verificationNotes && (
           <View className="px-4 pb-4">
             <Card className="p-4 bg-amber-50 border-amber-200">
               <View className="flex-row items-center mb-2">
@@ -406,7 +482,7 @@ export default function OnboardingRequestDetail() {
                 </Text>
               </View>
               <Text className="text-sm text-amber-700">
-                {request.verificationNotes}
+                {requestState.data.verificationNotes}
               </Text>
             </Card>
           </View>
@@ -426,21 +502,21 @@ export default function OnboardingRequestDetail() {
               <View className="flex-row justify-between">
                 <Text className="text-sm text-gray-600">Submitted:</Text>
                 <Text className="text-sm text-gray-900">
-                  {new Date(request.createdAt).toLocaleDateString()}
+                  {requestState.data?.createdAt ? new Date(requestState.data.createdAt).toLocaleDateString() : '-'}
                 </Text>
               </View>
               
               <View className="flex-row justify-between">
                 <Text className="text-sm text-gray-600">Last Updated:</Text>
                 <Text className="text-sm text-gray-900">
-                  {new Date(request.updatedAt).toLocaleDateString()}
+                  {requestState.data?.updatedAt ? new Date(requestState.data.updatedAt).toLocaleDateString() : '-'}
                 </Text>
               </View>
               
               <View className="flex-row justify-between">
                 <Text className="text-sm text-gray-600">Days Pending:</Text>
                 <Text className="text-sm text-gray-900">
-                  {Math.floor((Date.now() - new Date(request.createdAt).getTime()) / (1000 * 60 * 60 * 24))} days
+                  {requestState.data?.createdAt ? Math.floor((Date.now() - new Date(requestState.data.createdAt).getTime()) / (1000 * 60 * 60 * 24)) : 0} days
                 </Text>
               </View>
             </View>
@@ -449,34 +525,38 @@ export default function OnboardingRequestDetail() {
       </ScrollView>
 
       {/* Action Buttons */}
-      {request.status === 'pending' && (
-        <View className="p-4 bg-white border-t border-gray-200">
-          <View className="flex-row space-x-3">
-            <Button
-              onPress={handleReject}
-              variant="outline"
-              className="flex-1 border-red-300 bg-red-50"
-            >
-              Reject
-            </Button>
-            <Button
-              onPress={handleApprove}
-              variant="primary"
-              className="flex-1"
-            >
-              Approve
-            </Button>
+        {requestState.data?.status === 'pending' && (
+          <View className="p-4 bg-white border-t border-gray-200">
+            <View className="flex-row space-x-3">
+              <Button
+                onPress={handleReject}
+                variant="outline"
+                className="flex-1 border-red-300 bg-red-50"
+                disabled={submitting}
+              >
+                Reject
+              </Button>
+              <Button
+                onPress={handleApprove}
+                variant="primary"
+                className="flex-1"
+                disabled={submitting}
+              >
+                Approve
+              </Button>
+            </View>
           </View>
-        </View>
-      )}
+        )}
 
-      {/* Approval/Rejection Modal */}
-      <ApprovalModal
-        visible={showApprovalModal}
-        onClose={() => setShowApprovalModal(false)}
-        onConfirm={handleConfirmAction}
-        type={approvalType}
-      />
-    </View>
+        {/* Approval/Rejection Modal */}
+        <ApprovalModal
+          visible={showApprovalModal}
+          onClose={() => setShowApprovalModal(false)}
+          onConfirm={handleConfirmAction}
+          type={approvalType}
+          submitting={submitting}
+        />
+      </View>
+    </LoadingWrapper>
   );
 }

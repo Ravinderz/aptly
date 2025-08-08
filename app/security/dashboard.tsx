@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, ScrollView, TouchableOpacity, RefreshControl } from 'react-native';
 import { useDirectAuth } from '@/hooks/useDirectAuth';
 import { useSecurityPermissions } from '@/hooks/useSecurityPermissions';
+import { StandardHeader } from '@/components/design-system';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { 
@@ -102,38 +103,33 @@ function SecurityDashboard() {
   };
 
   return (
-    <ScrollView 
-      className="flex-1 bg-gray-50"
-      contentContainerStyle={{ padding: 16 }}
-      refreshControl={
-        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-      }
-    >
-      {/* Header */}
-      <View className="mb-6">
-        <View className="flex-row items-center justify-between mb-2">
-          <View className="flex-row items-center">
-            <Shield size={24} color="#6366f1" />
-            <Text className="text-2xl font-bold text-gray-900 ml-2">
-              Security Dashboard
-            </Text>
-          </View>
-          <View className="flex-row items-center">
-            <TouchableOpacity onPress={onRefresh} className="p-2">
-              <RefreshCw size={20} color="#6b7280" />
-            </TouchableOpacity>
-            <TouchableOpacity onPress={handleLogout} className="p-2">
-              <LogOut size={20} color="#dc2626" />
-            </TouchableOpacity>
-          </View>
+    <View className="flex-1 bg-gray-50">
+      <StandardHeader 
+        title="Security Dashboard" 
+        subtitle={`Welcome back, ${user?.fullName || 'Security Guard'}`}
+        showLogout
+        showRoleIndicator
+        onLogout={handleLogout}
+        rightAction={{
+          icon: <RefreshCw size={20} color="#6b7280" />,
+          onPress: onRefresh,
+          label: "Refresh"
+        }}
+      />
+      
+      <ScrollView 
+        className="flex-1"
+        contentContainerStyle={{ padding: 16 }}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }
+      >
+        {/* Last updated info */}
+        <View className="mb-4">
+          <Text className="text-xs text-gray-500 text-center">
+            Last updated: {lastRefresh.toLocaleTimeString()}
+          </Text>
         </View>
-        <Text className="text-gray-600">
-          Welcome back, {user?.fullName || 'Security Guard'}
-        </Text>
-        <Text className="text-xs text-gray-400 mt-1">
-          Last updated: {lastRefresh.toLocaleTimeString()}
-        </Text>
-      </View>
 
       {/* System Status Banner */}
       <Card className="p-4 mb-6" style={{ backgroundColor: stats.systemStatus === 'operational' ? '#f0fdf4' : '#fef2f2' }}>
@@ -461,7 +457,8 @@ function SecurityDashboard() {
           </Text>
         </Card>
       )}
-    </ScrollView>
+      </ScrollView>
+    </View>
   );
 };
 

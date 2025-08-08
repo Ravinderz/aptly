@@ -17,7 +17,6 @@ import {
   CheckCircle,
 } from 'lucide-react-native';
 import React, { useState } from 'react';
-import { Controller, useForm } from 'react-hook-form';
 import {
   ScrollView,
   Text,
@@ -25,16 +24,13 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
+import { FormWrapper, FormField, useFormContext } from '@/components/forms/FormWrapper';
+import ValidatedInput from '@/components/forms/ValidatedInput';
+import { createVisitorSchema, CreateVisitorForm } from '@/utils/validation.enhanced';
+import { restVisitorsService } from '@/services/visitors.service.rest';
 
-interface VisitorFormData {
-  visitorName: string;
-  contactNumber: string;
-  visitDate: string;
-  visitTime: string;
-  visitPurpose: string;
-  category: 'Personal' | 'Delivery' | 'Service' | 'Official';
-  preApproved: boolean;
-}
+// Using the validated form from validation schema
+type VisitorFormData = CreateVisitorForm;
 
 const VISITOR_CATEGORIES = [
   {
@@ -86,22 +82,49 @@ export default function AddVisitor() {
 
   const { showAlert, AlertComponent } = useAlert();
 
-  const {
-    control,
-    handleSubmit,
-    setValue,
-    formState: { errors },
-  } = useForm<VisitorFormData>({
-    defaultValues: {
-      visitorName: '',
-      contactNumber: '',
-      visitDate: '',
-      visitTime: '',
-      visitPurpose: '',
-      category: 'Personal',
-      preApproved: false,
-    },
-  });
+  // Form submission handler
+  const handleFormSubmit = async (values: VisitorFormData) => {
+    try {
+      showAlert('Loading...', 'Creating visitor entry...', 'loading');
+      
+      const result = await restVisitorsService.createVisitor({
+        name: values.name,
+        phoneNumber: values.phone,
+        purpose: values.purpose,
+        expectedDuration: values.expectedDuration,
+        vehicleNumber: values.vehicleNumber,
+        guestCount: values.guestCount,
+        visitDate: values.visitDate,
+        visitTime: values.visitTime,
+      });
+
+      if (result.success) {
+        showAlert(
+          'Success!',
+          'Visitor entry created successfully.',
+          'success'
+        );
+        setTimeout(() => {
+          safeGoBack();
+        }, 1500);
+      } else {
+        showAlert('Error', result.error || 'Failed to create visitor entry', 'error');
+      }
+    } catch (error) {
+      showAlert('Error', 'Network error. Please try again.', 'error');
+    }
+  };
+
+  const initialValues: VisitorFormData = {
+    name: '',
+    phone: '',
+    purpose: '',
+    expectedDuration: 60,
+    vehicleNumber: '',
+    guestCount: 1,
+    visitDate: new Date(),
+    visitTime: new Date(),
+  };
 
   const validatePhoneNumber = (phone: string): boolean => {
     // Indian mobile number validation: starts with 6-9, followed by 9 digits

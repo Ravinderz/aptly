@@ -17,8 +17,18 @@
     "format": "prettier --write .",
     "test": "jest",
     "test:watch": "jest --watch",
-    "test:coverage": "jest --coverage",
-    "typecheck": "tsc --noEmit"
+    "test:coverage": "jest --coverage --collectCoverageFrom='**/*.{ts,tsx}' --collectCoverageFrom='!**/*.d.ts' --collectCoverageFrom='!**/node_modules/**' --collectCoverageFrom='!**/coverage/**' --collectCoverageFrom='!jest.config.js' --collectCoverageFrom='!babel.config.js'",
+    "test:integration": "jest --testPathPattern=integration",
+    "test:unit": "jest --testPathPattern=__tests__ --testPathIgnorePatterns=integration",
+    "test:accessibility": "jest --testNamePattern='accessibility|a11y'",
+    "test:performance": "jest --testNamePattern='performance|perf'",
+    "test:ci": "jest --ci --coverage --watchAll=false --passWithNoTests",
+    "test:debug": "jest --runInBand --detectOpenHandles",
+    "typecheck": "tsc --noEmit",
+    "validate": "npm run typecheck && npm run lint && npm run test:ci",
+    "test:mutation": "stryker run",
+    "analyze:bundle": "npx @expo/bundle-analyzer",
+    "perf:profile": "npx react-native-performance-flipper"
   },
   "dependencies": {
     "@gorhom/bottom-sheet": "^5.1.4",

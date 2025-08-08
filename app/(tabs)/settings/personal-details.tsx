@@ -1,19 +1,18 @@
 import React, { useState } from 'react';
 import {
   ScrollView,
-  SafeAreaView,
   View,
   Text,
   KeyboardAvoidingView,
   Platform,
 } from 'react-native';
-import { ArrowLeft, Save } from 'lucide-react-native';
+import { Save } from 'lucide-react-native';
 import { router } from 'expo-router';
+import { StandardHeader } from '@/components/design-system';
 import Input from '../../../components/ui/Input';
 import Button from '../../../components/ui/Button';
 import { Card } from '../../../components/ui/Card';
 import { showErrorAlert, showSuccessAlert } from '../../../utils/alert';
-import { safeGoBack } from '../../../utils/navigation';
 
 export default function PersonalDetails() {
   const [formData, setFormData] = useState({
@@ -54,37 +53,28 @@ export default function PersonalDetails() {
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-background">
-      {/* Header */}
-      <View className="flex-row items-center justify-between p-4 border-b border-divider bg-surface">
-        <View className="flex-row items-center">
-          <Button
-            variant="ghost"
-            size="sm"
-            onPress={() => safeGoBack()}
-            className="mr-2 p-2">
-            <ArrowLeft size={20} color="#6366f1" />
-          </Button>
-          <Text className="text-text-primary text-headline-large font-semibold">
-            Personal Details
-          </Text>
-        </View>
-
-        {isEditing ? (
-          <View className="flex-row gap-2">
+    <View className="flex-1 bg-background">
+      <StandardHeader 
+        title="Personal Details"
+        showBack
+        rightAction={isEditing ? {
+          icon: <Save size={20} color="#ffffff" />,
+          onPress: handleSave,
+          label: "Save"
+        } : {
+          icon: <Text className="text-blue-600 font-medium">Edit</Text>,
+          onPress: () => setIsEditing(true),
+          label: "Edit"
+        }}
+      >
+        {isEditing && (
+          <View className="flex-row justify-end mt-2">
             <Button variant="outline" size="sm" onPress={handleCancel}>
               Cancel
             </Button>
-            <Button size="sm" onPress={handleSave}>
-              <Save size={16} color="white" />
-            </Button>
           </View>
-        ) : (
-          <Button size="sm" onPress={() => setIsEditing(true)}>
-            Edit
-          </Button>
         )}
-      </View>
+      </StandardHeader>
 
       <KeyboardAvoidingView
         className="flex-1"
@@ -263,6 +253,6 @@ export default function PersonalDetails() {
           )}
         </ScrollView>
       </KeyboardAvoidingView>
-    </SafeAreaView>
+    </View>
   );
 }

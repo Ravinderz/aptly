@@ -21,7 +21,7 @@ import {
 import { useDirectAuth } from '@/hooks/useDirectAuth';
 import { useDirectAdmin } from '@/hooks/useDirectAdmin';
 import { RequireManager } from '@/components/auth/RoleGuard';
-import { AdminHeader } from '@/components/admin/AdminHeader';
+import { StandardHeader } from '@/components/design-system';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { cn } from '@/utils/cn';
@@ -231,11 +231,12 @@ function ManagerDashboard() {
   return (
     <RequireManager>
       <View className="flex-1 bg-gray-50">
-      <AdminHeader 
+      <StandardHeader 
         title="Manager Dashboard" 
         subtitle={`Welcome back, ${user?.fullName || user?.name || 'Manager'}`}
         showNotifications
         showLogout
+        showRoleIndicator
         onLogout={handleLogout}
       />
       

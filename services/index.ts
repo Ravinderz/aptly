@@ -5,6 +5,11 @@ import { apiClient } from './api.client';
 import { RestAuthService } from './auth.service.rest';
 import { RestVisitorsService } from './visitors.service.rest';
 import { communityApi } from './communityApi';
+import { onboardingService } from './onboarding.service';
+import { emergencyService } from './emergency.service';
+import { reportsService } from './reports.service';
+import { supportService } from './support.service';
+import { vehiclesService } from './vehicles.service';
 
 // Re-export API client
 export { apiClient, APIClientError } from './api.client';
@@ -31,6 +36,79 @@ export type {
   VisitorStats,
 } from '@/types/api';
 
+// Onboarding service
+export { onboardingService, OnboardingService } from './onboarding.service';
+export type {
+  OnboardingRequest,
+  OnboardingDocument,
+  OnboardingListItem,
+  ApprovalRequest,
+  RejectionRequest,
+  OnboardingStats,
+} from './onboarding.service';
+
+// Emergency service  
+export { emergencyService, EmergencyService } from './emergency.service';
+export type {
+  EmergencyAlert,
+  EmergencyAttachment,
+  EmergencyUpdate,
+  CreateAlertRequest,
+  UpdateAlertRequest,
+  AcknowledgeAlertRequest,
+  ResolveAlertRequest,
+  EmergencyStats,
+  EmergencyFilters,
+} from './emergency.service';
+
+// Reports service
+export { reportsService, ReportsService } from './reports.service';
+export type {
+  PerformanceMetrics,
+  TrendDataPoint,
+  SocietyPerformance,
+  ReportFilters,
+  ExportOptions,
+  ManagerStats,
+  TeamComparison,
+  DetailedReport,
+  ReportRecommendation,
+} from './reports.service';
+
+// Support service
+export { supportService, SupportService } from './support.service';
+export type {
+  SupportTicket,
+  TicketAttachment,
+  TicketResponse,
+  CreateTicketRequest,
+  UpdateTicketRequest,
+  TicketResponseRequest,
+  StatusChangeRequest,
+  AssignTicketRequest,
+  EscalateTicketRequest,
+  TicketFilters,
+  SupportStats,
+  QueueStats,
+  SatisfactionSurvey,
+} from './support.service';
+
+// Vehicles service
+export { vehiclesService, VehiclesService } from './vehicles.service';
+export type {
+  SecurityVehicle,
+  RecurringSchedule,
+  VehicleViolation,
+  VehicleAlert,
+  GPSLocation,
+  ParkingZone,
+  VehicleRegistrationRequest,
+  VehicleDepartureRequest,
+  VehicleSearchFilters,
+  VehicleStats,
+  ParkingReport,
+} from './vehicles.service';
+
 // Community service
 export type {
   Comment,
@@ -53,6 +131,11 @@ export const services = {
   auth: RestAuthService.getInstance(),
   visitors: RestVisitorsService.getInstance(),
   community: communityApi,
+  onboarding: onboardingService,
+  emergency: emergencyService,
+  reports: reportsService,
+  support: supportService,
+  vehicles: vehiclesService,
 } as const;
 
 // Default export for convenience
@@ -87,6 +170,11 @@ export const ServiceStatus = {
       results.api = true; // API client is always available
       results.visitors = true; // Visitors service is always available
       results.community = true; // Community service is mock-based
+      results.onboarding = true; // Onboarding service is available
+      results.emergency = true; // Emergency service is available
+      results.reports = true; // Reports service is available
+      results.support = true; // Support service is available
+      results.vehicles = true; // Vehicles service is available
     } catch (error) {
       console.error('Service health check failed:', error);
       // Set failed services to false
@@ -109,6 +197,11 @@ export const ServiceStatus = {
         auth: { status: 'active', provider: 'REST', type: 'modern' },
         visitors: { status: 'active', provider: 'REST', type: 'modern' },
         community: { status: 'active', mode: 'mock' },
+        onboarding: { status: 'active', provider: 'REST', type: 'modern' },
+        emergency: { status: 'active', provider: 'REST', type: 'modern' },
+        reports: { status: 'active', provider: 'REST', type: 'modern' },
+        support: { status: 'active', provider: 'REST', type: 'modern' },
+        vehicles: { status: 'active', provider: 'REST', type: 'modern' },
       },
       lastHealthCheck: new Date().toISOString(),
     };
@@ -157,10 +250,15 @@ export const ServiceHelpers = {
         api: true,
         visitors: true,
         community: true,
+        onboarding: true,
+        emergency: true,
+        reports: true,
+        support: true,
+        vehicles: true,
       };
     } catch (error) {
       console.error('Failed to get service status:', error);
-      return { auth: false, api: false, visitors: false, community: false };
+      return { auth: false, api: false, visitors: false, community: false, onboarding: false, emergency: false, reports: false, support: false, vehicles: false };
     }
   },
 };
@@ -182,6 +280,11 @@ export const DEPRECATED_SERVICES_NOTICE = {
     'auth.service.rest.ts - REST-based authentication',
     'visitors.service.rest.ts - REST-based visitor management',
     'communityApi.ts - Community features',
+    'onboarding.service.ts - Society onboarding management',
+    'emergency.service.ts - Emergency alert system',
+    'reports.service.ts - Manager performance reports',
+    'support.service.ts - Support ticket management',
+    'vehicles.service.ts - Vehicle tracking and security',
     'biometric.service.ts - Biometric authentication',
     'admin/authService.ts - Admin authentication',
     'admin/roleManager.ts - Role-based access control',

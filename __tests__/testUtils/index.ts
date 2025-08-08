@@ -263,5 +263,201 @@ export const submitForm = async (
   return submitButton;
 };
 
+// Mock API client for service testing
+export const mockApiClient = {
+  get: jest.fn(),
+  post: jest.fn(), 
+  put: jest.fn(),
+  delete: jest.fn(),
+  patch: jest.fn(),
+};
+
+// Mock Zustand store creators
+export const createMockStore = (initialState = {}) => {
+  const listeners = new Set();
+  const state = { ...initialState };
+  
+  return {
+    getState: () => state,
+    setState: (partial, replace = false) => {
+      Object.assign(state, typeof partial === 'function' ? partial(state) : partial);
+      listeners.forEach(listener => listener(state, state));
+    },
+    subscribe: (listener) => {
+      listeners.add(listener);
+      return () => listeners.delete(listener);
+    },
+    destroy: () => listeners.clear(),
+  };
+};
+
+// Mock navigation for screen testing
+export const mockNavigation = {
+  navigate: jest.fn(),
+  goBack: jest.fn(),
+  dispatch: jest.fn(),
+  reset: jest.fn(),
+  canGoBack: jest.fn(() => false),
+  isFocused: jest.fn(() => true),
+  addListener: jest.fn(),
+  removeListener: jest.fn(),
+  setOptions: jest.fn(),
+  setParams: jest.fn(),
+  push: jest.fn(),
+  replace: jest.fn(),
+  pop: jest.fn(),
+  popToTop: jest.fn(),
+};
+
+// Mock route for screen testing
+export const mockRoute = {
+  key: 'test-route',
+  name: 'TestScreen',
+  params: {},
+};
+
+// Performance testing helpers
+export const measureRenderTime = async (renderFunction) => {
+  const start = Date.now();
+  const result = renderFunction();
+  
+  // Wait for component to mount
+  await new Promise(resolve => setTimeout(resolve, 0));
+  
+  const end = Date.now();
+  return {
+    renderTime: end - start,
+    result,
+  };
+};
+
+// Memory leak detection
+export const detectMemoryLeaks = (renderFunction, iterations = 100) => {
+  const results = [];
+  
+  for (let i = 0; i < iterations; i++) {
+    const { result } = renderFunction();
+    result.unmount();
+    
+    // Force garbage collection if available
+    if (global.gc) {
+      global.gc();
+    }
+    
+    results.push({
+      iteration: i,
+      memoryUsage: process.memoryUsage(),
+    });
+  }
+  
+  return results;
+};
+
+// Network state mocking
+export const mockNetworkState = (isConnected = true, type = 'wifi') => {
+  const NetInfo = require('@react-native-community/netinfo');
+  NetInfo.fetch.mockResolvedValue({
+    isConnected,
+    isInternetReachable: isConnected,
+    type,
+  });
+};
+
+// Async utility for waiting for state changes
+export const waitForStateChange = (getState, condition, timeout = 5000) => {
+  return new Promise((resolve, reject) => {
+    const start = Date.now();
+    
+    const check = () => {
+      if (condition(getState())) {
+        resolve(getState());
+        return;
+      }
+      
+      if (Date.now() - start > timeout) {
+        reject(new Error(`Timeout waiting for state change: ${condition.toString()}`));
+        return;
+      }
+      
+      setTimeout(check, 50);
+    };
+    
+    check();
+  });
+};
+
+// Error boundary testing
+export const TestErrorBoundary = ({ children, onError = jest.fn() }) => {
+  return React.createElement(
+    class extends React.Component {
+      constructor(props) {
+        super(props);
+        this.state = { hasError: false };
+      }
+      
+      static getDerivedStateFromError() {
+        return { hasError: true };
+      }
+      
+      componentDidCatch(error, errorInfo) {
+        onError(error, errorInfo);
+      }
+      
+      render() {
+        if (this.state.hasError) {
+          return React.createElement('div', {}, 'Something went wrong.');
+        }
+        
+        return this.props.children;
+      }
+    },
+    {},
+    children
+  );
+};
+
+// Mock timer utilities
+export const mockTimers = () => {
+  jest.useFakeTimers();
+  return {
+    advanceTimersByTime: jest.advanceTimersByTime,
+    runOnlyPendingTimers: jest.runOnlyPendingTimers,
+    runAllTimers: jest.runAllTimers,
+    clearAllTimers: jest.clearAllTimers,
+    restore: () => jest.useRealTimers(),
+  };
+};
+
+// Component accessibility testing
+export const testAccessibility = (component) => {
+  const { getByRole, getByLabelText, getAllByRole } = render(component);
+  
+  return {
+    hasAccessibleLabel: (testId) => {
+      try {
+        getByLabelText(testId);
+        return true;
+      } catch {
+        return false;
+      }
+    },
+    hasRole: (role) => {
+      try {
+        getByRole(role);
+        return true;
+      } catch {
+        return false;
+      }
+    },
+    getAllElementsWithRole: (role) => {
+      try {
+        return getAllByRole(role);
+      } catch {
+        return [];
+      }
+    },
+  };
+};
+
 // Re-export everything from @testing-library/react-native for convenience
 export * from '@testing-library/react-native';

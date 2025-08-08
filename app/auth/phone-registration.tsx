@@ -3,11 +3,11 @@ import React, { useState, useEffect } from 'react';
 import {
   SafeAreaView,
   Text,
-  TextInput,
   TouchableOpacity,
   View,
   KeyboardAvoidingView,
   Platform,
+  Alert,
 } from 'react-native';
 import { Button } from '@/components/ui/Button';
 import {
@@ -17,10 +17,13 @@ import {
   ResponsiveText,
 } from '@/components/ui/ResponsiveContainer';
 import LucideIcons from '@/components/ui/LucideIcons';
+import { ValidatedInput } from '@/components/forms/ValidatedInput';
 import { AuthService } from '@/services';
 import { BiometricService } from '@/services';
 import { useDirectAuth } from '@/hooks/useDirectAuth';
 import { useFeatureFlagStore } from '@/stores/slices/featureFlagStore';
+import { useFormValidation } from '@/hooks/useFormValidation';
+import { phoneRegistrationSchema, PhoneRegistrationForm, phoneSchema } from '@/utils/validation.enhanced';
 import { showErrorAlert } from '@/utils/alert';
 import { responsive, responsiveClasses, layoutUtils } from '@/utils/responsive';
 
@@ -30,14 +33,31 @@ export default function PhoneRegistration() {
   const { authenticateWithBiometrics } = useDirectAuth();
   const biometricAuthEnabled = useFeatureFlagStore((state) => state.flags.biometric_auth);
   const isSignIn = mode === 'signin';
-  const [phoneNumber, setPhoneNumber] = useState('');
-  const [societyCode, setSocietyCode] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
   const [isBiometricLoading, setIsBiometricLoading] = useState(false);
   const [showBiometricOption, setShowBiometricOption] = useState(false);
   const [biometricType, setBiometricType] = useState<string>('');
-  const [errors, setErrors] = useState<{ phone?: string; society?: string }>(
-    {},
+
+  // Enhanced form validation
+  const {
+    fields,
+    errors,
+    isValid,
+    isSubmitting,
+    setValue,
+    getFieldProps,
+    handleSubmit,
+    resetForm,
+  } = useFormValidation<PhoneRegistrationForm>(
+    phoneRegistrationSchema,
+    {
+      phone: '',
+      agreeToTerms: false,
+    },
+    {
+      validateOnChange: true,
+      validateOnBlur: true,
+      debounceMs: 500,
+    }
   );
 
   useEffect(() => {
@@ -87,29 +107,7 @@ export default function PhoneRegistration() {
     }
   };
 
-  // Indian phone number validation
-  const validatePhoneNumber = (phone: string): boolean => {
-    // Remove any spaces, dashes, or special characters
-    const cleanPhone = phone.replace(/[\s\-\(\)]/g, '');
-
-    // Check if it's a valid Indian mobile number
-    // Indian mobile numbers: 10 digits starting with 6, 7, 8, or 9
-    const indianMobileRegex = /^[6-9]\d{9}$/;
-
-    // If it starts with +91, remove it
-    if (cleanPhone.startsWith('+91')) {
-      return indianMobileRegex.test(cleanPhone.substring(3));
-    }
-
-    // If it starts with 91, remove it
-    if (cleanPhone.startsWith('91') && cleanPhone.length === 12) {
-      return indianMobileRegex.test(cleanPhone.substring(2));
-    }
-
-    // If it's 10 digits, check directly
-    return indianMobileRegex.test(cleanPhone);
-  };
-
+  // Enhanced phone number formatting
   const formatPhoneNumber = (phone: string): string => {
     // Remove any existing formatting
     const cleanPhone = phone.replace(/[\s\-\(\)]/g, '');
@@ -149,82 +147,23 @@ export default function PhoneRegistration() {
     return `+91${cleanPhone}`;
   };
 
-  const validateSocietyCode = (code: string): boolean => {
-    // Society code should be 6-8 alphanumeric characters
-    const societyCodeRegex = /^[A-Z0-9]{6,8}$/;
-    return societyCodeRegex.test(code.toUpperCase());
-  };
-
   const handlePhoneChange = (text: string) => {
     // Only allow numbers, spaces, +, -, (, )
     const cleanText = text.replace(/[^0-9\s\-\(\)\+]/g, '');
-
-    // Check if this is a deletion operation
-    const isDeletion = cleanText.length < phoneNumber.length;
-
-    if (isDeletion) {
-      // For deletion, allow backspace without reformatting
-      const numbersOnly = cleanText.replace(/[^\d]/g, '');
-      if (numbersOnly.length <= 10) {
-        setPhoneNumber(formatPhoneNumber(numbersOnly));
-      }
-    } else {
-      // For addition, apply normal formatting
-      if (cleanText.length <= 15) {
-        setPhoneNumber(formatPhoneNumber(cleanText));
-      }
-    }
-
-    // Clear phone error when user starts typing
-    if (errors.phone) {
-      setErrors((prev) => ({ ...prev, phone: undefined }));
+    const numbersOnly = cleanText.replace(/[^\d]/g, '');
+    
+    if (numbersOnly.length <= 10) {
+      const formattedPhone = formatPhoneNumber(numbersOnly);
+      setValue('phone', formattedPhone);
     }
   };
 
-  const handleSocietyCodeChange = (text: string) => {
-    // Convert to uppercase and limit to 8 characters
-    const upperText = text.toUpperCase().replace(/[^A-Z0-9]/g, '');
-    if (upperText.length <= 8) {
-      setSocietyCode(upperText);
-    }
-
-    // Clear society error when user starts typing
-    if (errors.society) {
-      setErrors((prev) => ({ ...prev, society: undefined }));
-    }
-  };
-
-  const handleSubmit = async () => {
-    const newErrors: { phone?: string; society?: string } = {};
-
-    // Validate phone number
-    if (!phoneNumber.trim()) {
-      newErrors.phone = 'Phone number is required';
-    } else if (!validatePhoneNumber(phoneNumber)) {
-      newErrors.phone = 'Please enter a valid Indian mobile number';
-    }
-
-    // Validate society code
-    if (!societyCode.trim()) {
-      newErrors.society = 'Society code is required';
-    } else if (!validateSocietyCode(societyCode)) {
-      newErrors.society = 'Society code should be 6-8 alphanumeric characters';
-    }
-
-    if (Object.keys(newErrors).length > 0) {
-      setErrors(newErrors);
-      return;
-    }
-
-    setIsLoading(true);
-
+  // Enhanced submit handler with comprehensive validation
+  const handleFormSubmit = async (formData: PhoneRegistrationForm) => {
     try {
-      const fullPhoneNumber = getFullPhoneNumber(phoneNumber);
+      const fullPhoneNumber = getFullPhoneNumber(formData.phone);
 
-      const result = await AuthService.registerPhone(
-        fullPhoneNumber,
-        societyCode,
-      );
+      const result = await AuthService.registerPhone(fullPhoneNumber);
 
       if (result.success) {
         // Navigate to OTP verification
@@ -232,27 +171,18 @@ export default function PhoneRegistration() {
           pathname: '/auth/otp-verification',
           params: {
             phoneNumber: fullPhoneNumber,
-            societyCode: societyCode,
           },
         });
       } else {
-        // Show specific error from auth service
-        if (result.error?.includes('phone')) {
-          setErrors({ phone: result.error });
-        } else if (result.error?.includes('society')) {
-          setErrors({ society: result.error });
-        } else {
-          showErrorAlert(
-            'Error',
-            result.error || 'Failed to send OTP. Please try again.',
-          );
-        }
+        // Show error alert for API failures
+        showErrorAlert(
+          'Error',
+          result.error || 'Failed to send OTP. Please try again.',
+        );
       }
     } catch (error) {
       console.error('Phone registration error:', error);
       showErrorAlert('Error', 'Failed to send OTP. Please try again.');
-    } finally {
-      setIsLoading(false);
     }
   };
 
@@ -306,67 +236,66 @@ export default function PhoneRegistration() {
             </ResponsiveText>
           </View>
 
-          {/* Phone Number Input */}
+          {/* Enhanced Phone Number Input with Validation */}
           <View className="mb-6">
-            <Text className="text-text-primary font-semibold mb-3">
-              Mobile Number
-            </Text>
             <View className="flex-row items-center bg-surface rounded-xl border border-divider px-4 py-4">
               <Text className="text-text-primary font-medium mr-3">🇮🇳 +91</Text>
               <View className="h-6 w-px bg-divider mr-3" />
-              <TextInput
-                className="flex-1 text-text-primary text-lg"
+              <ValidatedInput
+                label=""
+                {...getFieldProps('phone')}
                 placeholder="Enter mobile number"
-                placeholderTextColor="#757575"
-                value={phoneNumber}
-                onChangeText={handlePhoneChange}
                 keyboardType="phone-pad"
                 maxLength={13} // Formatted: XXX XXX XXXX
                 autoFocus={true}
+                containerStyle={{ marginBottom: 0, flex: 1 }}
+                variant="default"
+                showValidationIcon={false}
+                helperText={
+                  isSignIn
+                    ? "We'll send an OTP to your registered number"
+                    : "We'll send an OTP to verify your number"
+                }
+                validationSchema={phoneSchema}
               />
             </View>
-            {errors.phone && (
-              <Text className="text-error text-sm mt-2">{errors.phone}</Text>
-            )}
-            <Text className="text-text-secondary text-xs mt-2">
-              {isSignIn
-                ? "We'll send an OTP to your registered number"
-                : "We'll send an OTP to verify your number"}
-            </Text>
           </View>
 
-          {/* Society Code Input */}
-          <View className="mb-8">
-            <Text className="text-text-primary font-semibold mb-3">
-              Society Code
-            </Text>
-            <View className="flex-row items-center bg-surface rounded-xl border border-divider px-4 py-4">
-              <LucideIcons name="shield-outline" size={20} color="#6366f1" />
-              <TextInput
-                className="flex-1 text-text-primary text-lg"
-                placeholder="Enter society code"
-                placeholderTextColor="#757575"
-                value={societyCode}
-                onChangeText={handleSocietyCodeChange}
-                autoCapitalize="characters"
-                maxLength={8}
-              />
-            </View>
-            {errors.society && (
-              <Text className="text-error text-sm mt-2">{errors.society}</Text>
-            )}
-            <Text className="text-text-secondary text-xs mt-2">
-              {isSignIn
-                ? 'Enter your society code to verify your account'
-                : 'Get your society code from your housing society management'}
-            </Text>
+          {/* Terms Agreement Checkbox */}
+          <View className="mb-8 flex-row items-start">
+            <TouchableOpacity
+              onPress={() => setValue('agreeToTerms', !fields.agreeToTerms.value)}
+              className="mr-3 mt-1">
+              <View className={`w-5 h-5 border-2 rounded ${
+                fields.agreeToTerms.value 
+                  ? 'bg-primary border-primary' 
+                  : 'border-divider bg-surface'
+              } items-center justify-center`}>
+                {fields.agreeToTerms.value && (
+                  <LucideIcons name="check" size={12} color="#fff" />
+                )}
+              </View>
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => setValue('agreeToTerms', !fields.agreeToTerms.value)}
+              className="flex-1">
+              <Text className="text-text-secondary text-sm">
+                I agree to the{' '}
+                <Text className="text-primary underline">Terms & Conditions</Text>
+                {' '}and{' '}
+                <Text className="text-primary underline">Privacy Policy</Text>
+              </Text>
+            </TouchableOpacity>
           </View>
+          {errors.agreeToTerms && (
+            <Text className="text-error text-sm mb-4 mt-[-16px]">{errors.agreeToTerms}</Text>
+          )}
 
-          {/* Submit Button */}
+          {/* Enhanced Submit Button with Form Validation */}
           <Button
-            onPress={handleSubmit}
-            loading={isLoading}
-            disabled={isLoading}
+            onPress={() => handleSubmit(handleFormSubmit)}
+            loading={isSubmitting}
+            disabled={!isValid || isSubmitting}
             className="mb-6">
             Send OTP
           </Button>

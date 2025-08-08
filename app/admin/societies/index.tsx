@@ -20,7 +20,7 @@ import {
 } from 'lucide-react-native';
 import { useDirectAdmin } from '@/hooks/useDirectAdmin';
 import { useDirectSociety } from '@/hooks/useDirectSociety';
-import { AdminHeader } from '@/components/admin/AdminHeader';
+import { StandardHeader, LoadingCard, NoSocieties } from '@/components/design-system';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import FilterPill from '@/components/ui/FilterPill';
@@ -199,7 +199,7 @@ function SocietyManagement() {
 
   return (
     <View className="flex-1 bg-gray-50">
-      <AdminHeader 
+      <StandardHeader 
         title="Society Management" 
         subtitle={`${filteredSocieties.length} societies`}
         showBack
@@ -284,22 +284,7 @@ function SocietyManagement() {
           {(societyLoading || adminLoading) && !refreshing ? (
             <View className="space-y-3">
               {[1, 2, 3].map((index) => (
-                <Card key={index} className="p-4">
-                  <View className="animate-pulse">
-                    <View className="flex-row justify-between items-start mb-3">
-                      <View className="flex-1">
-                        <View className="w-32 h-5 bg-gray-200 rounded mb-2" />
-                        <View className="w-20 h-4 bg-gray-200 rounded" />
-                      </View>
-                      <View className="w-16 h-6 bg-gray-200 rounded" />
-                    </View>
-                    <View className="w-full h-4 bg-gray-200 rounded mb-2" />
-                    <View className="flex-row justify-between">
-                      <View className="w-16 h-4 bg-gray-200 rounded" />
-                      <View className="w-20 h-4 bg-gray-200 rounded" />
-                    </View>
-                  </View>
-                </Card>
+                <LoadingCard key={index} />
               ))}
             </View>
           ) : filteredSocieties.length > 0 ? (
@@ -314,27 +299,10 @@ function SocietyManagement() {
               ))}
             </View>
           ) : (
-            <Card className="p-8 items-center">
-              <Building2 size={48} color="#6b7280" />
-              <Text className="text-lg font-semibold text-gray-900 mt-4 text-center">
-                {localSearchQuery ? 'No societies found' : 'No societies yet'}
-              </Text>
-              <Text className="text-gray-600 text-center mt-2 mb-4">
-                {localSearchQuery 
-                  ? 'Try adjusting your search or filters'
-                  : 'Start by reviewing onboarding applications'
-                }
-              </Text>
-              <Button
-                onPress={localSearchQuery ? () => {
-                  setLocalSearchQuery('');
-                  setSearchQuery?.('');
-                } : handleCreateSociety}
-                variant="primary"
-              >
-                {localSearchQuery ? 'Clear Search' : 'Review Applications'}
-              </Button>
-            </Card>
+            <NoSocieties 
+              onAdd={localSearchQuery ? undefined : handleCreateSociety}
+              className="px-0"
+            />
           )}
         </View>
 

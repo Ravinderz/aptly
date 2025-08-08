@@ -1,103 +1,117 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   View, 
   Text, 
   ScrollView, 
   TouchableOpacity,
   Alert,
-  RefreshControl 
+  RefreshControl,
+  Modal
 } from 'react-native';
 import { router } from 'expo-router';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
+import { 
+  LoadingWrapper, 
+  useAsyncState, 
+  ErrorMessage,
+  LoadingSpinner 
+} from '@/components/ui/LoadingStates';
 import EmergencyAlertCard from '@/components/security/EmergencyAlertCard';
 import { 
   AlertTriangle, 
   Shield, 
   Plus,
-  ArrowLeft
+  ArrowLeft,
+  Filter,
+  Download,
+  Phone
 } from 'lucide-react-native';
 import { useDirectAuth } from '@/hooks/useDirectAuth';
-import type { EmergencyAlert } from '@/types/security';
-
-type AlertType = 'security' | 'medical' | 'fire' | 'evacuation' | 'other';
-type AlertSeverity = 'low' | 'medium' | 'high' | 'critical';
+import { useSecurityPermissions } from '@/hooks/useSecurityPermissions';
+import { cn } from '@/utils/cn';
+import { emergencyService } from '@/services/emergency.service';
+import type { 
+  EmergencyAlert, 
+  EmergencyStats,
+  EmergencyFilters,
+  CreateAlertRequest
+} from '@/services/emergency.service';
 
 /**
- * Emergency Response Interface - Phase 2
+ * Security Emergency Management - Real-time emergency alert dashboard
  * 
  * Features:
  * - Emergency alert creation and management
- * - Real-time alert monitoring
- * - Priority-based alert system
- * - Quick response actions
+ * - Real-time alert monitoring with service integration
+ * - Priority-based alert system with severity categorization
+ * - Quick response actions and status workflow
  * - Emergency contact integration
- * - Alert resolution tracking
+ * - Alert resolution tracking with audit trail
+ * - Export functionality for reporting
+ * - Filtering and search capabilities
  */
-const EmergencyResponse = () => {
+const SecurityEmergencyManagement = () => {
   const { user } = useDirectAuth();
+  const { canHandleEmergencies, permissionLevel } = useSecurityPermissions();
+  
+  const [alertsState, { setLoading, setData, setError }] = useAsyncState<{
+    alerts: EmergencyAlert[];
+    totalCount: number;
+    stats: EmergencyStats;
+  }>();
+  
   const [refreshing, setRefreshing] = useState(false);
   const [showCreateAlert, setShowCreateAlert] = useState(false);
-  const [selectedAlert, setSelectedAlert] = useState<EmergencyAlert | null>(null);
+  const [showFilters, setShowFilters] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
   
-  const [newAlert, setNewAlert] = useState({
-    type: 'security' as AlertType,
-    severity: 'medium' as AlertSeverity,
+  const [filters, setFilters] = useState<EmergencyFilters>({
+    status: 'all',
+    type: 'all',
+    severity: 'all',
+    page: 1,
+    limit: 20
+  });
+  
+  const [newAlert, setNewAlert] = useState<CreateAlertRequest>({
+    type: 'security',
+    severity: 'medium',
     title: '',
     description: '',
     location: ''
   });
 
-  // Mock data - will be replaced with real API calls
-  const [alerts, setAlerts] = useState<EmergencyAlert[]>([
-    {
-      id: '1',
-      type: 'security',
-      severity: 'high',
-      title: 'Suspicious Activity Reported',
-      description: 'Resident reported suspicious person near parking area',
-      location: 'Block A Parking',
-      reportedBy: 'Security Guard',
-      reportedAt: new Date(Date.now() - 30 * 60 * 1000), // 30 min ago
-      status: 'active',
-      assignedTo: ['guard1']
-    },
-    {
-      id: '2',
-      type: 'medical',
-      severity: 'critical',
-      title: 'Medical Emergency',
-      description: 'Elderly resident collapsed in lobby',
-      location: 'Main Lobby - Block B',
-      reportedBy: 'Resident',
-      reportedAt: new Date(Date.now() - 10 * 60 * 1000), // 10 min ago
-      status: 'acknowledged',
-      assignedTo: ['guard1', 'guard2']
-    },
-    {
-      id: '3',
-      type: 'fire',
-      severity: 'medium',
-      title: 'Smoke Detector Alert',
-      description: 'Smoke detector activated in basement parking',
-      location: 'B1 Parking Level',
-      reportedBy: 'Fire Safety System',
-      reportedAt: new Date(Date.now() - 2 * 60 * 60 * 1000), // 2 hours ago
-      status: 'resolved',
-      assignedTo: ['guard1'],
-      resolvedAt: new Date(Date.now() - 1.5 * 60 * 60 * 1000),
-      resolutionNotes: 'False alarm - dust from construction work'
+  // Load alerts data on mount and when filters change
+  useEffect(() => {
+    loadAlertsData();
+  }, [filters]);
+
+  const loadAlertsData = async () => {
+    try {
+      setLoading();
+      const response = await emergencyService.getAlerts(filters);
+      
+      if (response.success && response.data) {
+        setData(response.data);
+      } else {
+        setError(new Error(response.message || 'Failed to load alerts'));
+      }
+    } catch (error) {
+      console.error('Failed to load emergency alerts:', error);
+      setError(error as Error);
     }
-  ]);
+  };
 
-  const onRefresh = React.useCallback(() => {
+  const onRefresh = React.useCallback(async () => {
     setRefreshing(true);
-    setTimeout(() => {
+    try {
+      await loadAlertsData();
+    } finally {
       setRefreshing(false);
-    }, 1000);
-  }, []);
-
+    }
+  }, [filters]);
 
   const handleCreateAlert = async () => {
     if (!newAlert.title.trim() || !newAlert.description.trim()) {
@@ -105,49 +119,77 @@ const EmergencyResponse = () => {
       return;
     }
 
-    try {
-      const alert: EmergencyAlert = {
-        id: Date.now().toString(),
-        type: newAlert.type,
-        severity: newAlert.severity,
-        title: newAlert.title,
-        description: newAlert.description,
-        location: newAlert.location,
-        reportedBy: user?.fullName || 'Security Guard',
-        reportedAt: new Date(),
-        status: 'active',
-        assignedTo: [user?.id || 'current-guard']
-      };
+    if (!canHandleEmergencies) {
+      Alert.alert('Permission Denied', 'You do not have permission to create emergency alerts');
+      return;
+    }
 
-      setAlerts(prev => [alert, ...prev]);
+    try {
+      setSubmitting(true);
+      const response = await emergencyService.createAlert(newAlert);
       
-      // Reset form
-      setNewAlert({
-        type: 'security',
-        severity: 'medium',
-        title: '',
-        description: '',
-        location: ''
-      });
-      
-      setShowCreateAlert(false);
-      
-      Alert.alert('Alert Created', 'Emergency alert has been created successfully');
-      
+      if (response.success) {
+        // Reset form
+        setNewAlert({
+          type: 'security',
+          severity: 'medium',
+          title: '',
+          description: '',
+          location: ''
+        });
+        
+        setShowCreateAlert(false);
+        
+        Alert.alert('Alert Created', 'Emergency alert has been created successfully');
+        
+        // Reload data to show the new alert
+        await loadAlertsData();
+      } else {
+        throw new Error(response.message || 'Failed to create alert');
+      }
     } catch (error) {
-      Alert.alert('Error', 'Failed to create alert. Please try again.');
+      console.error('Failed to create alert:', error);
+      Alert.alert(
+        'Error', 
+        error instanceof Error ? error.message : 'Failed to create alert. Please try again.'
+      );
+    } finally {
+      setSubmitting(false);
     }
   };
 
-  const handleAcknowledgeAlert = (alertId: string) => {
-    setAlerts(prev => prev.map(alert => 
-      alert.id === alertId 
-        ? { ...alert, status: 'acknowledged' as const }
-        : alert
-    ));
+  const handleAcknowledgeAlert = async (alertId: string) => {
+    if (!canHandleEmergencies) {
+      Alert.alert('Permission Denied', 'You do not have permission to acknowledge alerts');
+      return;
+    }
+
+    try {
+      const response = await emergencyService.acknowledgeAlert(alertId, {
+        notes: `Acknowledged by ${user?.fullName || 'Security Guard'}`
+      });
+      
+      if (response.success) {
+        Alert.alert('Alert Acknowledged', 'Alert has been acknowledged successfully');
+        await loadAlertsData(); // Reload to show updated status
+      } else {
+        throw new Error(response.message || 'Failed to acknowledge alert');
+      }
+    } catch (error) {
+      console.error('Failed to acknowledge alert:', error);
+      Alert.alert(
+        'Error', 
+        error instanceof Error ? error.message : 'Failed to acknowledge alert. Please try again.'
+      );
+    }
   };
 
   const handleResolveAlert = (alertId: string) => {
+    if (!canHandleEmergencies) {
+      Alert.alert('Permission Denied', 'You do not have permission to resolve alerts');
+      return;
+    }
+
     Alert.prompt(
       'Resolve Alert',
       'Please enter resolution notes:',
@@ -155,17 +197,25 @@ const EmergencyResponse = () => {
         { text: 'Cancel', style: 'cancel' },
         {
           text: 'Resolve',
-          onPress: (notes) => {
-            setAlerts(prev => prev.map(alert => 
-              alert.id === alertId 
-                ? { 
-                    ...alert, 
-                    status: 'resolved' as const,
-                    resolvedAt: new Date(),
-                    resolutionNotes: notes || 'Resolved by security guard'
-                  }
-                : alert
-            ));
+          onPress: async (notes) => {
+            try {
+              const response = await emergencyService.resolveAlert(alertId, {
+                resolutionNotes: notes || 'Resolved by security guard'
+              });
+              
+              if (response.success) {
+                Alert.alert('Alert Resolved', 'Alert has been resolved successfully');
+                await loadAlertsData(); // Reload to show updated status
+              } else {
+                throw new Error(response.message || 'Failed to resolve alert');
+              }
+            } catch (error) {
+              console.error('Failed to resolve alert:', error);
+              Alert.alert(
+                'Error', 
+                error instanceof Error ? error.message : 'Failed to resolve alert. Please try again.'
+              );
+            }
           }
         }
       ],
@@ -173,12 +223,61 @@ const EmergencyResponse = () => {
     );
   };
 
+  const handleExportReport = async () => {
+    try {
+      const response = await emergencyService.exportReport('xlsx', filters);
+      
+      if (response.success && response.data?.downloadUrl) {
+        Alert.alert(
+          'Report Generated',
+          'Emergency alerts report has been generated successfully.',
+          [
+            { text: 'OK' }
+          ]
+        );
+        console.log('Download URL:', response.data.downloadUrl);
+      } else {
+        throw new Error(response.message || 'Failed to generate report');
+      }
+    } catch (error) {
+      console.error('Failed to export report:', error);
+      Alert.alert(
+        'Export Failed',
+        error instanceof Error ? error.message : 'Failed to export report. Please try again.'
+      );
+    }
+  };
+
+  // Permission check - only security guards can access
+  if (!user || (user.role !== 'security_guard' && user.role !== 'super_admin')) {
+    return (
+      <View className="flex-1 justify-center items-center p-4 bg-gray-50">
+        <Shield size={48} color="#6b7280" />
+        <Text className="text-lg font-semibold text-gray-900 mt-4 text-center">
+          Security Access Required
+        </Text>
+        <Text className="text-gray-600 text-center mt-2">
+          This area is restricted to security personnel only.
+        </Text>
+        <Button
+          onPress={() => router.replace('/(tabs)/')}
+          variant="primary"
+          className="mt-6"
+        >
+          Return to Dashboard
+        </Button>
+      </View>
+    );
+  }
+
+  const alerts = alertsState.data?.alerts || [];
+  const stats = alertsState.data?.stats;
   const activeAlerts = alerts.filter(alert => alert.status === 'active' || alert.status === 'acknowledged');
   const criticalAlerts = activeAlerts.filter(alert => alert.severity === 'critical');
-  const highAlerts = activeAlerts.filter(alert => alert.severity === 'high');
 
-  if (showCreateAlert) {
-    return (
+  // Create Alert Modal Component
+  const CreateAlertModal = () => (
+    <Modal visible={showCreateAlert} animationType="slide" presentationStyle="pageSheet">
       <View className="flex-1 bg-gray-50">
         {/* Header */}
         <View className="bg-white px-4 pt-12 pb-4 border-b border-gray-200">
@@ -216,7 +315,7 @@ const EmergencyResponse = () => {
                   key={type.key}
                   variant={newAlert.type === type.key ? 'primary' : 'outline'}
                   size="sm"
-                  onPress={() => setNewAlert(prev => ({ ...prev, type: type.key as AlertType }))}
+                  onPress={() => setNewAlert(prev => ({ ...prev, type: type.key as any }))}
                   className="mr-2 mb-2"
                 >
                   {type.label}
@@ -237,7 +336,7 @@ const EmergencyResponse = () => {
                   key={severity.key}
                   variant={newAlert.severity === severity.key ? 'primary' : 'outline'}
                   size="sm"
-                  onPress={() => setNewAlert(prev => ({ ...prev, severity: severity.key as AlertSeverity }))}
+                  onPress={() => setNewAlert(prev => ({ ...prev, severity: severity.key as any }))}
                   className="mr-2 mb-2"
                 >
                   {severity.label}
@@ -277,6 +376,7 @@ const EmergencyResponse = () => {
               size="lg"
               onPress={() => setShowCreateAlert(false)}
               className="flex-1"
+              disabled={submitting}
             >
               Cancel
             </Button>
@@ -285,156 +385,182 @@ const EmergencyResponse = () => {
               size="lg"
               onPress={handleCreateAlert}
               className="flex-1"
+              disabled={submitting}
             >
-              Create Alert
+              {submitting ? (
+                <View className="flex-row items-center">
+                  <LoadingSpinner size="small" color="#ffffff" className="mr-2" />
+                  <Text className="text-white">Creating...</Text>
+                </View>
+              ) : (
+                'Create Alert'
+              )}
             </Button>
           </View>
         </ScrollView>
       </View>
-    );
-  }
+    </Modal>
+  );
 
   return (
-    <View className="flex-1 bg-gray-50">
-      {/* Header */}
-      <View className="bg-white px-4 pt-12 pb-4 border-b border-gray-200">
-        <View className="flex-row items-center justify-between mb-2">
-          <View className="flex-row items-center">
-            <TouchableOpacity onPress={() => router.back()} className="mr-3 p-2">
-              <ArrowLeft size={20} color="#6b7280" />
-            </TouchableOpacity>
-            <AlertTriangle size={24} color="#dc2626" />
-            <Text className="text-2xl font-bold text-gray-900 ml-2">
-              Emergency Response
-            </Text>
-          </View>
-          <TouchableOpacity 
-            onPress={() => setShowCreateAlert(true)}
-            className="p-2"
-          >
-            <Plus size={24} color="#dc2626" />
-          </TouchableOpacity>
-        </View>
-        <Text className="text-gray-600">
-          Monitor and respond to emergency situations
-        </Text>
-      </View>
-
-      <ScrollView
-        className="flex-1"
-        contentContainerStyle={{ padding: 16 }}
-        refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-        }
-      >
-        {/* Alert Statistics */}
-        <View className="flex-row mb-6">
-          <Card className="flex-1 p-4 bg-white mr-2">
-            <View className="flex-row items-center justify-between">
-              <View>
-                <Text className="text-sm text-gray-600">Active Alerts</Text>
-                <Text className="text-2xl font-bold text-red-600">{activeAlerts.length}</Text>
-              </View>
-              <AlertTriangle size={24} color="#dc2626" />
-            </View>
-          </Card>
-          
-          <Card className="flex-1 p-4 bg-white ml-2">
-            <View className="flex-row items-center justify-between">
-              <View>
-                <Text className="text-sm text-gray-600">Critical</Text>
-                <Text className="text-2xl font-bold text-red-800">{criticalAlerts.length}</Text>
-              </View>
-              <Shield size={24} color="#7f1d1d" />
-            </View>
-          </Card>
-        </View>
-
-        {/* Critical Alerts Banner */}
-        {criticalAlerts.length > 0 && (
-          <Card className="p-4 mb-6 bg-red-50 border border-red-200">
+    <LoadingWrapper
+      isLoading={alertsState.isLoading}
+      error={alertsState.error}
+      onRetry={loadAlertsData}
+      skeletonProps={{ type: 'card', count: 3 }}
+    >
+      <View className="flex-1 bg-gray-50">
+        {/* Header */}
+        <View className="bg-white px-4 pt-12 pb-4 border-b border-gray-200">
+          <View className="flex-row items-center justify-between mb-2">
             <View className="flex-row items-center">
-              <AlertTriangle size={20} color="#dc2626" />
-              <Text className="text-red-900 font-semibold ml-2">
-                {criticalAlerts.length} Critical Alert{criticalAlerts.length > 1 ? 's' : ''} Require Immediate Attention
+              <TouchableOpacity onPress={() => router.back()} className="mr-3 p-2">
+                <ArrowLeft size={20} color="#6b7280" />
+              </TouchableOpacity>
+              <AlertTriangle size={24} color="#dc2626" />
+              <Text className="text-2xl font-bold text-gray-900 ml-2">
+                Emergency Management
               </Text>
             </View>
-          </Card>
-        )}
-
-        {/* Quick Actions */}
-        <Text className="text-lg font-semibold text-gray-900 mb-4">Quick Actions</Text>
-        <View className="flex-row mb-6">
-          <Button
-            variant="destructive"
-            size="md"
-            onPress={() => setShowCreateAlert(true)}
-            className="flex-1 mr-2"
-          >
-            Create Alert
-          </Button>
-          
-          <Button
-            variant="outline"
-            size="md"
-            onPress={() => {
-              // Call emergency services
-              Alert.alert(
-                'Emergency Contacts',
-                'Police: 100\nFire: 101\nAmbulance: 108\nGeneral Emergency: 112',
-                [
-                  { text: 'Cancel' },
-                  { 
-                    text: 'Call 112', 
-                    onPress: () => {
-                      // In a real app, this would initiate a phone call
-                      Alert.alert('Calling Emergency Services', 'This would dial 112 in a real app');
-                    }
-                  }
-                ]
-              );
-            }}
-            className="flex-1 ml-2"
-          >
-            Emergency Call
-          </Button>
+            <View className="flex-row items-center">
+              <TouchableOpacity 
+                onPress={handleExportReport}
+                className="p-2 mr-2"
+              >
+                <Download size={20} color="#6b7280" />
+              </TouchableOpacity>
+              <TouchableOpacity 
+                onPress={() => setShowCreateAlert(true)}
+                className="p-2"
+                disabled={!canHandleEmergencies}
+              >
+                <Plus size={24} color={canHandleEmergencies ? "#dc2626" : "#9ca3af"} />
+              </TouchableOpacity>
+            </View>
+          </View>
+          <Text className="text-gray-600">
+            Real-time emergency alert dashboard and management
+          </Text>
         </View>
 
-        {/* Alert List */}
-        <Text className="text-lg font-semibold text-gray-900 mb-4">
-          Recent Alerts ({alerts.length})
-        </Text>
-        
-        {alerts.length === 0 ? (
-          <Card className="p-6 bg-white">
-            <View className="items-center">
-              <Shield size={48} color="#9ca3af" />
-              <Text className="text-lg font-medium text-gray-900 mt-4 mb-2">
-                No Alerts
-              </Text>
-              <Text className="text-gray-600 text-center">
-                All systems are operating normally. Create an alert if you encounter an emergency situation.
-              </Text>
-            </View>
-          </Card>
-        ) : (
-          <View className="space-y-3">
-            {alerts.map((alert) => (
-              <EmergencyAlertCard
-                key={alert.id}
-                alert={alert}
-                onAcknowledge={handleAcknowledgeAlert}
-                onResolve={handleResolveAlert}
-                showActions={true}
-              />
-            ))}
+        <ScrollView
+          className="flex-1"
+          contentContainerStyle={{ padding: 16 }}
+          refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+          }
+        >
+          {/* Alert Statistics */}
+          <View className="flex-row mb-6">
+            <Card className="flex-1 p-4 bg-white mr-2">
+              <View className="flex-row items-center justify-between">
+                <View>
+                  <Text className="text-sm text-gray-600">Active Alerts</Text>
+                  <Text className="text-2xl font-bold text-red-600">{stats?.active || 0}</Text>
+                </View>
+                <AlertTriangle size={24} color="#dc2626" />
+              </View>
+            </Card>
+            
+            <Card className="flex-1 p-4 bg-white ml-2">
+              <View className="flex-row items-center justify-between">
+                <View>
+                  <Text className="text-sm text-gray-600">Critical</Text>
+                  <Text className="text-2xl font-bold text-red-800">{stats?.critical || 0}</Text>
+                </View>
+                <Shield size={24} color="#7f1d1d" />
+              </View>
+            </Card>
           </View>
-        )}
-      </ScrollView>
-    </View>
+
+          {/* Critical Alerts Banner */}
+          {criticalAlerts.length > 0 && (
+            <Card className="p-4 mb-6 bg-red-50 border border-red-200">
+              <View className="flex-row items-center">
+                <AlertTriangle size={20} color="#dc2626" />
+                <Text className="text-red-900 font-semibold ml-2">
+                  {criticalAlerts.length} Critical Alert{criticalAlerts.length > 1 ? 's' : ''} Require Immediate Attention
+                </Text>
+              </View>
+            </Card>
+          )}
+
+          {/* Quick Actions */}
+          <Text className="text-lg font-semibold text-gray-900 mb-4">Quick Actions</Text>
+          <View className="flex-row mb-6">
+            <Button
+              variant="destructive"
+              size="md"
+              onPress={() => setShowCreateAlert(true)}
+              className="flex-1 mr-2"
+              disabled={!canHandleEmergencies}
+            >
+              Create Alert
+            </Button>
+            
+            <Button
+              variant="outline"
+              size="md"
+              onPress={() => {
+                Alert.alert(
+                  'Emergency Contacts',
+                  'Police: 100\nFire: 101\nAmbulance: 108\nGeneral Emergency: 112',
+                  [
+                    { text: 'Cancel' },
+                    { 
+                      text: 'Call 112', 
+                      onPress: () => {
+                        Alert.alert('Calling Emergency Services', 'This would dial 112 in a real app');
+                      }
+                    }
+                  ]
+                );
+              }}
+              className="flex-1 ml-2"
+            >
+              Emergency Call
+            </Button>
+          </View>
+
+          {/* Alert List */}
+          <Text className="text-lg font-semibold text-gray-900 mb-4">
+            Recent Alerts ({alerts.length})
+          </Text>
+          
+          {alerts.length === 0 ? (
+            <Card className="p-6 bg-white">
+              <View className="items-center">
+                <Shield size={48} color="#9ca3af" />
+                <Text className="text-lg font-medium text-gray-900 mt-4 mb-2">
+                  No Alerts
+                </Text>
+                <Text className="text-gray-600 text-center">
+                  All systems are operating normally. Create an alert if you encounter an emergency situation.
+                </Text>
+              </View>
+            </Card>
+          ) : (
+            <View className="space-y-3">
+              {alerts.map((alert) => (
+                <EmergencyAlertCard
+                  key={alert.id}
+                  alert={alert}
+                  onAcknowledge={handleAcknowledgeAlert}
+                  onResolve={handleResolveAlert}
+                  showActions={canHandleEmergencies}
+                />
+              ))}
+            </View>
+          )}
+        </ScrollView>
+
+        {/* Create Alert Modal */}
+        <CreateAlertModal />
+      </View>
+    </LoadingWrapper>
   );
 };
 
-EmergencyResponse.displayName = 'EmergencyResponse';
+SecurityEmergencyManagement.displayName = 'SecurityEmergencyManagement';
 
-export default EmergencyResponse;
+export default SecurityEmergencyManagement;

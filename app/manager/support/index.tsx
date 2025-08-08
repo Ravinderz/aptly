@@ -1,399 +1,620 @@
-import { AdminHeader } from '@/components/admin/AdminHeader';
-import { RequireManager } from '@/components/auth/RoleGuard';
-import { Button } from '@/components/ui/Button';
-import { Card } from '@/components/ui/Card';
-import FilterPill from '@/components/ui/FilterPill';
-import { useDirectAuth } from '@/hooks/useDirectAuth';
-import { cn } from '@/utils/cn';
+import React, { useState, useEffect } from 'react';
+import {
+  View,
+  Text,
+  ScrollView,
+  TouchableOpacity,
+  RefreshControl,
+  Alert,
+  Modal,
+  TextInput,
+} from 'react-native';
 import { useRouter } from 'expo-router';
 import {
-  AlertTriangle,
-  Building2,
-  CheckCircle,
-  Clock,
   MessageSquare,
+  Clock,
+  AlertCircle,
+  CheckCircle,
+  ArrowUp,
+  ArrowDown,
+  Filter,
+  Plus,
   User,
+  Building2,
+  Tag,
+  Calendar,
+  Star,
+  TrendingUp,
+  Timer,
 } from 'lucide-react-native';
-import { useEffect, useState } from 'react';
-import { RefreshControl, ScrollView, Text, View } from 'react-native';
+import { useDirectAuth } from '@/hooks/useDirectAuth';
+import { RequireManager } from '@/components/auth/RoleGuard';
+import { AdminHeader } from '@/components/admin/AdminHeader';
+import { Card } from '@/components/ui/Card';
+import { Button } from '@/components/ui/Button';
+import { Input } from '@/components/ui/Input';
+import { 
+  LoadingWrapper, 
+  useAsyncState, 
+  LoadingSpinner 
+} from '@/components/ui/LoadingStates';
+import { cn } from '@/utils/cn';
+import { supportService } from '@/services/support.service';
+import type {
+  SupportTicket,
+  TicketFilters,
+  SupportStats,
+  QueueStats,
+  TicketResponseRequest,
+  StatusChangeRequest,
+  AssignTicketRequest,
+} from '@/services/support.service';
 
-interface SupportTicket {
-  id: string;
-  title: string;
-  description: string;
-  societyName: string;
-  societyId: string;
-  residentName: string;
-  residentPhone: string;
-  priority: 'high' | 'medium' | 'low';
-  status: 'open' | 'in_progress' | 'pending_response' | 'resolved';
-  category: 'maintenance' | 'billing' | 'community' | 'security' | 'other';
-  createdAt: string;
-  updatedAt: string;
-  responseTime?: number; // hours
-}
-
-type FilterStatus =
-  | 'all'
-  | 'open'
-  | 'in_progress'
-  | 'pending_response'
-  | 'resolved';
-
-const ManagerSupport = () => {
+/**
+ * Manager Support System - Support ticket queue management
+ * 
+ * Features:
+ * - Support ticket queue with priority and status management
+ * - Response time tracking and SLA monitoring
+ * - Priority and status management workflows
+ * - Quick response templates and bulk actions
+ * - Team performance metrics and insights
+ * - Advanced filtering and search capabilities
+ */
+const ManagerSupportSystem = () => {
   const router = useRouter();
-  const { user, logout } = useDirectAuth();
-
+  const { user } = useDirectAuth();
+  
+  const [supportState, { setLoading, setData, setError }] = useAsyncState<{
+    tickets: SupportTicket[];
+    totalCount: number;
+    stats: SupportStats;
+    queueStats: QueueStats;
+  }>();
+  
   const [refreshing, setRefreshing] = useState(false);
-  const [tickets, setTickets] = useState<SupportTicket[]>([]);
-  const [filteredTickets, setFilteredTickets] = useState<SupportTicket[]>([]);
-  const [filterStatus, setFilterStatus] = useState<FilterStatus>('all');
+  const [showFilters, setShowFilters] = useState(false);
+  const [showResponseModal, setShowResponseModal] = useState(false);
+  const [selectedTicket, setSelectedTicket] = useState<SupportTicket | null>(null);
+  const [responseText, setResponseText] = useState('');
+  const [submitting, setSubmitting] = useState(false);
+  
+  const [filters, setFilters] = useState<TicketFilters>({
+    status: 'all',
+    priority: 'all',
+    category: 'all',
+    assignedTo: 'me',
+    page: 1,
+    limit: 20,
+    sortBy: 'priority',
+    sortOrder: 'desc',
+  });
 
+  // Load support data on mount and when filters change
   useEffect(() => {
-    loadSupportTickets();
-  }, []);
+    loadSupportData();
+  }, [filters]);
 
-  useEffect(() => {
-    filterTickets();
-  }, [tickets, filterStatus]);
-
-  const loadSupportTickets = async () => {
+  const loadSupportData = async () => {
     try {
-      // Mock data - replace with actual API call
-      const mockTickets: SupportTicket[] = [
-        {
-          id: 'ticket_001',
-          title: 'Water Supply Issue',
-          description: 'No water supply since morning in Block A',
-          societyName: 'Green Valley Society',
-          societyId: '1',
-          residentName: 'John Doe',
-          residentPhone: '+91-9876543210',
-          priority: 'high',
-          status: 'open',
-          category: 'maintenance',
-          createdAt: '2024-03-01T08:30:00Z',
-          updatedAt: '2024-03-01T08:30:00Z',
-        },
-        {
-          id: 'ticket_002',
-          title: 'Security Gate Not Working',
-          description: 'Main gate automatic system is not functioning',
-          societyName: 'Sunrise Apartments',
-          societyId: '2',
-          residentName: 'Sarah Smith',
-          residentPhone: '+91-9876543211',
-          priority: 'medium',
-          status: 'in_progress',
-          category: 'security',
-          createdAt: '2024-02-29T14:15:00Z',
-          updatedAt: '2024-03-01T10:00:00Z',
-          responseTime: 18,
-        },
-        {
-          id: 'ticket_003',
-          title: 'Billing Query',
-          description: 'Question about maintenance charges calculation',
-          societyName: 'Metro Heights',
-          societyId: '3',
-          residentName: 'Mike Johnson',
-          residentPhone: '+91-9876543212',
-          priority: 'low',
-          status: 'pending_response',
-          category: 'billing',
-          createdAt: '2024-02-28T16:45:00Z',
-          updatedAt: '2024-03-01T09:30:00Z',
-          responseTime: 12,
-        },
-      ];
+      setLoading();
+      
+      // Load tickets and stats in parallel
+      const [ticketsResponse, statsResponse] = await Promise.all([
+        supportService.getTickets(filters),
+        supportService.getQueueStats(),
+      ]);
 
-      setTickets(mockTickets);
+      if (ticketsResponse.success && statsResponse.success) {
+        setData({
+          tickets: ticketsResponse.data!.tickets,
+          totalCount: ticketsResponse.data!.totalCount,
+          stats: ticketsResponse.data!.stats,
+          queueStats: statsResponse.data!,
+        });
+      } else {
+        const error = ticketsResponse.message || statsResponse.message || 'Failed to load support data';
+        setError(new Error(error));
+      }
     } catch (error) {
-      console.error('Failed to load support tickets:', error);
+      console.error('Failed to load support data:', error);
+      setError(error as Error);
     }
   };
 
-  const filterTickets = () => {
-    let filtered = [...tickets];
-
-    if (filterStatus !== 'all') {
-      filtered = filtered.filter((ticket) => ticket.status === filterStatus);
-    }
-
-    setFilteredTickets(filtered);
-  };
-
-  const handleRefresh = async () => {
+  const onRefresh = React.useCallback(async () => {
     setRefreshing(true);
     try {
-      await loadSupportTickets();
+      await loadSupportData();
     } finally {
       setRefreshing(false);
     }
+  }, [filters]);
+
+  const handleTicketPress = (ticket: SupportTicket) => {
+    setSelectedTicket(ticket);
+    setShowResponseModal(true);
   };
 
-  const handleLogout = async () => {
+  const handleStatusChange = async (ticketId: string, newStatus: SupportTicket['status']) => {
     try {
-      await logout();
-      router.replace('/welcome');
+      const response = await supportService.changeStatus(ticketId, { status: newStatus });
+      
+      if (response.success) {
+        Alert.alert('Status Updated', `Ticket status changed to ${newStatus.replace('_', ' ')}`);
+        await loadSupportData();
+      } else {
+        throw new Error(response.message || 'Failed to update status');
+      }
     } catch (error) {
-      console.error('Logout failed:', error);
+      console.error('Failed to update status:', error);
+      Alert.alert(
+        'Error',
+        error instanceof Error ? error.message : 'Failed to update status. Please try again.'
+      );
     }
+  };
+
+  const handlePriorityChange = async (ticketId: string, newPriority: SupportTicket['priority']) => {
+    try {
+      const response = await supportService.updateTicket(ticketId, { priority: newPriority });
+      
+      if (response.success) {
+        Alert.alert('Priority Updated', `Ticket priority changed to ${newPriority}`);
+        await loadSupportData();
+      } else {
+        throw new Error(response.message || 'Failed to update priority');
+      }
+    } catch (error) {
+      console.error('Failed to update priority:', error);
+      Alert.alert(
+        'Error',
+        error instanceof Error ? error.message : 'Failed to update priority. Please try again.'
+      );
+    }
+  };
+
+  const handleSendResponse = async () => {
+    if (!selectedTicket || !responseText.trim()) {
+      Alert.alert('Validation Error', 'Response message is required');
+      return;
+    }
+
+    try {
+      setSubmitting(true);
+      
+      const response = await supportService.addResponse(selectedTicket.id, {
+        message: responseText,
+        isInternal: false,
+      });
+      
+      if (response.success) {
+        setResponseText('');
+        setShowResponseModal(false);
+        setSelectedTicket(null);
+        
+        Alert.alert('Response Sent', 'Your response has been sent to the resident');
+        await loadSupportData();
+      } else {
+        throw new Error(response.message || 'Failed to send response');
+      }
+    } catch (error) {
+      console.error('Failed to send response:', error);
+      Alert.alert(
+        'Error',
+        error instanceof Error ? error.message : 'Failed to send response. Please try again.'
+      );
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const handleEscalateTicket = async (ticketId: string) => {
+    Alert.prompt(
+      'Escalate Ticket',
+      'Please provide a reason for escalation:',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Escalate',
+          onPress: async (reason) => {
+            try {
+              const response = await supportService.escalateTicket(ticketId, {
+                reason: reason || 'Manager escalation',
+                escalateTo: 'supervisor',
+              });
+              
+              if (response.success) {
+                Alert.alert('Ticket Escalated', 'Ticket has been escalated to supervisor');
+                await loadSupportData();
+              } else {
+                throw new Error(response.message || 'Failed to escalate ticket');
+              }
+            } catch (error) {
+              console.error('Failed to escalate ticket:', error);
+              Alert.alert(
+                'Error',
+                error instanceof Error ? error.message : 'Failed to escalate ticket. Please try again.'
+              );
+            }
+          }
+        }
+      ],
+      'plain-text'
+    );
   };
 
   const getPriorityColor = (priority: SupportTicket['priority']) => {
     switch (priority) {
-      case 'high':
-        return 'text-red-600';
-      case 'medium':
-        return 'text-yellow-600';
-      case 'low':
-        return 'text-green-600';
-      default:
-        return 'text-gray-600';
+      case 'high': return '#dc2626';
+      case 'medium': return '#f59e0b';
+      case 'low': return '#16a34a';
+      default: return '#6b7280';
     }
   };
 
   const getStatusColor = (status: SupportTicket['status']) => {
     switch (status) {
-      case 'open':
-        return 'text-red-600';
-      case 'in_progress':
-        return 'text-blue-600';
-      case 'pending_response':
-        return 'text-yellow-600';
-      case 'resolved':
-        return 'text-green-600';
-      default:
-        return 'text-gray-600';
+      case 'open': return '#dc2626';
+      case 'in_progress': return '#2563eb';
+      case 'pending_response': return '#f59e0b';
+      case 'resolved': return '#16a34a';
+      case 'closed': return '#6b7280';
+      default: return '#6b7280';
     }
   };
 
   const getStatusIcon = (status: SupportTicket['status']) => {
     switch (status) {
       case 'open':
-        return <AlertTriangle size={16} color="#dc2626" />;
+        return <AlertCircle size={16} color="#dc2626" />;
       case 'in_progress':
-        return <Clock size={16} color="#0284c7" />;
+        return <Clock size={16} color="#2563eb" />;
       case 'pending_response':
-        return <MessageSquare size={16} color="#d97706" />;
+        return <Timer size={16} color="#f59e0b" />;
       case 'resolved':
-        return <CheckCircle size={16} color="#059669" />;
+        return <CheckCircle size={16} color="#16a34a" />;
       default:
-        return <Clock size={16} color="#6b7280" />;
+        return <CheckCircle size={16} color="#6b7280" />;
     }
   };
 
-  const getFilterCount = (status: FilterStatus) => {
-    if (status === 'all') return tickets.length;
-    return tickets.filter((t) => t.status === status).length;
+  const getSLAStatusColor = (slaStatus: SupportTicket['slaStatus']) => {
+    switch (slaStatus) {
+      case 'on_track': return '#16a34a';
+      case 'at_risk': return '#f59e0b';
+      case 'breached': return '#dc2626';
+      default: return '#6b7280';
+    }
   };
 
-  return (
-    <RequireManager>
+  // Role check - only community managers can access
+  if (!user || user.role !== 'community_manager') {
+    return (
+      <View className="flex-1 justify-center items-center p-4 bg-gray-50">
+        <MessageSquare size={48} color="#6b7280" />
+        <Text className="text-lg font-semibold text-gray-900 mt-4 text-center">
+          Manager Access Required
+        </Text>
+        <Text className="text-gray-600 text-center mt-2">
+          This area is restricted to community managers only.
+        </Text>
+        <Button
+          onPress={() => router.replace('/(tabs)/')}
+          variant="primary"
+          className="mt-6"
+        >
+          Return to Dashboard
+        </Button>
+      </View>
+    );
+  }
+
+  const tickets = supportState.data?.tickets || [];
+  const stats = supportState.data?.stats;
+  const queueStats = supportState.data?.queueStats;
+
+  // Response Modal Component
+  const ResponseModal = () => (
+    <Modal visible={showResponseModal} animationType="slide" presentationStyle="pageSheet">
       <View className="flex-1 bg-gray-50">
-        <AdminHeader
-          title="Support Queue"
-          subtitle={`${tickets.filter((t) => t.status !== 'resolved').length} active tickets`}
-          showBack
-          showNotifications
-          showLogout
-          onLogout={handleLogout}
-        />
-
-        <ScrollView
-          className="flex-1"
-          refreshControl={
-            <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />
-          }
-          showsVerticalScrollIndicator={false}>
-          {/* Summary Stats */}
-          <View className="px-4 py-2">
-            <View className="flex-row flex-wrap gap-3 mb-4">
-              <Card className="flex-1 min-w-[120px] p-3">
-                <Text className="text-lg font-bold text-red-600">
-                  {getFilterCount('open')}
-                </Text>
-                <Text className="text-sm text-gray-600">Open</Text>
-              </Card>
-
-              <Card className="flex-1 min-w-[120px] p-3">
-                <Text className="text-lg font-bold text-blue-600">
-                  {getFilterCount('in_progress')}
-                </Text>
-                <Text className="text-sm text-gray-600">In Progress</Text>
-              </Card>
-
-              <Card className="flex-1 min-w-[120px] p-3">
-                <Text className="text-lg font-bold text-yellow-600">
-                  {getFilterCount('pending_response')}
-                </Text>
-                <Text className="text-sm text-gray-600">Pending</Text>
-              </Card>
-            </View>
-          </View>
-
-          {/* Filters */}
-          <View className="px-4 py-2">
-            <Text className="text-base font-semibold text-gray-900 mb-3">
-              Filter by Status
+        <View className="bg-white px-4 pt-12 pb-4 border-b border-gray-200">
+          <View className="flex-row items-center justify-between mb-2">
+            <Text className="text-xl font-bold text-gray-900">
+              Respond to Ticket
             </Text>
-
-            <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-              <View className="flex-row space-x-2 pb-2">
-                <FilterPill
-                  label="All"
-                  selected={filterStatus === 'all'}
-                  count={getFilterCount('all')}
-                  onPress={() => setFilterStatus('all')}
-                />
-                <FilterPill
-                  label="Open"
-                  selected={filterStatus === 'open'}
-                  count={getFilterCount('open')}
-                  onPress={() => setFilterStatus('open')}
-                />
-                <FilterPill
-                  label="In Progress"
-                  selected={filterStatus === 'in_progress'}
-                  count={getFilterCount('in_progress')}
-                  onPress={() => setFilterStatus('in_progress')}
-                />
-                <FilterPill
-                  label="Pending Response"
-                  selected={filterStatus === 'pending_response'}
-                  count={getFilterCount('pending_response')}
-                  onPress={() => setFilterStatus('pending_response')}
-                />
-                <FilterPill
-                  label="Resolved"
-                  selected={filterStatus === 'resolved'}
-                  count={getFilterCount('resolved')}
-                  onPress={() => setFilterStatus('resolved')}
-                />
-              </View>
-            </ScrollView>
+            <TouchableOpacity onPress={() => setShowResponseModal(false)}>
+              <Text className="text-blue-600 font-medium">Cancel</Text>
+            </TouchableOpacity>
           </View>
+          {selectedTicket && (
+            <Text className="text-gray-600">
+              #{selectedTicket.ticketNumber} • {selectedTicket.title}
+            </Text>
+          )}
+        </View>
 
-          {/* Tickets List */}
-          <View className="px-4 py-2 mb-6">
-            <View className="space-y-3">
-              {filteredTickets.map((ticket) => (
-                <Card key={ticket.id} className="p-4">
-                  {/* Header */}
-                  <View className="flex-row items-start justify-between mb-3">
-                    <View className="flex-1 mr-3">
-                      <Text className="text-base font-semibold text-gray-900 mb-1">
-                        {ticket.title}
-                      </Text>
-                      <Text className="text-sm text-gray-600 mb-2">
-                        {ticket.description}
-                      </Text>
-                    </View>
+        <ScrollView className="flex-1 p-4">
+          <Card className="p-4 mb-4">
+            <Text className="text-sm font-medium text-gray-900 mb-2">Response Message</Text>
+            <TextInput
+              value={responseText}
+              onChangeText={setResponseText}
+              placeholder="Type your response here..."
+              multiline
+              numberOfLines={6}
+              className="border border-gray-300 rounded-lg p-3 text-gray-900"
+              style={{ textAlignVertical: 'top' }}
+            />
+          </Card>
 
-                    <View className="items-end">
-                      <Text
-                        className={cn(
-                          'text-xs font-medium mb-1',
-                          getPriorityColor(ticket.priority),
-                        )}>
-                        {ticket.priority.toUpperCase()}
-                      </Text>
-                      <View className="flex-row items-center">
-                        {getStatusIcon(ticket.status)}
-                        <Text
-                          className={cn(
-                            'text-xs ml-1',
-                            getStatusColor(ticket.status),
-                          )}>
-                          {ticket.status.replace('_', ' ')}
-                        </Text>
-                      </View>
-                    </View>
-                  </View>
-
-                  {/* Society and Resident Info */}
-                  <View className="flex-row items-center justify-between mb-3">
-                    <View className="flex-row items-center">
-                      <Building2 size={14} color="#6b7280" />
-                      <Text className="text-sm text-gray-600 ml-1">
-                        {ticket.societyName}
-                      </Text>
-                    </View>
-
-                    <View className="flex-row items-center">
-                      <User size={14} color="#6b7280" />
-                      <Text className="text-sm text-gray-600 ml-1">
-                        {ticket.residentName}
-                      </Text>
-                    </View>
-                  </View>
-
-                  {/* Response Time */}
-                  {ticket.responseTime && (
-                    <View className="mb-3">
-                      <Text className="text-xs text-gray-500">
-                        Response time: {ticket.responseTime}h
-                      </Text>
-                    </View>
-                  )}
-
-                  {/* Actions */}
-                  <View className="flex-row gap-2 mt-3">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className="flex-1"
-                      onPress={() => {
-                        /* Handle view details */
-                      }}>
-                      View Details
-                    </Button>
-                    {ticket.status !== 'resolved' && (
-                      <Button
-                        variant="primary"
-                        size="sm"
-                        className="flex-1"
-                        onPress={() => {
-                          /* Handle respond */
-                        }}>
-                        Respond
-                      </Button>
-                    )}
-                  </View>
-
-                  {/* Timestamp */}
-                  <Text className="text-xs text-gray-400 mt-2">
-                    Created: {new Date(ticket.createdAt).toLocaleString()}
-                  </Text>
-                </Card>
-              ))}
-            </View>
-
-            {filteredTickets.length === 0 && (
-              <Card className="p-8 items-center">
-                <MessageSquare size={48} color="#6b7280" />
-                <Text className="text-gray-600 mt-4 text-center">
-                  No support tickets found
-                </Text>
-                {filterStatus !== 'all' && (
-                  <Button
-                    onPress={() => setFilterStatus('all')}
-                    variant="outline"
-                    className="mt-4">
-                    Clear Filters
-                  </Button>
-                )}
-              </Card>
-            )}
+          <View className="flex-row space-x-3">
+            <Button
+              variant="outline"
+              size="lg"
+              onPress={() => setShowResponseModal(false)}
+              className="flex-1"
+              disabled={submitting}
+            >
+              Cancel
+            </Button>
+            <Button
+              variant="primary"
+              size="lg"
+              onPress={handleSendResponse}
+              className="flex-1"
+              disabled={submitting || !responseText.trim()}
+            >
+              {submitting ? (
+                <View className="flex-row items-center">
+                  <LoadingSpinner size="small" color="#ffffff" className="mr-2" />
+                  <Text className="text-white">Sending...</Text>
+                </View>
+              ) : (
+                'Send Response'
+              )}
+            </Button>
           </View>
         </ScrollView>
       </View>
+    </Modal>
+  );
+
+  return (
+    <RequireManager>
+      <LoadingWrapper
+        isLoading={supportState.isLoading}
+        error={supportState.error}
+        onRetry={loadSupportData}
+        skeletonProps={{ type: 'card', count: 3 }}
+      >
+        <View className="flex-1 bg-gray-50">
+          <AdminHeader 
+            title="Support Queue" 
+            subtitle="Manage resident support tickets"
+            showBack
+          />
+          
+          <ScrollView
+            className="flex-1"
+            refreshControl={
+              <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+            }
+            showsVerticalScrollIndicator={false}
+          >
+            {/* Queue Statistics */}
+            {queueStats && (
+              <View className="px-4 py-4 bg-white border-b border-gray-200">
+                <Text className="text-lg font-semibold text-gray-900 mb-4">Queue Overview</Text>
+                
+                <View className="flex-row flex-wrap gap-3 mb-4">
+                  <Card className="flex-1 min-w-[120px] p-3">
+                    <View className="flex-row items-center justify-between mb-1">
+                      <MessageSquare size={20} color="#dc2626" />
+                      <Text className="text-xl font-bold text-gray-900">
+                        {queueStats.openTickets}
+                      </Text>
+                    </View>
+                    <Text className="text-xs font-medium text-gray-900">Open</Text>
+                  </Card>
+
+                  <Card className="flex-1 min-w-[120px] p-3">
+                    <View className="flex-row items-center justify-between mb-1">
+                      <Clock size={20} color="#2563eb" />
+                      <Text className="text-xl font-bold text-gray-900">
+                        {queueStats.inProgressTickets}
+                      </Text>
+                    </View>
+                    <Text className="text-xs font-medium text-gray-900">In Progress</Text>
+                  </Card>
+
+                  <Card className="flex-1 min-w-[120px] p-3">
+                    <View className="flex-row items-center justify-between mb-1">
+                      <Timer size={20} color="#f59e0b" />
+                      <Text className="text-xl font-bold text-gray-900">
+                        {queueStats.avgResponseTime}h
+                      </Text>
+                    </View>
+                    <Text className="text-xs font-medium text-gray-900">Avg Response</Text>
+                  </Card>
+
+                  <Card className="flex-1 min-w-[120px] p-3">
+                    <View className="flex-row items-center justify-between mb-1">
+                      <TrendingUp size={20} color="#16a34a" />
+                      <Text className="text-xl font-bold text-gray-900">
+                        {queueStats.resolutionRate}%
+                      </Text>
+                    </View>
+                    <Text className="text-xs font-medium text-gray-900">Resolution</Text>
+                  </Card>
+                </View>
+              </View>
+            )}
+
+            {/* Filter Controls */}
+            <View className="px-4 py-3 bg-white border-b border-gray-200">
+              <View className="flex-row space-x-2">
+                {[
+                  { key: 'all', label: 'All', count: supportState.data?.totalCount || 0 },
+                  { key: 'open', label: 'Open', count: queueStats?.openTickets || 0 },
+                  { key: 'in_progress', label: 'In Progress', count: queueStats?.inProgressTickets || 0 },
+                  { key: 'pending_response', label: 'Pending', count: queueStats?.pendingTickets || 0 },
+                ].map((status) => (
+                  <Button
+                    key={status.key}
+                    variant={filters.status === status.key ? 'primary' : 'outline'}
+                    size="sm"
+                    onPress={() => setFilters(prev => ({ ...prev, status: status.key as any }))}
+                    className="flex-1"
+                  >
+                    <Text className="text-xs">
+                      {status.label} ({status.count})
+                    </Text>
+                  </Button>
+                ))}
+              </View>
+            </View>
+
+            {/* Support Tickets List */}
+            <View className="px-4 py-4">
+              <Text className="text-lg font-semibold text-gray-900 mb-4">
+                Support Tickets ({tickets.length})
+              </Text>
+              
+              {tickets.length === 0 ? (
+                <Card className="p-6">
+                  <View className="items-center">
+                    <MessageSquare size={48} color="#9ca3af" />
+                    <Text className="text-lg font-medium text-gray-900 mt-4 mb-2">
+                      No Tickets Found
+                    </Text>
+                    <Text className="text-gray-600 text-center">
+                      No support tickets match your current filter criteria.
+                    </Text>
+                  </View>
+                </Card>
+              ) : (
+                <View className="space-y-3">
+                  {tickets.map((ticket) => (
+                    <TouchableOpacity
+                      key={ticket.id}
+                      onPress={() => handleTicketPress(ticket)}
+                    >
+                      <Card className="p-4">
+                        <View className="flex-row items-start justify-between mb-3">
+                          <View className="flex-1">
+                            <View className="flex-row items-center mb-1">
+                              <Text className="text-sm font-bold text-gray-900 mr-2">
+                                #{ticket.ticketNumber}
+                              </Text>
+                              <View 
+                                className="w-2 h-2 rounded-full mr-2"
+                                style={{ backgroundColor: getPriorityColor(ticket.priority) }}
+                              />
+                              <Text 
+                                className="text-xs font-medium px-2 py-1 rounded"
+                                style={{ 
+                                  backgroundColor: `${getPriorityColor(ticket.priority)}20`,
+                                  color: getPriorityColor(ticket.priority)
+                                }}
+                              >
+                                {ticket.priority.toUpperCase()}
+                              </Text>
+                            </View>
+                            <Text className="text-base font-semibold text-gray-900 mb-1">
+                              {ticket.title}
+                            </Text>
+                            <Text className="text-sm text-gray-600 mb-2">
+                              {ticket.societyName} • {ticket.residentName}
+                            </Text>
+                            <View className="flex-row items-center">
+                              <Tag size={12} color="#6b7280" />
+                              <Text className="text-xs text-gray-500 ml-1">
+                                {ticket.category}
+                              </Text>
+                            </View>
+                          </View>
+                          
+                          <View className="items-end">
+                            <View className="flex-row items-center mb-2">
+                              {getStatusIcon(ticket.status)}
+                              <Text 
+                                className="text-xs font-medium ml-1"
+                                style={{ color: getStatusColor(ticket.status) }}
+                              >
+                                {ticket.status.replace('_', ' ').toUpperCase()}
+                              </Text>
+                            </View>
+                            
+                            <View className="flex-row items-center">
+                              <View 
+                                className="w-2 h-2 rounded-full mr-1"
+                                style={{ backgroundColor: getSLAStatusColor(ticket.slaStatus) }}
+                              />
+                              <Text className="text-xs text-gray-500">
+                                SLA: {ticket.slaStatus.replace('_', ' ')}
+                              </Text>
+                            </View>
+                            
+                            <Text className="text-xs text-gray-400 mt-1">
+                              {new Date(ticket.createdAt).toLocaleDateString()}
+                            </Text>
+                          </View>
+                        </View>
+                        
+                        <View className="flex-row justify-between items-center pt-3 border-t border-gray-100">
+                          <View className="flex-row space-x-2">
+                            <TouchableOpacity
+                              onPress={() => handleStatusChange(ticket.id, 
+                                ticket.status === 'open' ? 'in_progress' : 'resolved'
+                              )}
+                              className="px-3 py-1 bg-blue-50 rounded"
+                            >
+                              <Text className="text-xs text-blue-700 font-medium">
+                                {ticket.status === 'open' ? 'Start Work' : 
+                                 ticket.status === 'in_progress' ? 'Resolve' : 'Update'}
+                              </Text>
+                            </TouchableOpacity>
+                            
+                            {ticket.priority !== 'high' && (
+                              <TouchableOpacity
+                                onPress={() => handlePriorityChange(ticket.id, 'high')}
+                                className="px-3 py-1 bg-red-50 rounded"
+                              >
+                                <Text className="text-xs text-red-700 font-medium">High Priority</Text>
+                              </TouchableOpacity>
+                            )}
+                            
+                            <TouchableOpacity
+                              onPress={() => handleEscalateTicket(ticket.id)}
+                              className="px-3 py-1 bg-gray-50 rounded"
+                            >
+                              <Text className="text-xs text-gray-700 font-medium">Escalate</Text>
+                            </TouchableOpacity>
+                          </View>
+                          
+                          {ticket.responseTime && (
+                            <Text className="text-xs text-gray-500">
+                              Response: {ticket.responseTime}h
+                            </Text>
+                          )}
+                        </View>
+                      </Card>
+                    </TouchableOpacity>
+                  ))}
+                </View>
+              )}
+            </View>
+          </ScrollView>
+
+          {/* Response Modal */}
+          <ResponseModal />
+        </View>
+      </LoadingWrapper>
     </RequireManager>
   );
 };
 
-// Add proper named export with displayName for React DevTools
-ManagerSupport.displayName = 'ManagerSupport';
+ManagerSupportSystem.displayName = 'ManagerSupportSystem';
 
-export default ManagerSupport;
+export default ManagerSupportSystem;

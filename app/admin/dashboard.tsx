@@ -22,7 +22,7 @@ import {
 import { useDirectAdmin } from '@/hooks/useDirectAdmin';
 import { useDirectAuth } from '@/hooks/useDirectAuth';
 import { RequireSuperAdmin } from '@/components/auth/RoleGuard';
-import { AdminHeader } from '@/components/admin/AdminHeader';
+import { StandardHeader } from '@/components/design-system';
 import { DashboardMetrics } from '@/components/admin/DashboardMetrics';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
@@ -204,11 +204,12 @@ function AdminDashboard() {
   return (
     <RequireSuperAdmin>
       <View className="flex-1 bg-gray-50">
-      <AdminHeader 
+      <StandardHeader 
         title="Admin Dashboard" 
         subtitle={`Welcome back, ${user?.fullName || user?.name || 'Admin'}`}
         showNotifications
         showLogout
+        showRoleIndicator
         onLogout={handleLogout}
       />
       
