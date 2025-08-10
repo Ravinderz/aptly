@@ -1,0 +1,26 @@
+# Authentication-specific helper functions
+# This file will contain reusable authentication flow utilities
+
+# Login helper function
+- loginUser:
+    - tapElement:
+        id: "auth.phone-input.field"
+    - inputText:
+        id: "auth.phone-input.field"
+        text: ${TEST_USER_PHONE}
+    - tapElement:
+        id: "auth.phone-input.submit-button"
+    - waitForElement:
+        id: "auth.otp-verification.screen"
+    - inputText:
+        id: "auth.otp-input.field"
+        text: ${TEST_USER_OTP}
+    - tapElement:
+        id: "auth.otp-verification.submit-button"
+
+# Logout helper function
+- logoutUser:
+    - tapElement:
+        id: "settings.logout.button"
+    - tapElement:
+        id: "confirm-logout.button"

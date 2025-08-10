@@ -1,9 +1,9 @@
-import React, { useEffect, useState, useCallback, useRef } from 'react';
-import { View, ActivityIndicator } from 'react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useDirectAuth } from '@/hooks/useDirectAuth';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useRouter, useSegments } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { ActivityIndicator, View } from 'react-native';
 
 const AppNavigator = ({
   children,
@@ -201,8 +201,8 @@ const AppNavigator = ({
   // Show loading spinner while checking auth or first launch
   if (isCheckingFirstLaunch || isLoading) {
     return (
-      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-        <ActivityIndicator size="large" color="#6366f1" />
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }} testID="app.loading">
+        <ActivityIndicator size="large" color="#6366f1" testID="app.loading.spinner" />
       </View>
     );
   }

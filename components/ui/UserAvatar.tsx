@@ -4,9 +4,10 @@ import { Text, View } from 'react-native';
 interface UserAvatarProps {
   name: string;
   size?: 'sm' | 'md' | 'lg' | number;
+  testID?: string;
 }
 
-const UserAvatar: React.FC<UserAvatarProps> = ({ name, size = 'md' }) => {
+const UserAvatar: React.FC<UserAvatarProps> = ({ name, size = 'md', testID }) => {
   const getLetters = (name: string) => {
     const names = name.split(' ');
     if (names.length > 1) {
@@ -26,7 +27,8 @@ const UserAvatar: React.FC<UserAvatarProps> = ({ name, size = 'md' }) => {
     return (
       <View
         className="bg-primary/10 rounded-full items-center justify-center"
-        style={{ width: size, height: size }}>
+        style={{ width: size, height: size }}
+        testID={testID}>
         <Text className="text-primary font-bold text-body-medium">
           {getLetters(name)}
         </Text>
@@ -36,7 +38,8 @@ const UserAvatar: React.FC<UserAvatarProps> = ({ name, size = 'md' }) => {
 
   return (
     <View
-      className={`bg-primary/10 rounded-full items-center justify-center ${sizeClasses[size as keyof typeof sizeClasses]}`}>
+      className={`bg-primary/10 rounded-full items-center justify-center ${sizeClasses[size as keyof typeof sizeClasses]}`}
+      testID={testID}>
       <Text className="text-primary font-bold">{getLetters(name)}</Text>
     </View>
   );

@@ -1,0 +1,26 @@
+# Navigation helper functions
+# This file will contain reusable navigation utilities
+
+# Navigate to tab
+- navigateToTab:
+    - tapElement:
+        id: "tab.${tabName}"
+    - waitForElement:
+        id: "${tabName}.screen"
+
+# Navigate back
+- navigateBack:
+    - tapElement:
+        id: "navigation.back-button"
+
+# Open modal
+- openModal:
+    - tapElement:
+        id: "${modalTrigger}"
+    - waitForElement:
+        id: "${modalId}"
+
+# Close modal
+- closeModal:
+    - tapElement:
+        id: "modal.close-button"

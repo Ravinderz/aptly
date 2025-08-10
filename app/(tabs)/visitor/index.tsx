@@ -1,37 +1,33 @@
+import { useAlert } from '@/components/ui/AlertCard';
 import AptlySearchBar from '@/components/ui/AptlySearchBar';
 import Header from '@/components/ui/Header';
+import { DatePickerModal, TimePickerModal } from '@/components/ui/pickers';
 import VisitorListItem from '@/components/ui/VisitorListItem';
 import VisitorQRModal from '@/components/ui/VisitorQRModal';
+import { formatDate } from '@/utils/dateUtils';
 import { router } from 'expo-router';
 import {
-  Calendar,
-  Filter,
+  CalendarDays,
+  Clock,
   Plus,
   Users,
-  X,
-  Clock,
-  CalendarDays,
-  Phone,
-  MessageSquare,
+  X
 } from 'lucide-react-native';
-import React, {
+import {
+  startTransition,
+  useCallback,
   useEffect,
   useState,
-  useCallback,
-  startTransition,
 } from 'react';
 import {
+  Modal,
   RefreshControl,
   ScrollView,
   Text,
+  TextInput,
   TouchableOpacity,
   View,
-  Modal,
-  TextInput,
 } from 'react-native';
-import { DatePickerModal, TimePickerModal } from '@/components/ui/pickers';
-import { formatDate } from '@/utils/dateUtils';
-import { useAlert } from '@/components/ui/AlertCard';
 
 interface Visitor {
   id: string;
@@ -339,24 +335,25 @@ export default function VisitorDashboard() {
     visitors.filter((v) => v.status === 'Pending').length;
 
   return (
-    <Header>
+    <Header testID="visitor.screen">
       {/* Enhanced Header with Stats */}
-      <View className="mb-6">
-        <View className="flex-row items-center justify-between mb-4">
-          <Text className="text-display-small font-bold text-text-primary">
+      <View className="mb-6" testID="visitor.header">
+        <View className="flex-row items-center justify-between mb-4" testID="visitor.header-row">
+          <Text className="text-display-small font-bold text-text-primary" testID="visitor.title">
             Visitors
           </Text>
           <TouchableOpacity
             onPress={handleAddVisitor}
-            className="bg-primary rounded-full w-12 h-12 items-center justify-center shadow-sm">
+            className="bg-primary rounded-full w-12 h-12 items-center justify-center shadow-sm"
+            testID="visitor.add-button">
             <Plus size={20} color="white" strokeWidth={2} />
           </TouchableOpacity>
         </View>
 
         {/* Enhanced Quick Stats */}
-        <View className="flex-row gap-3 mb-6">
+        <View className="flex-row gap-3 mb-6" testID="visitor.stats">
           {/* Upcoming Visitors */}
-          <View className="flex-1 bg-primary/10 border border-primary/20 rounded-xl p-4">
+          <View className="flex-1 bg-primary/10 border border-primary/20 rounded-xl p-4" testID="visitor.stats.upcoming">
             <View className="flex-row items-center justify-between mb-2">
               <Text className="text-display-small font-bold text-primary">
                 {getUpcomingCount()}
@@ -372,7 +369,7 @@ export default function VisitorDashboard() {
           </View>
 
           {/* Pending Approval */}
-          <View className="flex-1 bg-warning/10 border border-warning/20 rounded-xl p-4">
+          <View className="flex-1 bg-warning/10 border border-warning/20 rounded-xl p-4" testID="visitor.stats.pending">
             <View className="flex-row items-center justify-between mb-2">
               <Text className="text-display-small font-bold text-warning">
                 {getPendingCount()}
@@ -388,7 +385,7 @@ export default function VisitorDashboard() {
           </View>
 
           {/* Today's Visits */}
-          <View className="flex-1 bg-success/10 border border-success/20 rounded-xl p-4">
+          <View className="flex-1 bg-success/10 border border-success/20 rounded-xl p-4" testID="visitor.stats.today">
             <View className="flex-row items-center justify-between mb-2">
               <Text className="text-display-small font-bold text-success">
                 {visitors.filter((v) => v.date === 'Today').length}
@@ -406,21 +403,23 @@ export default function VisitorDashboard() {
       </View>
 
       {/* Search Bar */}
-      <View className="mb-4">
+      <View className="mb-4" testID="visitor.search-section">
         <AptlySearchBar
           placeholder="Search visitors, purpose..."
           value={searchQuery}
           onChangeText={setSearchQuery}
           onClear={() => setSearchQuery('')}
+          testID="visitor.search-bar"
         />
       </View>
 
       {/* Filter Pills - Status */}
-      <View className="mb-4">
+      <View className="mb-4" testID="visitor.status-filters">
         <ScrollView
           horizontal
           showsHorizontalScrollIndicator={false}
-          contentContainerStyle={{ paddingRight: 16 }}>
+          contentContainerStyle={{ paddingRight: 16 }}
+          testID="visitor.status-filters.scroll">
           {FILTER_OPTIONS.map((filter) => (
             <TouchableOpacity
               key={filter.key}
@@ -430,7 +429,8 @@ export default function VisitorDashboard() {
                   ? 'bg-primary border-primary'
                   : 'bg-surface border-divider'
               }`}
-              activeOpacity={0.7}>
+              activeOpacity={0.7}
+              testID={`visitor.status-filter.${filter.key}`}>
               <Text
                 className={`text-body-medium font-medium ${
                   selectedFilter === filter.key
@@ -488,9 +488,10 @@ export default function VisitorDashboard() {
         refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }
-        showsVerticalScrollIndicator={false}>
+        showsVerticalScrollIndicator={false}
+        testID="visitor.list">
         {loading ? (
-          <View className="flex-1 items-center justify-center py-12">
+          <View className="flex-1 items-center justify-center py-12" testID="visitor.loading">
             <Text className="text-text-secondary">Loading visitors...</Text>
           </View>
         ) : filteredVisitors.length > 0 ? (
@@ -515,6 +516,7 @@ export default function VisitorDashboard() {
                 onApprove={() => handleVisitorAction(visitor, 'approve')}
                 onReject={() => handleVisitorAction(visitor, 'reject')}
                 handleClick={() => handleVisitorAction(visitor, 'view')}
+                testID={`visitor.item.${visitor.id}`}
               />
             ))}
           </>

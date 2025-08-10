@@ -1,0 +1,35 @@
+# Test content data for posts, notices, and visitor information
+
+testContent:
+  posts:
+    - title: "Community Event Announcement"
+      content: "Join us for the annual community gathering this weekend!"
+      author: "Test Resident"
+      
+    - title: "Maintenance Notice"
+      content: "Water supply will be interrupted tomorrow from 10 AM to 2 PM"
+      author: "Test Admin"
+
+  visitors:
+    - name: "John Visitor"
+      phone: "+1234567894"
+      purpose: "Delivery"
+      expectedTime: "2024-01-15T10:00:00Z"
+      
+    - name: "Jane Guest"
+      phone: "+1234567895"
+      purpose: "Personal Visit"
+      expectedTime: "2024-01-15T14:00:00Z"
+
+  notices:
+    - title: "Important Security Update"
+      content: "New security protocols are now in effect"
+      priority: "high"
+      
+    - title: "Parking Guidelines"
+      content: "Please follow the new parking guidelines"
+      priority: "medium"
+      
+    - title: "Community Newsletter"
+      content: "Monthly newsletter is now available"
+      priority: "low"

@@ -1,12 +1,11 @@
 import { Tabs } from 'expo-router';
 import {
-  Building2,
-  House,
-  PencilRuler,
-  Settings2,
-  Users2,
+    Building2,
+    House,
+    PencilRuler,
+    Settings2,
+    Users2,
 } from 'lucide-react-native';
-import React from 'react';
 import { Platform } from 'react-native';
 
 export default function TabLayout() {
@@ -27,6 +26,7 @@ export default function TabLayout() {
             height: 70,
           },
         }),
+        tabBarTestID: 'nav.tab-bar',
       }}>
       <Tabs.Screen
         name="index"
@@ -36,6 +36,7 @@ export default function TabLayout() {
           tabBarIcon: ({ focused, color }) => (
             <House size={18} color={focused ? activeColor : color} />
           ),
+          tabBarTestID: 'nav.tab.home',
         }}
       />
       <Tabs.Screen
@@ -46,6 +47,7 @@ export default function TabLayout() {
           tabBarIcon: ({ focused, color }) => (
             <Users2 size={18} color={focused ? activeColor : color} />
           ),
+          tabBarTestID: 'nav.tab.visitor',
         }}
       />
       <Tabs.Screen
@@ -56,6 +58,7 @@ export default function TabLayout() {
           tabBarIcon: ({ focused, color }) => (
             <Building2 size={18} color={focused ? activeColor : color} />
           ),
+          tabBarTestID: 'nav.tab.community',
         }}
       />
       <Tabs.Screen
@@ -66,6 +69,7 @@ export default function TabLayout() {
           tabBarIcon: ({ focused, color }) => (
             <PencilRuler size={18} color={focused ? activeColor : color} />
           ),
+          tabBarTestID: 'nav.tab.services',
         }}
       />
       <Tabs.Screen
@@ -76,6 +80,7 @@ export default function TabLayout() {
           tabBarIcon: ({ focused, color }) => (
             <Settings2 size={18} color={focused ? activeColor : color} />
           ),
+          tabBarTestID: 'nav.tab.settings',
         }}
       />
       <Tabs.Screen

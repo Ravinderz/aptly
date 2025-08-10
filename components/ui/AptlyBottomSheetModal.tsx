@@ -1,7 +1,7 @@
 import {
-  BottomSheetModal,
-  BottomSheetModalProvider,
-  BottomSheetView,
+    BottomSheetModal,
+    BottomSheetModalProvider,
+    BottomSheetView,
 } from '@gorhom/bottom-sheet';
 import { Image } from 'expo-image';
 import { CircleX, Download, Share2 } from 'lucide-react-native';
@@ -21,7 +21,7 @@ const AptlyBottomSheetModal = ({ ref }: AptlyBottomSheetModalProps) => {
 
   // renders
   return (
-    <GestureHandlerRootView style={styles.container}>
+    <GestureHandlerRootView style={styles.container} testID="modal.bottom-sheet.container">
       <BottomSheetModalProvider>
         <BottomSheetModal
           ref={bottomSheetModalRef}
@@ -29,14 +29,14 @@ const AptlyBottomSheetModal = ({ ref }: AptlyBottomSheetModalProps) => {
           stackBehavior="push"
           containerStyle={{ zIndex: 2 }}
           snapPoints={['90%']}>
-          <BottomSheetView style={styles.contentContainer}>
-            <View className="w-full px-4">
-              <View className="flex flex-row justify-between items-center pb-3 ">
-                <View className="flex flex-row gap-2 items-center ">
-                  <Text className="text-2xl font-bold bg-accent_secondary text-white rounded-full flex items-center justify-center p-3">
+          <BottomSheetView style={styles.contentContainer} testID="modal.bottom-sheet.content">
+            <View className="w-full px-4" testID="modal.bottom-sheet.wrapper">
+              <View className="flex flex-row justify-between items-center pb-3" testID="modal.bottom-sheet.header">
+                <View className="flex flex-row gap-2 items-center" testID="modal.bottom-sheet.visitor-info">
+                  <Text className="text-2xl font-bold bg-accent_secondary text-white rounded-full flex items-center justify-center p-3" testID="modal.bottom-sheet.avatar">
                     {getLetters(selectedVisitor?.name as string)}
                   </Text>
-                  <Text className="text-xl font-semibold">
+                  <Text className="text-xl font-semibold" testID="modal.bottom-sheet.visitor-name">
                     {selectedVisitor?.name}
                   </Text>
                 </View>
@@ -45,6 +45,7 @@ const AptlyBottomSheetModal = ({ ref }: AptlyBottomSheetModalProps) => {
                   color="black"
                   strokeWidth={1.5}
                   onPress={() => bottomSheetModalRef.current?.dismiss()}
+                  testID="modal.bottom-sheet.close-button"
                 />
               </View>
               <View className="flex items-center justify-center">

@@ -1,10 +1,10 @@
 import {
-  CalendarDays,
-  Check,
-  Clock,
-  Eye,
-  MessageSquare,
-  X,
+    CalendarDays,
+    Check,
+    Clock,
+    Eye,
+    MessageSquare,
+    X,
 } from 'lucide-react-native';
 import React from 'react';
 import { Text, TouchableOpacity, View } from 'react-native';
@@ -23,6 +23,7 @@ interface VisitorListItemProps {
   onApprove?: () => void;
   onReject?: () => void;
   handleClick?: any;
+  testID?: string;
 }
 
 const VisitorListItem: React.FC<VisitorListItemProps> = ({
@@ -38,6 +39,7 @@ const VisitorListItem: React.FC<VisitorListItemProps> = ({
   onApprove,
   onReject,
   handleClick,
+  testID,
 }) => {
   const getStatusConfig = (status: string) => {
     switch (status) {
@@ -78,13 +80,13 @@ const VisitorListItem: React.FC<VisitorListItemProps> = ({
   const statusConfig = getStatusConfig(status);
 
   return (
-    <View className="bg-surface border border-divider rounded-xl p-4 mb-3">
+    <View className="bg-surface border border-divider rounded-xl p-4 mb-3" testID={testID}>
       {/* Main Content */}
-      <View className="flex-row">
+      <View className="flex-row" testID={testID ? `${testID}.content` : undefined}>
         {/* Avatar and Info */}
-        <View className="flex-1">
+        <View className="flex-1" testID={testID ? `${testID}.info` : undefined}>
           <View className="flex-row items-start">
-            <UserAvatar name={name} size={44} />
+            <UserAvatar name={name} size={44} testID={testID ? `${testID}.avatar` : undefined} />
             <View className="ml-3 flex-1">
               {/* Name and Category */}
               <View className="flex-row items-center justify-between mb-1">
@@ -152,7 +154,8 @@ const VisitorListItem: React.FC<VisitorListItemProps> = ({
               <TouchableOpacity
                 className="flex-1 py-3 bg-green-600 rounded-lg flex-row items-center justify-center mr-2"
                 onPress={onApprove}
-                activeOpacity={0.8}>
+                activeOpacity={0.8}
+                testID={testID ? `${testID}.approve-button` : undefined}>
                 <Check size={16} color="white" strokeWidth={2} />
                 <Text className="text-label-large font-semibold text-white ml-2">
                   Approve
@@ -161,7 +164,8 @@ const VisitorListItem: React.FC<VisitorListItemProps> = ({
               <TouchableOpacity
                 className="flex-1 py-3 bg-surface border border-divider rounded-lg flex-row items-center justify-center"
                 onPress={onReject}
-                activeOpacity={0.7}>
+                activeOpacity={0.7}
+                testID={testID ? `${testID}.reject-button` : undefined}>
                 <X size={16} className="text-red-600" strokeWidth={2} />
                 <Text className="text-label-large font-medium text-red-600 ml-2">
                   Deny
@@ -178,7 +182,8 @@ const VisitorListItem: React.FC<VisitorListItemProps> = ({
               <TouchableOpacity
                 className="flex-1 py-3 bg-primary rounded-lg flex-row items-center justify-center mr-2"
                 onPress={onViewQR}
-                activeOpacity={0.8}>
+                activeOpacity={0.8}
+                testID={testID ? `${testID}.view-qr-button` : undefined}>
                 <Eye size={16} color="white" strokeWidth={1.5} />
                 <Text className="text-label-large font-semibold text-white ml-2">
                   View QR
@@ -187,7 +192,8 @@ const VisitorListItem: React.FC<VisitorListItemProps> = ({
               <TouchableOpacity
                 className="flex-1 py-3 bg-surface border border-divider rounded-lg flex-row items-center justify-center"
                 onPress={handleClick}
-                activeOpacity={0.7}>
+                activeOpacity={0.7}
+                testID={testID ? `${testID}.reschedule-button` : undefined}>
                 <CalendarDays
                   size={16}
                   className="text-text-secondary"

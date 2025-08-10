@@ -1,0 +1,50 @@
+# Test user data for different roles and scenarios
+
+testUsers:
+  resident:
+    phone: "+1234567890"
+    otp: "123456"
+    profile:
+      name: "Test Resident"
+      email: "resident@test.com"
+      apartment: "A-101"
+    society:
+      name: "Test Society"
+      code: "TEST123"
+    role: "resident"
+
+  admin:
+    phone: "+1234567891"
+    otp: "123456"
+    profile:
+      name: "Test Admin"
+      email: "admin@test.com"
+      apartment: "A-102"
+    society:
+      name: "Test Society"
+      code: "TEST123"
+    role: "admin"
+
+  security:
+    phone: "+1234567892"
+    otp: "123456"
+    profile:
+      name: "Test Security"
+      email: "security@test.com"
+      apartment: "Security Office"
+    society:
+      name: "Test Society"
+      code: "TEST123"
+    role: "security"
+
+  manager:
+    phone: "+1234567893"
+    otp: "123456"
+    profile:
+      name: "Test Manager"
+      email: "manager@test.com"
+      apartment: "Manager Office"
+    society:
+      name: "Test Society"
+      code: "TEST123"
+    role: "manager"

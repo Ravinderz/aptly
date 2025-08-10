@@ -1,6 +1,9 @@
-import { useRouter, useLocalSearchParams } from 'expo-router';
-import { ArrowLeft, Shield, RefreshCw } from 'lucide-react-native';
-import React, { useState, useEffect, useRef } from 'react';
+import { Button } from '@/components/ui/Button';
+import { AuthService } from '@/services';
+import { showErrorAlert, showSuccessAlert } from '@/utils/alert';
+import { useLocalSearchParams, useRouter } from 'expo-router';
+import { ArrowLeft, RefreshCw, Shield } from 'lucide-react-native';
+import { useEffect, useRef, useState } from 'react';
 import {
   SafeAreaView,
   Text,
@@ -8,9 +11,6 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import { Button } from '@/components/ui/Button';
-import { AuthService } from '@/services';
-import { showErrorAlert, showSuccessAlert } from '@/utils/alert';
 
 export default function OTPVerification() {
   const router = useRouter();
@@ -154,38 +154,38 @@ export default function OTPVerification() {
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-background">
+    <SafeAreaView className="flex-1 bg-background" testID="auth.otp-verification.screen">
       {/* Header */}
-      <View className="flex-row items-center px-4 py-4">
-        <TouchableOpacity onPress={() => router.back()} className="mr-4">
+      <View className="flex-row items-center px-4 py-4" testID="auth.otp-verification.header">
+        <TouchableOpacity onPress={() => router.back()} className="mr-4" testID="auth.otp-verification.back-button">
           <ArrowLeft size={24} color="#212121" />
         </TouchableOpacity>
-        <Text className="text-xl font-bold text-text-primary">Verify OTP</Text>
+        <Text className="text-xl font-bold text-text-primary" testID="auth.otp-verification.title">Verify OTP</Text>
       </View>
 
-      <View className="flex-1 px-6 py-8">
+      <View className="flex-1 px-6 py-8" testID="auth.otp-verification.content">
         {/* Header Section */}
-        <View className="items-center mb-8">
-          <View className="bg-primary/10 rounded-full w-20 h-20 items-center justify-center mb-4">
+        <View className="items-center mb-8" testID="auth.otp-verification.welcome">
+          <View className="bg-primary/10 rounded-full w-20 h-20 items-center justify-center mb-4" testID="auth.otp-verification.icon">
             <Shield size={32} color="#6366f1" />
           </View>
-          <Text className="text-2xl font-bold text-text-primary mb-2 text-center">
+          <Text className="text-2xl font-bold text-text-primary mb-2 text-center" testID="auth.otp-verification.welcome-title">
             Verify Your Number
           </Text>
-          <Text className="text-text-secondary text-center leading-6 mb-2">
+          <Text className="text-text-secondary text-center leading-6 mb-2" testID="auth.otp-verification.welcome-subtitle">
             We've sent a 6-digit verification code to
           </Text>
-          <Text className="text-text-primary font-semibold">
+          <Text className="text-text-primary font-semibold" testID="auth.otp-verification.phone-number">
             {formatPhoneNumber(phoneNumber || '')}
           </Text>
         </View>
 
         {/* OTP Input Section */}
-        <View className="mb-6">
-          <Text className="text-text-primary font-semibold mb-4 text-center">
+        <View className="mb-6" testID="auth.otp-verification.otp-section">
+          <Text className="text-text-primary font-semibold mb-4 text-center" testID="auth.otp-verification.otp-label">
             Enter Verification Code
           </Text>
-          <View className="flex-row justify-between mb-4">
+          <View className="flex-row justify-between mb-4" testID="auth.otp-verification.otp-inputs">
             {otp.map((digit, index) => (
               <TextInput
                 key={index}
@@ -201,12 +201,13 @@ export default function OTPVerification() {
                 keyboardType="number-pad"
                 maxLength={1}
                 selectTextOnFocus={true}
+                testID={`auth.otp-verification.otp-input-${index}`}
               />
             ))}
           </View>
 
           {error && (
-            <Text className="text-error text-sm text-center mb-4">{error}</Text>
+            <Text className="text-error text-sm text-center mb-4" testID="auth.otp-verification.error">{error}</Text>
           )}
         </View>
 
@@ -215,13 +216,14 @@ export default function OTPVerification() {
           onPress={() => handleVerifyOTP()}
           loading={isLoading}
           disabled={isLoading || otp.some((digit) => !digit)}
-          className="mb-6">
+          className="mb-6"
+          testID="auth.otp-verification.verify-button">
           Verify OTP
         </Button>
 
         {/* Resend Section */}
-        <View className="items-center">
-          <Text className="text-text-secondary mb-4">
+        <View className="items-center" testID="auth.otp-verification.resend-section">
+          <Text className="text-text-secondary mb-4" testID="auth.otp-verification.resend-label">
             Didn't receive the code?
           </Text>
 
@@ -229,7 +231,8 @@ export default function OTPVerification() {
             <TouchableOpacity
               onPress={handleResendOTP}
               disabled={isResending}
-              className="flex-row items-center">
+              className="flex-row items-center"
+              testID="auth.otp-verification.resend-button">
               <RefreshCw
                 size={16}
                 color="#6366f1"
@@ -240,7 +243,7 @@ export default function OTPVerification() {
               </Text>
             </TouchableOpacity>
           ) : (
-            <Text className="text-text-secondary">
+            <Text className="text-text-secondary" testID="auth.otp-verification.resend-timer">
               Resend OTP in {timeLeft}s
             </Text>
           )}

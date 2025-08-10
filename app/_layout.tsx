@@ -20,7 +20,7 @@ function RootLayout() {
 
   return (
     <StoreInitializer environment={__DEV__ ? 'development' : 'production'}>
-      <SafeAreaView style={{ flex: 1 }}>
+      <SafeAreaView style={{ flex: 1 }} testID="app.root">
         <AppNavigator>
           <Stack screenOptions={{ headerShown: false }}>
             <Stack.Screen name="index" options={{ headerShown: false }} />

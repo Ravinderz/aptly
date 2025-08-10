@@ -1,5 +1,5 @@
 import React, { forwardRef } from 'react';
-import { TextInput, View, Text, TextInputProps } from 'react-native';
+import { Text, TextInput, TextInputProps, View } from 'react-native';
 import { cn } from '../../utils/cn';
 
 export interface InputProps extends TextInputProps {
@@ -12,6 +12,7 @@ export interface InputProps extends TextInputProps {
   rightIcon?: React.ReactNode;
   className?: string;
   containerClassName?: string;
+  testID?: string;
 }
 
 const inputVariants = {
@@ -38,14 +39,18 @@ export const Input = forwardRef<TextInput, InputProps>(
       rightIcon,
       className,
       containerClassName,
+      testID,
       ...props
     },
     ref,
   ) => {
     return (
-      <View className={cn('w-full', containerClassName)}>
+      <View className={cn('w-full', containerClassName)} testID={testID ? `${testID}.container` : undefined}>
         {label && (
-          <Text className="text-text-primary text-label-medium font-medium mb-2">
+          <Text 
+            className="text-text-primary text-label-medium font-medium mb-2"
+            testID={testID ? `${testID}.label` : undefined}
+          >
             {label}
           </Text>
         )}
@@ -59,6 +64,7 @@ export const Input = forwardRef<TextInput, InputProps>(
 
           <TextInput
             ref={ref}
+            testID={testID ? `${testID}.field` : undefined}
             className={cn(
               'rounded-lg text-text-primary font-inter',
               inputVariants[variant],
@@ -84,7 +90,9 @@ export const Input = forwardRef<TextInput, InputProps>(
             className={cn(
               'text-label-small mt-1',
               error ? 'text-error' : 'text-text-secondary',
-            )}>
+            )}
+            testID={testID ? `${testID}.${error ? 'error' : 'helper'}` : undefined}
+          >
             {error || helperText}
           </Text>
         )}

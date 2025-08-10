@@ -7,12 +7,12 @@ import UpcomingVisitorSection from '@/components/UpcomingVisitorSection';
 
 export default function HomePage() {
   return (
-    <Header>
-      <NoticeSection />
-      <UpcomingVisitorSection />
-      <BillerSection />
-      <QuickActions />
-      <SocietyOverview />
+    <Header testID="home.screen">
+      <NoticeSection testID="home.notices" />
+      <UpcomingVisitorSection testID="home.upcoming-visitors" />
+      <BillerSection testID="home.billers" />
+      <QuickActions testID="home.quick-actions" />
+      <SocietyOverview testID="home.society-overview" />
     </Header>
   );
 }

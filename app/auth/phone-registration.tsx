@@ -1,31 +1,27 @@
-import { useRouter, useLocalSearchParams } from 'expo-router';
-import React, { useState, useEffect } from 'react';
+import { ValidatedInput } from '@/components/forms/ValidatedInput';
+import { Button } from '@/components/ui/Button';
+import LucideIcons from '@/components/ui/LucideIcons';
 import {
+  ResponsiveContainer,
+  ResponsiveText
+} from '@/components/ui/ResponsiveContainer';
+import { useDirectAuth } from '@/hooks/useDirectAuth';
+import { useFormValidation } from '@/hooks/useFormValidation';
+import { AuthService, BiometricService } from '@/services';
+import { useFeatureFlagStore } from '@/stores/slices/featureFlagStore';
+import { showErrorAlert } from '@/utils/alert';
+import { responsive } from '@/utils/responsive';
+import { PhoneRegistrationForm, phoneRegistrationSchema, phoneSchema } from '@/utils/validation.enhanced';
+import { useLocalSearchParams, useRouter } from 'expo-router';
+import { useEffect, useState } from 'react';
+import {
+  KeyboardAvoidingView,
+  Platform,
   SafeAreaView,
   Text,
   TouchableOpacity,
-  View,
-  KeyboardAvoidingView,
-  Platform,
-  Alert,
+  View
 } from 'react-native';
-import { Button } from '@/components/ui/Button';
-import {
-  ResponsiveContainer,
-  ResponsiveCard,
-  ResponsiveRow,
-  ResponsiveText,
-} from '@/components/ui/ResponsiveContainer';
-import LucideIcons from '@/components/ui/LucideIcons';
-import { ValidatedInput } from '@/components/forms/ValidatedInput';
-import { AuthService } from '@/services';
-import { BiometricService } from '@/services';
-import { useDirectAuth } from '@/hooks/useDirectAuth';
-import { useFeatureFlagStore } from '@/stores/slices/featureFlagStore';
-import { useFormValidation } from '@/hooks/useFormValidation';
-import { phoneRegistrationSchema, PhoneRegistrationForm, phoneSchema } from '@/utils/validation.enhanced';
-import { showErrorAlert } from '@/utils/alert';
-import { responsive, responsiveClasses, layoutUtils } from '@/utils/responsive';
 
 export default function PhoneRegistration() {
   const router = useRouter();
@@ -190,16 +186,17 @@ export default function PhoneRegistration() {
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-background">
+    <SafeAreaView className="flex-1 bg-background" testID="auth.phone-registration.screen">
       <KeyboardAvoidingView
         className="flex-1"
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        testID="auth.phone-registration.keyboard-view">
         {/* Header */}
-        <View className="flex-row items-center px-4 py-4">
-          <TouchableOpacity onPress={() => router.back()} className="mr-4">
+        <View className="flex-row items-center px-4 py-4" testID="auth.phone-registration.header">
+          <TouchableOpacity onPress={() => router.back()} className="mr-4" testID="auth.phone-registration.back-button">
             <LucideIcons name="arrow-left" size={24} color="#212121" />
           </TouchableOpacity>
-          <Text className="text-xl font-bold text-text-primary">
+          <Text className="text-xl font-bold text-text-primary" testID="auth.phone-registration.title">
             {isSignIn ? 'Sign In' : 'Sign Up'}
           </Text>
         </View>
@@ -208,15 +205,17 @@ export default function PhoneRegistration() {
           type="scroll"
           padding="lg"
           keyboardAware={true}
-          preventOverflow={true}>
+          preventOverflow={true}
+          testID="auth.phone-registration.content">
           {/* Welcome Section */}
-          <View className="items-center mb-8">
+          <View className="items-center mb-8" testID="auth.phone-registration.welcome">
             <View
               className="bg-primary/10 rounded-full items-center justify-center mb-4"
               style={{
                 width: responsive.spacing(64),
                 height: responsive.spacing(64),
-              }}>
+              }}
+              testID="auth.phone-registration.icon">
               <LucideIcons
                 name="call-outline"
                 size={responsive.spacing(32)}
@@ -226,13 +225,15 @@ export default function PhoneRegistration() {
             <ResponsiveText
               variant="display"
               size="small"
-              className="font-bold mb-2 text-center">
+              className="font-bold mb-2 text-center"
+              testID="auth.phone-registration.welcome-title">
               Welcome to Aptly
             </ResponsiveText>
             <ResponsiveText
               variant="body"
               size="medium"
-              className="text-text-secondary text-center">
+              className="text-text-secondary text-center"
+              testID="auth.phone-registration.welcome-subtitle">
               {isSignIn
                 ? 'Enter your registered mobile number and society code to sign in'
                 : 'Enter your mobile number and society code to get started with your housing society management'}
@@ -240,9 +241,9 @@ export default function PhoneRegistration() {
           </View>
 
           {/* Enhanced Phone Number Input with Validation */}
-          <View className="mb-6">
-            <View className="flex-row items-center bg-surface rounded-xl border border-divider px-4 py-4">
-              <Text className="text-text-primary font-medium mr-3">🇮🇳 +91</Text>
+          <View className="mb-6" testID="auth.phone-registration.phone-section">
+            <View className="flex-row items-center bg-surface rounded-xl border border-divider px-4 py-4" testID="auth.phone-registration.phone-container">
+              <Text className="text-text-primary font-medium mr-3" testID="auth.phone-registration.country-code">🇮🇳 +91</Text>
               <View className="h-6 w-px bg-divider mr-3" />
               <ValidatedInput
                 label=""
@@ -260,15 +261,17 @@ export default function PhoneRegistration() {
                     : "We'll send an OTP to verify your number"
                 }
                 validationSchema={phoneSchema}
+                testID="auth.phone-registration.phone-input"
               />
             </View>
           </View>
 
           {/* Terms Agreement Checkbox */}
-          <View className="mb-8 flex-row items-start">
+          <View className="mb-8 flex-row items-start" testID="auth.phone-registration.terms-section">
             <TouchableOpacity
               onPress={() => setValue('agreeToTerms', !fields.agreeToTerms.value)}
-              className="mr-3 mt-1">
+              className="mr-3 mt-1"
+              testID="auth.phone-registration.terms-checkbox">
               <View className={`w-5 h-5 border-2 rounded ${
                 fields.agreeToTerms.value 
                   ? 'bg-primary border-primary' 
@@ -281,7 +284,8 @@ export default function PhoneRegistration() {
             </TouchableOpacity>
             <TouchableOpacity
               onPress={() => setValue('agreeToTerms', !fields.agreeToTerms.value)}
-              className="flex-1">
+              className="flex-1"
+              testID="auth.phone-registration.terms-text">
               <Text className="text-text-secondary text-sm">
                 I agree to the{' '}
                 <Text className="text-primary underline">Terms & Conditions</Text>
@@ -299,14 +303,15 @@ export default function PhoneRegistration() {
             onPress={() => handleSubmit(handleFormSubmit)}
             loading={isSubmitting}
             disabled={!isValid || isSubmitting}
-            className="mb-6">
+            className="mb-6"
+            testID="auth.phone-registration.send-otp-button">
             Send OTP
           </Button>
 
           {/* Biometric Login Option */}
           {biometricAuthEnabled && showBiometricOption && (
-              <View className="mb-6">
-                <View className="flex-row items-center mb-4">
+              <View className="mb-6" testID="auth.phone-registration.biometric-section">
+                <View className="flex-row items-center mb-4" testID="auth.phone-registration.divider">
                   <View className="flex-1 h-px bg-divider" />
                   <Text className="text-text-secondary text-sm mx-4">or</Text>
                   <View className="flex-1 h-px bg-divider" />
@@ -316,7 +321,8 @@ export default function PhoneRegistration() {
                   onPress={handleBiometricLogin}
                   disabled={isBiometricLoading}
                   className="bg-surface border border-primary/20 rounded-xl p-4 flex-row items-center justify-center"
-                  activeOpacity={0.8}>
+                  activeOpacity={0.8}
+                  testID="auth.phone-registration.biometric-button">
                   <View className="bg-primary/10 rounded-full w-10 h-10 items-center justify-center mr-3">
                     <LucideIcons name="fingerprint" size={20} color="#6366f1" />
                   </View>

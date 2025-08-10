@@ -1,9 +1,9 @@
 import { useDirectAuth } from '@/hooks/useDirectAuth';
-import { ArrowLeft, Bell, HelpCircle, MapPin } from 'lucide-react-native';
-import React, { useEffect, useRef, useState } from 'react';
-import { Animated, Text, View } from 'react-native';
-import { router } from 'expo-router';
 import { navigateWithReset } from '@/utils/navigation';
+import { router } from 'expo-router';
+import { ArrowLeft, Bell, HelpCircle, MapPin } from 'lucide-react-native';
+import { useEffect, useRef, useState } from 'react';
+import { Animated, Text, View } from 'react-native';
 import HeaderAction from './HeaderAction';
 
 interface TabHeaderProps {
@@ -15,6 +15,7 @@ interface TabHeaderProps {
   subtitle?: string;
   showBackButton?: boolean;
   onBackPress?: () => void;
+  testID?: string;
 }
 
 export default function TabHeader({
@@ -26,6 +27,7 @@ export default function TabHeader({
   subtitle,
   showBackButton = false,
   onBackPress,
+  testID,
 }: TabHeaderProps) {
   const { user } = useDirectAuth();
   const [mounted, setMounted] = useState(false);
@@ -93,8 +95,9 @@ export default function TabHeader({
         opacity: fadeAnim,
         transform: [{ translateY: slideAnim }],
       }}
-      className="bg-surface border-b border-divider shadow-sm shadow-primary/5">
-      <View className="flex-row items-center justify-between px-6 py-4 pt-6">
+      className="bg-surface border-b border-divider shadow-sm shadow-primary/5"
+      testID={testID}>
+      <View className="flex-row items-center justify-between px-6 py-4 pt-6" testID={testID ? `${testID}.container` : undefined}>
         {/* Back Button */}
         {showBackButton && (
           <HeaderAction
@@ -102,11 +105,12 @@ export default function TabHeader({
             onPress={handleBackPress}
             size={20}
             className="mr-3"
+            testID={testID ? `${testID}.back` : undefined}
           />
         )}
 
         {/* Content Section */}
-        <View className="flex-1 pr-4">
+        <View className="flex-1 pr-4" testID={testID ? `${testID}.content` : undefined}>
           {title ? (
             <>
               {/* Custom Title */}
@@ -143,9 +147,14 @@ export default function TabHeader({
         </View>
 
         {/* Action Buttons */}
-        <View className="flex-row items-center gap-3">
+        <View className="flex-row items-center gap-3" testID={testID ? `${testID}.actions` : undefined}>
           {/* Help Action */}
-          <HeaderAction icon={HelpCircle} onPress={handleHelpPress} size={20} />
+          <HeaderAction 
+            icon={HelpCircle} 
+            onPress={handleHelpPress} 
+            size={20} 
+            testID={testID ? `${testID}.help` : undefined}
+          />
 
           {/* Notification Action */}
           <HeaderAction
@@ -154,6 +163,7 @@ export default function TabHeader({
             size={20}
             showBadge={notificationCount > 0}
             badgeCount={notificationCount}
+            testID={testID ? `${testID}.notifications` : undefined}
           />
         </View>
       </View>

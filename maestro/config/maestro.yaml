@@ -1,0 +1,6 @@
+appId: com.ravinderz.aptly
+env:
+  APP_ENV: development
+  API_BASE_URL: ${API_BASE_URL}
+  TEST_USER_PHONE: ${TEST_USER_PHONE}
+  TEST_USER_OTP: ${TEST_USER_OTP}

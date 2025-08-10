@@ -1,0 +1,22 @@
+# Common reusable test utilities
+# This file will contain shared helper functions for Maestro tests
+
+# Wait for element to be visible
+- waitForElement:
+    id: ${elementId}
+    timeout: 10000
+
+# Tap element by testID
+- tapElement:
+    id: ${elementId}
+
+# Input text into field
+- inputText:
+    id: ${fieldId}
+    text: ${inputText}
+
+# Wait for loading to complete
+- waitForLoadingComplete:
+    - waitForElementToDisappear:
+        id: "loading-indicator"
+        timeout: 15000

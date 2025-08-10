@@ -8,6 +8,7 @@ interface SearchBarProps {
   onChangeText: (text: string) => void;
   onSearch?: () => void;
   onClear?: () => void;
+  testID?: string;
 }
 
 const AptlySearchBar: React.FC<SearchBarProps> = ({
@@ -16,6 +17,7 @@ const AptlySearchBar: React.FC<SearchBarProps> = ({
   onChangeText,
   onSearch,
   onClear,
+  testID,
 }) => {
   const handleSearch = () => {
     onSearch?.();
@@ -26,8 +28,8 @@ const AptlySearchBar: React.FC<SearchBarProps> = ({
     onClear?.();
   };
   return (
-    <View className="flex flex-row gap-2 items-center w-full">
-      <View className="flex-[11] relative">
+    <View className="flex flex-row gap-2 items-center w-full" testID={testID}>
+      <View className="flex-[11] relative" testID={testID ? `${testID}.input-container` : undefined}>
         <TextInput
           placeholder={placeholder}
           cursorColor={'#6366f1'}
@@ -37,12 +39,14 @@ const AptlySearchBar: React.FC<SearchBarProps> = ({
           onChangeText={onChangeText}
           returnKeyType="search"
           onSubmitEditing={handleSearch}
+          testID={testID ? `${testID}.input` : undefined}
         />
         {value.length > 0 && (
           <TouchableOpacity
             onPress={handleClear}
             className="absolute right-3 top-1/2 -translate-y-2"
-            style={{ transform: [{ translateY: -10 }] }}>
+            style={{ transform: [{ translateY: -10 }] }}
+            testID={testID ? `${testID}.clear` : undefined}>
             <X size={16} color="#757575" />
           </TouchableOpacity>
         )}
@@ -50,7 +54,8 @@ const AptlySearchBar: React.FC<SearchBarProps> = ({
       <TouchableOpacity
         onPress={handleSearch}
         className="bg-primary rounded-xl py-3 px-4 flex-[1] items-center justify-center"
-        activeOpacity={0.7}>
+        activeOpacity={0.7}
+        testID={testID ? `${testID}.search` : undefined}>
         <Search size={18} color="white" />
       </TouchableOpacity>
     </View>

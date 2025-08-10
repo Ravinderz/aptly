@@ -1,6 +1,6 @@
-import React, { useRef } from 'react';
-import { Animated, TouchableOpacity, View } from 'react-native';
 import { LucideIcon } from 'lucide-react-native';
+import { useRef } from 'react';
+import { Animated, TouchableOpacity, View } from 'react-native';
 
 interface HeaderActionProps {
   icon: LucideIcon;
@@ -10,6 +10,8 @@ interface HeaderActionProps {
   showBadge?: boolean;
   badgeCount?: number;
   disabled?: boolean;
+  testID?: string;
+  className?: string;
 }
 
 export default function HeaderAction({
@@ -20,6 +22,8 @@ export default function HeaderAction({
   showBadge = false,
   badgeCount = 0,
   disabled = false,
+  testID,
+  className,
 }: HeaderActionProps) {
   const scaleAnim = useRef(new Animated.Value(1)).current;
   const shadowAnim = useRef(new Animated.Value(0)).current;
@@ -73,7 +77,8 @@ export default function HeaderAction({
       onPressOut={handlePressOut}
       disabled={disabled}
       activeOpacity={1}
-      className="relative">
+      className={`relative ${className || ''}`}
+      testID={testID}>
       <Animated.View
         style={{
           transform: [{ scale: scaleAnim }],
@@ -94,7 +99,10 @@ export default function HeaderAction({
 
         {/* Badge for notifications */}
         {showBadge && badgeCount > 0 && (
-          <View className="absolute -top-1 -right-1 bg-error rounded-full min-w-5 h-5 items-center justify-center px-1">
+          <View 
+            className="absolute -top-1 -right-1 bg-error rounded-full min-w-5 h-5 items-center justify-center px-1"
+            testID={testID ? `${testID}.badge` : undefined}
+          >
             <Animated.Text
               className="text-white text-xs font-bold"
               style={{

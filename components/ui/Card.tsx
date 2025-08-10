@@ -7,6 +7,7 @@ export interface CardProps extends ViewProps {
   padding?: 'none' | 'sm' | 'md' | 'lg';
   children: React.ReactNode;
   className?: string;
+  testID?: string;
 }
 
 const cardVariants = {
@@ -27,6 +28,7 @@ export const Card: React.FC<CardProps> = ({
   padding = 'md',
   children,
   className,
+  testID,
   ...props
 }) => {
   return (
@@ -37,6 +39,7 @@ export const Card: React.FC<CardProps> = ({
         cardPadding[padding],
         className,
       )}
+      testID={testID}
       {...props}>
       {children}
     </View>
@@ -45,36 +48,39 @@ export const Card: React.FC<CardProps> = ({
 
 Card.displayName = 'Card';
 
-export const CardHeader: React.FC<ViewProps & { className?: string }> = ({
+export const CardHeader: React.FC<ViewProps & { className?: string; testID?: string }> = ({
   children,
   className,
+  testID,
   ...props
 }) => (
-  <View className={cn('mb-4', className)} {...props}>
+  <View className={cn('mb-4', className)} testID={testID} {...props}>
     {children}
   </View>
 );
 
 CardHeader.displayName = 'CardHeader';
 
-export const CardContent: React.FC<ViewProps & { className?: string }> = ({
+export const CardContent: React.FC<ViewProps & { className?: string; testID?: string }> = ({
   children,
   className,
+  testID,
   ...props
 }) => (
-  <View className={cn('', className)} {...props}>
+  <View className={cn('', className)} testID={testID} {...props}>
     {children}
   </View>
 );
 
 CardContent.displayName = 'CardContent';
 
-export const CardFooter: React.FC<ViewProps & { className?: string }> = ({
+export const CardFooter: React.FC<ViewProps & { className?: string; testID?: string }> = ({
   children,
   className,
+  testID,
   ...props
 }) => (
-  <View className={cn('mt-4 flex-row justify-end', className)} {...props}>
+  <View className={cn('mt-4 flex-row justify-end', className)} testID={testID} {...props}>
     {children}
   </View>
 );

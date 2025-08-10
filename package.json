@@ -29,7 +29,14 @@
     "test:backend": "npx tsx scripts/test-backend-connection.ts",
     "test:mutation": "stryker run",
     "analyze:bundle": "npx @expo/bundle-analyzer",
-    "perf:profile": "npx react-native-performance-flipper"
+    "perf:profile": "npx react-native-performance-flipper",
+    "e2e:setup": "bash maestro/scripts/setup.sh",
+    "e2e:test": "bash maestro/scripts/run-tests.sh",
+    "e2e:test:dev": "bash maestro/scripts/run-tests.sh --environment development",
+    "e2e:test:staging": "bash maestro/scripts/run-tests.sh --environment staging",
+    "e2e:test:auth": "bash maestro/scripts/run-tests.sh --flow maestro/flows/auth",
+    "e2e:test:navigation": "bash maestro/scripts/run-tests.sh --flow maestro/flows/navigation",
+    "e2e:test:verbose": "bash maestro/scripts/run-tests.sh --verbose"
   },
   "dependencies": {
     "@gorhom/bottom-sheet": "^5.1.4",

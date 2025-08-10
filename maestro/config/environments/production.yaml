@@ -1,0 +1,7 @@
+appId: com.ravinderz.aptly
+env:
+  APP_ENV: production
+  API_BASE_URL: https://api.aptly.com
+  TEST_USER_PHONE: "+1234567890"
+  TEST_USER_OTP: "123456"
+  TIMEOUT: 30000

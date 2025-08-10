@@ -1,22 +1,21 @@
-import { useRouter, useLocalSearchParams } from 'expo-router';
-import {
-  ArrowLeft,
-  Building,
-  MapPin,
-  Users,
-  CheckCircle,
-} from 'lucide-react-native';
-import React, { useState, useEffect } from 'react';
-import {
-  SafeAreaView,
-  Text,
-  TouchableOpacity,
-  View,
-  ActivityIndicator,
-  ScrollView,
-  Dimensions,
-} from 'react-native';
 import { Button } from '@/components/ui/Button';
+import { useLocalSearchParams, useRouter } from 'expo-router';
+import {
+    ArrowLeft,
+    Building,
+    CheckCircle,
+    MapPin
+} from 'lucide-react-native';
+import { useEffect, useState } from 'react';
+import {
+    ActivityIndicator,
+    Dimensions,
+    SafeAreaView,
+    ScrollView,
+    Text,
+    TouchableOpacity,
+    View,
+} from 'react-native';
 
 interface Society {
   id: string;
@@ -108,22 +107,22 @@ export default function SocietyVerification() {
 
   if (isLoading) {
     return (
-      <SafeAreaView className="flex-1 bg-background">
-        <View className="flex-row items-center px-4 py-4">
-          <TouchableOpacity onPress={() => router.back()} className="mr-4">
+      <SafeAreaView className="flex-1 bg-background" testID="auth.society-verification.loading-screen">
+        <View className="flex-row items-center px-4 py-4" testID="auth.society-verification.loading-header">
+          <TouchableOpacity onPress={() => router.back()} className="mr-4" testID="auth.society-verification.loading-back-button">
             <ArrowLeft size={24} color="#212121" />
           </TouchableOpacity>
-          <Text className="text-headline-large font-bold text-text-primary">
+          <Text className="text-headline-large font-bold text-text-primary" testID="auth.society-verification.loading-title">
             Society Verification
           </Text>
         </View>
 
-        <View className="flex-1 items-center justify-center px-6">
-          <ActivityIndicator size="large" color="#6366f1" />
-          <Text className="text-text-primary font-semibold mt-4 mb-2">
+        <View className="flex-1 items-center justify-center px-6" testID="auth.society-verification.loading-content">
+          <ActivityIndicator size="large" color="#6366f1" testID="auth.society-verification.loading-spinner" />
+          <Text className="text-text-primary font-semibold mt-4 mb-2" testID="auth.society-verification.loading-message">
             Verifying Society Details
           </Text>
-          <Text className="text-text-secondary text-center">
+          <Text className="text-text-secondary text-center" testID="auth.society-verification.loading-subtitle">
             Please wait while we verify your society code: {societyCode}
           </Text>
         </View>
@@ -174,13 +173,13 @@ export default function SocietyVerification() {
   }
 
   return (
-    <SafeAreaView className="flex-1 bg-background">
+    <SafeAreaView className="flex-1 bg-background" testID="auth.society-verification.screen">
       {/* Header */}
-      <View className="flex-row items-center px-4 py-4">
-        <TouchableOpacity onPress={() => router.back()} className="mr-4">
+      <View className="flex-row items-center px-4 py-4" testID="auth.society-verification.header">
+        <TouchableOpacity onPress={() => router.back()} className="mr-4" testID="auth.society-verification.back-button">
           <ArrowLeft size={24} color="#212121" />
         </TouchableOpacity>
-        <Text className="text-headline-large font-bold text-text-primary">
+        <Text className="text-headline-large font-bold text-text-primary" testID="auth.society-verification.title">
           Society Verification
         </Text>
       </View>
@@ -194,14 +193,14 @@ export default function SocietyVerification() {
         }}
         showsVerticalScrollIndicator={false}>
         {/* Success Header */}
-        <View className={`items-center ${isSmallScreen ? 'mb-6' : 'mb-8'}`}>
-          <View className="bg-success/10 rounded-full w-20 h-20 items-center justify-center mb-4">
+        <View className={`items-center ${isSmallScreen ? 'mb-6' : 'mb-8'}`} testID="auth.society-verification.success-header">
+          <View className="bg-success/10 rounded-full w-20 h-20 items-center justify-center mb-4" testID="auth.society-verification.success-icon">
             <CheckCircle size={32} color="#4CAF50" />
           </View>
-          <Text className="text-display-small font-bold text-text-primary mb-2 text-center">
+          <Text className="text-display-small font-bold text-text-primary mb-2 text-center" testID="auth.society-verification.success-title">
             Society Verified!
           </Text>
-          <Text className="text-text-secondary text-center leading-6">
+          <Text className="text-text-secondary text-center leading-6" testID="auth.society-verification.success-subtitle">
             We found your society. Please review the details below.
           </Text>
         </View>
@@ -296,12 +295,12 @@ export default function SocietyVerification() {
         </View>
 
         {/* Proceed Button */}
-        <Button onPress={handleProceed} className="mb-4">
+        <Button onPress={handleProceed} className="mb-4" testID="auth.society-verification.continue-button">
           Continue to Profile Setup
         </Button>
 
         {/* Wrong Society */}
-        <TouchableOpacity onPress={handleRetry} className="items-center py-3">
+        <TouchableOpacity onPress={handleRetry} className="items-center py-3" testID="auth.society-verification.retry-button">
           <Text className="text-text-secondary">
             Wrong society?{' '}
             <Text className="text-primary font-semibold">

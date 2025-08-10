@@ -4,7 +4,7 @@ import type { UserProfileExtended as UserProfile } from '@/types/api';
 import { showErrorAlert, showSuccessAlert } from '@/utils/alert';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { ArrowLeft, User } from 'lucide-react-native';
-import React, { useState } from 'react';
+import { useState } from 'react';
 import {
   SafeAreaView,
   ScrollView,
@@ -185,38 +185,38 @@ export default function ProfileSetup() {
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-background">
+    <SafeAreaView className="flex-1 bg-background" testID="auth.profile-setup.screen">
       {/* Header */}
-      <View className="flex-row items-center px-4 py-4 border-b border-divider">
-        <TouchableOpacity onPress={() => router.back()} className="mr-4">
+      <View className="flex-row items-center px-4 py-4 border-b border-divider" testID="auth.profile-setup.header">
+        <TouchableOpacity onPress={() => router.back()} className="mr-4" testID="auth.profile-setup.back-button">
           <ArrowLeft size={24} color="#212121" />
         </TouchableOpacity>
         <View className="flex-1">
-          <Text className="text-xl font-bold text-text-primary">
+          <Text className="text-xl font-bold text-text-primary" testID="auth.profile-setup.title">
             Profile Setup
           </Text>
-          <Text className="text-text-secondary text-sm">{societyName}</Text>
+          <Text className="text-text-secondary text-sm" testID="auth.profile-setup.society-name">{societyName}</Text>
         </View>
       </View>
 
-      <ScrollView className="flex-1" showsVerticalScrollIndicator={false}>
-        <View className="px-6 py-8">
+      <ScrollView className="flex-1" showsVerticalScrollIndicator={false} testID="auth.profile-setup.scroll">
+        <View className="px-6 py-8" testID="auth.profile-setup.content">
           {/* Welcome Section */}
-          <View className="items-center mb-8">
-            <View className="bg-primary/10 rounded-full w-20 h-20 items-center justify-center mb-4">
+          <View className="items-center mb-8" testID="auth.profile-setup.welcome">
+            <View className="bg-primary/10 rounded-full w-20 h-20 items-center justify-center mb-4" testID="auth.profile-setup.icon">
               <User size={32} color="#6366f1" />
             </View>
-            <Text className="text-2xl font-bold text-text-primary mb-2 text-center">
+            <Text className="text-2xl font-bold text-text-primary mb-2 text-center" testID="auth.profile-setup.welcome-title">
               Complete Your Profile
             </Text>
-            <Text className="text-text-secondary text-center leading-6">
+            <Text className="text-text-secondary text-center leading-6" testID="auth.profile-setup.welcome-subtitle">
               Help us set up your account with basic information
             </Text>
           </View>
 
           {/* Full Name */}
-          <View className="mb-6">
-            <Text className="text-text-primary font-semibold mb-3">
+          <View className="mb-6" testID="auth.profile-setup.fullname-section">
+            <Text className="text-text-primary font-semibold mb-3" testID="auth.profile-setup.fullname-label">
               Full Name *
             </Text>
             <TextInput
@@ -226,9 +226,10 @@ export default function ProfileSetup() {
               value={profileData.fullName}
               onChangeText={(value) => handleInputChange('fullName', value)}
               autoCapitalize="words"
+              testID="auth.profile-setup.fullname-input"
             />
             {errors.fullName && (
-              <Text className="text-error text-sm mt-2">{errors.fullName}</Text>
+              <Text className="text-error text-sm mt-2" testID="auth.profile-setup.fullname-error">{errors.fullName}</Text>
             )}
           </View>
 
@@ -393,7 +394,8 @@ export default function ProfileSetup() {
             onPress={handleSubmit}
             loading={isLoading}
             disabled={isLoading}
-            className="mb-6">
+            className="mb-6"
+            testID="auth.profile-setup.create-profile-button">
             Create Profile
           </Button>
 

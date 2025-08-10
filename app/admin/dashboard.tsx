@@ -1,32 +1,30 @@
-import React, { useEffect, useState, useMemo } from 'react';
-import {
-  View,
-  Text,
-  ScrollView,
-  TouchableOpacity,
-  RefreshControl,
-} from 'react-native';
-import { useRouter } from 'expo-router';
-import {
-  Users,
-  Building2,
-  UserCheck,
-  Clock,
-  AlertTriangle,
-  TrendingUp,
-  Settings,
-  Bell,
-  Shield,
-  BarChart3,
-} from 'lucide-react-native';
-import { useDirectAdmin } from '@/hooks/useDirectAdmin';
-import { useDirectAuth } from '@/hooks/useDirectAuth';
+import { DashboardMetrics } from '@/components/admin/DashboardMetrics';
 import { RequireSuperAdmin } from '@/components/auth/RoleGuard';
 import { StandardHeader } from '@/components/design-system';
-import { DashboardMetrics } from '@/components/admin/DashboardMetrics';
-import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
+import { Card } from '@/components/ui/Card';
+import { useDirectAdmin } from '@/hooks/useDirectAdmin';
+import { useDirectAuth } from '@/hooks/useDirectAuth';
 import { cn } from '@/utils/cn';
+import { useRouter } from 'expo-router';
+import {
+    AlertTriangle,
+    BarChart3,
+    Building2,
+    Clock,
+    Settings,
+    Shield,
+    UserCheck,
+    Users
+} from 'lucide-react-native';
+import React, { useEffect, useMemo, useState } from 'react';
+import {
+    RefreshControl,
+    ScrollView,
+    Text,
+    TouchableOpacity,
+    View,
+} from 'react-native';
 
 interface QuickAction {
   id: string;
@@ -203,7 +201,7 @@ function AdminDashboard() {
 
   return (
     <RequireSuperAdmin>
-      <View className="flex-1 bg-gray-50">
+      <View className="flex-1 bg-gray-50" testID="admin.dashboard.screen">
       <StandardHeader 
         title="Admin Dashboard" 
         subtitle={`Welcome back, ${user?.fullName || user?.name || 'Admin'}`}
@@ -211,6 +209,7 @@ function AdminDashboard() {
         showLogout
         showRoleIndicator
         onLogout={handleLogout}
+        testID="admin.dashboard.header"
       />
       
       <ScrollView
@@ -219,27 +218,29 @@ function AdminDashboard() {
           <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />
         }
         showsVerticalScrollIndicator={false}
+        testID="admin.dashboard.scroll"
       >
         {/* Dashboard Metrics */}
-        <View className="px-4 py-2">
+        <View className="px-4 py-2" testID="admin.dashboard.metrics">
           <DashboardMetrics 
             analytics={analytics}
             loading={loading}
+            testID="admin.dashboard.metrics.component"
           />
         </View>
 
         {/* Quick Actions */}
-        <View className="px-4 py-2">
+        <View className="px-4 py-2" testID="admin.dashboard.quick-actions">
           <View className="flex-row justify-between items-center mb-4">
-            <Text className="text-lg font-semibold text-gray-900">
+            <Text className="text-lg font-semibold text-gray-900" testID="admin.dashboard.quick-actions.title">
               Quick Actions
             </Text>
-            <TouchableOpacity onPress={handleRefresh}>
+            <TouchableOpacity onPress={handleRefresh} testID="admin.dashboard.refresh-button">
               <Text className="text-blue-600 font-medium">Refresh</Text>
             </TouchableOpacity>
           </View>
           
-          <View className="flex-row flex-wrap gap-3">
+          <View className="flex-row flex-wrap gap-3" testID="admin.dashboard.actions-grid">
             {quickActions.map((action) => (
               <TouchableOpacity
                 key={action.id}
@@ -249,6 +250,7 @@ function AdminDashboard() {
                   action.color
                 )}
                 style={{ minWidth: '47%' }}
+                testID={`admin.dashboard.action.${action.id}`}
               >
                 <View className="flex-row items-center justify-between mb-2">
                   {action.icon}

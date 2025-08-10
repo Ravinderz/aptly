@@ -1,32 +1,32 @@
 import AptlySearchBar from '@/components/ui/AptlySearchBar';
 import Header from '@/components/ui/Header';
-import PillFilter from '@/components/ui/PillFilter';
-import PostCard from '@/components/ui/PostCard';
 import ImagePicker from '@/components/ui/ImagePicker';
 import MentionInput from '@/components/ui/MentionInput';
-import {
-  ScrollView,
-  Text,
-  TouchableOpacity,
-  View,
-  RefreshControl,
-  ActivityIndicator,
-  KeyboardAvoidingView,
-  Platform,
-  FlatList,
-} from 'react-native';
-import React, { useState, useEffect, useCallback } from 'react';
-import { router, useFocusEffect } from 'expo-router';
-import {
-  Post,
-  CategoryType,
-  CATEGORY_FILTERS,
-  MAX_POST_LENGTH,
-  User,
-} from '@/types/community';
+import PillFilter from '@/components/ui/PillFilter';
+import PostCard from '@/components/ui/PostCard';
 import { communityApi } from '@/services/communityApi';
-import { filterPosts, validatePostContent } from '@/utils/community';
+import {
+    CATEGORY_FILTERS,
+    CategoryType,
+    MAX_POST_LENGTH,
+    Post,
+    User,
+} from '@/types/community';
 import { showErrorAlert, showSuccessAlert } from '@/utils/alert';
+import { filterPosts, validatePostContent } from '@/utils/community';
+import { router, useFocusEffect } from 'expo-router';
+import { useCallback, useEffect, useState } from 'react';
+import {
+    ActivityIndicator,
+    FlatList,
+    KeyboardAvoidingView,
+    Platform,
+    RefreshControl,
+    ScrollView,
+    Text,
+    TouchableOpacity,
+    View,
+} from 'react-native';
 
 export default function Community() {
   const [posts, setPosts] = useState<Post[]>([]);
@@ -217,11 +217,12 @@ export default function Community() {
   }
 
   return (
-    <Header>
+    <Header testID="community.screen">
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         className="flex-1"
-        keyboardVerticalOffset={Platform.OS === 'ios' ? 90 : 0}>
+        keyboardVerticalOffset={Platform.OS === 'ios' ? 90 : 0}
+        testID="community.keyboard-view">
         <ScrollView
           className="flex-1"
           showsVerticalScrollIndicator={false}
@@ -237,10 +238,11 @@ export default function Community() {
           keyboardShouldPersistTaps="handled"
           scrollEventThrottle={16}
           overScrollMode="always"
-          nestedScrollEnabled={false}>
+          nestedScrollEnabled={false}
+          testID="community.scroll">
           {/* Post Creation Section */}
-          <View className="mb-6">
-            <View className="bg-surface border border-divider rounded-2xl p-5">
+          <View className="mb-6" testID="community.post-creation">
+            <View className="bg-surface border border-divider rounded-2xl p-5" testID="community.post-creation.container">
               <MentionInput
                 placeholder="What do you want to share with your community?"
                 className="w-full min-h-[80px] p-0 text-text-primary text-base leading-6"
@@ -251,6 +253,7 @@ export default function Community() {
                 maxLength={MAX_POST_LENGTH}
                 users={allUsers}
                 disabled={isSubmittingPost}
+                testID="community.post-creation.input"
               />
 
               {/* Image Upload */}
@@ -281,7 +284,8 @@ export default function Community() {
                     characterCount > MAX_POST_LENGTH
                       ? 'bg-text-secondary/20'
                       : 'bg-primary'
-                  }`}>
+                  }`}
+                  testID="community.post-creation.share-button">
                   {isSubmittingPost ? (
                     <ActivityIndicator size="small" color="white" />
                   ) : null}
@@ -301,13 +305,14 @@ export default function Community() {
           </View>
 
           {/* Search and Filters */}
-          <View className="mb-4">
+          <View className="mb-4" testID="community.search-filters">
             <AptlySearchBar
               placeholder="Search community posts..."
               value={searchQuery}
               onChangeText={setSearchQuery}
               onSearch={handleSearch}
               onClear={handleClearSearch}
+              testID="community.search-bar"
             />
 
             <ScrollView
@@ -316,7 +321,8 @@ export default function Community() {
               className="mt-4"
               contentContainerStyle={{ paddingHorizontal: 4, gap: 8 }}
               nestedScrollEnabled={false}
-              scrollEventThrottle={1}>
+              scrollEventThrottle={1}
+              testID="community.filters">
               {CATEGORY_FILTERS.map((filter) => (
                 <PillFilter
                   key={filter.key}
@@ -325,6 +331,7 @@ export default function Community() {
                   isActive={selectedFilter === filter.key}
                   count={filterCounts[filter.key]}
                   onPress={handleFilterSelect}
+                  testID={`community.filter.${filter.key}`}
                 />
               ))}
             </ScrollView>
@@ -340,11 +347,13 @@ export default function Community() {
                 onLike={handleLike}
                 onComment={handleComment}
                 onDelete={handleDelete}
+                testID={`community.post.${post.id}`}
               />
             )}
             scrollEnabled={false}
+            testID="community.posts-list"
             ListEmptyComponent={
-              <View className="flex-1 items-center justify-center py-16 min-h-[200px]">
+              <View className="flex-1 items-center justify-center py-16 min-h-[200px]" testID="community.empty-state">
                 <Text className="text-xl font-semibold text-text-primary mb-2">
                   {searchQuery
                     ? 'No posts found'
