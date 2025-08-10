@@ -1,10 +1,9 @@
-import React, { useState } from 'react';
-import { ScrollView, SafeAreaView, View, Text, Switch } from 'react-native';
-import { ArrowLeft, Bell, BellOff, Clock, Moon } from 'lucide-react-native';
 import { router } from 'expo-router';
+import { ArrowLeft, Bell, BellOff, Clock, Moon } from 'lucide-react-native';
+import React, { useState } from 'react';
+import { SafeAreaView, ScrollView, Switch, Text, View } from 'react-native';
 import Button from '../../../components/ui/Button';
 import { Card } from '../../../components/ui/Card';
-import { cn } from '../../../utils/cn';
 
 interface NotificationSetting {
   id: string;
@@ -171,17 +170,24 @@ export default function NotificationPreferences() {
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-background">
+    <SafeAreaView
+      className="flex-1 bg-background"
+      testID="settings.notifications.screen">
       {/* Header */}
-      <View className="flex-row items-center p-4 border-b border-divider bg-surface">
+      <View
+        className="flex-row items-center p-4 border-b border-divider bg-surface"
+        testID="settings.notifications.header">
         <Button
           variant="ghost"
           size="sm"
           onPress={() => router.back()}
-          className="mr-2 p-2">
+          className="mr-2 p-2"
+          testID="settings.notifications.back-button">
           <ArrowLeft size={20} color="#6366f1" />
         </Button>
-        <Text className="text-text-primary text-headline-large font-semibold">
+        <Text
+          className="text-text-primary text-headline-large font-semibold"
+          testID="settings.notifications.title">
           Notification Preferences
         </Text>
       </View>
@@ -189,20 +195,29 @@ export default function NotificationPreferences() {
       <ScrollView
         className="flex-1"
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ paddingBottom: 20 }}>
+        contentContainerStyle={{ paddingBottom: 20 }}
+        testID="settings.notifications.scroll">
         {/* Do Not Disturb */}
-        <View className="p-4">
-          <Card>
-            <View className="flex-row items-center justify-between mb-4">
+        <View
+          className="p-4"
+          testID="settings.notifications.do-not-disturb-section">
+          <Card testID="settings.notifications.do-not-disturb-card">
+            <View
+              className="flex-row items-center justify-between mb-4"
+              testID="settings.notifications.do-not-disturb-header">
               <View className="flex-row items-center">
                 <View className="w-10 h-10 rounded-full bg-primary/10 items-center justify-center mr-3">
                   <Moon size={20} color="#6366f1" />
                 </View>
                 <View>
-                  <Text className="text-text-primary text-body-large font-semibold">
+                  <Text
+                    className="text-text-primary text-body-large font-semibold"
+                    testID="settings.notifications.do-not-disturb-title">
                     Do Not Disturb
                   </Text>
-                  <Text className="text-text-secondary text-sm">
+                  <Text
+                    className="text-text-secondary text-sm"
+                    testID="settings.notifications.do-not-disturb-status">
                     {doNotDisturbSettings.enabled
                       ? `${doNotDisturbSettings.startTime} - ${doNotDisturbSettings.endTime}`
                       : 'Disabled'}
@@ -214,18 +229,27 @@ export default function NotificationPreferences() {
                 onValueChange={toggleDoNotDisturb}
                 trackColor={{ false: '#E0E0E0', true: '#6366f1' }}
                 thumbColor="#FFFFFF"
+                testID="settings.notifications.do-not-disturb-switch"
               />
             </View>
 
             {doNotDisturbSettings.enabled && (
-              <View className="bg-background rounded-lg p-3">
-                <Text className="text-text-secondary text-sm mb-2">
+              <View
+                className="bg-background rounded-lg p-3"
+                testID="settings.notifications.do-not-disturb-details">
+                <Text
+                  className="text-text-secondary text-sm mb-2"
+                  testID="settings.notifications.do-not-disturb-description">
                   During these hours, only emergency notifications will be
                   shown.
                 </Text>
-                <View className="flex-row items-center">
+                <View
+                  className="flex-row items-center"
+                  testID="settings.notifications.do-not-disturb-time">
                   <Clock size={14} color="#757575" />
-                  <Text className="text-text-secondary text-sm ml-1">
+                  <Text
+                    className="text-text-secondary text-sm ml-1"
+                    testID="settings.notifications.do-not-disturb-time-text">
                     {doNotDisturbSettings.startTime} to{' '}
                     {doNotDisturbSettings.endTime}
                   </Text>
@@ -236,24 +260,37 @@ export default function NotificationPreferences() {
         </View>
 
         {/* Notification Categories */}
-        <View className="px-4">
-          <Text className="text-text-primary text-lg font-semibold mb-3">
+        <View
+          className="px-4"
+          testID="settings.notifications.categories-section">
+          <Text
+            className="text-text-primary text-lg font-semibold mb-3"
+            testID="settings.notifications.categories-title">
             Notification Categories
           </Text>
 
           {notificationSettings.map((setting) => (
-            <Card key={setting.id} className="mb-4">
+            <Card
+              key={setting.id}
+              className="mb-4"
+              testID={`settings.notifications.category.${setting.id}`}>
               {/* Main Category */}
-              <View className="flex-row items-center justify-between mb-3">
+              <View
+                className="flex-row items-center justify-between mb-3"
+                testID={`settings.notifications.category.${setting.id}.header`}>
                 <View className="flex-row items-center flex-1">
                   <View className="w-10 h-10 rounded-full bg-primary/10 items-center justify-center mr-3">
                     {setting.icon}
                   </View>
                   <View className="flex-1">
-                    <Text className="text-text-primary text-body-large font-semibold">
+                    <Text
+                      className="text-text-primary text-body-large font-semibold"
+                      testID={`settings.notifications.category.${setting.id}.title`}>
                       {setting.category}
                     </Text>
-                    <Text className="text-text-secondary text-sm">
+                    <Text
+                      className="text-text-secondary text-sm"
+                      testID={`settings.notifications.category.${setting.id}.description`}>
                       {setting.description}
                     </Text>
                   </View>
@@ -263,16 +300,23 @@ export default function NotificationPreferences() {
                   onValueChange={() => toggleMainCategory(setting.id)}
                   trackColor={{ false: '#E0E0E0', true: '#6366f1' }}
                   thumbColor="#FFFFFF"
+                  testID={`settings.notifications.category.${setting.id}.switch`}
                 />
               </View>
 
               {/* Subcategories */}
               {setting.enabled && setting.subcategories && (
-                <View className="bg-background rounded-lg p-3">
+                <View
+                  className="bg-background rounded-lg p-3"
+                  testID={`settings.notifications.category.${setting.id}.subcategories`}>
                   {setting.subcategories.map((subcategory, index) => (
-                    <View key={subcategory.id}>
+                    <View
+                      key={subcategory.id}
+                      testID={`settings.notifications.category.${setting.id}.subcategory.${subcategory.id}`}>
                       <View className="flex-row items-center justify-between py-2">
-                        <Text className="text-text-primary text-sm font-medium flex-1">
+                        <Text
+                          className="text-text-primary text-sm font-medium flex-1"
+                          testID={`settings.notifications.category.${setting.id}.subcategory.${subcategory.id}.name`}>
                           {subcategory.name}
                         </Text>
                         <Switch
@@ -285,6 +329,7 @@ export default function NotificationPreferences() {
                           style={{
                             transform: [{ scaleX: 0.8 }, { scaleY: 0.8 }],
                           }}
+                          testID={`settings.notifications.category.${setting.id}.subcategory.${subcategory.id}.switch`}
                         />
                       </View>
                       {index < (setting.subcategories?.length || 0) - 1 && (
@@ -296,10 +341,14 @@ export default function NotificationPreferences() {
               )}
 
               {!setting.enabled && (
-                <View className="bg-background rounded-lg p-3">
+                <View
+                  className="bg-background rounded-lg p-3"
+                  testID={`settings.notifications.category.${setting.id}.disabled-message`}>
                   <View className="flex-row items-center">
                     <BellOff size={16} color="#757575" />
-                    <Text className="text-text-secondary text-sm ml-2">
+                    <Text
+                      className="text-text-secondary text-sm ml-2"
+                      testID={`settings.notifications.category.${setting.id}.disabled-text`}>
                       All notifications disabled for this category
                     </Text>
                   </View>
@@ -310,19 +359,29 @@ export default function NotificationPreferences() {
         </View>
 
         {/* Delivery Channels */}
-        <View className="px-4">
-          <Text className="text-text-primary text-lg font-semibold mb-3">
+        <View
+          className="px-4"
+          testID="settings.notifications.delivery-channels-section">
+          <Text
+            className="text-text-primary text-lg font-semibold mb-3"
+            testID="settings.notifications.delivery-channels-title">
             Delivery Channels
           </Text>
 
-          <Card>
-            <Text className="text-text-secondary text-sm mb-4">
+          <Card testID="settings.notifications.delivery-channels-card">
+            <Text
+              className="text-text-secondary text-sm mb-4"
+              testID="settings.notifications.delivery-channels-description">
               Choose how you want to receive notifications
             </Text>
 
             <View className="space-y-3">
-              <View className="flex-row items-center justify-between">
-                <Text className="text-text-primary text-body-large">
+              <View
+                className="flex-row items-center justify-between"
+                testID="settings.notifications.delivery-channels.push">
+                <Text
+                  className="text-text-primary text-body-large"
+                  testID="settings.notifications.delivery-channels.push.label">
                   Push Notifications
                 </Text>
                 <Switch
@@ -330,30 +389,45 @@ export default function NotificationPreferences() {
                   onValueChange={() => toggleDeliveryChannel('push')}
                   trackColor={{ false: '#E0E0E0', true: '#6366f1' }}
                   thumbColor="#FFFFFF"
+                  testID="settings.notifications.delivery-channels.push.switch"
                 />
               </View>
 
               <View className="h-px bg-divider" />
 
-              <View className="flex-row items-center justify-between">
-                <Text className="text-text-primary text-body-large">Email</Text>
+              <View
+                className="flex-row items-center justify-between"
+                testID="settings.notifications.delivery-channels.email">
+                <Text
+                  className="text-text-primary text-body-large"
+                  testID="settings.notifications.delivery-channels.email.label">
+                  Email
+                </Text>
                 <Switch
                   value={deliveryChannels.email}
                   onValueChange={() => toggleDeliveryChannel('email')}
                   trackColor={{ false: '#E0E0E0', true: '#6366f1' }}
                   thumbColor="#FFFFFF"
+                  testID="settings.notifications.delivery-channels.email.switch"
                 />
               </View>
 
               <View className="h-px bg-divider" />
 
-              <View className="flex-row items-center justify-between">
-                <Text className="text-text-primary text-body-large">SMS</Text>
+              <View
+                className="flex-row items-center justify-between"
+                testID="settings.notifications.delivery-channels.sms">
+                <Text
+                  className="text-text-primary text-body-large"
+                  testID="settings.notifications.delivery-channels.sms.label">
+                  SMS
+                </Text>
                 <Switch
                   value={deliveryChannels.sms}
                   onValueChange={() => toggleDeliveryChannel('sms')}
                   trackColor={{ false: '#E0E0E0', true: '#6366f1' }}
                   thumbColor="#FFFFFF"
+                  testID="settings.notifications.delivery-channels.sms.switch"
                 />
               </View>
             </View>
@@ -361,12 +435,20 @@ export default function NotificationPreferences() {
         </View>
 
         {/* Info Card */}
-        <View className="px-4 mt-6">
-          <Card className="bg-secondary/10 border-secondary/20">
-            <Text className="text-secondary text-sm font-medium mb-2">
+        <View
+          className="px-4 mt-6"
+          testID="settings.notifications.tips-section">
+          <Card
+            className="bg-secondary/10 border-secondary/20"
+            testID="settings.notifications.tips-card">
+            <Text
+              className="text-secondary text-sm font-medium mb-2"
+              testID="settings.notifications.tips-title">
               🔔 Notification Tips
             </Text>
-            <Text className="text-text-secondary text-sm leading-5">
+            <Text
+              className="text-text-secondary text-sm leading-5"
+              testID="settings.notifications.tips-content">
               • Emergency notifications override Do Not Disturb{'\n'}• You can
               customize preferences for each category{'\n'}• Push notifications
               require app permissions{'\n'}• Email/SMS may have additional

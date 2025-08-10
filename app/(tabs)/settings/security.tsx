@@ -1,23 +1,22 @@
-import React, { useState, useEffect } from 'react';
+import LucideIcons from '@/components/ui/LucideIcons';
+import { showErrorAlert, showSuccessAlert } from '@/utils/alert';
+import { safeGoBack } from '@/utils/navigation';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import * as LocalAuthentication from 'expo-local-authentication';
+import { useEffect, useState } from 'react';
 import {
+  Alert,
   SafeAreaView,
   ScrollView,
-  View,
+  Switch,
   Text,
   TouchableOpacity,
-  Switch,
-  Alert,
+  View,
 } from 'react-native';
-import { router } from 'expo-router';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import LucideIcons from '@/components/ui/LucideIcons';
-import { showSuccessAlert, showErrorAlert } from '@/utils/alert';
-import { safeGoBack } from '@/utils/navigation';
-import * as LocalAuthentication from 'expo-local-authentication';
 
 // UI Components
-import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
+import { Card } from '@/components/ui/Card';
 import StackHeader from '@/components/ui/headers/StackHeader';
 
 // Default security preferences
@@ -144,21 +143,31 @@ export default function SecuritySettingsPage() {
   };
 
   const renderAuthenticationSettings = () => (
-    <Card className="mb-4">
+    <Card className="mb-4" testID="settings.security.authentication-card">
       <View className="p-4">
-        <Text className="text-headline-small font-semibold text-text-primary mb-4">
+        <Text
+          className="text-headline-small font-semibold text-text-primary mb-4"
+          testID="settings.security.authentication-title">
           Authentication
         </Text>
 
-        <View className="space-y-4">
+        <View
+          className="space-y-4"
+          testID="settings.security.authentication-options">
           {/* Biometric Login */}
           {biometricAvailable && (
-            <View className="flex-row items-center justify-between">
+            <View
+              className="flex-row items-center justify-between"
+              testID="settings.security.biometric-login">
               <View className="flex-1 mr-4">
-                <Text className="text-body-medium font-medium text-text-primary">
+                <Text
+                  className="text-body-medium font-medium text-text-primary"
+                  testID="settings.security.biometric-login.title">
                   {biometricType}
                 </Text>
-                <Text className="text-body-small text-text-secondary">
+                <Text
+                  className="text-body-small text-text-secondary"
+                  testID="settings.security.biometric-login.description">
                   Use biometric authentication to secure app access
                 </Text>
               </View>
@@ -167,17 +176,24 @@ export default function SecuritySettingsPage() {
                 onValueChange={handleBiometricToggle}
                 trackColor={{ false: '#D1D5DB', true: '#6366f1' }}
                 thumbColor={preferences.biometricLogin ? '#FFFFFF' : '#757575'}
+                testID="settings.security.biometric-login.switch"
               />
             </View>
           )}
 
           {/* App Lock */}
-          <View className="flex-row items-center justify-between">
+          <View
+            className="flex-row items-center justify-between"
+            testID="settings.security.app-lock">
             <View className="flex-1 mr-4">
-              <Text className="text-body-medium font-medium text-text-primary">
+              <Text
+                className="text-body-medium font-medium text-text-primary"
+                testID="settings.security.app-lock.title">
                 App Lock
               </Text>
-              <Text className="text-body-small text-text-secondary">
+              <Text
+                className="text-body-small text-text-secondary"
+                testID="settings.security.app-lock.description">
                 Require authentication when opening the app
               </Text>
             </View>
@@ -188,16 +204,23 @@ export default function SecuritySettingsPage() {
               }
               trackColor={{ false: '#D1D5DB', true: '#6366f1' }}
               thumbColor={preferences.appLock ? '#FFFFFF' : '#757575'}
+              testID="settings.security.app-lock.switch"
             />
           </View>
 
           {/* Two Factor Auth */}
-          <View className="flex-row items-center justify-between">
+          <View
+            className="flex-row items-center justify-between"
+            testID="settings.security.two-factor-auth">
             <View className="flex-1 mr-4">
-              <Text className="text-body-medium font-medium text-text-primary">
+              <Text
+                className="text-body-medium font-medium text-text-primary"
+                testID="settings.security.two-factor-auth.title">
                 Two-Factor Authentication
               </Text>
-              <Text className="text-body-small text-text-secondary">
+              <Text
+                className="text-body-small text-text-secondary"
+                testID="settings.security.two-factor-auth.description">
                 Add extra security with SMS verification
               </Text>
             </View>
@@ -208,6 +231,7 @@ export default function SecuritySettingsPage() {
               }
               trackColor={{ false: '#D1D5DB', true: '#6366f1' }}
               thumbColor={preferences.twoFactorAuth ? '#FFFFFF' : '#757575'}
+              testID="settings.security.two-factor-auth.switch"
             />
           </View>
         </View>
@@ -216,20 +240,28 @@ export default function SecuritySettingsPage() {
   );
 
   const renderPrivacySettings = () => (
-    <Card className="mb-4">
+    <Card className="mb-4" testID="settings.security.privacy-card">
       <View className="p-4">
-        <Text className="text-headline-small font-semibold text-text-primary mb-4">
+        <Text
+          className="text-headline-small font-semibold text-text-primary mb-4"
+          testID="settings.security.privacy-title">
           Privacy & Security
         </Text>
 
-        <View className="space-y-4">
+        <View className="space-y-4" testID="settings.security.privacy-options">
           {/* Login Notifications */}
-          <View className="flex-row items-center justify-between">
+          <View
+            className="flex-row items-center justify-between"
+            testID="settings.security.login-notifications">
             <View className="flex-1 mr-4">
-              <Text className="text-body-medium font-medium text-text-primary">
+              <Text
+                className="text-body-medium font-medium text-text-primary"
+                testID="settings.security.login-notifications.title">
                 Login Notifications
               </Text>
-              <Text className="text-body-small text-text-secondary">
+              <Text
+                className="text-body-small text-text-secondary"
+                testID="settings.security.login-notifications.description">
                 Get notified of new login attempts on your account
               </Text>
             </View>
@@ -245,16 +277,23 @@ export default function SecuritySettingsPage() {
               thumbColor={
                 preferences.loginNotifications ? '#FFFFFF' : '#757575'
               }
+              testID="settings.security.login-notifications.switch"
             />
           </View>
 
           {/* Device Trust */}
-          <View className="flex-row items-center justify-between">
+          <View
+            className="flex-row items-center justify-between"
+            testID="settings.security.device-trust">
             <View className="flex-1 mr-4">
-              <Text className="text-body-medium font-medium text-text-primary">
+              <Text
+                className="text-body-medium font-medium text-text-primary"
+                testID="settings.security.device-trust.title">
                 Device Trust
               </Text>
-              <Text className="text-body-small text-text-secondary">
+              <Text
+                className="text-body-small text-text-secondary"
+                testID="settings.security.device-trust.description">
                 Remember this device to reduce authentication prompts
               </Text>
             </View>
@@ -265,16 +304,23 @@ export default function SecuritySettingsPage() {
               }
               trackColor={{ false: '#D1D5DB', true: '#6366f1' }}
               thumbColor={preferences.deviceTrust ? '#FFFFFF' : '#757575'}
+              testID="settings.security.device-trust.switch"
             />
           </View>
 
           {/* Encrypt Backup */}
-          <View className="flex-row items-center justify-between">
+          <View
+            className="flex-row items-center justify-between"
+            testID="settings.security.encrypt-backup">
             <View className="flex-1 mr-4">
-              <Text className="text-body-medium font-medium text-text-primary">
+              <Text
+                className="text-body-medium font-medium text-text-primary"
+                testID="settings.security.encrypt-backup.title">
                 Encrypted Backups
               </Text>
-              <Text className="text-body-small text-text-secondary">
+              <Text
+                className="text-body-small text-text-secondary"
+                testID="settings.security.encrypt-backup.description">
                 Encrypt your data in cloud backups
               </Text>
             </View>
@@ -285,6 +331,7 @@ export default function SecuritySettingsPage() {
               }
               trackColor={{ false: '#D1D5DB', true: '#6366f1' }}
               thumbColor={preferences.encryptBackup ? '#FFFFFF' : '#757575'}
+              testID="settings.security.encrypt-backup.switch"
             />
           </View>
         </View>
@@ -293,23 +340,30 @@ export default function SecuritySettingsPage() {
   );
 
   const renderSecurityActions = () => (
-    <Card className="mb-4">
+    <Card className="mb-4" testID="settings.security.actions-card">
       <View className="p-4">
-        <Text className="text-headline-small font-semibold text-text-primary mb-4">
+        <Text
+          className="text-headline-small font-semibold text-text-primary mb-4"
+          testID="settings.security.actions-title">
           Security Actions
         </Text>
 
-        <View className="space-y-4">
+        <View className="space-y-4" testID="settings.security.actions-list">
           <TouchableOpacity
             className="flex-row items-center justify-between py-2"
             onPress={() => {
               /* Navigate to active sessions */
-            }}>
+            }}
+            testID="settings.security.active-sessions-button">
             <View className="flex-1">
-              <Text className="text-body-medium font-medium text-text-primary">
+              <Text
+                className="text-body-medium font-medium text-text-primary"
+                testID="settings.security.active-sessions.title">
                 Active Sessions
               </Text>
-              <Text className="text-body-small text-text-secondary">
+              <Text
+                className="text-body-small text-text-secondary"
+                testID="settings.security.active-sessions.description">
                 View and manage devices logged into your account
               </Text>
             </View>
@@ -320,12 +374,17 @@ export default function SecuritySettingsPage() {
             className="flex-row items-center justify-between py-2"
             onPress={() => {
               /* Navigate to login history */
-            }}>
+            }}
+            testID="settings.security.login-history-button">
             <View className="flex-1">
-              <Text className="text-body-medium font-medium text-text-primary">
+              <Text
+                className="text-body-medium font-medium text-text-primary"
+                testID="settings.security.login-history.title">
                 Login History
               </Text>
-              <Text className="text-body-small text-text-secondary">
+              <Text
+                className="text-body-small text-text-secondary"
+                testID="settings.security.login-history.description">
                 Review recent account access activity
               </Text>
             </View>
@@ -336,12 +395,17 @@ export default function SecuritySettingsPage() {
             className="flex-row items-center justify-between py-2"
             onPress={() => {
               /* Change password */
-            }}>
+            }}
+            testID="settings.security.change-password-button">
             <View className="flex-1">
-              <Text className="text-body-medium font-medium text-text-primary">
+              <Text
+                className="text-body-medium font-medium text-text-primary"
+                testID="settings.security.change-password.title">
                 Change Password
               </Text>
-              <Text className="text-body-small text-text-secondary">
+              <Text
+                className="text-body-small text-text-secondary"
+                testID="settings.security.change-password.description">
                 Update your account password
               </Text>
             </View>
@@ -353,27 +417,38 @@ export default function SecuritySettingsPage() {
   );
 
   return (
-    <SafeAreaView className="flex-1 bg-background">
-      <StackHeader title="Security Settings" onBackPress={() => safeGoBack()} />
+    <SafeAreaView
+      className="flex-1 bg-background"
+      testID="settings.security.screen">
+      <StackHeader
+        title="Security Settings"
+        onBackPress={() => safeGoBack()}
+        testID="settings.security.header"
+      />
 
       <ScrollView
         className="flex-1"
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ padding: 16, paddingBottom: 100 }}>
+        contentContainerStyle={{ padding: 16, paddingBottom: 100 }}
+        testID="settings.security.scroll">
         {renderAuthenticationSettings()}
         {renderPrivacySettings()}
         {renderSecurityActions()}
 
         {/* Action Buttons */}
-        <View className="space-y-3">
+        <View className="space-y-3" testID="settings.security.action-buttons">
           <Button
             variant="primary"
             onPress={handleSavePreferences}
-            disabled={isSaving}>
+            disabled={isSaving}
+            testID="settings.security.save-button">
             {isSaving ? 'Saving...' : 'Save Security Settings'}
           </Button>
 
-          <Button variant="destructive" onPress={handleResetSecurity}>
+          <Button
+            variant="destructive"
+            onPress={handleResetSecurity}
+            testID="settings.security.reset-button">
             Reset to Defaults
           </Button>
         </View>

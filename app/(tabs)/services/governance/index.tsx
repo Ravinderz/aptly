@@ -1,30 +1,25 @@
-import React, { useState, useEffect } from 'react';
-import {
-  SafeAreaView,
-  View,
-  Text,
-  TouchableOpacity,
-} from 'react-native';
 import LucideIcons from '@/components/ui/LucideIcons';
-import { showSuccessAlert, showErrorAlert } from '@/utils/alert';
+import { showErrorAlert, showSuccessAlert } from '@/utils/alert';
 import { safeGoBack } from '@/utils/navigation';
+import { useEffect, useState } from 'react';
+import { SafeAreaView, Text, TouchableOpacity, View } from 'react-native';
 
 // Import our governance components
-import { GovernanceDashboard } from '@/components/governance/GovernanceDashboard';
-import { VotingSystem } from '@/components/governance/VotingSystem';
 import { EmergencyManagement } from '@/components/governance/EmergencyManagement';
-import { SuccessionManagement } from '@/components/governance/SuccessionManagement';
+import { GovernanceDashboard } from '@/components/governance/GovernanceDashboard';
 import { PolicyGovernance } from '@/components/governance/PolicyGovernance';
+import { SuccessionManagement } from '@/components/governance/SuccessionManagement';
+import { VotingSystem } from '@/components/governance/VotingSystem';
 
 // Import types
 import type {
-  VotingCampaign,
   EmergencyAlert,
-  SuccessionPlan,
-  PolicyProposal,
-  VotingAnalytics,
   EmergencyAnalytics,
   GovernanceDashboard as GovernanceDashboardData,
+  PolicyProposal,
+  SuccessionPlan,
+  VotingAnalytics,
+  VotingCampaign,
 } from '@/types/governance';
 
 // UI Components
@@ -378,7 +373,10 @@ export default function GovernancePage() {
               deputies={[]} // Would come from API
               handoverTasks={[]} // Would come from API
               onCreatePlan={handleCreateSuccessionPlan}
-              onUpdatePlan={async (planId: string, updates: Partial<SuccessionPlan>) => {
+              onUpdatePlan={async (
+                planId: string,
+                updates: Partial<SuccessionPlan>,
+              ) => {
                 console.log('Updating succession plan:', planId, updates);
               }}
               onActivatePlan={async (planId: string) => {
@@ -433,17 +431,22 @@ export default function GovernancePage() {
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-background">
+    <SafeAreaView
+      className="flex-1 bg-background"
+      testID="services.governance.screen">
       <TabHeader
         title="Governance Center"
         subtitle="Democratic participation and emergency management"
         notificationCount={2}
         showBackButton
         onBackPress={() => safeGoBack()}
+        testID="services.governance.header"
       />
 
       {/* Tab Navigation */}
-      <View className="flex-row bg-surface-primary border-b border-border-primary">
+      <View
+        className="flex-row bg-surface-primary border-b border-border-primary"
+        testID="services.governance.tab-navigation">
         {[
           { key: 'dashboard', label: 'Overview', icon: 'home-outline' },
           {
@@ -468,7 +471,8 @@ export default function GovernancePage() {
             onPress={() => setActiveTab(tab.key as any)}
             className={`flex-1 p-3 border-b-2 ${
               activeTab === tab.key ? 'border-primary' : 'border-transparent'
-            }`}>
+            }`}
+            testID={`services.governance.tab.${tab.key}`}>
             <View className="items-center relative">
               <LucideIcons
                 name={tab.icon as any}
@@ -478,12 +482,17 @@ export default function GovernancePage() {
               <Text
                 className={`text-label-small font-medium mt-1 ${
                   activeTab === tab.key ? 'text-primary' : 'text-text-secondary'
-                }`}>
+                }`}
+                testID={`services.governance.tab.${tab.key}.label`}>
                 {tab.label}
               </Text>
               {tab.count && tab.count > 0 && (
-                <View className="absolute -top-1 -right-1 bg-error rounded-full min-w-[16px] h-4 px-1 items-center justify-center">
-                  <Text className="text-white text-label-large font-medium">
+                <View
+                  className="absolute -top-1 -right-1 bg-error rounded-full min-w-[16px] h-4 px-1 items-center justify-center"
+                  testID={`services.governance.tab.${tab.key}.badge`}>
+                  <Text
+                    className="text-white text-label-large font-medium"
+                    testID={`services.governance.tab.${tab.key}.badge-text`}>
                     {tab.count > 99 ? '99+' : tab.count}
                   </Text>
                 </View>
@@ -494,7 +503,11 @@ export default function GovernancePage() {
       </View>
 
       {/* Content */}
-      <View className="flex-1 bg-surface-secondary">{renderContent()}</View>
+      <View
+        className="flex-1 bg-surface-secondary"
+        testID="services.governance.content">
+        {renderContent()}
+      </View>
     </SafeAreaView>
   );
 }

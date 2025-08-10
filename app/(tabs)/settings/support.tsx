@@ -1,7 +1,7 @@
 import LucideIcons from '@/components/ui/LucideIcons';
 import { showErrorAlert, showSuccessAlert } from '@/utils/alert';
 import { safeGoBack } from '@/utils/navigation';
-import React, { useState } from 'react';
+import { useState } from 'react';
 import {
   Linking,
   SafeAreaView,
@@ -326,13 +326,20 @@ export default function SupportPage() {
   );
 
   return (
-    <SafeAreaView className="flex-1 bg-background">
-      <StackHeader title="Help & Support" onBackPress={() => safeGoBack()} />
+    <SafeAreaView
+      className="flex-1 bg-background"
+      testID="settings.support.screen">
+      <StackHeader
+        title="Help & Support"
+        onBackPress={() => safeGoBack()}
+        testID="settings.support.header"
+      />
 
       <ScrollView
         className="flex-1"
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ padding: 16, paddingBottom: 100 }}>
+        contentContainerStyle={{ padding: 16, paddingBottom: 100 }}
+        testID="settings.support.scroll">
         {renderContactOptions()}
         {renderFAQ()}
         {renderFeedbackForm()}

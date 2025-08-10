@@ -1,17 +1,16 @@
-import React, { useState } from 'react';
+import { StandardHeader } from '@/components/design-system';
+import { Save } from 'lucide-react-native';
+import { useState } from 'react';
 import {
-  ScrollView,
-  View,
-  Text,
   KeyboardAvoidingView,
   Platform,
+  ScrollView,
+  Text,
+  View,
 } from 'react-native';
-import { Save } from 'lucide-react-native';
-import { router } from 'expo-router';
-import { StandardHeader } from '@/components/design-system';
-import Input from '../../../components/ui/Input';
 import Button from '../../../components/ui/Button';
 import { Card } from '../../../components/ui/Card';
+import Input from '../../../components/ui/Input';
 import { showErrorAlert, showSuccessAlert } from '../../../utils/alert';
 
 export default function PersonalDetails() {
@@ -53,23 +52,35 @@ export default function PersonalDetails() {
   };
 
   return (
-    <View className="flex-1 bg-background">
-      <StandardHeader 
+    <View
+      className="flex-1 bg-background"
+      testID="settings.personal-details.screen">
+      <StandardHeader
         title="Personal Details"
         showBack
-        rightAction={isEditing ? {
-          icon: <Save size={20} color="#ffffff" />,
-          onPress: handleSave,
-          label: "Save"
-        } : {
-          icon: <Text className="text-blue-600 font-medium">Edit</Text>,
-          onPress: () => setIsEditing(true),
-          label: "Edit"
-        }}
-      >
+        rightAction={
+          isEditing
+            ? {
+                icon: <Save size={20} color="#ffffff" />,
+                onPress: handleSave,
+                label: 'Save',
+              }
+            : {
+                icon: <Text className="text-blue-600 font-medium">Edit</Text>,
+                onPress: () => setIsEditing(true),
+                label: 'Edit',
+              }
+        }
+        testID="settings.personal-details.header">
         {isEditing && (
-          <View className="flex-row justify-end mt-2">
-            <Button variant="outline" size="sm" onPress={handleCancel}>
+          <View
+            className="flex-row justify-end mt-2"
+            testID="settings.personal-details.cancel-section">
+            <Button
+              variant="outline"
+              size="sm"
+              onPress={handleCancel}
+              testID="settings.personal-details.cancel-button">
               Cancel
             </Button>
           </View>
@@ -79,15 +90,21 @@ export default function PersonalDetails() {
       <KeyboardAvoidingView
         className="flex-1"
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        keyboardVerticalOffset={Platform.OS === 'ios' ? 90 : 0}>
+        keyboardVerticalOffset={Platform.OS === 'ios' ? 90 : 0}
+        testID="settings.personal-details.keyboard-avoiding-view">
         <ScrollView
           className="flex-1 p-4"
           showsVerticalScrollIndicator={false}
           contentContainerStyle={{ paddingBottom: 20 }}
-          keyboardShouldPersistTaps="handled">
+          keyboardShouldPersistTaps="handled"
+          testID="settings.personal-details.scroll">
           {/* Basic Information */}
-          <Card className="mb-6">
-            <Text className="text-text-primary text-lg font-semibold mb-4">
+          <Card
+            className="mb-6"
+            testID="settings.personal-details.basic-info-card">
+            <Text
+              className="text-text-primary text-lg font-semibold mb-4"
+              testID="settings.personal-details.basic-info-title">
               Basic Information
             </Text>
 
@@ -100,6 +117,7 @@ export default function PersonalDetails() {
               editable={isEditing}
               variant={isEditing ? 'outlined' : 'filled'}
               className={!isEditing ? 'bg-background' : ''}
+              testID="settings.personal-details.full-name-input"
             />
 
             <Input
@@ -113,6 +131,7 @@ export default function PersonalDetails() {
               className={!isEditing ? 'bg-background' : ''}
               keyboardType="email-address"
               containerClassName="mt-4"
+              testID="settings.personal-details.email-input"
             />
 
             <Input
@@ -126,6 +145,7 @@ export default function PersonalDetails() {
               className={!isEditing ? 'bg-background' : ''}
               keyboardType="phone-pad"
               containerClassName="mt-4"
+              testID="settings.personal-details.phone-input"
             />
 
             <Input
@@ -139,6 +159,7 @@ export default function PersonalDetails() {
               className={!isEditing ? 'bg-background' : ''}
               keyboardType="phone-pad"
               containerClassName="mt-4"
+              testID="settings.personal-details.alternate-phone-input"
             />
 
             <Input
@@ -151,12 +172,17 @@ export default function PersonalDetails() {
               variant={isEditing ? 'outlined' : 'filled'}
               className={!isEditing ? 'bg-background' : ''}
               containerClassName="mt-4"
+              testID="settings.personal-details.occupation-input"
             />
           </Card>
 
           {/* Identity Documents */}
-          <Card className="mb-6">
-            <Text className="text-text-primary text-lg font-semibold mb-4">
+          <Card
+            className="mb-6"
+            testID="settings.personal-details.identity-documents-card">
+            <Text
+              className="text-text-primary text-lg font-semibold mb-4"
+              testID="settings.personal-details.identity-documents-title">
               Identity Documents
             </Text>
 
@@ -171,6 +197,7 @@ export default function PersonalDetails() {
               className={!isEditing ? 'bg-background' : ''}
               keyboardType="numeric"
               maxLength={14}
+              testID="settings.personal-details.aadhar-input"
             />
 
             <Input
@@ -188,12 +215,17 @@ export default function PersonalDetails() {
               maxLength={10}
               containerClassName="mt-4"
               autoCapitalize="characters"
+              testID="settings.personal-details.pan-input"
             />
           </Card>
 
           {/* Address Information */}
-          <Card className="mb-6">
-            <Text className="text-text-primary text-lg font-semibold mb-4">
+          <Card
+            className="mb-6"
+            testID="settings.personal-details.address-card">
+            <Text
+              className="text-text-primary text-lg font-semibold mb-4"
+              testID="settings.personal-details.address-title">
               Address Information
             </Text>
 
@@ -208,12 +240,17 @@ export default function PersonalDetails() {
               className={!isEditing ? 'bg-background' : ''}
               multiline
               numberOfLines={3}
+              testID="settings.personal-details.address-input"
             />
           </Card>
 
           {/* Emergency Contact */}
-          <Card className="mb-6">
-            <Text className="text-text-primary text-lg font-semibold mb-4">
+          <Card
+            className="mb-6"
+            testID="settings.personal-details.emergency-contact-card">
+            <Text
+              className="text-text-primary text-lg font-semibold mb-4"
+              testID="settings.personal-details.emergency-contact-title">
               Emergency Contact
             </Text>
 
@@ -227,6 +264,7 @@ export default function PersonalDetails() {
               variant={isEditing ? 'outlined' : 'filled'}
               className={!isEditing ? 'bg-background' : ''}
               placeholder="Name - Relationship"
+              testID="settings.personal-details.emergency-contact-name-input"
             />
 
             <Input
@@ -240,13 +278,18 @@ export default function PersonalDetails() {
               className={!isEditing ? 'bg-background' : ''}
               keyboardType="phone-pad"
               containerClassName="mt-4"
+              testID="settings.personal-details.emergency-contact-phone-input"
             />
           </Card>
 
           {/* Note */}
           {!isEditing && (
-            <View className="bg-primary/10 rounded-lg p-4">
-              <Text className="text-text-secondary text-sm text-center">
+            <View
+              className="bg-primary/10 rounded-lg p-4"
+              testID="settings.personal-details.note">
+              <Text
+                className="text-text-secondary text-sm text-center"
+                testID="settings.personal-details.note-text">
                 * Required fields. Tap "Edit" to modify your information.
               </Text>
             </View>

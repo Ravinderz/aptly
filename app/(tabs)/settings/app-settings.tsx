@@ -1,22 +1,21 @@
-import React, { useState, useEffect } from 'react';
+import LucideIcons from '@/components/ui/LucideIcons';
+import { showErrorAlert, showSuccessAlert } from '@/utils/alert';
+import { safeGoBack } from '@/utils/navigation';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useEffect, useState } from 'react';
 import {
+  Alert,
   SafeAreaView,
   ScrollView,
-  View,
+  Switch,
   Text,
   TouchableOpacity,
-  Switch,
-  Alert,
+  View,
 } from 'react-native';
-import { router } from 'expo-router';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import LucideIcons from '@/components/ui/LucideIcons';
-import { showSuccessAlert, showErrorAlert } from '@/utils/alert';
-import { safeGoBack } from '@/utils/navigation';
 
 // UI Components
-import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
+import { Card } from '@/components/ui/Card';
 import StackHeader from '@/components/ui/headers/StackHeader';
 
 // Default app preferences
@@ -424,28 +423,41 @@ export default function AppSettingsPage() {
   );
 
   return (
-    <SafeAreaView className="flex-1 bg-background">
-      <StackHeader title="App Settings" onBackPress={() => safeGoBack()} />
+    <SafeAreaView
+      className="flex-1 bg-background"
+      testID="settings.app-settings.screen">
+      <StackHeader
+        title="App Settings"
+        onBackPress={() => safeGoBack()}
+        testID="settings.app-settings.header"
+      />
 
       <ScrollView
         className="flex-1"
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ padding: 16, paddingBottom: 100 }}>
+        contentContainerStyle={{ padding: 16, paddingBottom: 100 }}
+        testID="settings.app-settings.scroll">
         {renderLanguageTheme()}
         {renderDataSync()}
         {renderStoragePrivacy()}
         {renderDeveloperOptions()}
 
         {/* Action Buttons */}
-        <View className="space-y-3">
+        <View
+          className="space-y-3"
+          testID="settings.app-settings.action-buttons">
           <Button
             variant="primary"
             onPress={handleSavePreferences}
-            disabled={isSaving}>
+            disabled={isSaving}
+            testID="settings.app-settings.save-button">
             {isSaving ? 'Saving...' : 'Save App Settings'}
           </Button>
 
-          <Button variant="destructive" onPress={handleResetSettings}>
+          <Button
+            variant="destructive"
+            onPress={handleResetSettings}
+            testID="settings.app-settings.reset-button">
             Reset to Defaults
           </Button>
         </View>

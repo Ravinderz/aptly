@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from 'react';
-import { SafeAreaView, View, Text, TouchableOpacity } from 'react-native';
 import LucideIcons from '@/components/ui/LucideIcons';
-import { showSuccessAlert, showErrorAlert } from '@/utils/alert';
+import { showErrorAlert, showSuccessAlert } from '@/utils/alert';
 import { safeGoBack } from '@/utils/navigation';
+import { useEffect, useState } from 'react';
+import { SafeAreaView, Text, TouchableOpacity, View } from 'react-native';
 
 // Import our analytics components
 import { AnalyticsDashboard } from '@/components/analytics/AnalyticsDashboard';
@@ -12,15 +12,15 @@ import { PerformanceOptimizer } from '@/components/analytics/PerformanceOptimize
 
 // Import types
 import type {
-  SocietyAnalytics,
   AuditEntry,
-  PerformanceMetrics,
-  SystemHealth,
-  NotificationTemplate,
+  IntelligentDelivery,
   NotificationCampaign,
   NotificationPreference,
-  IntelligentDelivery,
+  NotificationTemplate,
   OptimizationRecommendation,
+  PerformanceMetrics,
+  SocietyAnalytics,
+  SystemHealth,
 } from '@/types/analytics';
 
 // UI Components
@@ -693,17 +693,22 @@ export default function AnalyticsPage() {
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-background">
+    <SafeAreaView
+      className="flex-1 bg-background"
+      testID="services.analytics.screen">
       <TabHeader
         title="Analytics Center"
         subtitle="Performance insights and intelligent optimization"
         notificationCount={2}
         showBackButton
         onBackPress={() => safeGoBack()}
+        testID="services.analytics.header"
       />
 
       {/* Tab Navigation */}
-      <View className="flex-row bg-surface-primary border-b border-border-primary">
+      <View
+        className="flex-row bg-surface-primary border-b border-border-primary"
+        testID="services.analytics.tab-navigation">
         {[
           { key: 'dashboard', label: 'Overview', icon: 'analytics-outline' },
           { key: 'audit', label: 'Audit', icon: 'shield-checkmark-outline' },
@@ -727,7 +732,8 @@ export default function AnalyticsPage() {
             onPress={() => setActiveTab(tab.key as any)}
             className={`flex-1 p-3 border-b-2 ${
               activeTab === tab.key ? 'border-primary' : 'border-transparent'
-            }`}>
+            }`}
+            testID={`services.analytics.tab.${tab.key}`}>
             <View className="items-center relative">
               <LucideIcons
                 name={tab.icon as any}
@@ -737,12 +743,17 @@ export default function AnalyticsPage() {
               <Text
                 className={`text-label-small font-medium mt-1 ${
                   activeTab === tab.key ? 'text-primary' : 'text-text-secondary'
-                }`}>
+                }`}
+                testID={`services.analytics.tab.${tab.key}.label`}>
                 {tab.label}
               </Text>
               {tab.count && tab.count > 0 && (
-                <View className="absolute -top-1 -right-1 bg-error rounded-full min-w-[16px] h-4 px-1 items-center justify-center">
-                  <Text className="text-white text-label-large font-medium">
+                <View
+                  className="absolute -top-1 -right-1 bg-error rounded-full min-w-[16px] h-4 px-1 items-center justify-center"
+                  testID={`services.analytics.tab.${tab.key}.badge`}>
+                  <Text
+                    className="text-white text-label-large font-medium"
+                    testID={`services.analytics.tab.${tab.key}.badge-text`}>
                     {tab.count > 99 ? '99+' : tab.count}
                   </Text>
                 </View>
@@ -753,7 +764,11 @@ export default function AnalyticsPage() {
       </View>
 
       {/* Content */}
-      <View className="flex-1 bg-surface-secondary">{renderContent()}</View>
+      <View
+        className="flex-1 bg-surface-secondary"
+        testID="services.analytics.content">
+        {renderContent()}
+      </View>
     </SafeAreaView>
   );
 }
