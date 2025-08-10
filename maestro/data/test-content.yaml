@@ -1,35 +1,240 @@
 # Test content data for posts, notices, and visitor information
+# This file contains comprehensive test content for E2E testing scenarios
 
+# Community posts for testing social features
 testContent:
   posts:
-    - title: "Community Event Announcement"
-      content: "Join us for the annual community gathering this weekend!"
-      author: "Test Resident"
-      
-    - title: "Maintenance Notice"
-      content: "Water supply will be interrupted tomorrow from 10 AM to 2 PM"
-      author: "Test Admin"
+    - id: 'post_001'
+      title: 'Community Event Announcement'
+      content: 'Join us for the annual community gathering this weekend! There will be food, music, and activities for all ages.'
+      author: 'Test Resident'
+      authorId: 'resident_001'
+      timestamp: '2024-01-15T09:00:00Z'
+      tags: ['event', 'community']
+      likes: 5
+      comments: 2
+      images: ['https://via.placeholder.com/400x300']
 
+    - id: 'post_002'
+      title: 'Maintenance Notice'
+      content: 'Water supply will be interrupted tomorrow from 10 AM to 2 PM for essential maintenance work.'
+      author: 'Test Admin'
+      authorId: 'admin_001'
+      timestamp: '2024-01-14T16:30:00Z'
+      tags: ['maintenance', 'important']
+      likes: 12
+      comments: 8
+      priority: 'high'
+
+    - id: 'post_003'
+      title: 'Lost Pet - Please Help'
+      content: "My cat Whiskers has been missing since yesterday. He's orange and white. Please contact me if you see him."
+      author: 'Test Resident'
+      authorId: 'resident_002'
+      timestamp: '2024-01-13T20:15:00Z'
+      tags: ['lost', 'pet', 'help']
+      likes: 8
+      comments: 15
+      images: ['https://via.placeholder.com/300x300']
+
+    - id: 'post_004'
+      title: 'Parking Space Available'
+      content: 'I have an extra parking space available for rent. Monthly rate $100. Contact me for details.'
+      author: 'Test Resident'
+      authorId: 'resident_003'
+      timestamp: '2024-01-12T14:20:00Z'
+      tags: ['parking', 'rent']
+      likes: 3
+      comments: 5
+
+  # Comments for testing comment functionality
+  comments:
+    - id: 'comment_001'
+      postId: 'post_001'
+      content: "Sounds great! I'll be there with my family."
+      author: 'Test Resident 2'
+      authorId: 'resident_002'
+      timestamp: '2024-01-15T10:30:00Z'
+      likes: 2
+
+    - id: 'comment_002'
+      postId: 'post_001'
+      content: 'What time does it start?'
+      author: 'Test Resident 3'
+      authorId: 'resident_003'
+      timestamp: '2024-01-15T11:15:00Z'
+      likes: 1
+
+    - id: 'comment_003'
+      postId: 'post_002'
+      content: "Thanks for the heads up! I'll fill up water containers."
+      author: 'Test Resident'
+      authorId: 'resident_001'
+      timestamp: '2024-01-14T17:00:00Z'
+      likes: 3
+
+  # Visitor data for testing visitor management
   visitors:
-    - name: "John Visitor"
-      phone: "+1234567894"
-      purpose: "Delivery"
-      expectedTime: "2024-01-15T10:00:00Z"
-      
-    - name: "Jane Guest"
-      phone: "+1234567895"
-      purpose: "Personal Visit"
-      expectedTime: "2024-01-15T14:00:00Z"
+    - id: 'visitor_001'
+      name: 'John Visitor'
+      phone: '+919876543221'
+      purpose: 'Delivery'
+      expectedTime: '2024-01-15T10:00:00Z'
+      duration: '30 minutes'
+      hostResident: 'Test Resident'
+      hostApartment: 'A-101'
+      status: 'pending'
+      vehicleNumber: 'ABC123'
 
+    - id: 'visitor_002'
+      name: 'Jane Guest'
+      phone: '+919876543222'
+      purpose: 'Personal Visit'
+      expectedTime: '2024-01-15T14:00:00Z'
+      duration: '2 hours'
+      hostResident: 'Test Resident'
+      hostApartment: 'A-101'
+      status: 'approved'
+      qrCode: 'QR123456789'
+
+    - id: 'visitor_003'
+      name: 'Mike Contractor'
+      phone: '+919876543223'
+      purpose: 'Maintenance Work'
+      expectedTime: '2024-01-16T09:00:00Z'
+      duration: '4 hours'
+      hostResident: 'Test Admin'
+      hostApartment: 'A-102'
+      status: 'approved'
+      vehicleNumber: 'XYZ789'
+      tools: ['toolbox', 'ladder']
+
+    - id: 'visitor_004'
+      name: 'Sarah Delivery'
+      phone: '+919876543224'
+      purpose: 'Package Delivery'
+      expectedTime: '2024-01-15T16:30:00Z'
+      duration: '15 minutes'
+      hostResident: 'Test Resident 2'
+      hostApartment: 'B-201'
+      status: 'completed'
+      deliveryCompany: 'FastDelivery Inc'
+
+  # Notice data for testing notice system
   notices:
-    - title: "Important Security Update"
-      content: "New security protocols are now in effect"
-      priority: "high"
-      
-    - title: "Parking Guidelines"
-      content: "Please follow the new parking guidelines"
-      priority: "medium"
-      
-    - title: "Community Newsletter"
-      content: "Monthly newsletter is now available"
-      priority: "low"
+    - id: 'notice_001'
+      title: 'Important Security Update'
+      content: 'New security protocols are now in effect. All residents must register their biometric data by the end of this month.'
+      priority: 'high'
+      author: 'Test Admin'
+      publishDate: '2024-01-10T08:00:00Z'
+      expiryDate: '2024-01-31T23:59:59Z'
+      category: 'security'
+      attachments: ['security_protocol.pdf']
+
+    - id: 'notice_002'
+      title: 'Parking Guidelines'
+      content: 'Please follow the new parking guidelines. Visitor parking is now available in Section C.'
+      priority: 'medium'
+      author: 'Test Manager'
+      publishDate: '2024-01-12T12:00:00Z'
+      expiryDate: '2024-02-12T23:59:59Z'
+      category: 'parking'
+
+    - id: 'notice_003'
+      title: 'Community Newsletter'
+      content: 'Monthly newsletter is now available. Check out the latest updates and upcoming events.'
+      priority: 'low'
+      author: 'Test Admin'
+      publishDate: '2024-01-01T00:00:00Z'
+      expiryDate: '2024-01-31T23:59:59Z'
+      category: 'newsletter'
+      attachments: ['newsletter_jan_2024.pdf']
+
+    - id: 'notice_004'
+      title: 'Water Tank Cleaning Schedule'
+      content: 'Water tank cleaning will be conducted on the following dates: Jan 20, Feb 20, Mar 20.'
+      priority: 'medium'
+      author: 'Test Manager'
+      publishDate: '2024-01-15T10:00:00Z'
+      expiryDate: '2024-03-31T23:59:59Z'
+      category: 'maintenance'
+
+  # Vehicle data for testing vehicle management
+  vehicles:
+    - id: 'vehicle_001'
+      ownerName: 'Test Resident'
+      ownerApartment: 'A-101'
+      vehicleNumber: 'TEST123'
+      vehicleType: 'car'
+      brand: 'Toyota'
+      model: 'Camry'
+      color: 'Blue'
+      status: 'active'
+
+    - id: 'vehicle_002'
+      ownerName: 'Test Admin'
+      ownerApartment: 'A-102'
+      vehicleNumber: 'ADMIN456'
+      vehicleType: 'motorcycle'
+      brand: 'Honda'
+      model: 'CBR'
+      color: 'Red'
+      status: 'active'
+
+  # Emergency contact data
+  emergencyContacts:
+    - id: 'emergency_001'
+      name: 'Emergency Contact 1'
+      phone: '+919876543218'
+      relationship: 'spouse'
+      residentId: 'resident_001'
+
+    - id: 'emergency_002'
+      name: 'Emergency Contact 2'
+      phone: '+919876543219'
+      relationship: 'parent'
+      residentId: 'resident_001'
+
+  # Family member data
+  familyMembers:
+    - id: 'family_001'
+      name: 'Family Member 1'
+      phone: '+919876543225'
+      relationship: 'child'
+      age: 12
+      residentId: 'resident_001'
+
+# Test data for different scenarios
+testScenarios:
+  # Data for smoke tests
+  smoke:
+    posts: ['post_001']
+    visitors: ['visitor_001']
+    notices: ['notice_001']
+
+  # Data for regression tests
+  regression:
+    posts: ['post_001', 'post_002', 'post_003']
+    visitors: ['visitor_001', 'visitor_002', 'visitor_003']
+    notices: ['notice_001', 'notice_002', 'notice_003']
+
+  # Data for performance tests
+  performance:
+    posts: ['post_001', 'post_002', 'post_003', 'post_004']
+    visitors: ['visitor_001', 'visitor_002', 'visitor_003', 'visitor_004']
+    notices: ['notice_001', 'notice_002', 'notice_003', 'notice_004']
+
+# Data seeding configuration
+seeding:
+  enabled: true
+  order:
+    - users
+    - societies
+    - posts
+    - visitors
+    - notices
+    - vehicles
+  cleanup:
+    enabled: true
+    retainLogs: true

@@ -1,0 +1,214 @@
+# Data seeding and cleanup utilities for Maestro E2E tests
+# This file contains reusable flows for managing test data
+
+# Data seeding flows
+seedTestData:
+  - runFlow: seedUsers
+  - runFlow: seedSocieties
+  - runFlow: seedPosts
+  - runFlow: seedVisitors
+  - runFlow: seedNotices
+  - runFlow: seedVehicles
+
+# Individual seeding flows
+seedUsers:
+  - launchApp
+  - tapOn: 'Skip Onboarding' # If onboarding exists
+  - repeat:
+      times: 4
+      commands:
+        - tapOn: 'Register New User'
+        - inputText: '${testUsers.resident.phone}'
+        - tapOn: 'Send OTP'
+        - inputText: '${testUsers.resident.otp}'
+        - tapOn: 'Verify'
+        - inputText: '${testUsers.resident.profile.name}'
+        - inputText: '${testUsers.resident.profile.email}'
+        - tapOn: 'Complete Profile'
+
+seedSocieties:
+  - tapOn: 'Admin Panel'
+  - tapOn: 'Manage Societies'
+  - tapOn: 'Add Society'
+  - inputText: '${testSocieties.primary.name}'
+  - inputText: '${testSocieties.primary.code}'
+  - inputText: '${testSocieties.primary.address}'
+  - tapOn: 'Create Society'
+
+seedPosts:
+  - tapOn: 'Community'
+  - tapOn: 'Create Post'
+  - repeat:
+      times: 3
+      commands:
+        - inputText: '${testContent.posts[0].title}'
+        - inputText: '${testContent.posts[0].content}'
+        - tapOn: 'Post'
+        - delay: 2000
+
+seedVisitors:
+  - tapOn: 'Visitors'
+  - tapOn: 'Add Visitor'
+  - repeat:
+      times: 2
+      commands:
+        - inputText: '${testContent.visitors[0].name}'
+        - inputText: '${testContent.visitors[0].phone}'
+        - inputText: '${testContent.visitors[0].purpose}'
+        - tapOn: 'Save Visitor'
+        - delay: 1000
+
+seedNotices:
+  - tapOn: 'Admin Panel'
+  - tapOn: 'Manage Notices'
+  - tapOn: 'Create Notice'
+  - repeat:
+      times: 3
+      commands:
+        - inputText: '${testContent.notices[0].title}'
+        - inputText: '${testContent.notices[0].content}'
+        - tapOn: 'Publish Notice'
+        - delay: 1000
+
+seedVehicles:
+  - tapOn: 'Settings'
+  - tapOn: 'Vehicles'
+  - tapOn: 'Add Vehicle'
+  - repeat:
+      times: 2
+      commands:
+        - inputText: '${testContent.vehicles[0].vehicleNumber}'
+        - inputText: '${testContent.vehicles[0].brand}'
+        - inputText: '${testContent.vehicles[0].model}'
+        - tapOn: 'Save Vehicle'
+        - delay: 1000
+
+# Data cleanup flows
+cleanupTestData:
+  - runFlow: cleanupUsers
+  - runFlow: cleanupPosts
+  - runFlow: cleanupVisitors
+  - runFlow: cleanupNotices
+  - runFlow: cleanupVehicles
+
+cleanupUsers:
+  - tapOn: 'Admin Panel'
+  - tapOn: 'Manage Users'
+  - repeat:
+      while:
+        visible: 'Test User'
+      commands:
+        - tapOn: 'Test User'
+        - tapOn: 'Delete User'
+        - tapOn: 'Confirm'
+
+cleanupPosts:
+  - tapOn: 'Community'
+  - repeat:
+      while:
+        visible: 'Test Post'
+      commands:
+        - longPressOn: 'Test Post'
+        - tapOn: 'Delete'
+        - tapOn: 'Confirm'
+
+cleanupVisitors:
+  - tapOn: 'Visitors'
+  - repeat:
+      while:
+        visible: 'Test Visitor'
+      commands:
+        - swipeLeft: 'Test Visitor'
+        - tapOn: 'Delete'
+        - tapOn: 'Confirm'
+
+cleanupNotices:
+  - tapOn: 'Admin Panel'
+  - tapOn: 'Manage Notices'
+  - repeat:
+      while:
+        visible: 'Test Notice'
+      commands:
+        - tapOn: 'Test Notice'
+        - tapOn: 'Delete'
+        - tapOn: 'Confirm'
+
+cleanupVehicles:
+  - tapOn: 'Settings'
+  - tapOn: 'Vehicles'
+  - repeat:
+      while:
+        visible: 'Test Vehicle'
+      commands:
+        - swipeLeft: 'Test Vehicle'
+        - tapOn: 'Delete'
+        - tapOn: 'Confirm'
+
+# State management utilities
+resetAppState:
+  - clearState
+  - clearKeychain
+  - launchApp
+  - delay: 3000
+
+loginAsUser:
+  - inputText: '${phone}'
+  - tapOn: 'Send OTP'
+  - inputText: '${otp}'
+  - tapOn: 'Verify'
+  - assertVisible: 'Home'
+
+logoutUser:
+  - tapOn: 'Settings'
+  - tapOn: 'Logout'
+  - tapOn: 'Confirm Logout'
+  - assertVisible: 'Login'
+
+# Verification utilities
+verifyDataSeeded:
+  - tapOn: 'Community'
+  - assertVisible: 'Community Event Announcement'
+  - tapOn: 'Visitors'
+  - assertVisible: 'John Visitor'
+  - tapOn: 'Home'
+  - assertVisible: 'Important Security Update'
+
+verifyDataCleaned:
+  - tapOn: 'Community'
+  - assertNotVisible: 'Test Post'
+  - tapOn: 'Visitors'
+  - assertNotVisible: 'Test Visitor'
+  - tapOn: 'Admin Panel'
+  - assertNotVisible: 'Test User'
+
+# Environment-specific data management
+developmentDataSetup:
+  - runFlow: resetAppState
+  - runFlow: seedTestData
+  - runFlow: verifyDataSeeded
+
+stagingDataSetup:
+  - runFlow: resetAppState
+  - runFlow: seedTestData
+  - runFlow: verifyDataSeeded
+
+productionDataSetup:
+  - runFlow: resetAppState
+  # Minimal data seeding for production
+  - runFlow: seedUsers
+  - runFlow: verifyDataSeeded
+
+# Test data validation
+validateTestData:
+  - assertVisible: '${testUsers.resident.profile.name}'
+  - assertVisible: '${testSocieties.primary.name}'
+  - assertVisible: '${testContent.posts[0].title}'
+  - assertVisible: '${testContent.visitors[0].name}'
+  - assertVisible: '${testContent.notices[0].title}'
+
+# Error handling for data operations
+handleDataError:
+  - onError:
+      - takeScreenshot
+      - runFlow: cleanupTestData
+      - runFlow: resetAppState

@@ -1,6 +1,30 @@
 appId: com.ravinderz.aptly
 env:
-  APP_ENV: development
-  API_BASE_URL: ${API_BASE_URL}
-  TEST_USER_PHONE: ${TEST_USER_PHONE}
-  TEST_USER_OTP: ${TEST_USER_OTP}
+  APP_ENV: ${APP_ENV:-development}
+  API_BASE_URL: ${API_BASE_URL:-http://localhost:3000}
+  TEST_USER_PHONE: ${TEST_USER_PHONE:-+919876543210}
+  TEST_USER_OTP: ${TEST_USER_OTP:-123456}
+  TIMEOUT: ${TIMEOUT:-30000}
+  APP_SCHEME: ${APP_SCHEME:-aptly}
+  PLATFORM: ${PLATFORM:-ios}
+  DEVICE: ${DEVICE:-iPhone 15}
+
+# Global test configuration
+tags:
+  - smoke
+  - regression
+  - e2e
+
+# Default timeouts (in milliseconds)
+timeouts:
+  default: 30000
+  long: 60000
+  short: 10000
+
+# Test execution settings
+onFlowStart:
+  - clearState
+  - clearKeychain
+
+onFlowComplete:
+  - clearState

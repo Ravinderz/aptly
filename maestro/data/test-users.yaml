@@ -1,50 +1,184 @@
 # Test user data for different roles and scenarios
+# This file contains comprehensive test user data for E2E testing
 
+# Primary test users for main flows
 testUsers:
   resident:
-    phone: "+1234567890"
-    otp: "123456"
+    phone: '+919876543210'
+    otp: '123456'
     profile:
-      name: "Test Resident"
-      email: "resident@test.com"
-      apartment: "A-101"
+      name: 'Test Resident'
+      email: 'resident@test.com'
+      apartment: 'A-101'
+      emergencyContact: '+919876543219'
+      profileImage: 'https://via.placeholder.com/150'
     society:
-      name: "Test Society"
-      code: "TEST123"
-    role: "resident"
+      name: 'Test Society'
+      code: 'TEST123'
+      address: '123 Test Street, Test City'
+    role: 'resident'
+    permissions:
+      - 'view_community'
+      - 'create_posts'
+      - 'manage_visitors'
+      - 'view_notices'
+    biometric:
+      enabled: true
+      type: 'fingerprint'
 
   admin:
-    phone: "+1234567891"
-    otp: "123456"
+    phone: '+919876543211'
+    otp: '123456'
     profile:
-      name: "Test Admin"
-      email: "admin@test.com"
-      apartment: "A-102"
+      name: 'Test Admin'
+      email: 'admin@test.com'
+      apartment: 'A-102'
+      emergencyContact: '+919876543218'
+      profileImage: 'https://via.placeholder.com/150'
     society:
-      name: "Test Society"
-      code: "TEST123"
-    role: "admin"
+      name: 'Test Society'
+      code: 'TEST123'
+      address: '123 Test Street, Test City'
+    role: 'admin'
+    permissions:
+      - 'manage_users'
+      - 'manage_society'
+      - 'view_analytics'
+      - 'manage_notices'
+      - 'manage_security'
+    biometric:
+      enabled: true
+      type: 'face'
 
   security:
-    phone: "+1234567892"
-    otp: "123456"
+    phone: '+919876543212'
+    otp: '123456'
     profile:
-      name: "Test Security"
-      email: "security@test.com"
-      apartment: "Security Office"
+      name: 'Test Security'
+      email: 'security@test.com'
+      apartment: 'Security Office'
+      emergencyContact: '+919876543217'
+      profileImage: 'https://via.placeholder.com/150'
     society:
-      name: "Test Society"
-      code: "TEST123"
-    role: "security"
+      name: 'Test Society'
+      code: 'TEST123'
+      address: '123 Test Street, Test City'
+    role: 'security'
+    permissions:
+      - 'manage_visitors'
+      - 'view_security_alerts'
+      - 'manage_vehicles'
+      - 'emergency_access'
+    biometric:
+      enabled: true
+      type: 'fingerprint'
 
   manager:
-    phone: "+1234567893"
-    otp: "123456"
+    phone: '+919876543213'
+    otp: '123456'
     profile:
-      name: "Test Manager"
-      email: "manager@test.com"
-      apartment: "Manager Office"
+      name: 'Test Manager'
+      email: 'manager@test.com'
+      apartment: 'Manager Office'
+      emergencyContact: '+919876543216'
+      profileImage: 'https://via.placeholder.com/150'
     society:
-      name: "Test Society"
-      code: "TEST123"
-    role: "manager"
+      name: 'Test Society'
+      code: 'TEST123'
+      address: '123 Test Street, Test City'
+    role: 'manager'
+    permissions:
+      - 'view_reports'
+      - 'manage_maintenance'
+      - 'view_analytics'
+      - 'manage_billing'
+    biometric:
+      enabled: false
+      type: null
+
+# Additional test users for edge cases and multi-user scenarios
+additionalUsers:
+  newResident:
+    phone: '+919876543214'
+    otp: '123456'
+    profile:
+      name: 'New Test Resident'
+      email: 'newresident@test.com'
+      apartment: 'B-201'
+    society:
+      name: 'Test Society'
+      code: 'TEST123'
+    role: 'resident'
+    status: 'pending_approval'
+
+  inactiveUser:
+    phone: '+919876543215'
+    otp: '123456'
+    profile:
+      name: 'Inactive User'
+      email: 'inactive@test.com'
+      apartment: 'C-301'
+    society:
+      name: 'Test Society'
+      code: 'TEST123'
+    role: 'resident'
+    status: 'inactive'
+
+  multiSocietyAdmin:
+    phone: '+919876543220'
+    otp: '123456'
+    profile:
+      name: 'Multi Society Admin'
+      email: 'multiadmin@test.com'
+      apartment: 'Admin Office'
+    societies:
+      - name: 'Test Society'
+        code: 'TEST123'
+        role: 'admin'
+      - name: 'Test Society 2'
+        code: 'TEST456'
+        role: 'admin'
+    role: 'super_admin'
+
+# Test societies for multi-society scenarios
+testSocieties:
+  primary:
+    name: 'Test Society'
+    code: 'TEST123'
+    address: '123 Test Street, Test City'
+    type: 'residential'
+    settings:
+      visitorApproval: true
+      communityPosts: true
+      emergencyAlerts: true
+
+  secondary:
+    name: 'Test Society 2'
+    code: 'TEST456'
+    address: '456 Test Avenue, Test City'
+    type: 'commercial'
+    settings:
+      visitorApproval: false
+      communityPosts: false
+      emergencyAlerts: true
+
+# User credentials for different test scenarios
+credentials:
+  valid:
+    phone: '+919876543210'
+    otp: '123456'
+
+  invalid:
+    phone: '+919999999999'
+    otp: '000000'
+
+  expired:
+    phone: '+919876543210'
+    otp: 'expired'
+
+# Test data cleanup configuration
+cleanup:
+  enabled: true
+  retainLogs: true
+  clearUserData: true
+  resetPermissions: true

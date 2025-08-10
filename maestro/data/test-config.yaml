@@ -1,0 +1,158 @@
+# Test Data Configuration
+# This file defines the overall test data management configuration
+
+# Data management settings
+dataManagement:
+  enabled: true
+  autoSeed: true
+  autoCleanup: true
+  retainLogs: true
+
+# Environment-specific data settings
+environments:
+  development:
+    dataSeeding:
+      enabled: true
+      fullDataSet: true
+      users: 4
+      posts: 4
+      visitors: 4
+      notices: 4
+      vehicles: 2
+    cleanup:
+      enabled: true
+      aggressive: true
+      retainTestUsers: false
+
+  staging:
+    dataSeeding:
+      enabled: true
+      fullDataSet: true
+      users: 4
+      posts: 3
+      visitors: 3
+      notices: 3
+      vehicles: 2
+    cleanup:
+      enabled: true
+      aggressive: false
+      retainTestUsers: true
+
+  production:
+    dataSeeding:
+      enabled: false
+      fullDataSet: false
+      users: 1
+      posts: 0
+      visitors: 0
+      notices: 0
+      vehicles: 0
+    cleanup:
+      enabled: true
+      aggressive: true
+      retainTestUsers: false
+
+# Test data validation rules
+validation:
+  required:
+    - testUsers.resident
+    - testUsers.admin
+    - testSocieties.primary
+  optional:
+    - testContent.posts
+    - testContent.visitors
+    - testContent.notices
+
+# Data seeding order and dependencies
+seedingOrder:
+  1: societies
+  2: users
+  3: vehicles
+  4: notices
+  5: posts
+  6: visitors
+  7: comments
+
+# Cleanup order (reverse of seeding)
+cleanupOrder:
+  1: comments
+  2: visitors
+  3: posts
+  4: notices
+  5: vehicles
+  6: users
+  7: societies
+
+# Error handling configuration
+errorHandling:
+  retryAttempts: 3
+  retryDelay: 2000
+  continueOnError: false
+  captureScreenshots: true
+  logErrors: true
+
+# Performance settings
+performance:
+  batchSize: 10
+  delayBetweenOperations: 1000
+  timeoutPerOperation: 30000
+  maxConcurrentOperations: 3
+
+# Data integrity checks
+integrityChecks:
+  enabled: true
+  checkUserProfiles: true
+  checkSocietyAssociations: true
+  checkDataConsistency: true
+  checkPermissions: true
+
+# Backup and restore settings
+backup:
+  enabled: false
+  location: './maestro/data/backups'
+  retentionDays: 7
+  includeUserData: false
+
+# Monitoring and reporting
+monitoring:
+  enabled: true
+  logLevel: 'info'
+  metricsCollection: true
+  performanceTracking: true
+
+# Test data templates
+templates:
+  user:
+    phone: '+9198765432XX'
+    otp: '123456'
+    profile:
+      name: 'Test User X'
+      email: 'testX@test.com'
+      apartment: 'X-10X'
+    society:
+      name: 'Test Society'
+      code: 'TEST123'
+    role: 'resident'
+
+  post:
+    title: 'Test Post X'
+    content: 'This is test content for post X'
+    author: 'Test User'
+    timestamp: '2024-01-15T12:00:00Z'
+    tags: ['test']
+
+  visitor:
+    name: 'Test Visitor X'
+    phone: '+9198765432XX'
+    purpose: 'Test Visit'
+    expectedTime: '2024-01-15T14:00:00Z'
+    duration: '1 hour'
+    status: 'pending'
+
+  notice:
+    title: 'Test Notice X'
+    content: 'This is test notice content X'
+    priority: 'medium'
+    author: 'Test Admin'
+    publishDate: '2024-01-15T08:00:00Z'
+    category: 'general'
