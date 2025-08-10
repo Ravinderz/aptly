@@ -26,6 +26,7 @@
     "test:debug": "jest --runInBand --detectOpenHandles",
     "typecheck": "tsc --noEmit",
     "validate": "npm run typecheck && npm run lint && npm run test:ci",
+    "test:backend": "npx tsx scripts/test-backend-connection.ts",
     "test:mutation": "stryker run",
     "analyze:bundle": "npx @expo/bundle-analyzer",
     "perf:profile": "npx react-native-performance-flipper"

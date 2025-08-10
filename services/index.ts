@@ -4,6 +4,9 @@
 import { apiClient } from './api.client';
 import { RestAuthService } from './auth.service.rest';
 import { RestVisitorsService } from './visitors.service.rest';
+import { RestNoticesService } from './notices.service.rest';
+import { RestHomeService } from './home.service.rest';
+import { developmentService } from './development.service';
 import { communityApi } from './communityApi';
 import { onboardingService } from './onboarding.service';
 import { emergencyService } from './emergency.service';
@@ -14,6 +17,7 @@ import { vehiclesService } from './vehicles.service';
 // Re-export API client
 export { apiClient, APIClientError } from './api.client';
 export type { APIResponse, APIError } from '@/types/api';
+
 
 // Modern REST-based Authentication service
 export { RestAuthService as AuthService } from './auth.service.rest';
@@ -35,6 +39,24 @@ export type {
   VisitorListQuery,
   VisitorStats,
 } from '@/types/api';
+
+// Modern REST-based Notices service
+export { RestNoticesService as NoticesService } from './notices.service.rest';
+export type {
+  Notice,
+} from '@/types/notifications';
+
+// Modern REST-based Home service
+export { RestHomeService as HomeService } from './home.service.rest';
+export type {
+  HomeStats,
+  HomeDashboardData,
+  RecentActivity,
+  HomeResult,
+} from './home.service.rest';
+
+// Development service for API integration
+export { developmentService, DevelopmentService } from './development.service';
 
 // Onboarding service
 export { onboardingService, OnboardingService } from './onboarding.service';
@@ -128,8 +150,12 @@ export * from './admin/roleManager';
 
 export const services = {
   api: apiClient,
+  // Modern REST services
   auth: RestAuthService.getInstance(),
   visitors: RestVisitorsService.getInstance(),
+  notices: RestNoticesService.getInstance(),
+  home: RestHomeService.getInstance(),
+  development: developmentService,
   community: communityApi,
   onboarding: onboardingService,
   emergency: emergencyService,
@@ -141,23 +167,6 @@ export const services = {
 // Default export for convenience
 export default services;
 
-// Legacy compatibility exports (deprecated - use modern services instead)
-export const LegacyServices = {
-  warning: 'These exports point to deprecated services. Use modern REST services instead.',
-  // For backwards compatibility - these will be removed in future versions
-  get APIService() {
-    console.warn('APIService is deprecated. Use apiClient instead.');
-    return require('./deprecated/api.service').APIService;
-  },
-  get AuthService() {
-    console.warn('Legacy AuthService is deprecated. Use RestAuthService instead.');
-    return require('./deprecated/auth.service').AuthService;
-  },
-  get BillingService() {
-    console.warn('BillingService is deprecated and moved to deprecated folder.');
-    return require('./deprecated/billing.service').BillingService;
-  },
-};
 
 // Service status and health check utilities
 export const ServiceStatus = {
@@ -169,7 +178,8 @@ export const ServiceStatus = {
       results.auth = await RestAuthService.getInstance().isAuthenticated();
       results.api = true; // API client is always available
       results.visitors = true; // Visitors service is always available
-      results.community = true; // Community service is mock-based
+      results.notices = true; // Notices service is available
+      results.community = true; // Community service is available
       results.onboarding = true; // Onboarding service is available
       results.emergency = true; // Emergency service is available
       results.reports = true; // Reports service is available
@@ -194,8 +204,9 @@ export const ServiceStatus = {
       environment: 'development',
       services: {
         api: { status: 'active', baseURL: 'https://api.aptly.app/v4', type: 'REST' },
-        auth: { status: 'active', provider: 'REST', type: 'modern' },
-        visitors: { status: 'active', provider: 'REST', type: 'modern' },
+        auth: { status: 'active', provider: 'REST', type: 'modern', features: ['resident', 'admin', 'biometric'] },
+        visitors: { status: 'active', provider: 'REST', type: 'modern', features: ['filtering', 'pagination'] },
+        notices: { status: 'active', provider: 'REST', type: 'modern', features: ['filtering', 'pagination'] },
         community: { status: 'active', mode: 'mock' },
         onboarding: { status: 'active', provider: 'REST', type: 'modern' },
         emergency: { status: 'active', provider: 'REST', type: 'modern' },
@@ -249,6 +260,7 @@ export const ServiceHelpers = {
         auth: authStatus,
         api: true,
         visitors: true,
+        notices: true,
         community: true,
         onboarding: true,
         emergency: true,
@@ -258,35 +270,8 @@ export const ServiceHelpers = {
       };
     } catch (error) {
       console.error('Failed to get service status:', error);
-      return { auth: false, api: false, visitors: false, community: false, onboarding: false, emergency: false, reports: false, support: false, vehicles: false };
+      return { auth: false, api: false, visitors: false, notices: false, community: false, onboarding: false, emergency: false, reports: false, support: false, vehicles: false };
     }
   },
 };
 
-// Deprecated services notice - for migration reference
-export const DEPRECATED_SERVICES_NOTICE = {
-  message: 'Legacy services have been moved to services/deprecated folder',
-  migratedServices: [
-    'api.service.ts → api.client.ts (REST-based HTTP client)',
-    'auth.service.ts → auth.service.rest.ts (REST authentication)',
-    'billing.service.ts → deprecated (unused mock service)',
-    'governance.service.ts → deprecated (unused mock service)',
-    'maintenance.service.ts → deprecated (unused mock service)',
-    'notification.service.ts → deprecated (minimal usage mock service)',
-    'admin/adminAuthService.ts → deprecated (unused admin service)',
-  ],
-  currentServices: [
-    'api.client.ts - Modern HTTP client with interceptors',
-    'auth.service.rest.ts - REST-based authentication',
-    'visitors.service.rest.ts - REST-based visitor management',
-    'communityApi.ts - Community features',
-    'onboarding.service.ts - Society onboarding management',
-    'emergency.service.ts - Emergency alert system',
-    'reports.service.ts - Manager performance reports',
-    'support.service.ts - Support ticket management',
-    'vehicles.service.ts - Vehicle tracking and security',
-    'biometric.service.ts - Biometric authentication',
-    'admin/authService.ts - Admin authentication',
-    'admin/roleManager.ts - Role-based access control',
-  ],
-};

@@ -5,7 +5,8 @@ import {
   CreateCommentRequest,
   User,
 } from '@/types/community';
-import { apiService } from './api.service';
+import { apiClient, APIClientError } from './api.client';
+import { API_ENDPOINTS } from '@/config/api.config';
 
 /**
  * Community API Service - Now using real API calls with fallback to mock data
@@ -20,7 +21,11 @@ export const communityApi = {
   // Get current user
   getCurrentUser: async (): Promise<User> => {
     try {
-      return await apiService.getCurrentUser();
+      const response = await apiClient.get<User>(API_ENDPOINTS.AUTH.ME);
+      if (response.success) {
+        return response.data;
+      }
+      throw new Error(response.error?.message || 'Failed to get user');
     } catch (error) {
       console.warn('Failed to fetch user from API, using fallback:', error);
       // Mock fallback for development
@@ -41,8 +46,10 @@ export const communityApi = {
   // Fetch all posts with pagination support
   getPosts: async (page: number = 1, limit: number = 20): Promise<Post[]> => {
     try {
-      const response = await apiService.getCommunityPosts(page, limit);
-      return response.data || [];
+      const response = await apiClient.get<Post[]>(API_ENDPOINTS.COMMUNITY.POSTS, {
+        params: { page, limit }
+      });
+      return response.success ? response.data : [];
     } catch (error) {
       console.warn('Failed to fetch posts from API, using fallback:', error);
       // Mock fallback with sample posts
@@ -70,7 +77,11 @@ export const communityApi = {
   // Create new post
   createPost: async (request: CreatePostRequest): Promise<Post> => {
     try {
-      return await apiService.createPost(request);
+      const response = await apiClient.post<Post>(API_ENDPOINTS.COMMUNITY.POSTS, request);
+      if (response.success) {
+        return response.data;
+      }
+      throw new Error(response.error?.message || 'Failed to create post');
     } catch (error) {
       console.warn('Failed to create post via API, using fallback:', error);
       // Mock fallback - simulate successful creation
@@ -98,7 +109,13 @@ export const communityApi = {
   // Toggle like on post
   toggleLike: async (postId: string): Promise<{ liked: boolean; likesCount: number }> => {
     try {
-      return await apiService.togglePostLike(postId);
+      const response = await apiClient.post<{ liked: boolean; likesCount: number }>(
+        `${API_ENDPOINTS.COMMUNITY.POSTS}/${postId}/like`
+      );
+      if (response.success) {
+        return response.data;
+      }
+      throw new Error(response.error?.message || 'Failed to toggle like');
     } catch (error) {
       console.warn('Failed to toggle like via API, using fallback:', error);
       // Mock fallback
@@ -109,7 +126,10 @@ export const communityApi = {
   // Get comments for a post
   getComments: async (postId: string): Promise<Comment[]> => {
     try {
-      return await apiService.getPostComments(postId);
+      const response = await apiClient.get<Comment[]>(
+        `${API_ENDPOINTS.COMMUNITY.POSTS}/${postId}/comments`
+      );
+      return response.success ? response.data : [];
     } catch (error) {
       console.warn('Failed to fetch comments from API, using fallback:', error);
       // Mock fallback
@@ -131,7 +151,14 @@ export const communityApi = {
   // Add comment to post
   addComment: async (request: CreateCommentRequest): Promise<Comment> => {
     try {
-      return await apiService.addComment(request);
+      const response = await apiClient.post<Comment>(
+        `${API_ENDPOINTS.COMMUNITY.POSTS}/${request.postId}/comments`,
+        request
+      );
+      if (response.success) {
+        return response.data;
+      }
+      throw new Error(response.error?.message || 'Failed to add comment');
     } catch (error) {
       console.warn('Failed to add comment via API, using fallback:', error);
       // Mock fallback
@@ -153,8 +180,8 @@ export const communityApi = {
   // Delete post
   deletePost: async (postId: string): Promise<boolean> => {
     try {
-      await apiService.deletePost(postId);
-      return true;
+      const response = await apiClient.delete(`${API_ENDPOINTS.COMMUNITY.POSTS}/${postId}`);
+      return response.success;
     } catch (error) {
       console.warn('Failed to delete post via API, using fallback:', error);
       // Mock fallback - simulate success
@@ -208,7 +235,8 @@ export const communityApi = {
   // Get user by ID (for mentions, etc.)
   getUser: async (userId: string): Promise<User | null> => {
     try {
-      return await apiService.getCurrentUser(); // Simplified for now
+      const response = await apiClient.get<User>(`${API_ENDPOINTS.COMMUNITY.USERS}/${userId}`);
+      return response.success ? response.data : null;
     } catch (error) {
       console.warn('Failed to fetch user from API, using fallback:', error);
       // Mock fallback
@@ -241,18 +269,9 @@ export const communityApi = {
 
   // New methods for enhanced functionality
 
-  // Get loading states from API service
-  getLoadingManager: () => {
-    return apiService.getLoadingManager();
-  },
-
-  // Invalidate cache for fresh data
+  // Simple cache refresh (placeholder for future caching implementation)
   refreshCache: () => {
-    apiService.invalidateCache('community');
-  },
-
-  // Get API service instance for advanced usage
-  getApiService: () => {
-    return apiService;
+    console.log('Community cache refreshed');
+    // Future: implement cache invalidation if needed
   },
 };

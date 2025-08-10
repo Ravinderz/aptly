@@ -163,7 +163,9 @@ export default function PhoneRegistration() {
     try {
       const fullPhoneNumber = getFullPhoneNumber(formData.phone);
 
-      const result = await AuthService.registerPhone(fullPhoneNumber);
+      // Use society code from registration (mock for now)
+      const societyCode = 'APT001'; // In a real app, this would come from society selection
+      const result = await AuthService.registerPhone(fullPhoneNumber, societyCode);
 
       if (result.success) {
         // Navigate to OTP verification
@@ -171,6 +173,7 @@ export default function PhoneRegistration() {
           pathname: '/auth/otp-verification',
           params: {
             phoneNumber: fullPhoneNumber,
+            sessionId: result.sessionId || 'dev-session',
           },
         });
       } else {

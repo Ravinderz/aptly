@@ -394,6 +394,11 @@ export class RestNoticesService {
     return params;
   }
 
+
+  // ====================
+  // PRIVATE UTILITY METHODS
+  // ====================
+
   /**
    * Handle and format errors consistently
    */

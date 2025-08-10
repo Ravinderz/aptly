@@ -1,0 +1,842 @@
+{
+  "baseUrl": "http://localhost:3000",
+  "endpoints": [
+    {
+      "path": "/health",
+      "method": "GET",
+      "responses": {
+        "200": {
+          "status": 200,
+          "statusText": "OK",
+          "data": {
+            "status": "OK",
+            "timestamp": "2025-08-10T04:58:22.911Z",
+            "uptime": 141.591446667,
+            "memory": {
+              "rss": 57868288,
+              "heapTotal": 35045376,
+              "heapUsed": 32715576,
+              "external": 3863671,
+              "arrayBuffers": 454678
+            },
+            "environment": "development",
+            "version": "1.0.0"
+          },
+          "headers": {
+            "content-security-policy": "default-src 'none'; frame-ancestors 'none';",
+            "cross-origin-opener-policy": "same-origin",
+            "cross-origin-resource-policy": "same-origin",
+            "origin-agent-cluster": "?1",
+            "referrer-policy": "strict-origin-when-cross-origin",
+            "strict-transport-security": "max-age=15552000; includeSubDomains",
+            "x-content-type-options": "nosniff",
+            "x-dns-prefetch-control": "off",
+            "x-download-options": "noopen",
+            "x-frame-options": "DENY",
+            "x-permitted-cross-domain-policies": "none",
+            "x-xss-protection": "1; mode=block",
+            "vary": "Origin, Accept-Encoding",
+            "access-control-allow-credentials": "true",
+            "access-control-expose-headers": "X-Request-ID,X-Response-Time",
+            "x-request-id": "9458b855-eb74-476e-b4b9-ec5dce73a8f7",
+            "content-type": "application/json; charset=utf-8",
+            "content-length": "231",
+            "etag": "W/\"e7-TIxCy4x9vB4OSPS+AhcLlymyDeU\"",
+            "date": "Sun, 10 Aug 2025 04:58:22 GMT",
+            "connection": "keep-alive",
+            "keep-alive": "timeout=5"
+          }
+        }
+      }
+    },
+    {
+      "path": "/api",
+      "method": "GET",
+      "responses": {
+        "200": {
+          "status": 200,
+          "statusText": "OK",
+          "data": "...(large response truncated)",
+          "headers": {
+            "content-security-policy": "default-src 'none'; frame-ancestors 'none';",
+            "cross-origin-opener-policy": "same-origin",
+            "cross-origin-resource-policy": "same-origin",
+            "origin-agent-cluster": "?1",
+            "referrer-policy": "strict-origin-when-cross-origin",
+            "strict-transport-security": "max-age=15552000; includeSubDomains",
+            "x-content-type-options": "nosniff",
+            "x-dns-prefetch-control": "off",
+            "x-download-options": "noopen",
+            "x-frame-options": "DENY",
+            "x-permitted-cross-domain-policies": "none",
+            "x-xss-protection": "1; mode=block",
+            "vary": "Origin, Accept-Encoding",
+            "access-control-allow-credentials": "true",
+            "access-control-expose-headers": "X-Request-ID,X-Response-Time",
+            "x-request-id": "f3956790-26ba-47e1-8c41-8a3b725c5f7b",
+            "ratelimit-policy": "100;w=900",
+            "ratelimit-limit": "100",
+            "ratelimit-remaining": "99",
+            "ratelimit-reset": "759",
+            "content-type": "application/json; charset=utf-8",
+            "etag": "W/\"2073-w0k/irGAPUgUC4tCTEcbcJPlZtY\"",
+            "date": "Sun, 10 Aug 2025 04:58:22 GMT",
+            "connection": "keep-alive",
+            "keep-alive": "timeout=5",
+            "transfer-encoding": "chunked"
+          }
+        }
+      }
+    },
+    {
+      "path": "/api/v4",
+      "method": "GET",
+      "responses": {
+        "404": {
+          "status": 404,
+          "statusText": "Not Found",
+          "data": {
+            "error": "Route /api/v4 not found",
+            "code": "ROUTE_NOT_FOUND",
+            "statusCode": 404,
+            "method": "GET",
+            "url": "/api/v4"
+          },
+          "headers": {
+            "content-security-policy": "default-src 'none'; frame-ancestors 'none';",
+            "cross-origin-opener-policy": "same-origin",
+            "cross-origin-resource-policy": "same-origin",
+            "origin-agent-cluster": "?1",
+            "referrer-policy": "strict-origin-when-cross-origin",
+            "strict-transport-security": "max-age=15552000; includeSubDomains",
+            "x-content-type-options": "nosniff",
+            "x-dns-prefetch-control": "off",
+            "x-download-options": "noopen",
+            "x-frame-options": "DENY",
+            "x-permitted-cross-domain-policies": "none",
+            "x-xss-protection": "1; mode=block",
+            "vary": "Origin, Accept-Encoding",
+            "access-control-allow-credentials": "true",
+            "access-control-expose-headers": "X-Request-ID,X-Response-Time",
+            "x-request-id": "63001061-0034-4fa8-a630-a3c46af94e0b",
+            "ratelimit-policy": "100;w=900",
+            "ratelimit-limit": "100",
+            "ratelimit-remaining": "98",
+            "ratelimit-reset": "759",
+            "content-type": "application/json; charset=utf-8",
+            "content-length": "108",
+            "etag": "W/\"6c-q59lyU7Ua9JNUodP7n3mRrNDNIk\"",
+            "date": "Sun, 10 Aug 2025 04:58:22 GMT",
+            "connection": "keep-alive",
+            "keep-alive": "timeout=5"
+          }
+        }
+      }
+    },
+    {
+      "path": "/api/v4/auth/login",
+      "method": "POST",
+      "responses": {
+        "404": {
+          "status": 404,
+          "statusText": "Not Found",
+          "data": {
+            "error": "Route /api/v4/auth/login not found",
+            "code": "ROUTE_NOT_FOUND",
+            "statusCode": 404,
+            "method": "POST",
+            "url": "/api/v4/auth/login"
+          },
+          "headers": {
+            "content-security-policy": "default-src 'none'; frame-ancestors 'none';",
+            "cross-origin-opener-policy": "same-origin",
+            "cross-origin-resource-policy": "same-origin",
+            "origin-agent-cluster": "?1",
+            "referrer-policy": "strict-origin-when-cross-origin",
+            "strict-transport-security": "max-age=15552000; includeSubDomains",
+            "x-content-type-options": "nosniff",
+            "x-dns-prefetch-control": "off",
+            "x-download-options": "noopen",
+            "x-frame-options": "DENY",
+            "x-permitted-cross-domain-policies": "none",
+            "x-xss-protection": "1; mode=block",
+            "vary": "Origin, Accept-Encoding",
+            "access-control-allow-credentials": "true",
+            "access-control-expose-headers": "X-Request-ID,X-Response-Time",
+            "x-request-id": "0741065a-0eef-48a4-b16f-f33bee268062",
+            "ratelimit-policy": "5;w=900",
+            "ratelimit-limit": "5",
+            "ratelimit-remaining": "4",
+            "ratelimit-reset": "759",
+            "content-type": "application/json; charset=utf-8",
+            "content-length": "131",
+            "etag": "W/\"83-Op00g7lAjZh11dVF5AKM3t3zSac\"",
+            "date": "Sun, 10 Aug 2025 04:58:22 GMT",
+            "connection": "keep-alive",
+            "keep-alive": "timeout=5"
+          }
+        }
+      }
+    },
+    {
+      "path": "/api/v4/auth/register",
+      "method": "POST",
+      "responses": {
+        "400": {
+          "status": 400,
+          "statusText": "Bad Request",
+          "data": {
+            "success": false,
+            "error": "Validation failed",
+            "details": [
+              {
+                "type": "field",
+                "msg": "phoneNumber must be a valid 10-digit Indian mobile number with country code",
+                "path": "phoneNumber",
+                "location": "body"
+              },
+              {
+                "type": "field",
+                "msg": "Invalid value",
+                "path": "societyCode",
+                "location": "body"
+              },
+              {
+                "type": "field",
+                "msg": "societyCode must be 6 alphanumeric characters",
+                "path": "societyCode",
+                "location": "body"
+              }
+            ]
+          },
+          "headers": {
+            "content-security-policy": "default-src 'none'; frame-ancestors 'none';",
+            "cross-origin-opener-policy": "same-origin",
+            "cross-origin-resource-policy": "same-origin",
+            "origin-agent-cluster": "?1",
+            "referrer-policy": "strict-origin-when-cross-origin",
+            "strict-transport-security": "max-age=15552000; includeSubDomains",
+            "x-content-type-options": "nosniff",
+            "x-dns-prefetch-control": "off",
+            "x-download-options": "noopen",
+            "x-frame-options": "DENY",
+            "x-permitted-cross-domain-policies": "none",
+            "x-xss-protection": "1; mode=block",
+            "vary": "Origin, Accept-Encoding",
+            "access-control-allow-credentials": "true",
+            "access-control-expose-headers": "X-Request-ID,X-Response-Time",
+            "x-request-id": "985b38a5-3142-40b4-a883-0742e436e685",
+            "ratelimit-policy": "5;w=900",
+            "ratelimit-limit": "5",
+            "ratelimit-remaining": "4",
+            "ratelimit-reset": "759",
+            "content-type": "application/json; charset=utf-8",
+            "content-length": "385",
+            "etag": "W/\"181-HmOuqU23o+/eC5dw1dSmID9DKP0\"",
+            "date": "Sun, 10 Aug 2025 04:58:22 GMT",
+            "connection": "keep-alive",
+            "keep-alive": "timeout=5"
+          }
+        }
+      }
+    },
+    {
+      "path": "/api/v4/auth/refresh",
+      "method": "POST",
+      "responses": {
+        "401": {
+          "status": 401,
+          "statusText": "Unauthorized",
+          "data": {
+            "success": false,
+            "message": "Invalid or expired refresh token"
+          },
+          "headers": {
+            "content-security-policy": "default-src 'none'; frame-ancestors 'none';",
+            "cross-origin-opener-policy": "same-origin",
+            "cross-origin-resource-policy": "same-origin",
+            "origin-agent-cluster": "?1",
+            "referrer-policy": "strict-origin-when-cross-origin",
+            "strict-transport-security": "max-age=15552000; includeSubDomains",
+            "x-content-type-options": "nosniff",
+            "x-dns-prefetch-control": "off",
+            "x-download-options": "noopen",
+            "x-frame-options": "DENY",
+            "x-permitted-cross-domain-policies": "none",
+            "x-xss-protection": "1; mode=block",
+            "vary": "Origin, Accept-Encoding",
+            "access-control-allow-credentials": "true",
+            "access-control-expose-headers": "X-Request-ID,X-Response-Time",
+            "x-request-id": "8b07262b-99c0-4e66-9838-fc5508895d2a",
+            "ratelimit-policy": "100;w=900",
+            "ratelimit-limit": "100",
+            "ratelimit-remaining": "95",
+            "ratelimit-reset": "759",
+            "content-type": "application/json; charset=utf-8",
+            "content-length": "62",
+            "etag": "W/\"3e-OarIQtdMrqTRGj5D7cibWicxU+U\"",
+            "date": "Sun, 10 Aug 2025 04:58:22 GMT",
+            "connection": "keep-alive",
+            "keep-alive": "timeout=5"
+          }
+        }
+      }
+    },
+    {
+      "path": "/api/v4/auth/logout",
+      "method": "POST",
+      "responses": {
+        "401": {
+          "status": 401,
+          "statusText": "Unauthorized",
+          "data": {
+            "error": "Unauthorized",
+            "message": "No authorization header provided"
+          },
+          "headers": {
+            "content-security-policy": "default-src 'none'; frame-ancestors 'none';",
+            "cross-origin-opener-policy": "same-origin",
+            "cross-origin-resource-policy": "same-origin",
+            "origin-agent-cluster": "?1",
+            "referrer-policy": "strict-origin-when-cross-origin",
+            "strict-transport-security": "max-age=15552000; includeSubDomains",
+            "x-content-type-options": "nosniff",
+            "x-dns-prefetch-control": "off",
+            "x-download-options": "noopen",
+            "x-frame-options": "DENY",
+            "x-permitted-cross-domain-policies": "none",
+            "x-xss-protection": "1; mode=block",
+            "vary": "Origin, Accept-Encoding",
+            "access-control-allow-credentials": "true",
+            "access-control-expose-headers": "X-Request-ID,X-Response-Time",
+            "x-request-id": "52d2b54a-4e64-4b29-9f5e-6d4f6be18adc",
+            "ratelimit-policy": "100;w=900",
+            "ratelimit-limit": "100",
+            "ratelimit-remaining": "94",
+            "ratelimit-reset": "759",
+            "content-type": "application/json; charset=utf-8",
+            "content-length": "69",
+            "etag": "W/\"45-KSAUxS+zMmwJ6j0qteUDlPr4DdA\"",
+            "date": "Sun, 10 Aug 2025 04:58:22 GMT",
+            "connection": "keep-alive",
+            "keep-alive": "timeout=5"
+          }
+        }
+      }
+    },
+    {
+      "path": "/auth/me",
+      "method": "GET",
+      "responses": {
+        "404": {
+          "status": 404,
+          "statusText": "Not Found",
+          "data": {
+            "error": "Route /auth/me not found",
+            "code": "ROUTE_NOT_FOUND",
+            "statusCode": 404,
+            "method": "GET",
+            "url": "/auth/me"
+          },
+          "headers": {
+            "content-security-policy": "default-src 'none'; frame-ancestors 'none';",
+            "cross-origin-opener-policy": "same-origin",
+            "cross-origin-resource-policy": "same-origin",
+            "origin-agent-cluster": "?1",
+            "referrer-policy": "strict-origin-when-cross-origin",
+            "strict-transport-security": "max-age=15552000; includeSubDomains",
+            "x-content-type-options": "nosniff",
+            "x-dns-prefetch-control": "off",
+            "x-download-options": "noopen",
+            "x-frame-options": "DENY",
+            "x-permitted-cross-domain-policies": "none",
+            "x-xss-protection": "1; mode=block",
+            "vary": "Origin, Accept-Encoding",
+            "access-control-allow-credentials": "true",
+            "access-control-expose-headers": "X-Request-ID,X-Response-Time",
+            "x-request-id": "f3719505-0b6c-48da-b64a-9ad84d781c93",
+            "content-type": "application/json; charset=utf-8",
+            "content-length": "110",
+            "etag": "W/\"6e-4jzuniizVzBi9xiDjy7uwb7gLD4\"",
+            "date": "Sun, 10 Aug 2025 04:58:22 GMT",
+            "connection": "keep-alive",
+            "keep-alive": "timeout=5"
+          }
+        }
+      }
+    },
+    {
+      "path": "/api/v4/societies",
+      "method": "GET",
+      "responses": {
+        "404": {
+          "status": 404,
+          "statusText": "Not Found",
+          "data": {
+            "error": "Route /api/v4/societies not found",
+            "code": "ROUTE_NOT_FOUND",
+            "statusCode": 404,
+            "method": "GET",
+            "url": "/api/v4/societies"
+          },
+          "headers": {
+            "content-security-policy": "default-src 'none'; frame-ancestors 'none';",
+            "cross-origin-opener-policy": "same-origin",
+            "cross-origin-resource-policy": "same-origin",
+            "origin-agent-cluster": "?1",
+            "referrer-policy": "strict-origin-when-cross-origin",
+            "strict-transport-security": "max-age=15552000; includeSubDomains",
+            "x-content-type-options": "nosniff",
+            "x-dns-prefetch-control": "off",
+            "x-download-options": "noopen",
+            "x-frame-options": "DENY",
+            "x-permitted-cross-domain-policies": "none",
+            "x-xss-protection": "1; mode=block",
+            "vary": "Origin, Accept-Encoding",
+            "access-control-allow-credentials": "true",
+            "access-control-expose-headers": "X-Request-ID,X-Response-Time",
+            "x-request-id": "a11ea15f-46f5-490a-9e6b-de9a07717e92",
+            "ratelimit-policy": "100;w=900",
+            "ratelimit-limit": "100",
+            "ratelimit-remaining": "93",
+            "ratelimit-reset": "759",
+            "content-type": "application/json; charset=utf-8",
+            "content-length": "128",
+            "etag": "W/\"80-43zOi0W7kjyEoNXNrjTnSG+5N9w\"",
+            "date": "Sun, 10 Aug 2025 04:58:22 GMT",
+            "connection": "keep-alive",
+            "keep-alive": "timeout=5"
+          }
+        }
+      }
+    },
+    {
+      "path": "/api/v4/societies",
+      "method": "POST",
+      "responses": {
+        "400": {
+          "status": 400,
+          "statusText": "Bad Request",
+          "data": {
+            "success": false,
+            "error": "Validation failed",
+            "details": [
+              {
+                "type": "field",
+                "msg": "Society name must be between 2 and 100 characters",
+                "path": "name",
+                "location": "body"
+              },
+              {
+                "type": "field",
+                "msg": "Address must be between 10 and 500 characters",
+                "path": "address",
+                "location": "body"
+              },
+              {
+                "type": "field",
+                "msg": "City is required",
+                "path": "city",
+                "location": "body"
+              },
+              {
+                "type": "field",
+                "msg": "State is required",
+                "path": "state",
+                "location": "body"
+              },
+              {
+                "type": "field",
+                "msg": "Pin code must be a valid 6-digit Indian postal code",
+                "path": "pinCode",
+                "location": "body"
+              },
+              {
+                "type": "field",
+                "msg": "Total flats must be between 1 and 10000",
+                "path": "totalFlats",
+                "location": "body"
+              }
+            ]
+          },
+          "headers": {
+            "content-security-policy": "default-src 'none'; frame-ancestors 'none';",
+            "cross-origin-opener-policy": "same-origin",
+            "cross-origin-resource-policy": "same-origin",
+            "origin-agent-cluster": "?1",
+            "referrer-policy": "strict-origin-when-cross-origin",
+            "strict-transport-security": "max-age=15552000; includeSubDomains",
+            "x-content-type-options": "nosniff",
+            "x-dns-prefetch-control": "off",
+            "x-download-options": "noopen",
+            "x-frame-options": "DENY",
+            "x-permitted-cross-domain-policies": "none",
+            "x-xss-protection": "1; mode=block",
+            "vary": "Origin, Accept-Encoding",
+            "access-control-allow-credentials": "true",
+            "access-control-expose-headers": "X-Request-ID,X-Response-Time",
+            "x-request-id": "03975344-734e-4e57-9459-c3aacc861fe0",
+            "ratelimit-policy": "100;w=900",
+            "ratelimit-limit": "100",
+            "ratelimit-remaining": "92",
+            "ratelimit-reset": "759",
+            "content-type": "application/json; charset=utf-8",
+            "content-length": "635",
+            "etag": "W/\"27b-7me6zKdzuGxS5PSGKd8aL2/OIhU\"",
+            "date": "Sun, 10 Aug 2025 04:58:22 GMT",
+            "connection": "keep-alive",
+            "keep-alive": "timeout=5"
+          }
+        }
+      }
+    },
+    {
+      "path": "/api/v4/visitors",
+      "method": "GET",
+      "responses": {
+        "401": {
+          "status": 401,
+          "statusText": "Unauthorized",
+          "data": {
+            "error": "Unauthorized",
+            "message": "No authorization header provided"
+          },
+          "headers": {
+            "content-security-policy": "default-src 'none'; frame-ancestors 'none';",
+            "cross-origin-opener-policy": "same-origin",
+            "cross-origin-resource-policy": "same-origin",
+            "origin-agent-cluster": "?1",
+            "referrer-policy": "strict-origin-when-cross-origin",
+            "strict-transport-security": "max-age=15552000; includeSubDomains",
+            "x-content-type-options": "nosniff",
+            "x-dns-prefetch-control": "off",
+            "x-download-options": "noopen",
+            "x-frame-options": "DENY",
+            "x-permitted-cross-domain-policies": "none",
+            "x-xss-protection": "1; mode=block",
+            "vary": "Origin, Accept-Encoding",
+            "access-control-allow-credentials": "true",
+            "access-control-expose-headers": "X-Request-ID,X-Response-Time",
+            "x-request-id": "324f475e-e32c-44b3-b732-349f15f3a2d1",
+            "ratelimit-policy": "100;w=900",
+            "ratelimit-limit": "100",
+            "ratelimit-remaining": "91",
+            "ratelimit-reset": "759",
+            "content-type": "application/json; charset=utf-8",
+            "content-length": "69",
+            "etag": "W/\"45-KSAUxS+zMmwJ6j0qteUDlPr4DdA\"",
+            "date": "Sun, 10 Aug 2025 04:58:22 GMT",
+            "connection": "keep-alive",
+            "keep-alive": "timeout=5"
+          }
+        }
+      }
+    },
+    {
+      "path": "/api/v4/visitors",
+      "method": "POST",
+      "responses": {
+        "401": {
+          "status": 401,
+          "statusText": "Unauthorized",
+          "data": {
+            "error": "Unauthorized",
+            "message": "No authorization header provided"
+          },
+          "headers": {
+            "content-security-policy": "default-src 'none'; frame-ancestors 'none';",
+            "cross-origin-opener-policy": "same-origin",
+            "cross-origin-resource-policy": "same-origin",
+            "origin-agent-cluster": "?1",
+            "referrer-policy": "strict-origin-when-cross-origin",
+            "strict-transport-security": "max-age=15552000; includeSubDomains",
+            "x-content-type-options": "nosniff",
+            "x-dns-prefetch-control": "off",
+            "x-download-options": "noopen",
+            "x-frame-options": "DENY",
+            "x-permitted-cross-domain-policies": "none",
+            "x-xss-protection": "1; mode=block",
+            "vary": "Origin, Accept-Encoding",
+            "access-control-allow-credentials": "true",
+            "access-control-expose-headers": "X-Request-ID,X-Response-Time",
+            "x-request-id": "0e9b7c55-9574-44d7-a46c-8c51c2e6b431",
+            "ratelimit-policy": "100;w=900",
+            "ratelimit-limit": "100",
+            "ratelimit-remaining": "90",
+            "ratelimit-reset": "759",
+            "content-type": "application/json; charset=utf-8",
+            "content-length": "69",
+            "etag": "W/\"45-KSAUxS+zMmwJ6j0qteUDlPr4DdA\"",
+            "date": "Sun, 10 Aug 2025 04:58:22 GMT",
+            "connection": "keep-alive",
+            "keep-alive": "timeout=5"
+          }
+        }
+      }
+    },
+    {
+      "path": "/api/v4/home",
+      "method": "GET",
+      "responses": {
+        "404": {
+          "status": 404,
+          "statusText": "Not Found",
+          "data": {
+            "error": "Route /api/v4/home not found",
+            "code": "ROUTE_NOT_FOUND",
+            "statusCode": 404,
+            "method": "GET",
+            "url": "/api/v4/home"
+          },
+          "headers": {
+            "content-security-policy": "default-src 'none'; frame-ancestors 'none';",
+            "cross-origin-opener-policy": "same-origin",
+            "cross-origin-resource-policy": "same-origin",
+            "origin-agent-cluster": "?1",
+            "referrer-policy": "strict-origin-when-cross-origin",
+            "strict-transport-security": "max-age=15552000; includeSubDomains",
+            "x-content-type-options": "nosniff",
+            "x-dns-prefetch-control": "off",
+            "x-download-options": "noopen",
+            "x-frame-options": "DENY",
+            "x-permitted-cross-domain-policies": "none",
+            "x-xss-protection": "1; mode=block",
+            "vary": "Origin, Accept-Encoding",
+            "access-control-allow-credentials": "true",
+            "access-control-expose-headers": "X-Request-ID,X-Response-Time",
+            "x-request-id": "a32c9328-361a-493e-9c76-953a8f2a67af",
+            "ratelimit-policy": "100;w=900",
+            "ratelimit-limit": "100",
+            "ratelimit-remaining": "89",
+            "ratelimit-reset": "759",
+            "content-type": "application/json; charset=utf-8",
+            "content-length": "118",
+            "etag": "W/\"76-43TdboaU0Z80dWuEFFozRMvQH1w\"",
+            "date": "Sun, 10 Aug 2025 04:58:22 GMT",
+            "connection": "keep-alive",
+            "keep-alive": "timeout=5"
+          }
+        }
+      }
+    },
+    {
+      "path": "/api/v4/home/stats",
+      "method": "GET",
+      "responses": {
+        "404": {
+          "status": 404,
+          "statusText": "Not Found",
+          "data": {
+            "error": "Route /api/v4/home/stats not found",
+            "code": "ROUTE_NOT_FOUND",
+            "statusCode": 404,
+            "method": "GET",
+            "url": "/api/v4/home/stats"
+          },
+          "headers": {
+            "content-security-policy": "default-src 'none'; frame-ancestors 'none';",
+            "cross-origin-opener-policy": "same-origin",
+            "cross-origin-resource-policy": "same-origin",
+            "origin-agent-cluster": "?1",
+            "referrer-policy": "strict-origin-when-cross-origin",
+            "strict-transport-security": "max-age=15552000; includeSubDomains",
+            "x-content-type-options": "nosniff",
+            "x-dns-prefetch-control": "off",
+            "x-download-options": "noopen",
+            "x-frame-options": "DENY",
+            "x-permitted-cross-domain-policies": "none",
+            "x-xss-protection": "1; mode=block",
+            "vary": "Origin, Accept-Encoding",
+            "access-control-allow-credentials": "true",
+            "access-control-expose-headers": "X-Request-ID,X-Response-Time",
+            "x-request-id": "0caf2879-3a01-4bd5-bc67-3bcee6ff3a4a",
+            "ratelimit-policy": "100;w=900",
+            "ratelimit-limit": "100",
+            "ratelimit-remaining": "88",
+            "ratelimit-reset": "759",
+            "content-type": "application/json; charset=utf-8",
+            "content-length": "130",
+            "etag": "W/\"82-yMHKQBgDyhkeg4hWJ13Bu80BU7s\"",
+            "date": "Sun, 10 Aug 2025 04:58:22 GMT",
+            "connection": "keep-alive",
+            "keep-alive": "timeout=5"
+          }
+        }
+      }
+    },
+    {
+      "path": "/api/v4/services/maintenance",
+      "method": "GET",
+      "responses": {
+        "401": {
+          "status": 401,
+          "statusText": "Unauthorized",
+          "data": {
+            "success": false,
+            "error": "Authentication required",
+            "message": "Please provide a valid authorization token"
+          },
+          "headers": {
+            "content-security-policy": "default-src 'none'; frame-ancestors 'none';",
+            "cross-origin-opener-policy": "same-origin",
+            "cross-origin-resource-policy": "same-origin",
+            "origin-agent-cluster": "?1",
+            "referrer-policy": "strict-origin-when-cross-origin",
+            "strict-transport-security": "max-age=15552000; includeSubDomains",
+            "x-content-type-options": "nosniff",
+            "x-dns-prefetch-control": "off",
+            "x-download-options": "noopen",
+            "x-frame-options": "DENY",
+            "x-permitted-cross-domain-policies": "none",
+            "x-xss-protection": "1; mode=block",
+            "vary": "Origin, Accept-Encoding",
+            "access-control-allow-credentials": "true",
+            "access-control-expose-headers": "X-Request-ID,X-Response-Time",
+            "x-request-id": "4dea211a-295e-4f4d-b539-7706b65dc36a",
+            "ratelimit-policy": "100;w=900",
+            "ratelimit-limit": "100",
+            "ratelimit-remaining": "87",
+            "ratelimit-reset": "759",
+            "content-type": "application/json; charset=utf-8",
+            "content-length": "106",
+            "etag": "W/\"6a-ijHHJNd4R3kpxYaD2D5fbtts5pI\"",
+            "date": "Sun, 10 Aug 2025 04:58:22 GMT",
+            "connection": "keep-alive",
+            "keep-alive": "timeout=5"
+          }
+        }
+      }
+    },
+    {
+      "path": "/api/v4/services/billing",
+      "method": "GET",
+      "responses": {
+        "404": {
+          "status": 404,
+          "statusText": "Not Found",
+          "data": {
+            "error": "Route /api/v4/services/billing not found",
+            "code": "ROUTE_NOT_FOUND",
+            "statusCode": 404,
+            "method": "GET",
+            "url": "/api/v4/services/billing"
+          },
+          "headers": {
+            "content-security-policy": "default-src 'none'; frame-ancestors 'none';",
+            "cross-origin-opener-policy": "same-origin",
+            "cross-origin-resource-policy": "same-origin",
+            "origin-agent-cluster": "?1",
+            "referrer-policy": "strict-origin-when-cross-origin",
+            "strict-transport-security": "max-age=15552000; includeSubDomains",
+            "x-content-type-options": "nosniff",
+            "x-dns-prefetch-control": "off",
+            "x-download-options": "noopen",
+            "x-frame-options": "DENY",
+            "x-permitted-cross-domain-policies": "none",
+            "x-xss-protection": "1; mode=block",
+            "vary": "Origin, Accept-Encoding",
+            "access-control-allow-credentials": "true",
+            "access-control-expose-headers": "X-Request-ID,X-Response-Time",
+            "x-request-id": "bf1bf521-00ee-4955-8feb-c40defa81cc1",
+            "ratelimit-policy": "100;w=900",
+            "ratelimit-limit": "100",
+            "ratelimit-remaining": "86",
+            "ratelimit-reset": "759",
+            "content-type": "application/json; charset=utf-8",
+            "content-length": "142",
+            "etag": "W/\"8e-IJklLHPLs4nyITW2rtz7wtGfZDs\"",
+            "date": "Sun, 10 Aug 2025 04:58:22 GMT",
+            "connection": "keep-alive",
+            "keep-alive": "timeout=5"
+          }
+        }
+      }
+    },
+    {
+      "path": "/api/notices",
+      "method": "GET",
+      "responses": {
+        "401": {
+          "status": 401,
+          "statusText": "Unauthorized",
+          "data": {
+            "error": "Unauthorized",
+            "message": "No authorization header provided"
+          },
+          "headers": {
+            "content-security-policy": "default-src 'none'; frame-ancestors 'none';",
+            "cross-origin-opener-policy": "same-origin",
+            "cross-origin-resource-policy": "same-origin",
+            "origin-agent-cluster": "?1",
+            "referrer-policy": "strict-origin-when-cross-origin",
+            "strict-transport-security": "max-age=15552000; includeSubDomains",
+            "x-content-type-options": "nosniff",
+            "x-dns-prefetch-control": "off",
+            "x-download-options": "noopen",
+            "x-frame-options": "DENY",
+            "x-permitted-cross-domain-policies": "none",
+            "x-xss-protection": "1; mode=block",
+            "vary": "Origin, Accept-Encoding",
+            "access-control-allow-credentials": "true",
+            "access-control-expose-headers": "X-Request-ID,X-Response-Time",
+            "x-request-id": "af637db4-17ab-49ca-9bd5-34de5962ecce",
+            "ratelimit-policy": "100;w=900",
+            "ratelimit-limit": "100",
+            "ratelimit-remaining": "85",
+            "ratelimit-reset": "759",
+            "content-type": "application/json; charset=utf-8",
+            "content-length": "69",
+            "etag": "W/\"45-KSAUxS+zMmwJ6j0qteUDlPr4DdA\"",
+            "date": "Sun, 10 Aug 2025 04:58:22 GMT",
+            "connection": "keep-alive",
+            "keep-alive": "timeout=5"
+          }
+        }
+      }
+    },
+    {
+      "path": "/api/notices/all",
+      "method": "GET",
+      "responses": {
+        "401": {
+          "status": 401,
+          "statusText": "Unauthorized",
+          "data": {
+            "error": "Unauthorized",
+            "message": "No authorization header provided"
+          },
+          "headers": {
+            "content-security-policy": "default-src 'none'; frame-ancestors 'none';",
+            "cross-origin-opener-policy": "same-origin",
+            "cross-origin-resource-policy": "same-origin",
+            "origin-agent-cluster": "?1",
+            "referrer-policy": "strict-origin-when-cross-origin",
+            "strict-transport-security": "max-age=15552000; includeSubDomains",
+            "x-content-type-options": "nosniff",
+            "x-dns-prefetch-control": "off",
+            "x-download-options": "noopen",
+            "x-frame-options": "DENY",
+            "x-permitted-cross-domain-policies": "none",
+            "x-xss-protection": "1; mode=block",
+            "vary": "Origin, Accept-Encoding",
+            "access-control-allow-credentials": "true",
+            "access-control-expose-headers": "X-Request-ID,X-Response-Time",
+            "x-request-id": "7a61377f-8092-4da8-8e4f-4e0b6824ec88",
+            "ratelimit-policy": "100;w=900",
+            "ratelimit-limit": "100",
+            "ratelimit-remaining": "84",
+            "ratelimit-reset": "759",
+            "content-type": "application/json; charset=utf-8",
+            "content-length": "69",
+            "etag": "W/\"45-KSAUxS+zMmwJ6j0qteUDlPr4DdA\"",
+            "date": "Sun, 10 Aug 2025 04:58:22 GMT",
+            "connection": "keep-alive",
+            "keep-alive": "timeout=5"
+          }
+        }
+      }
+    }
+  ],
+  "health": true,
+  "timestamp": "2025-08-10T04:58:22.883Z"
+}

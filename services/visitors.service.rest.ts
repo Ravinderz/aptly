@@ -7,6 +7,7 @@ import { z } from 'zod';
 import { parsePhoneNumber, isValidPhoneNumber } from 'libphonenumber-js';
 import { apiClient, APIClientError } from '@/services/api.client';
 import { API_ENDPOINTS } from '@/config/api.config';
+import { developmentService } from '@/services/development.service';
 import { 
   APIResponse,
   PaginatedAPIResponse,
@@ -76,30 +77,34 @@ export class RestVisitorsService {
    * Get paginated list of visitors
    */
   async getVisitors(query: VisitorListQuery = {}): Promise<VisitorResult> {
-    try {
-      const params = this.buildQueryParams(query);
-      
-      const response = await apiClient.get<Visitor[]>(
-        API_ENDPOINTS.VISITORS.LIST,
-        { params }
-      );
+    return await developmentService.tryRealAPIOrMock(
+      async () => {
+        const params = this.buildQueryParams(query);
+        
+        const response = await apiClient.get<Visitor[]>(
+          API_ENDPOINTS.VISITORS.LIST,
+          { params }
+        );
 
-      if (response.success) {
-        return {
-          success: true,
-          data: response.data,
-        };
-      } else {
-        return {
-          success: false,
-          error: response.error?.message || 'Failed to fetch visitors',
-          code: response.error?.code,
-        };
-      }
-    } catch (error) {
-      console.error('❌ Failed to get visitors:', error);
-      return this.handleError(error, 'Failed to fetch visitors');
-    }
+        if (response.success) {
+          return {
+            success: true,
+            data: response.data,
+          };
+        } else {
+          return {
+            success: false,
+            error: response.error?.message || 'Failed to fetch visitors',
+            code: response.error?.code,
+          };
+        }
+      },
+      {
+        success: true,
+        data: developmentService.getMockData('visitors'),
+      },
+      'getVisitors'
+    );
   }
 
   /**
@@ -579,7 +584,10 @@ export class RestVisitorsService {
     }
   }
 
-  // Private utility methods
+
+  // ====================
+  // PRIVATE UTILITY METHODS
+  // ====================
 
   /**
    * Build query parameters for API calls

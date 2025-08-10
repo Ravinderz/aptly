@@ -27,7 +27,9 @@
         "backgroundColor": "#6366f1"
       },
       "edgeToEdgeEnabled": true,
-      "package": "com.ravinderz.aptly"
+      "package": "com.ravinderz.aptly",
+      "usesCleartextTraffic": true,
+      "networkSecurityConfig": "./network_security_config.xml"
     },
     "web": {
       "bundler": "metro",
