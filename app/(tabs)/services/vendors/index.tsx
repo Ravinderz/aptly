@@ -1,27 +1,27 @@
+import HighlightCard from '@/components/ui/HighlightCard';
+import { StackHeader } from '@/components/ui/headers';
+import { useRouter } from 'expo-router';
+import {
+  AlertTriangle,
+  Car,
+  Home,
+  MessageCircle,
+  Phone,
+  Shield,
+  Snowflake,
+  TreePine,
+  Truck,
+  Wrench,
+  Zap,
+} from 'lucide-react-native';
 import React, { useState } from 'react';
 import {
+  Linking,
   ScrollView,
   Text,
   TouchableOpacity,
   View,
-  Linking,
 } from 'react-native';
-import { useRouter } from 'expo-router';
-import {
-  Wrench,
-  Zap,
-  Home,
-  Snowflake,
-  Truck,
-  Shield,
-  TreePine,
-  Car,
-  Phone,
-  MessageCircle,
-  AlertTriangle,
-} from 'lucide-react-native';
-import HighlightCard from '@/components/ui/HighlightCard';
-import { StackHeader } from '@/components/ui/headers';
 
 // Service categories with icons and descriptions
 const serviceCategories = [
@@ -126,16 +126,19 @@ const emergencyContacts = [
 interface ServiceCategoryCardProps {
   category: (typeof serviceCategories)[0];
   onPress: () => void;
+  testID?: string;
 }
 
 const ServiceCategoryCard: React.FC<ServiceCategoryCardProps> = ({
   category,
   onPress,
+  testID,
 }) => (
   <TouchableOpacity
     onPress={onPress}
     className="bg-surface rounded-xl p-5 mb-4 border border-divider shadow-sm shadow-black/5"
-    activeOpacity={0.7}>
+    activeOpacity={0.7}
+    testID={testID}>
     <View className="flex-row items-center justify-between">
       <View className="flex-row items-center flex-1">
         <View className="bg-primary/10 rounded-full w-16 h-16 items-center justify-center mr-4">
@@ -172,10 +175,12 @@ const ServiceCategoryCard: React.FC<ServiceCategoryCardProps> = ({
 
 interface EmergencyContactCardProps {
   contact: (typeof emergencyContacts)[0];
+  testID?: string;
 }
 
 const EmergencyContactCard: React.FC<EmergencyContactCardProps> = ({
   contact,
+  testID,
 }) => {
   const handleCall = () => {
     Linking.openURL(`tel:${contact.phone}`);
@@ -200,7 +205,9 @@ const EmergencyContactCard: React.FC<EmergencyContactCardProps> = ({
   };
 
   return (
-    <View className="bg-surface rounded-xl p-5 mb-4 border border-divider">
+    <View
+      className="bg-surface rounded-xl p-5 mb-4 border border-divider"
+      testID={testID}>
       <View className="flex-row items-center justify-between mb-4">
         <View className="flex-1">
           <Text className="text-headline-medium font-semibold text-text-primary mb-1">
@@ -217,12 +224,14 @@ const EmergencyContactCard: React.FC<EmergencyContactCardProps> = ({
         <View className="flex-row gap-3">
           <TouchableOpacity
             onPress={handleCall}
-            className="bg-primary rounded-full w-12 h-12 items-center justify-center">
+            className="bg-primary rounded-full w-12 h-12 items-center justify-center"
+            testID={testID ? `${testID}.call-button` : undefined}>
             <Phone size={20} color="white" />
           </TouchableOpacity>
           <TouchableOpacity
             onPress={handleWhatsApp}
-            className="bg-secondary rounded-full w-12 h-12 items-center justify-center">
+            className="bg-secondary rounded-full w-12 h-12 items-center justify-center"
+            testID={testID ? `${testID}.whatsapp-button` : undefined}>
             <MessageCircle size={20} color="white" />
           </TouchableOpacity>
         </View>
@@ -247,27 +256,39 @@ export default function VendorDirectory() {
     : serviceCategories.slice(0, 4);
 
   return (
-    <View className="flex-1 bg-background">
+    <View className="flex-1 bg-background" testID="services.vendors.screen">
       <StackHeader
         title="Vendor Directory"
         subtitle="Find trusted service providers"
         showBackButton={true}
+        testID="services.vendors.header"
       />
 
       <ScrollView
         className="flex-1"
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ paddingBottom: 20 }}>
+        contentContainerStyle={{ paddingBottom: 20 }}
+        testID="services.vendors.scroll">
         {/* Emergency Contacts Section */}
-        <View className="px-6 mb-8">
-          <View className="flex-row items-center mb-4">
+        <View
+          className="px-6 mb-8"
+          testID="services.vendors.emergency-contacts">
+          <View
+            className="flex-row items-center mb-4"
+            testID="services.vendors.emergency-contacts.header">
             <AlertTriangle size={24} color="#D32F2F" />
-            <Text className="text-headline-large font-semibold text-text-primary ml-2">
+            <Text
+              className="text-headline-large font-semibold text-text-primary ml-2"
+              testID="services.vendors.emergency-contacts.title">
               Emergency Contacts
             </Text>
           </View>
           {emergencyContacts.map((contact, index) => (
-            <EmergencyContactCard key={index} contact={contact} />
+            <EmergencyContactCard
+              key={index}
+              contact={contact}
+              testID={`services.vendors.emergency-contact.${index}`}
+            />
           ))}
         </View>
 
@@ -285,8 +306,10 @@ export default function VendorDirectory() {
         </View>
 
         {/* Service Categories Section */}
-        <View className="px-6">
-          <Text className="text-headline-large font-semibold text-text-primary mb-4">
+        <View className="px-6" testID="services.vendors.categories">
+          <Text
+            className="text-headline-large font-semibold text-text-primary mb-4"
+            testID="services.vendors.categories.title">
             Service Categories
           </Text>
 
@@ -295,13 +318,15 @@ export default function VendorDirectory() {
               key={category.id}
               category={category}
               onPress={() => handleCategoryPress(category.id)}
+              testID={`services.vendors.category.${category.id}`}
             />
           ))}
 
           {!showAllCategories && serviceCategories.length > 4 && (
             <TouchableOpacity
               onPress={() => setShowAllCategories(true)}
-              className="bg-primary/10 rounded-xl p-4 items-center">
+              className="bg-primary/10 rounded-xl p-4 items-center"
+              testID="services.vendors.view-all-button">
               <Text className="text-primary font-semibold text-body-large">
                 View All Categories ({serviceCategories.length - 4} more)
               </Text>

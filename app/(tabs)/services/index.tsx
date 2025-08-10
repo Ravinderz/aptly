@@ -15,7 +15,6 @@ import {
   Vote,
   Wrench,
 } from 'lucide-react-native';
-import React from 'react';
 import { SafeAreaView, Text, TouchableOpacity, View } from 'react-native';
 
 export default function Services() {
@@ -88,25 +87,27 @@ export default function Services() {
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-background">
-      <TabHeader notificationCount={2} />
-      <ResponsiveContainer type="scroll" padding="lg" gap="lg">
+    <SafeAreaView className="flex-1 bg-background" testID="services.screen">
+      <TabHeader notificationCount={2} testID="services.header" />
+      <ResponsiveContainer type="scroll" padding="lg" gap="lg" testID="services.content">
         {/* Header was moved to TabHeader */}
 
         {/* Quick Actions */}
         {maintenanceTrackingEnabled && (
-          <View className="mb-8">
+          <View className="mb-8" testID="services.quick-actions">
             <ResponsiveText
               variant="headline"
               size="medium"
-              className="font-semibold mb-4">
+              className="font-semibold mb-4"
+              testID="services.quick-actions.title">
               Quick Actions
             </ResponsiveText>
             <TouchableOpacity
               className="bg-primary rounded-2xl p-5 flex-row items-center justify-center"
               onPress={() =>
                 router.push('/(tabs)/services/maintenance/common-area/create')
-              }>
+              }
+              testID="services.quick-actions.new-maintenance-button">
               <Plus size={24} color="white" />
               <ResponsiveText className="text-white font-semibold ml-3">
                 New Maintenance Request
@@ -116,15 +117,16 @@ export default function Services() {
         )}
 
         {/* Main Services Grid */}
-        <View className="mb-8">
-          <Text className="text-lg font-semibold text-text-primary mb-4">
+        <View className="mb-8" testID="services.main-grid">
+          <Text className="text-lg font-semibold text-text-primary mb-4" testID="services.main-grid.title">
             Services
           </Text>
 
           {/* Vendor Directory Card - Full Width */}
           <TouchableOpacity
             className="bg-surface rounded-2xl p-6 border border-divider mb-5"
-            onPress={() => router.push('/(tabs)/services/vendors')}>
+            onPress={() => router.push('/(tabs)/services/vendors')}
+            testID="services.vendor-directory-card">
             <View className="flex-row items-center">
               <View className="bg-primary/10 rounded-full w-12 h-12 items-center justify-center mr-4">
                 <Users size={24} color="#6366f1" />
@@ -152,11 +154,12 @@ export default function Services() {
             </View>
           </TouchableOpacity>
 
-          <View className="flex-row gap-4 mb-4">
+          <View className="flex-row gap-4 mb-4" testID="services.main-grid.row1">
             {/* Maintenance Requests Card */}
             <TouchableOpacity
               className="flex-1 bg-surface rounded-2xl p-6 border border-divider"
-              onPress={() => router.push('/(tabs)/services/maintenance')}>
+              onPress={() => router.push('/(tabs)/services/maintenance')}
+              testID="services.maintenance-card">
               <View className="bg-primary/10 rounded-full w-12 h-12 items-center justify-center mb-5">
                 <Wrench size={24} color="#6366f1" />
               </View>
@@ -178,7 +181,8 @@ export default function Services() {
             {/* Billing Card */}
             <TouchableOpacity
               className="flex-1 bg-surface rounded-2xl p-6 border border-divider"
-              onPress={() => router.push('/(tabs)/services/billing')}>
+              onPress={() => router.push('/(tabs)/services/billing')}
+              testID="services.billing-card">
               <View className="bg-success/10 rounded-full w-12 h-12 items-center justify-center mb-5">
                 <Receipt size={24} color="#4CAF50" />
               </View>
@@ -198,11 +202,12 @@ export default function Services() {
             </TouchableOpacity>
           </View>
 
-          <View className="flex-row gap-4">
+          <View className="flex-row gap-4" testID="services.main-grid.row2">
             {/* Governance Card */}
             <TouchableOpacity
               className="flex-1 bg-surface rounded-2xl p-6 border border-divider"
-              onPress={() => router.push('/(tabs)/services/governance')}>
+              onPress={() => router.push('/(tabs)/services/governance')}
+              testID="services.governance-card">
               <View className="bg-indigo-500/10 rounded-full w-12 h-12 items-center justify-center mb-5">
                 <Vote size={24} color="#6366f1" />
               </View>
@@ -224,7 +229,8 @@ export default function Services() {
             {/* Analytics Card */}
             <TouchableOpacity
               className="flex-1 bg-surface rounded-2xl p-6 border border-divider"
-              onPress={() => router.push('/(tabs)/services/analytics')}>
+              onPress={() => router.push('/(tabs)/services/analytics')}
+              testID="services.analytics-card">
               <View className="bg-purple-500/10 rounded-full w-12 h-12 items-center justify-center mb-5">
                 <BarChart3 size={24} color="#8B5CF6" />
               </View>
@@ -247,17 +253,18 @@ export default function Services() {
 
         {/* Recent Maintenance Requests */}
         {recentRequests.length > 0 && (
-          <View className="mb-8">
-            <View className="flex-row items-center justify-between mb-4">
-              <Text className="text-lg font-semibold text-text-primary">
+          <View className="mb-8" testID="services.recent-requests">
+            <View className="flex-row items-center justify-between mb-4" testID="services.recent-requests.header">
+              <Text className="text-lg font-semibold text-text-primary" testID="services.recent-requests.title">
                 Recent Requests
               </Text>
               <TouchableOpacity
-                onPress={() => router.push('/(tabs)/services/maintenance')}>
+                onPress={() => router.push('/(tabs)/services/maintenance')}
+                testID="services.recent-requests.view-all-button">
                 <Text className="text-primary font-medium">View All</Text>
               </TouchableOpacity>
             </View>
-            <View className="space-y-3">
+            <View className="space-y-3" testID="services.recent-requests.list">
               {recentRequests.map((request) => (
                 <TouchableOpacity
                   key={request.id}
@@ -266,7 +273,8 @@ export default function Services() {
                     router.push(
                       `/(tabs)/services/maintenance/common-area/${request.id}`,
                     )
-                  }>
+                  }
+                  testID={`services.recent-requests.item.${request.id}`}>
                   <View className="flex-row items-start justify-between mb-3">
                     <Text className="text-text-primary font-medium flex-1 mr-3">
                       {request.title}
@@ -302,24 +310,26 @@ export default function Services() {
 
         {/* Unpaid Bills */}
         {unpaidBills.length > 0 && (
-          <View className="mb-8">
-            <View className="flex-row items-center justify-between mb-4">
-              <Text className="text-lg font-semibold text-text-primary">
+          <View className="mb-8" testID="services.pending-bills">
+            <View className="flex-row items-center justify-between mb-4" testID="services.pending-bills.header">
+              <Text className="text-lg font-semibold text-text-primary" testID="services.pending-bills.title">
                 Pending Bills
               </Text>
               <TouchableOpacity
-                onPress={() => router.push('/(tabs)/services/billing')}>
+                onPress={() => router.push('/(tabs)/services/billing')}
+                testID="services.pending-bills.view-all-button">
                 <Text className="text-primary font-medium">View All</Text>
               </TouchableOpacity>
             </View>
-            <View className="space-y-3">
+            <View className="space-y-3" testID="services.pending-bills.list">
               {unpaidBills.map((bill) => (
                 <TouchableOpacity
                   key={bill.id}
                   className="bg-surface rounded-xl p-5 border border-divider mb-3"
                   onPress={() =>
                     router.push(`/(tabs)/services/billing/${bill.id}`)
-                  }>
+                  }
+                  testID={`services.pending-bills.item.${bill.id}`}>
                   <View className="flex-row items-start justify-between mb-3">
                     <Text className="text-text-primary font-medium flex-1 mr-3">
                       {bill.title}
@@ -353,29 +363,29 @@ export default function Services() {
         )}
 
         {/* Analytics Overview */}
-        <View className="mb-8">
-          <Text className="text-lg font-semibold text-text-primary mb-4">
+        <View className="mb-8" testID="services.analytics-overview">
+          <Text className="text-lg font-semibold text-text-primary mb-4" testID="services.analytics-overview.title">
             This Month
           </Text>
-          <View className="bg-surface rounded-2xl p-6 border border-divider">
-            <View className="flex-row items-center mb-5">
+          <View className="bg-surface rounded-2xl p-6 border border-divider" testID="services.analytics-overview.card">
+            <View className="flex-row items-center mb-5" testID="services.analytics-overview.header">
               <TrendingUp size={20} color="#4CAF50" />
               <Text className="text-text-primary font-medium ml-3">
                 Activity Summary
               </Text>
             </View>
-            <View className="flex-row justify-between">
-              <View className="items-center">
+            <View className="flex-row justify-between" testID="services.analytics-overview.stats">
+              <View className="items-center" testID="services.analytics-overview.requests-stat">
                 <Text className="text-2xl font-bold text-text-primary mb-1">
                   3
                 </Text>
                 <Text className="text-text-secondary text-sm">Requests</Text>
               </View>
-              <View className="items-center">
+              <View className="items-center" testID="services.analytics-overview.completed-stat">
                 <Text className="text-2xl font-bold text-success mb-1">2</Text>
                 <Text className="text-text-secondary text-sm">Completed</Text>
               </View>
-              <View className="items-center">
+              <View className="items-center" testID="services.analytics-overview.bills-paid-stat">
                 <Text className="text-2xl font-bold text-text-primary mb-1">
                   ₹12,450
                 </Text>

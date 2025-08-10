@@ -1,6 +1,6 @@
+import { CategoryType } from '@/types/community';
 import React from 'react';
 import { Text, TouchableOpacity } from 'react-native';
-import { CategoryType } from '@/types/community';
 
 interface PillFilterProps {
   label: string;
@@ -8,6 +8,7 @@ interface PillFilterProps {
   isActive: boolean;
   count?: number;
   onPress: (category: CategoryType) => void;
+  testID?: string;
 }
 
 const PillFilter: React.FC<PillFilterProps> = ({
@@ -16,6 +17,7 @@ const PillFilter: React.FC<PillFilterProps> = ({
   isActive,
   count,
   onPress,
+  testID,
 }) => {
   const handlePress = () => {
     onPress(category);
@@ -26,7 +28,8 @@ const PillFilter: React.FC<PillFilterProps> = ({
       className={`px-4 py-3 rounded-full border ${
         isActive ? 'bg-primary border-primary' : 'bg-background border-divider'
       }`}
-      activeOpacity={0.7}>
+      activeOpacity={0.7}
+      testID={testID}>
       <Text
         className={`font-medium text-sm ${
           isActive ? 'text-white' : 'text-text-secondary'

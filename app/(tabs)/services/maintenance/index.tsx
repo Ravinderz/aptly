@@ -1,6 +1,6 @@
 import { useRouter } from 'expo-router';
 import { ArrowLeft, Building, Search, Users } from 'lucide-react-native';
-import React, { useState } from 'react';
+import { useState } from 'react';
 import {
   SafeAreaView,
   ScrollView,
@@ -165,30 +165,44 @@ export default function MaintenanceRequests() {
   });
 
   return (
-    <SafeAreaView className="flex-1 bg-background">
+    <SafeAreaView
+      className="flex-1 bg-background"
+      testID="services.maintenance.screen">
       {/* Header */}
-      <View className="flex-row items-center px-4 py-4 border-b border-divider bg-surface">
-        <TouchableOpacity onPress={() => router.back()} className="mr-4">
+      <View
+        className="flex-row items-center px-4 py-4 border-b border-divider bg-surface"
+        testID="services.maintenance.header">
+        <TouchableOpacity
+          onPress={() => router.back()}
+          className="mr-4"
+          testID="services.maintenance.back-button">
           <ArrowLeft size={24} color="#212121" />
         </TouchableOpacity>
         <View className="flex-1">
-          <Text className="text-xl font-bold text-text-primary">
+          <Text
+            className="text-xl font-bold text-text-primary"
+            testID="services.maintenance.title">
             Maintenance Requests
           </Text>
-          <Text className="text-text-secondary text-sm">
+          <Text
+            className="text-text-secondary text-sm"
+            testID="services.maintenance.count">
             {filteredRequests.length} requests
           </Text>
         </View>
       </View>
 
       {/* Quick Actions */}
-      <View className="bg-surface px-6 py-5 border-b border-divider">
+      <View
+        className="bg-surface px-6 py-5 border-b border-divider"
+        testID="services.maintenance.quick-actions">
         <View className="flex-row gap-4">
           <TouchableOpacity
             onPress={() =>
               router.push('/(tabs)/services/maintenance/common-area/create')
             }
-            className="flex-1 bg-primary rounded-xl p-5 flex-row items-center justify-center">
+            className="flex-1 bg-primary rounded-xl p-5 flex-row items-center justify-center"
+            testID="services.maintenance.create-request-button">
             <Building size={20} color="white" />
             <Text className="text-white font-semibold ml-3">
               Common Area Request
@@ -198,9 +212,13 @@ export default function MaintenanceRequests() {
       </View>
 
       {/* Search and Filters */}
-      <View className="px-6 py-5 bg-surface border-b border-divider">
+      <View
+        className="px-6 py-5 bg-surface border-b border-divider"
+        testID="services.maintenance.search-filters">
         {/* Search Bar */}
-        <View className="flex-row items-center bg-background rounded-xl px-4 py-4 mb-5">
+        <View
+          className="flex-row items-center bg-background rounded-xl px-4 py-4 mb-5"
+          testID="services.maintenance.search-bar">
           <Search size={20} color="#757575" />
           <TextInput
             className="flex-1 ml-3 text-text-primary"
@@ -208,11 +226,15 @@ export default function MaintenanceRequests() {
             placeholderTextColor="#757575"
             value={searchQuery}
             onChangeText={setSearchQuery}
+            testID="services.maintenance.search-input"
           />
         </View>
 
         {/* Filter Tabs */}
-        <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          testID="services.maintenance.filters">
           <View className="flex-row gap-3">
             {filterOptions.map((filter) => (
               <TouchableOpacity
@@ -222,7 +244,8 @@ export default function MaintenanceRequests() {
                   selectedFilter === filter.value
                     ? 'bg-primary border-primary'
                     : 'bg-background border-divider'
-                }`}>
+                }`}
+                testID={`services.maintenance.filter.${filter.value}`}>
                 <Text
                   className={`font-medium ${
                     selectedFilter === filter.value
@@ -245,9 +268,12 @@ export default function MaintenanceRequests() {
           paddingVertical: 20,
           paddingBottom: 24,
         }}
-        showsVerticalScrollIndicator={false}>
+        showsVerticalScrollIndicator={false}
+        testID="services.maintenance.requests-list">
         {filteredRequests.length === 0 ? (
-          <View className="flex-1 items-center justify-center py-16">
+          <View
+            className="flex-1 items-center justify-center py-16"
+            testID="services.maintenance.empty-state">
             <Text className="text-text-secondary text-lg mb-2">
               No requests found
             </Text>
@@ -271,7 +297,8 @@ export default function MaintenanceRequests() {
                   } else {
                     router.push(`/(tabs)/services/maintenance/${request.id}`);
                   }
-                }}>
+                }}
+                testID={`services.maintenance.request.${request.id}`}>
                 {/* Header with Category and Priority */}
                 <View className="flex-row items-center justify-between mb-3">
                   <View className="flex-row items-center">

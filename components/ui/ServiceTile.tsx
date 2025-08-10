@@ -1,3 +1,4 @@
+import { cn } from '@/utils/cn';
 import {
   Bug,
   Cog,
@@ -14,17 +15,21 @@ import {
 } from 'lucide-react-native';
 import React from 'react';
 import { Text, View } from 'react-native';
-import { cn } from '@/utils/cn';
 
 // Define props interface
 interface ServiceTileProps {
   iconName: string;
   serviceName: string;
+  testID?: string;
 }
 
 // Styled components for NativeWind
 
-const ServiceTile: React.FC<ServiceTileProps> = ({ iconName, serviceName }) => {
+const ServiceTile: React.FC<ServiceTileProps> = ({
+  iconName,
+  serviceName,
+  testID,
+}) => {
   // Dynamically import the icon based on the iconName prop
 
   const IconMap = {
@@ -43,17 +48,22 @@ const ServiceTile: React.FC<ServiceTileProps> = ({ iconName, serviceName }) => {
   };
 
   return (
-    <View>
+    <View testID={testID}>
       <View
         className={cn(
           'p-6 rounded-xl items-center justify-center bg-surface border border-divider',
           'shadow-sm shadow-black/5',
-        )}>
-        <View className="flex items-center justify-center bg-primary/10 rounded-full p-4">
+        )}
+        testID={testID ? `${testID}.container` : undefined}>
+        <View
+          className="flex items-center justify-center bg-primary/10 rounded-full p-4"
+          testID={testID ? `${testID}.icon` : undefined}>
           {IconMap[iconName as keyof typeof IconMap]}
         </View>
       </View>
-      <Text className="text-sm text-center font-medium mt-2 text-text-primary">
+      <Text
+        className="text-sm text-center font-medium mt-2 text-text-primary"
+        testID={testID ? `${testID}.label` : undefined}>
         {serviceName}
       </Text>
     </View>

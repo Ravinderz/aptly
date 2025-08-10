@@ -1,24 +1,24 @@
 import LucideIcons from '@/components/ui/LucideIcons';
-import React, { useState } from 'react';
-import {
-  Text,
-  View,
-  TouchableOpacity,
-  ActivityIndicator,
-  Image,
-} from 'react-native';
-import UserAvatar from './UserAvatar';
-import MentionText from './MentionText';
+import { communityApi } from '@/services/communityApi';
 import { Post } from '@/types/community';
+import { showDeleteConfirmAlert, showErrorAlert } from '@/utils/alert';
 import {
+  canEditPost,
   formatTimeAgo,
   getCategoryDisplay,
   getPostStats,
-  canEditPost,
 } from '@/utils/community';
-import { communityApi } from '@/services/communityApi';
 import { useRouter } from 'expo-router';
-import { showErrorAlert, showDeleteConfirmAlert } from '@/utils/alert';
+import React, { useState } from 'react';
+import {
+  ActivityIndicator,
+  Image,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
+import MentionText from './MentionText';
+import UserAvatar from './UserAvatar';
 
 interface PostCardProps {
   post: Post;
@@ -28,6 +28,7 @@ interface PostCardProps {
   onEdit?: (postId: string) => void;
   onMentionPress?: (mentionUserId: string) => void;
   showReadMore?: boolean;
+  testID?: string;
 }
 
 const PostCard: React.FC<PostCardProps> = ({
@@ -38,6 +39,7 @@ const PostCard: React.FC<PostCardProps> = ({
   onEdit,
   onMentionPress,
   showReadMore = true,
+  testID,
 }) => {
   const [liking, setLiking] = useState(false);
   const [deleting, setDeleting] = useState(false);
@@ -100,10 +102,17 @@ const PostCard: React.FC<PostCardProps> = ({
   const categoryDisplay = getCategoryDisplay(post.category);
   const postStats = getPostStats(post.likesCount, post.commentsCount);
   return (
-    <View className="bg-surface border border-divider rounded-2xl p-5 mb-4 shadow-sm shadow-black/5">
-      <View className="flex flex-row justify-between items-start mb-3">
+    <View
+      className="bg-surface border border-divider rounded-2xl p-5 mb-4 shadow-sm shadow-black/5"
+      testID={testID}>
+      <View
+        className="flex flex-row justify-between items-start mb-3"
+        testID={testID ? `${testID}.header` : undefined}>
         <View className="flex flex-row gap-3 items-center flex-1">
-          <UserAvatar name={post.userName} />
+          <UserAvatar
+            name={post.userName}
+            testID={testID ? `${testID}.avatar` : undefined}
+          />
           <View className="flex flex-col gap-1 flex-1">
             <Text className="text-headline-small font-semibold text-text-primary">
               {post.userName}

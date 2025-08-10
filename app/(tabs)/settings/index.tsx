@@ -1,31 +1,30 @@
 import { useDirectAuth } from '@/hooks/useDirectAuth';
 import { useFeatureFlagStore } from '@/stores/slices/featureFlagStore';
 import {
-  showConfirmAlert,
-  showErrorAlert,
-  showSuccessAlert,
+    showConfirmAlert,
+    showErrorAlert,
+    showSuccessAlert,
 } from '@/utils/alert';
 import * as ImagePicker from 'expo-image-picker';
 import { useRouter } from 'expo-router';
 import {
-  BarChart3,
-  Bell,
-  Car,
-  FileText,
-  HelpCircle,
-  LogOut,
-  Phone,
-  Settings as SettingsIcon,
-  Shield,
-  User,
-  Users,
-  Vote,
+    BarChart3,
+    Bell,
+    Car,
+    FileText,
+    HelpCircle,
+    LogOut,
+    Phone,
+    Settings as SettingsIcon,
+    Shield,
+    User,
+    Users,
+    Vote,
 } from 'lucide-react-native';
-import React from 'react';
 import { SafeAreaView, ScrollView, View } from 'react-native';
 import ProfileHeader from '../../../components/ui/ProfileHeader';
 import ProfileSection, {
-  ProfileItem,
+    ProfileItem,
 } from '../../../components/ui/ProfileSection';
 
 export default function Profile() {
@@ -121,11 +120,12 @@ export default function Profile() {
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-background">
+    <SafeAreaView className="flex-1 bg-background" testID="settings.screen">
       <ScrollView
         className="flex-1"
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ paddingBottom: 20 }}>
+        contentContainerStyle={{ paddingBottom: 20 }}
+        testID="settings.scroll">
         {/* Profile Header */}
         <ProfileHeader
           userName={userData.name}
@@ -135,15 +135,17 @@ export default function Profile() {
           profileImageUrl={userData.profileImage}
           onEditProfile={handleEditProfile}
           onChangePhoto={handleChangePhoto}
+          testID="settings.profile-header"
         />
 
         {/* Personal Information Section */}
-        <ProfileSection title="Personal Information">
+        <ProfileSection title="Personal Information" testID="settings.personal-info-section">
           <ProfileItem
             icon={<User size={20} color="#6366f1" />}
             title="Personal Details"
             subtitle="Complete profile with Indian documents"
             onPress={handlePersonalInfo}
+            testID="settings.personal-details-item"
           />
           <View className="h-px bg-divider mx-4" />
           <ProfileItem
@@ -151,6 +153,7 @@ export default function Profile() {
             title="Family Members"
             subtitle="4 members • 2 dependents"
             onPress={handleFamilyMembers}
+            testID="settings.family-members-item"
           />
           <View className="h-px bg-divider mx-4" />
           <ProfileItem
@@ -158,6 +161,7 @@ export default function Profile() {
             title="Vehicles"
             subtitle="3 vehicles registered • 1 electric"
             onPress={handleVehicles}
+            testID="settings.vehicles-item"
           />
           <View className="h-px bg-divider mx-4" />
           <ProfileItem
@@ -165,16 +169,18 @@ export default function Profile() {
             title="Documents"
             subtitle="Aadhar, PAN, RC, Insurance"
             onPress={handleDocuments}
+            testID="settings.documents-item"
           />
         </ProfileSection>
 
         {/* Preferences Section */}
-        <ProfileSection title="Preferences & Settings">
+        <ProfileSection title="Preferences & Settings" testID="settings.preferences-section">
           <ProfileItem
             icon={<Bell size={20} color="#6366f1" />}
             title="Notifications"
             subtitle="8 categories • Festival mode enabled"
             onPress={handleNotifications}
+            testID="settings.notifications-item"
           />
           <View className="h-px bg-divider mx-4" />
           <ProfileItem
@@ -182,6 +188,7 @@ export default function Profile() {
             title="Emergency Contacts"
             subtitle="2 verified contacts"
             onPress={handleEmergencyContacts}
+            testID="settings.emergency-contacts-item"
           />
           <View className="h-px bg-divider mx-4" />
 
@@ -195,6 +202,7 @@ export default function Profile() {
                 onPress={() =>
                   router.push('/(tabs)/settings/governance-settings')
                 }
+                testID="settings.governance-center-item"
               />
               <View className="h-px bg-divider mx-4" />
             </>
@@ -205,16 +213,18 @@ export default function Profile() {
             title="Analytics Settings"
             subtitle="Performance monitoring, data preferences"
             onPress={() => router.push('/(tabs)/settings/analytics-settings')}
+            testID="settings.analytics-settings-item"
           />
         </ProfileSection>
 
         {/* Security & Support Section */}
-        <ProfileSection title="Security & Support">
+        <ProfileSection title="Security & Support" testID="settings.security-support-section">
           <ProfileItem
             icon={<Shield size={20} color="#6366f1" />}
             title="Security Settings"
             subtitle="Privacy, biometric, app lock"
             onPress={handleSecurity}
+            testID="settings.security-settings-item"
           />
           <View className="h-px bg-divider mx-4" />
           <ProfileItem
@@ -222,6 +232,7 @@ export default function Profile() {
             title="Help & Support"
             subtitle="FAQs, contact support, feedback"
             onPress={handleHelp}
+            testID="settings.help-support-item"
           />
           <View className="h-px bg-divider mx-4" />
           <ProfileItem
@@ -229,17 +240,19 @@ export default function Profile() {
             title="App Settings"
             subtitle="Language, theme, storage"
             onPress={handleSettings}
+            testID="settings.app-settings-item"
           />
         </ProfileSection>
 
         {/* Account Section */}
-        <ProfileSection title="Account">
+        <ProfileSection title="Account" testID="settings.account-section">
           <ProfileItem
             icon={<LogOut size={20} color="#D32F2F" />}
             title="Logout"
             subtitle="Sign out securely from this device"
             onPress={handleLogout}
             showArrow={false}
+            testID="settings.logout-item"
           />
         </ProfileSection>
       </ScrollView>

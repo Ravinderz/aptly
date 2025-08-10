@@ -1,12 +1,13 @@
-import React from 'react';
-import { View, Text, TouchableOpacity } from 'react-native';
 import { ChevronRight } from 'lucide-react-native';
+import React from 'react';
+import { Text, TouchableOpacity, View } from 'react-native';
 import { cn } from '../../utils/cn';
 
 export interface ProfileSectionProps {
   title: string;
   children: React.ReactNode;
   className?: string;
+  testID?: string;
 }
 
 export interface ProfileItemProps {
@@ -17,19 +18,21 @@ export interface ProfileItemProps {
   showArrow?: boolean;
   rightElement?: React.ReactNode;
   className?: string;
+  testID?: string;
 }
 
 export const ProfileSection: React.FC<ProfileSectionProps> = ({
   title,
   children,
   className,
+  testID,
 }) => {
   return (
-    <View className={cn('mx-4 mb-6', className)}>
-      <Text className="text-text-primary text-lg font-semibold mb-3 px-2">
+    <View className={cn('mx-4 mb-6', className)} testID={testID}>
+      <Text className="text-text-primary text-lg font-semibold mb-3 px-2" testID={testID ? `${testID}.title` : undefined}>
         {title}
       </Text>
-      <View className="bg-surface rounded-xl border border-divider shadow-sm shadow-black/5">
+      <View className="bg-surface rounded-xl border border-divider shadow-sm shadow-black/5" testID={testID ? `${testID}.container` : undefined}>
         {children}
       </View>
     </View>
@@ -44,6 +47,7 @@ export const ProfileItem: React.FC<ProfileItemProps> = ({
   showArrow = true,
   rightElement,
   className,
+  testID,
 }) => {
   const Wrapper = onPress ? TouchableOpacity : View;
 
@@ -55,19 +59,20 @@ export const ProfileItem: React.FC<ProfileItemProps> = ({
         onPress && 'active:bg-background',
         className,
       )}
-      activeOpacity={0.6}>
+      activeOpacity={0.6}
+      testID={testID}>
       {/* Icon */}
-      <View className="w-10 h-10 rounded-full bg-primary/10 items-center justify-center mr-3">
+      <View className="w-10 h-10 rounded-full bg-primary/10 items-center justify-center mr-3" testID={testID ? `${testID}.icon` : undefined}>
         {icon}
       </View>
 
       {/* Content */}
-      <View className="flex-1">
-        <Text className="text-text-primary text-body-large font-medium">
+      <View className="flex-1" testID={testID ? `${testID}.content` : undefined}>
+        <Text className="text-text-primary text-body-large font-medium" testID={testID ? `${testID}.title` : undefined}>
           {title}
         </Text>
         {subtitle && (
-          <Text className="text-text-secondary text-sm mt-1">{subtitle}</Text>
+          <Text className="text-text-secondary text-sm mt-1" testID={testID ? `${testID}.subtitle` : undefined}>{subtitle}</Text>
         )}
       </View>
 

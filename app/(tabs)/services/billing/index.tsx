@@ -1,24 +1,24 @@
-import { useRouter } from 'expo-router';
+import { Card } from '@/components/ui/Card';
+import HighlightCard from '@/components/ui/HighlightCard';
 import LucideIcons from '@/components/ui/LucideIcons';
-import React, { useState } from 'react';
+import {
+  ResponsiveCard,
+  ResponsiveContainer,
+  ResponsiveRow,
+  ResponsiveText,
+} from '@/components/ui/ResponsiveContainer';
+import { showAlert } from '@/utils/alert';
+import { layoutUtils } from '@/utils/responsive';
+import { useRouter } from 'expo-router';
+import { useState } from 'react';
 import {
   SafeAreaView,
   ScrollView,
   Text,
+  TextInput,
   TouchableOpacity,
   View,
-  TextInput,
 } from 'react-native';
-import { showAlert } from '@/utils/alert';
-import HighlightCard from '@/components/ui/HighlightCard';
-import { Card } from '@/components/ui/Card';
-import {
-  ResponsiveContainer,
-  ResponsiveCard,
-  ResponsiveRow,
-  ResponsiveText,
-} from '@/components/ui/ResponsiveContainer';
-import { layoutUtils } from '@/utils/responsive';
 
 export default function Billing() {
   const router = useRouter();
@@ -197,23 +197,35 @@ export default function Billing() {
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-background">
+    <SafeAreaView
+      className="flex-1 bg-background"
+      testID="services.billing.screen">
       <ResponsiveContainer
         type="scroll"
         padding="none"
         preventOverflow={true}
         showScrollIndicator={false}
-        style={{ paddingBottom: 100 }}>
+        style={{ paddingBottom: 100 }}
+        testID="services.billing.container">
         {/* Header */}
-        <View className="flex-row items-center px-6 py-4 border-b border-divider bg-surface">
-          <TouchableOpacity onPress={() => router.back()} className="mr-4 p-2">
+        <View
+          className="flex-row items-center px-6 py-4 border-b border-divider bg-surface"
+          testID="services.billing.header">
+          <TouchableOpacity
+            onPress={() => router.back()}
+            className="mr-4 p-2"
+            testID="services.billing.back-button">
             <LucideIcons name="arrow-left" size={20} color="#6366f1" />
           </TouchableOpacity>
           <View className="flex-1">
-            <Text className="text-headline-large font-semibold text-text-primary">
+            <Text
+              className="text-headline-large font-semibold text-text-primary"
+              testID="services.billing.title">
               Billing
             </Text>
-            <Text className="text-body-medium text-text-secondary">
+            <Text
+              className="text-body-medium text-text-secondary"
+              testID="services.billing.flat-number">
               Flat A-201
             </Text>
           </View>
@@ -237,9 +249,15 @@ export default function Billing() {
         </View>
 
         {/* Summary Cards */}
-        <View className="px-6 py-6 bg-surface border-b border-divider">
-          <View className="flex-row gap-4 mb-6">
-            <View className="flex-1 bg-error/10 rounded-xl p-4 border border-error/20">
+        <View
+          className="px-6 py-6 bg-surface border-b border-divider"
+          testID="services.billing.summary">
+          <View
+            className="flex-row gap-4 mb-6"
+            testID="services.billing.summary.cards">
+            <View
+              className="flex-1 bg-error/10 rounded-xl p-4 border border-error/20"
+              testID="services.billing.summary.pending-card">
               <View className="flex-row items-center mb-3">
                 <LucideIcons name="alert-circle" size={16} color="#D32F2F" />
                 <Text className="text-error text-body-medium font-medium ml-2">
@@ -253,7 +271,9 @@ export default function Billing() {
                 3 bills pending
               </Text>
             </View>
-            <View className="flex-1 bg-success/10 rounded-xl p-4 border border-success/20">
+            <View
+              className="flex-1 bg-success/10 rounded-xl p-4 border border-success/20"
+              testID="services.billing.summary.paid-card">
               <View className="flex-row items-center mb-3">
                 <LucideIcons
                   name="checkmark-circle"
@@ -274,10 +294,13 @@ export default function Billing() {
           </View>
 
           {/* Quick Actions */}
-          <View className="flex-row gap-4">
+          <View
+            className="flex-row gap-4"
+            testID="services.billing.quick-actions">
             <TouchableOpacity
               onPress={() => router.push('/(tabs)/services/billing/auto-pay')}
-              className="flex-1 bg-primary rounded-xl p-4 flex-row items-center justify-center">
+              className="flex-1 bg-primary rounded-xl p-4 flex-row items-center justify-center"
+              testID="services.billing.auto-pay-button">
               <LucideIcons name="card-outline" size={16} color="#FFFFFF" />
               <Text className="text-white font-semibold ml-2 text-body-medium">
                 Setup Auto Pay
@@ -285,7 +308,8 @@ export default function Billing() {
             </TouchableOpacity>
             <TouchableOpacity
               onPress={() => router.push('/(tabs)/services/billing/analytics')}
-              className="flex-1 bg-surface border border-divider rounded-xl p-4 flex-row items-center justify-center">
+              className="flex-1 bg-surface border border-divider rounded-xl p-4 flex-row items-center justify-center"
+              testID="services.billing.analytics-button">
               <LucideIcons name="trending-up" size={16} color="#6366f1" />
               <Text className="text-primary font-semibold ml-2 text-body-medium">
                 View Analytics

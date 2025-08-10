@@ -6,13 +6,13 @@
  * protection, and flexible layouts that work on any device.
  */
 
-import React, { ReactNode } from 'react';
-import { View, ScrollView, StyleSheet } from 'react-native';
 import {
-  responsiveClasses,
-  layoutUtils,
-  scrollUtils,
+    layoutUtils,
+    responsiveClasses,
+    scrollUtils,
 } from '@/utils/responsive';
+import React, { ReactNode } from 'react';
+import { ScrollView, View } from 'react-native';
 
 interface ResponsiveContainerProps {
   children: ReactNode;
@@ -29,6 +29,7 @@ interface ResponsiveContainerProps {
   // Style overrides
   className?: string;
   style?: any;
+  testID?: string;
 }
 
 export const ResponsiveContainer: React.FC<ResponsiveContainerProps> = ({
@@ -42,6 +43,7 @@ export const ResponsiveContainer: React.FC<ResponsiveContainerProps> = ({
   keyboardAware = true,
   className = '',
   style,
+  testID,
 }) => {
   // Generate responsive classes
   const containerClass = responsiveClasses.container();
@@ -87,7 +89,8 @@ export const ResponsiveContainer: React.FC<ResponsiveContainerProps> = ({
         style={baseStyle}
         contentContainerStyle={scrollUtils.scrollContainerStyle}
         showsVerticalScrollIndicator={showScrollIndicator}
-        keyboardShouldPersistTaps={keyboardAware ? 'handled' : 'never'}>
+        keyboardShouldPersistTaps={keyboardAware ? 'handled' : 'never'}
+        testID={testID}>
         {children}
       </ScrollView>
     );
@@ -97,14 +100,15 @@ export const ResponsiveContainer: React.FC<ResponsiveContainerProps> = ({
     return (
       <View
         className={`${baseClasses} flex-1`}
-        style={[...baseStyle, layoutUtils.safeFlexContainer]}>
+        style={[...baseStyle, layoutUtils.safeFlexContainer]}
+        testID={testID}>
         {children}
       </View>
     );
   }
 
   return (
-    <View className={baseClasses} style={baseStyle}>
+    <View className={baseClasses} style={baseStyle} testID={testID}>
       {children}
     </View>
   );
