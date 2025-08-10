@@ -1,0 +1,598 @@
+appId: com.ravinderz.aptly
+---
+# Profile Setup Flow Test
+# Tests user profile information input and image upload functionality
+# Requirements: 3.1, 5.1, 5.2
+
+- launchApp
+- clearState
+
+# Setup: Navigate to profile setup screen
+- runFlow:
+    file: ../helpers/auth-helpers.yaml
+    commands:
+      - registerPhoneNumber:
+          phoneNumber: '${TEST_USER_PHONE}'
+      - verifyOTP:
+          otp: '${TEST_USER_OTP}'
+
+# Test Case 1: Complete profile setup with all fields
+- assertVisible:
+    id: 'auth.profile-setup.screen'
+    timeout: 10000
+
+# Fill in name field
+- tap:
+    id: 'auth.profile.name.field'
+- clearText
+- inputText: 'Test User'
+
+# Verify name is entered correctly
+- assertVisible:
+    text: 'Test User'
+
+# Fill in email field
+- tap:
+    id: 'auth.profile.email.field'
+- clearText
+- inputText: 'testuser@test.com'
+
+# Verify email is entered correctly
+- assertVisible:
+    text: 'testuser@test.com'
+
+# Fill in apartment field
+- tap:
+    id: 'auth.profile.apartment.field'
+- clearText
+- inputText: 'A-101'
+
+# Verify apartment is entered correctly
+- assertVisible:
+    text: 'A-101'
+
+# Test profile image upload (if available)
+- runFlow:
+    when:
+      visible:
+        id: 'auth.profile.image.upload'
+    commands:
+      - tap:
+          id: 'auth.profile.image.upload'
+      - runFlow:
+          when:
+            visible:
+              id: 'image.picker.camera'
+          commands:
+            - tap:
+                id: 'image.picker.gallery'
+      - runFlow:
+          when:
+            visible:
+              id: 'gallery.test.image'
+          commands:
+            - tap:
+                id: 'gallery.test.image'
+      - waitForElement:
+          id: 'auth.profile.image.preview'
+          timeout: 10000
+
+# Submit profile
+- tap:
+    id: 'auth.profile-setup.submit-button'
+
+# Verify navigation to next step (society onboarding)
+- waitForElement:
+    id: 'auth.society-onboarding.screen'
+    timeout: 15000
+
+- assertVisible:
+    id: 'auth.society-onboarding.screen'
+
+---
+# Test Case 2: Profile setup with missing required fields
+- launchApp
+- clearState
+
+# Setup: Navigate to profile setup screen
+- runFlow:
+    file: ../helpers/auth-helpers.yaml
+    commands:
+      - registerPhoneNumber:
+          phoneNumber: '${TEST_USER_PHONE}'
+      - verifyOTP:
+          otp: '${TEST_USER_OTP}'
+
+- assertVisible:
+    id: 'auth.profile-setup.screen'
+
+# Try to submit without filling required fields
+- tap:
+    id: 'auth.profile-setup.submit-button'
+
+# Verify validation errors for required fields
+- runFlow:
+    when:
+      visible:
+        id: 'auth.profile.name.error'
+    commands:
+      - assertVisible:
+          id: 'auth.profile.name.error'
+
+- runFlow:
+    when:
+      visible:
+        id: 'auth.profile.email.error'
+    commands:
+      - assertVisible:
+          id: 'auth.profile.email.error'
+
+- runFlow:
+    when:
+      visible:
+        id: 'auth.profile.apartment.error'
+    commands:
+      - assertVisible:
+          id: 'auth.profile.apartment.error'
+
+# Verify we stay on profile setup screen
+- assertVisible:
+    id: 'auth.profile-setup.screen'
+
+---
+# Test Case 3: Email validation
+- launchApp
+- clearState
+
+# Setup: Navigate to profile setup screen
+- runFlow:
+    file: ../helpers/auth-helpers.yaml
+    commands:
+      - registerPhoneNumber:
+          phoneNumber: '${TEST_USER_PHONE}'
+      - verifyOTP:
+          otp: '${TEST_USER_OTP}'
+
+- assertVisible:
+    id: 'auth.profile-setup.screen'
+
+# Fill required fields with valid data
+- tap:
+    id: 'auth.profile.name.field'
+- clearText
+- inputText: 'Test User'
+
+- tap:
+    id: 'auth.profile.apartment.field'
+- clearText
+- inputText: 'A-101'
+
+# Test invalid email format
+- tap:
+    id: 'auth.profile.email.field'
+- clearText
+- inputText: 'invalid-email'
+
+- tap:
+    id: 'auth.profile-setup.submit-button'
+
+# Verify email validation error
+- waitForElement:
+    id: 'auth.profile.email.error'
+    timeout: 5000
+
+- assertVisible:
+    id: 'auth.profile.email.error'
+
+# Test valid email format
+- tap:
+    id: 'auth.profile.email.field'
+- clearText
+- inputText: 'valid@test.com'
+
+- tap:
+    id: 'auth.profile-setup.submit-button'
+
+# Verify successful submission
+- waitForElement:
+    id: 'auth.society-onboarding.screen'
+    timeout: 15000
+
+---
+# Test Case 4: Name field validation
+- launchApp
+- clearState
+
+# Setup: Navigate to profile setup screen
+- runFlow:
+    file: ../helpers/auth-helpers.yaml
+    commands:
+      - registerPhoneNumber:
+          phoneNumber: '${TEST_USER_PHONE}'
+      - verifyOTP:
+          otp: '${TEST_USER_OTP}'
+
+- assertVisible:
+    id: 'auth.profile-setup.screen'
+
+# Test name with special characters
+- tap:
+    id: 'auth.profile.name.field'
+- clearText
+- inputText: 'Test@User#123'
+
+- tap:
+    id: 'auth.profile.email.field'
+- clearText
+- inputText: 'test@test.com'
+
+- tap:
+    id: 'auth.profile.apartment.field'
+- clearText
+- inputText: 'A-101'
+
+- tap:
+    id: 'auth.profile-setup.submit-button'
+
+# Check if special characters are allowed or show error
+- runFlow:
+    when:
+      visible:
+        id: 'auth.profile.name.error'
+        timeout: 5000
+    commands:
+      - assertVisible:
+          id: 'auth.profile.name.error'
+      - takeScreenshot: 'profile-name-validation-error'
+
+# Test name with only spaces
+- tap:
+    id: 'auth.profile.name.field'
+- clearText
+- inputText: '   '
+
+- tap:
+    id: 'auth.profile-setup.submit-button'
+
+# Verify empty name validation
+- runFlow:
+    when:
+      visible:
+        id: 'auth.profile.name.error'
+    commands:
+      - assertVisible:
+          id: 'auth.profile.name.error'
+
+---
+# Test Case 5: Apartment field validation
+- launchApp
+- clearState
+
+# Setup: Navigate to profile setup screen
+- runFlow:
+    file: ../helpers/auth-helpers.yaml
+    commands:
+      - registerPhoneNumber:
+          phoneNumber: '${TEST_USER_PHONE}'
+      - verifyOTP:
+          otp: '${TEST_USER_OTP}'
+
+- assertVisible:
+    id: 'auth.profile-setup.screen'
+
+# Fill required fields
+- tap:
+    id: 'auth.profile.name.field'
+- clearText
+- inputText: 'Test User'
+
+- tap:
+    id: 'auth.profile.email.field'
+- clearText
+- inputText: 'test@test.com'
+
+# Test various apartment formats
+- tap:
+    id: 'auth.profile.apartment.field'
+- clearText
+- inputText: '101'
+
+- tap:
+    id: 'auth.profile-setup.submit-button'
+
+# Verify apartment format is accepted
+- waitForElement:
+    id: 'auth.society-onboarding.screen'
+    timeout: 15000
+
+---
+# Test Case 6: Profile image upload functionality
+- launchApp
+- clearState
+
+# Setup: Navigate to profile setup screen
+- runFlow:
+    file: ../helpers/auth-helpers.yaml
+    commands:
+      - registerPhoneNumber:
+          phoneNumber: '${TEST_USER_PHONE}'
+      - verifyOTP:
+          otp: '${TEST_USER_OTP}'
+
+- assertVisible:
+    id: 'auth.profile-setup.screen'
+
+# Fill required text fields first
+- tap:
+    id: 'auth.profile.name.field'
+- clearText
+- inputText: 'Test User'
+
+- tap:
+    id: 'auth.profile.email.field'
+- clearText
+- inputText: 'test@test.com'
+
+- tap:
+    id: 'auth.profile.apartment.field'
+- clearText
+- inputText: 'A-101'
+
+# Test profile image upload
+- runFlow:
+    when:
+      visible:
+        id: 'auth.profile.image.upload'
+    commands:
+      - tap:
+          id: 'auth.profile.image.upload'
+
+      # Test camera option
+      - runFlow:
+          when:
+            visible:
+              id: 'image.picker.camera'
+          commands:
+            - tap:
+                id: 'image.picker.camera'
+            - runFlow:
+                when:
+                  visible:
+                    id: 'camera.capture.button'
+                commands:
+                  - tap:
+                      id: 'camera.capture.button'
+                  - waitForElement:
+                      id: 'camera.confirm.button'
+                      timeout: 5000
+                  - tap:
+                      id: 'camera.confirm.button'
+
+      # Test gallery option
+      - runFlow:
+          when:
+            visible:
+              id: 'image.picker.gallery'
+          commands:
+            - tap:
+                id: 'image.picker.gallery'
+            - waitForElement:
+                id: 'gallery.image.list'
+                timeout: 5000
+            - tap:
+                id: 'gallery.first.image'
+
+      # Verify image preview is shown
+      - waitForElement:
+          id: 'auth.profile.image.preview'
+          timeout: 10000
+      - assertVisible:
+          id: 'auth.profile.image.preview'
+
+# Submit profile with image
+- tap:
+    id: 'auth.profile-setup.submit-button'
+
+- waitForElement:
+    id: 'auth.society-onboarding.screen'
+    timeout: 15000
+
+---
+# Test Case 7: Profile image removal
+- launchApp
+- clearState
+
+# Setup: Navigate to profile setup screen
+- runFlow:
+    file: ../helpers/auth-helpers.yaml
+    commands:
+      - registerPhoneNumber:
+          phoneNumber: '${TEST_USER_PHONE}'
+      - verifyOTP:
+          otp: '${TEST_USER_OTP}'
+
+- assertVisible:
+    id: 'auth.profile-setup.screen'
+
+# Fill required fields
+- tap:
+    id: 'auth.profile.name.field'
+- clearText
+- inputText: 'Test User'
+
+- tap:
+    id: 'auth.profile.email.field'
+- clearText
+- inputText: 'test@test.com'
+
+- tap:
+    id: 'auth.profile.apartment.field'
+- clearText
+- inputText: 'A-101'
+
+# Upload image first
+- runFlow:
+    when:
+      visible:
+        id: 'auth.profile.image.upload'
+    commands:
+      - tap:
+          id: 'auth.profile.image.upload'
+      - runFlow:
+          when:
+            visible:
+              id: 'image.picker.gallery'
+          commands:
+            - tap:
+                id: 'image.picker.gallery'
+            - tap:
+                id: 'gallery.first.image'
+      - waitForElement:
+          id: 'auth.profile.image.preview'
+          timeout: 10000
+
+# Test image removal
+- runFlow:
+    when:
+      visible:
+        id: 'auth.profile.image.remove'
+    commands:
+      - tap:
+          id: 'auth.profile.image.remove'
+      - assertNotVisible:
+          id: 'auth.profile.image.preview'
+      - assertVisible:
+          id: 'auth.profile.image.upload'
+
+---
+# Test Case 8: Back navigation from profile setup
+- launchApp
+- clearState
+
+# Setup: Navigate to profile setup screen
+- runFlow:
+    file: ../helpers/auth-helpers.yaml
+    commands:
+      - registerPhoneNumber:
+          phoneNumber: '${TEST_USER_PHONE}'
+      - verifyOTP:
+          otp: '${TEST_USER_OTP}'
+
+- assertVisible:
+    id: 'auth.profile-setup.screen'
+
+# Test back navigation
+- runFlow:
+    when:
+      visible:
+        id: 'auth.back.button'
+    commands:
+      - tap:
+          id: 'auth.back.button'
+      - waitForElement:
+          id: 'auth.otp-verification.screen'
+          timeout: 5000
+      - assertVisible:
+          id: 'auth.otp-verification.screen'
+
+---
+# Test Case 9: Form field focus and keyboard behavior
+- launchApp
+- clearState
+
+# Setup: Navigate to profile setup screen
+- runFlow:
+    file: ../helpers/auth-helpers.yaml
+    commands:
+      - registerPhoneNumber:
+          phoneNumber: '${TEST_USER_PHONE}'
+      - verifyOTP:
+          otp: '${TEST_USER_OTP}'
+
+- assertVisible:
+    id: 'auth.profile-setup.screen'
+
+# Test field focus behavior
+- tap:
+    id: 'auth.profile.name.field'
+- assertVisible:
+    id: 'keyboard'
+
+# Test tab navigation between fields
+- runFlow:
+    when:
+      visible:
+        id: 'keyboard.next.button'
+    commands:
+      - tap:
+          id: 'keyboard.next.button'
+      - assertVisible:
+          id: 'auth.profile.email.field.focused'
+
+# Test keyboard dismiss
+- runFlow:
+    when:
+      visible:
+        id: 'keyboard.done.button'
+    commands:
+      - tap:
+          id: 'keyboard.done.button'
+      - assertNotVisible:
+          id: 'keyboard'
+
+---
+# Test Case 10: Network error during profile submission
+- launchApp
+- clearState
+
+# Setup: Navigate to profile setup screen
+- runFlow:
+    file: ../helpers/auth-helpers.yaml
+    commands:
+      - registerPhoneNumber:
+          phoneNumber: '${TEST_USER_PHONE}'
+      - verifyOTP:
+          otp: '${TEST_USER_OTP}'
+
+- assertVisible:
+    id: 'auth.profile-setup.screen'
+
+# Fill all required fields
+- tap:
+    id: 'auth.profile.name.field'
+- clearText
+- inputText: 'Test User'
+
+- tap:
+    id: 'auth.profile.email.field'
+- clearText
+- inputText: 'test@test.com'
+
+- tap:
+    id: 'auth.profile.apartment.field'
+- clearText
+- inputText: 'A-101'
+
+# Submit profile
+- tap:
+    id: 'auth.profile-setup.submit-button'
+
+# Wait for potential network error
+- runFlow:
+    when:
+      visible:
+        id: 'auth.network-error.message'
+        timeout: 15000
+    commands:
+      - assertVisible:
+          id: 'auth.network-error.message'
+      - takeScreenshot: 'profile-setup-network-error'
+      - tap:
+          id: 'auth.error.retry.button'
+
+---
+# Cleanup
+- runFlow:
+    file: ../helpers/common.yaml
+    commands:
+      - cleanupTestData

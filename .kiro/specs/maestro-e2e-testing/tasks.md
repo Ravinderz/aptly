@@ -58,26 +58,26 @@
   - Implement custom assertion helpers for common UI patterns
   - _Requirements: 4.1, 4.2, 4.4_
 
-- [-] 5. Implement authentication flow tests
-- [-] 5.1 Create phone registration flow test
+- [x] 5. Implement authentication flow tests
+- [x] 5.1 Create phone registration flow test
   - Write test for phone number input and validation
   - Test phone number submission and OTP request flow
   - Verify error handling for invalid phone numbers
   - _Requirements: 3.1, 5.1, 5.2_
 
-- [ ] 5.2 Create OTP verification flow test
+- [x] 5.2 Create OTP verification flow test
   - Write test for OTP input and verification
   - Test OTP resend functionality
   - Verify error handling for invalid OTP codes
   - _Requirements: 3.1, 5.1, 5.2_
 
-- [ ] 5.3 Create profile setup flow test
+- [x] 5.3 Create profile setup flow test
   - Write test for user profile information input
   - Test profile image upload functionality
   - Verify profile completion and navigation to next step
   - _Requirements: 3.1, 5.1, 5.2_
 
-- [ ] 5.4 Create society onboarding flow test
+- [x] 5.4 Create society onboarding flow test
   - Write test for society selection and verification
   - Test society code input and validation
   - Verify successful onboarding completion

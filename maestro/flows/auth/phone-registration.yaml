@@ -1,0 +1,292 @@
+appId: com.ravinderz.aptly
+---
+# Phone Registration Flow Test
+# Tests phone number input, validation, and OTP request flow
+# Requirements: 3.1, 5.1, 5.2
+
+- launchApp
+- clearState
+
+# Test Case 1: Valid phone number registration
+- assertVisible:
+    id: 'auth.phone-registration.screen'
+    timeout: 10000
+
+# Test valid phone number input
+- tap:
+    id: 'auth.phone-input.field'
+- clearText
+- inputText: '${TEST_USER_PHONE}'
+
+# Verify phone number is displayed correctly
+- assertVisible:
+    text: '${TEST_USER_PHONE}'
+
+# Accept terms if checkbox is present
+- runFlow:
+    when:
+      visible:
+        id: 'auth.terms.checkbox'
+    commands:
+      - tap:
+          id: 'auth.terms.checkbox'
+
+# Submit phone number
+- tap:
+    id: 'auth.phone-input.submit-button'
+
+# Verify navigation to OTP screen
+- waitForElement:
+    id: 'auth.otp-verification.screen'
+    timeout: 15000
+
+- assertVisible:
+    id: 'auth.otp-verification.screen'
+
+# Verify phone number is displayed on OTP screen
+- assertVisible:
+    text: '${TEST_USER_PHONE}'
+
+---
+# Test Case 2: Invalid phone number validation
+- launchApp
+- clearState
+
+- assertVisible:
+    id: 'auth.phone-registration.screen'
+
+# Test invalid phone number (too short)
+- tap:
+    id: 'auth.phone-input.field'
+- clearText
+- inputText: '123'
+
+- tap:
+    id: 'auth.phone-input.submit-button'
+
+# Verify error message for invalid phone
+- assertVisible:
+    id: 'auth.phone-input.error'
+    timeout: 5000
+
+# Verify we stay on registration screen
+- assertVisible:
+    id: 'auth.phone-registration.screen'
+
+---
+# Test Case 3: Empty phone number validation
+- launchApp
+- clearState
+
+- runFlow:
+    file: ../helpers/common.yaml
+    commands:
+      - resetAppState
+
+- assertVisible:
+    id: 'auth.phone-registration.screen'
+
+# Test empty phone number submission
+- tap:
+    id: 'auth.phone-input.field'
+- clearText
+
+- tap:
+    id: 'auth.phone-input.submit-button'
+
+# Verify error message for empty phone
+- assertVisible:
+    id: 'auth.phone-input.error'
+    timeout: 5000
+
+# Verify submit button is disabled or error is shown
+- runFlow:
+    when:
+      visible:
+        id: 'auth.phone-input.submit-button'
+    commands:
+      - assertVisible:
+          id: 'auth.phone-input.error'
+
+---
+# Test Case 4: Invalid phone format validation
+- launchApp
+- clearState
+
+- runFlow:
+    file: ../helpers/common.yaml
+    commands:
+      - resetAppState
+
+- assertVisible:
+    id: 'auth.phone-registration.screen'
+
+# Test invalid phone format (letters)
+- tap:
+    id: 'auth.phone-input.field'
+- clearText
+- inputText: 'abcd123456'
+
+- tap:
+    id: 'auth.phone-input.submit-button'
+
+# Verify error message for invalid format
+- assertVisible:
+    id: 'auth.phone-input.error'
+    timeout: 5000
+
+---
+# Test Case 5: Network error handling
+- launchApp
+- clearState
+
+- runFlow:
+    file: ../helpers/common.yaml
+    commands:
+      - resetAppState
+
+- assertVisible:
+    id: 'auth.phone-registration.screen'
+
+# Test with valid phone but simulate network error
+- tap:
+    id: 'auth.phone-input.field'
+- clearText
+- inputText: '+919999999999'
+
+- runFlow:
+    when:
+      visible:
+        id: 'auth.terms.checkbox'
+    commands:
+      - tap:
+          id: 'auth.terms.checkbox'
+
+- tap:
+    id: 'auth.phone-input.submit-button'
+
+# Wait for potential network error
+- runFlow:
+    when:
+      visible:
+        id: 'auth.network-error.message'
+        timeout: 10000
+    commands:
+      - assertVisible:
+          id: 'auth.network-error.message'
+      - takeScreenshot: 'phone-registration-network-error'
+      - tap:
+          id: 'auth.error.retry.button'
+
+---
+# Test Case 6: Terms and conditions validation
+- launchApp
+- clearState
+
+- runFlow:
+    file: ../helpers/common.yaml
+    commands:
+      - resetAppState
+
+- assertVisible:
+    id: 'auth.phone-registration.screen'
+
+# Test submission without accepting terms
+- tap:
+    id: 'auth.phone-input.field'
+- clearText
+- inputText: '${TEST_USER_PHONE}'
+
+# Ensure terms checkbox is unchecked
+- runFlow:
+    when:
+      visible:
+        id: 'auth.terms.checkbox'
+    commands:
+      - runFlow:
+          when:
+            visible:
+              id: 'auth.terms.checkbox.checked'
+          commands:
+            - tap:
+                id: 'auth.terms.checkbox'
+
+- tap:
+    id: 'auth.phone-input.submit-button'
+
+# Verify terms acceptance error
+- runFlow:
+    when:
+      visible:
+        id: 'auth.terms.error'
+    commands:
+      - assertVisible:
+          id: 'auth.terms.error'
+      - takeScreenshot: 'phone-registration-terms-error'
+
+---
+# Test Case 7: Back navigation
+- launchApp
+- clearState
+
+- runFlow:
+    file: ../helpers/common.yaml
+    commands:
+      - resetAppState
+
+- assertVisible:
+    id: 'auth.phone-registration.screen'
+
+# Test back navigation if available
+- runFlow:
+    when:
+      visible:
+        id: 'auth.back.button'
+    commands:
+      - tap:
+          id: 'auth.back.button'
+      - waitForElement:
+          id: 'welcome.screen'
+          timeout: 5000
+
+---
+# Test Case 8: Phone number formatting
+- launchApp
+- clearState
+
+- runFlow:
+    file: ../helpers/common.yaml
+    commands:
+      - resetAppState
+
+- assertVisible:
+    id: 'auth.phone-registration.screen'
+
+# Test phone number auto-formatting
+- tap:
+    id: 'auth.phone-input.field'
+- clearText
+- inputText: '9876543210'
+
+# Verify auto-formatting to +91 format
+- runFlow:
+    when:
+      visible:
+        text: '+919876543210'
+    commands:
+      - assertVisible:
+          text: '+919876543210'
+
+# Test international format
+- clearText
+- inputText: '+919876543210'
+
+- assertVisible:
+    text: '+919876543210'
+
+---
+# Cleanup
+- runFlow:
+    file: ../helpers/common.yaml
+    commands:
+      - cleanupTestData

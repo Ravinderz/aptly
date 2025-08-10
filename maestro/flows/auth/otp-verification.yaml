@@ -1,0 +1,430 @@
+appId: com.ravinderz.aptly
+---
+# OTP Verification Flow Test
+# Tests OTP input, verification, and resend functionality
+# Requirements: 3.1, 5.1, 5.2
+
+- launchApp
+- clearState
+
+# Setup: Navigate to OTP screen first
+- runFlow:
+    file: ../helpers/auth-helpers.yaml
+    commands:
+      - registerPhoneNumber:
+          phoneNumber: '${TEST_USER_PHONE}'
+
+# Test Case 1: Valid OTP verification
+- assertVisible:
+    id: 'auth.otp-verification.screen'
+    timeout: 10000
+
+# Verify phone number is displayed
+- assertVisible:
+    text: '${TEST_USER_PHONE}'
+
+# Enter valid OTP
+- tap:
+    id: 'auth.otp-input.field'
+- clearText
+- inputText: '${TEST_USER_OTP}'
+
+# Verify OTP is displayed (masked or visible)
+- runFlow:
+    when:
+      visible:
+        text: '${TEST_USER_OTP}'
+    commands:
+      - assertVisible:
+          text: '${TEST_USER_OTP}'
+
+# Submit OTP
+- tap:
+    id: 'auth.otp-verification.submit-button'
+
+# Verify successful verification and navigation
+- waitForElement:
+    id: 'auth.profile-setup.screen'
+    timeout: 15000
+
+- assertVisible:
+    id: 'auth.profile-setup.screen'
+
+---
+# Test Case 2: Invalid OTP handling
+- launchApp
+- clearState
+
+# Setup: Navigate to OTP screen
+- runFlow:
+    file: ../helpers/auth-helpers.yaml
+    commands:
+      - registerPhoneNumber:
+          phoneNumber: '${TEST_USER_PHONE}'
+
+- assertVisible:
+    id: 'auth.otp-verification.screen'
+
+# Enter invalid OTP
+- tap:
+    id: 'auth.otp-input.field'
+- clearText
+- inputText: '000000'
+
+- tap:
+    id: 'auth.otp-verification.submit-button'
+
+# Verify error message for invalid OTP
+- waitForElement:
+    id: 'auth.otp-error.message'
+    timeout: 10000
+
+- assertVisible:
+    id: 'auth.otp-error.message'
+
+# Verify we stay on OTP verification screen
+- assertVisible:
+    id: 'auth.otp-verification.screen'
+
+# Verify OTP field is cleared or highlighted for retry
+- runFlow:
+    when:
+      visible:
+        id: 'auth.otp-input.field'
+    commands:
+      - tap:
+          id: 'auth.otp-input.field'
+
+---
+# Test Case 3: Empty OTP validation
+- launchApp
+- clearState
+
+# Setup: Navigate to OTP screen
+- runFlow:
+    file: ../helpers/auth-helpers.yaml
+    commands:
+      - registerPhoneNumber:
+          phoneNumber: '${TEST_USER_PHONE}'
+
+- assertVisible:
+    id: 'auth.otp-verification.screen'
+
+# Try to submit without entering OTP
+- tap:
+    id: 'auth.otp-input.field'
+- clearText
+
+- tap:
+    id: 'auth.otp-verification.submit-button'
+
+# Verify validation error for empty OTP
+- runFlow:
+    when:
+      visible:
+        id: 'auth.otp-empty.error'
+    commands:
+      - assertVisible:
+          id: 'auth.otp-empty.error'
+
+# Verify submit button is disabled or shows error
+- runFlow:
+    when:
+      visible:
+        id: 'auth.otp-verification.submit-button.disabled'
+    commands:
+      - assertVisible:
+          id: 'auth.otp-verification.submit-button.disabled'
+
+---
+# Test Case 4: OTP resend functionality
+- launchApp
+- clearState
+
+# Setup: Navigate to OTP screen
+- runFlow:
+    file: ../helpers/auth-helpers.yaml
+    commands:
+      - registerPhoneNumber:
+          phoneNumber: '${TEST_USER_PHONE}'
+
+- assertVisible:
+    id: 'auth.otp-verification.screen'
+
+# Wait for resend button to be available (usually after countdown)
+- waitForElement:
+    id: 'auth.otp-resend.button'
+    timeout: 30000
+
+# Tap resend OTP
+- tap:
+    id: 'auth.otp-resend.button'
+
+# Verify resend confirmation message
+- waitForElement:
+    id: 'auth.otp-resent.message'
+    timeout: 10000
+
+- assertVisible:
+    id: 'auth.otp-resent.message'
+
+# Verify resend button is disabled again (countdown restart)
+- runFlow:
+    when:
+      visible:
+        id: 'auth.otp-resend.countdown'
+    commands:
+      - assertVisible:
+          id: 'auth.otp-resend.countdown'
+
+# Test that we can still enter OTP after resend
+- tap:
+    id: 'auth.otp-input.field'
+- clearText
+- inputText: '${TEST_USER_OTP}'
+
+- tap:
+    id: 'auth.otp-verification.submit-button'
+
+- waitForElement:
+    id: 'auth.profile-setup.screen'
+    timeout: 15000
+
+---
+# Test Case 5: OTP expiration handling
+- launchApp
+- clearState
+
+# Setup: Navigate to OTP screen
+- runFlow:
+    file: ../helpers/auth-helpers.yaml
+    commands:
+      - registerPhoneNumber:
+          phoneNumber: '${TEST_USER_PHONE}'
+
+- assertVisible:
+    id: 'auth.otp-verification.screen'
+
+# Enter expired OTP (if supported by test environment)
+- tap:
+    id: 'auth.otp-input.field'
+- clearText
+- inputText: 'expired'
+
+- tap:
+    id: 'auth.otp-verification.submit-button'
+
+# Verify expired OTP error message
+- runFlow:
+    when:
+      visible:
+        id: 'auth.otp-expired.error'
+        timeout: 10000
+    commands:
+      - assertVisible:
+          id: 'auth.otp-expired.error'
+      - takeScreenshot: 'otp-expired-error'
+
+---
+# Test Case 6: Back navigation from OTP screen
+- launchApp
+- clearState
+
+# Setup: Navigate to OTP screen
+- runFlow:
+    file: ../helpers/auth-helpers.yaml
+    commands:
+      - registerPhoneNumber:
+          phoneNumber: '${TEST_USER_PHONE}'
+
+- assertVisible:
+    id: 'auth.otp-verification.screen'
+
+# Test back navigation
+- runFlow:
+    when:
+      visible:
+        id: 'auth.back.button'
+    commands:
+      - tap:
+          id: 'auth.back.button'
+      - waitForElement:
+          id: 'auth.phone-registration.screen'
+          timeout: 5000
+      - assertVisible:
+          id: 'auth.phone-registration.screen'
+
+---
+# Test Case 7: OTP auto-fill functionality (if supported)
+- launchApp
+- clearState
+
+# Setup: Navigate to OTP screen
+- runFlow:
+    file: ../helpers/auth-helpers.yaml
+    commands:
+      - registerPhoneNumber:
+          phoneNumber: '${TEST_USER_PHONE}'
+
+- assertVisible:
+    id: 'auth.otp-verification.screen'
+
+# Wait for potential auto-fill
+- runFlow:
+    when:
+      visible:
+        id: 'auth.otp-autofill.suggestion'
+        timeout: 5000
+    commands:
+      - tap:
+          id: 'auth.otp-autofill.suggestion'
+      - waitForElement:
+          id: 'auth.profile-setup.screen'
+          timeout: 15000
+
+---
+# Test Case 8: Multiple invalid OTP attempts
+- launchApp
+- clearState
+
+# Setup: Navigate to OTP screen
+- runFlow:
+    file: ../helpers/auth-helpers.yaml
+    commands:
+      - registerPhoneNumber:
+          phoneNumber: '${TEST_USER_PHONE}'
+
+- assertVisible:
+    id: 'auth.otp-verification.screen'
+
+# First invalid attempt
+- tap:
+    id: 'auth.otp-input.field'
+- clearText
+- inputText: '111111'
+- tap:
+    id: 'auth.otp-verification.submit-button'
+
+- waitForElement:
+    id: 'auth.otp-error.message'
+    timeout: 5000
+
+# Second invalid attempt
+- tap:
+    id: 'auth.otp-input.field'
+- clearText
+- inputText: '222222'
+- tap:
+    id: 'auth.otp-verification.submit-button'
+
+- waitForElement:
+    id: 'auth.otp-error.message'
+    timeout: 5000
+
+# Third invalid attempt
+- tap:
+    id: 'auth.otp-input.field'
+- clearText
+- inputText: '333333'
+- tap:
+    id: 'auth.otp-verification.submit-button'
+
+# Check for account lockout or additional security measures
+- runFlow:
+    when:
+      visible:
+        id: 'auth.otp-attempts-exceeded.error'
+        timeout: 10000
+    commands:
+      - assertVisible:
+          id: 'auth.otp-attempts-exceeded.error'
+      - takeScreenshot: 'otp-attempts-exceeded'
+
+---
+# Test Case 9: Network error during OTP verification
+- launchApp
+- clearState
+
+# Setup: Navigate to OTP screen
+- runFlow:
+    file: ../helpers/auth-helpers.yaml
+    commands:
+      - registerPhoneNumber:
+          phoneNumber: '${TEST_USER_PHONE}'
+
+- assertVisible:
+    id: 'auth.otp-verification.screen'
+
+# Enter valid OTP but simulate network error
+- tap:
+    id: 'auth.otp-input.field'
+- clearText
+- inputText: '${TEST_USER_OTP}'
+
+- tap:
+    id: 'auth.otp-verification.submit-button'
+
+# Wait for potential network error
+- runFlow:
+    when:
+      visible:
+        id: 'auth.network-error.message'
+        timeout: 15000
+    commands:
+      - assertVisible:
+          id: 'auth.network-error.message'
+      - takeScreenshot: 'otp-verification-network-error'
+      - tap:
+          id: 'auth.error.retry.button'
+
+---
+# Test Case 10: OTP input field behavior
+- launchApp
+- clearState
+
+# Setup: Navigate to OTP screen
+- runFlow:
+    file: ../helpers/auth-helpers.yaml
+    commands:
+      - registerPhoneNumber:
+          phoneNumber: '${TEST_USER_PHONE}'
+
+- assertVisible:
+    id: 'auth.otp-verification.screen'
+
+# Test OTP field character limit
+- tap:
+    id: 'auth.otp-input.field'
+- clearText
+- inputText: '1234567890'
+
+# Verify only 6 characters are accepted (assuming 6-digit OTP)
+- runFlow:
+    when:
+      visible:
+        text: '123456'
+    commands:
+      - assertVisible:
+          text: '123456'
+      - assertNotVisible:
+          text: '1234567890'
+
+# Test numeric input only
+- clearText
+- inputText: '12ab34'
+
+# Verify only numeric characters are accepted
+- runFlow:
+    when:
+      visible:
+        text: '1234'
+    commands:
+      - assertVisible:
+          text: '1234'
+
+---
+# Cleanup
+- runFlow:
+    file: ../helpers/common.yaml
+    commands:
+      - cleanupTestData

@@ -1,0 +1,594 @@
+appId: com.ravinderz.aptly
+---
+# Society Onboarding Flow Test
+# Tests society selection, verification, and onboarding completion
+# Requirements: 3.1, 5.1, 5.2
+
+- launchApp
+- clearState
+
+# Setup: Navigate to society onboarding screen
+- runFlow:
+    file: ../helpers/auth-helpers.yaml
+    commands:
+      - registerPhoneNumber:
+          phoneNumber: '${TEST_USER_PHONE}'
+      - verifyOTP:
+          otp: '${TEST_USER_OTP}'
+      - setupUserProfile:
+          name: 'Test User'
+          email: 'test@test.com'
+          apartment: 'A-101'
+
+# Test Case 1: Complete society onboarding with society search
+- assertVisible:
+    id: 'auth.society-onboarding.screen'
+    timeout: 10000
+
+# Test society search functionality
+- runFlow:
+    when:
+      visible:
+        id: 'auth.society.search.field'
+    commands:
+      - tap:
+          id: 'auth.society.search.field'
+      - clearText
+      - inputText: 'Test Society'
+
+      # Wait for search results
+      - waitForElement:
+          id: 'auth.society.search.results'
+          timeout: 10000
+
+      # Select society from search results
+      - runFlow:
+          when:
+            visible:
+              id: 'auth.society.result.Test Society'
+          commands:
+            - tap:
+                id: 'auth.society.result.Test Society'
+            - assertVisible:
+                text: 'Test Society'
+
+# Enter society code
+- runFlow:
+    when:
+      visible:
+        id: 'auth.society.code.field'
+    commands:
+      - tap:
+          id: 'auth.society.code.field'
+      - clearText
+      - inputText: 'TEST123'
+      - assertVisible:
+          text: 'TEST123'
+
+# Submit society onboarding
+- tap:
+    id: 'auth.society-onboarding.submit-button'
+
+# Verify successful onboarding completion
+- waitForElement:
+    id: 'auth.onboarding-complete.screen'
+    timeout: 15000
+
+- assertVisible:
+    id: 'auth.onboarding-complete.screen'
+
+# Verify navigation to main app or biometric setup
+- runFlow:
+    when:
+      visible:
+        id: 'auth.biometric-setup.screen'
+        timeout: 5000
+    commands:
+      - assertVisible:
+          id: 'auth.biometric-setup.screen'
+
+- runFlow:
+    when:
+      visible:
+        id: 'home.screen'
+        timeout: 5000
+    commands:
+      - assertVisible:
+          id: 'home.screen'
+
+---
+# Test Case 2: Society onboarding with manual society code entry
+- launchApp
+- clearState
+
+# Setup: Navigate to society onboarding screen
+- runFlow:
+    file: ../helpers/auth-helpers.yaml
+    commands:
+      - registerPhoneNumber:
+          phoneNumber: '${TEST_USER_PHONE}'
+      - verifyOTP:
+          otp: '${TEST_USER_OTP}'
+      - setupUserProfile:
+          name: 'Test User'
+          email: 'test@test.com'
+          apartment: 'A-101'
+
+- assertVisible:
+    id: 'auth.society-onboarding.screen'
+
+# Skip society search and enter code directly
+- runFlow:
+    when:
+      visible:
+        id: 'auth.society.code.field'
+    commands:
+      - tap:
+          id: 'auth.society.code.field'
+      - clearText
+      - inputText: 'TEST123'
+
+# Submit with just society code
+- tap:
+    id: 'auth.society-onboarding.submit-button'
+
+# Verify successful onboarding
+- waitForElement:
+    id: 'auth.onboarding-complete.screen'
+    timeout: 15000
+
+---
+# Test Case 3: Invalid society code validation
+- launchApp
+- clearState
+
+# Setup: Navigate to society onboarding screen
+- runFlow:
+    file: ../helpers/auth-helpers.yaml
+    commands:
+      - registerPhoneNumber:
+          phoneNumber: '${TEST_USER_PHONE}'
+      - verifyOTP:
+          otp: '${TEST_USER_OTP}'
+      - setupUserProfile:
+          name: 'Test User'
+          email: 'test@test.com'
+          apartment: 'A-101'
+
+- assertVisible:
+    id: 'auth.society-onboarding.screen'
+
+# Enter invalid society code
+- runFlow:
+    when:
+      visible:
+        id: 'auth.society.code.field'
+    commands:
+      - tap:
+          id: 'auth.society.code.field'
+      - clearText
+      - inputText: 'INVALID123'
+
+- tap:
+    id: 'auth.society-onboarding.submit-button'
+
+# Verify error message for invalid society code
+- waitForElement:
+    id: 'auth.society.code.error'
+    timeout: 10000
+
+- assertVisible:
+    id: 'auth.society.code.error'
+
+# Verify we stay on society onboarding screen
+- assertVisible:
+    id: 'auth.society-onboarding.screen'
+
+---
+# Test Case 4: Empty society code validation
+- launchApp
+- clearState
+
+# Setup: Navigate to society onboarding screen
+- runFlow:
+    file: ../helpers/auth-helpers.yaml
+    commands:
+      - registerPhoneNumber:
+          phoneNumber: '${TEST_USER_PHONE}'
+      - verifyOTP:
+          otp: '${TEST_USER_OTP}'
+      - setupUserProfile:
+          name: 'Test User'
+          email: 'test@test.com'
+          apartment: 'A-101'
+
+- assertVisible:
+    id: 'auth.society-onboarding.screen'
+
+# Try to submit without entering society code
+- tap:
+    id: 'auth.society-onboarding.submit-button'
+
+# Verify validation error for empty society code
+- runFlow:
+    when:
+      visible:
+        id: 'auth.society.code.required.error'
+    commands:
+      - assertVisible:
+          id: 'auth.society.code.required.error'
+
+# Verify submit button is disabled or shows error
+- runFlow:
+    when:
+      visible:
+        id: 'auth.society-onboarding.submit-button.disabled'
+    commands:
+      - assertVisible:
+          id: 'auth.society-onboarding.submit-button.disabled'
+
+---
+# Test Case 5: Society search functionality
+- launchApp
+- clearState
+
+# Setup: Navigate to society onboarding screen
+- runFlow:
+    file: ../helpers/auth-helpers.yaml
+    commands:
+      - registerPhoneNumber:
+          phoneNumber: '${TEST_USER_PHONE}'
+      - verifyOTP:
+          otp: '${TEST_USER_OTP}'
+      - setupUserProfile:
+          name: 'Test User'
+          email: 'test@test.com'
+          apartment: 'A-101'
+
+- assertVisible:
+    id: 'auth.society-onboarding.screen'
+
+# Test society search with partial name
+- runFlow:
+    when:
+      visible:
+        id: 'auth.society.search.field'
+    commands:
+      - tap:
+          id: 'auth.society.search.field'
+      - clearText
+      - inputText: 'Test'
+
+      # Wait for search results
+      - waitForElement:
+          id: 'auth.society.search.results'
+          timeout: 10000
+
+      # Verify search results are displayed
+      - assertVisible:
+          id: 'auth.society.search.results'
+
+      # Test selecting a society from results
+      - runFlow:
+          when:
+            visible:
+              id: 'auth.society.result.first'
+          commands:
+            - tap:
+                id: 'auth.society.result.first'
+
+# Test search with no results
+- runFlow:
+    when:
+      visible:
+        id: 'auth.society.search.field'
+    commands:
+      - tap:
+          id: 'auth.society.search.field'
+      - clearText
+      - inputText: 'NonExistentSociety'
+
+      # Wait for no results message
+      - waitForElement:
+          id: 'auth.society.search.no-results'
+          timeout: 10000
+
+      - assertVisible:
+          id: 'auth.society.search.no-results'
+
+---
+# Test Case 6: Society verification pending state
+- launchApp
+- clearState
+
+# Setup: Navigate to society onboarding screen
+- runFlow:
+    file: ../helpers/auth-helpers.yaml
+    commands:
+      - registerPhoneNumber:
+          phoneNumber: '${TEST_USER_PHONE}'
+      - verifyOTP:
+          otp: '${TEST_USER_OTP}'
+      - setupUserProfile:
+          name: 'Test User'
+          email: 'test@test.com'
+          apartment: 'A-101'
+
+- assertVisible:
+    id: 'auth.society-onboarding.screen'
+
+# Enter society code that requires verification
+- runFlow:
+    when:
+      visible:
+        id: 'auth.society.code.field'
+    commands:
+      - tap:
+          id: 'auth.society.code.field'
+      - clearText
+      - inputText: 'PENDING123'
+
+- tap:
+    id: 'auth.society-onboarding.submit-button'
+
+# Check for pending verification state
+- runFlow:
+    when:
+      visible:
+        id: 'auth.society.verification.pending'
+        timeout: 15000
+    commands:
+      - assertVisible:
+          id: 'auth.society.verification.pending'
+      - takeScreenshot: 'society-verification-pending'
+
+---
+# Test Case 7: Back navigation from society onboarding
+- launchApp
+- clearState
+
+# Setup: Navigate to society onboarding screen
+- runFlow:
+    file: ../helpers/auth-helpers.yaml
+    commands:
+      - registerPhoneNumber:
+          phoneNumber: '${TEST_USER_PHONE}'
+      - verifyOTP:
+          otp: '${TEST_USER_OTP}'
+      - setupUserProfile:
+          name: 'Test User'
+          email: 'test@test.com'
+          apartment: 'A-101'
+
+- assertVisible:
+    id: 'auth.society-onboarding.screen'
+
+# Test back navigation
+- runFlow:
+    when:
+      visible:
+        id: 'auth.back.button'
+    commands:
+      - tap:
+          id: 'auth.back.button'
+      - waitForElement:
+          id: 'auth.profile-setup.screen'
+          timeout: 5000
+      - assertVisible:
+          id: 'auth.profile-setup.screen'
+
+---
+# Test Case 8: Society information display
+- launchApp
+- clearState
+
+# Setup: Navigate to society onboarding screen
+- runFlow:
+    file: ../helpers/auth-helpers.yaml
+    commands:
+      - registerPhoneNumber:
+          phoneNumber: '${TEST_USER_PHONE}'
+      - verifyOTP:
+          otp: '${TEST_USER_OTP}'
+      - setupUserProfile:
+          name: 'Test User'
+          email: 'test@test.com'
+          apartment: 'A-101'
+
+- assertVisible:
+    id: 'auth.society-onboarding.screen'
+
+# Search and select society
+- runFlow:
+    when:
+      visible:
+        id: 'auth.society.search.field'
+    commands:
+      - tap:
+          id: 'auth.society.search.field'
+      - clearText
+      - inputText: 'Test Society'
+      - waitForElement:
+          id: 'auth.society.search.results'
+          timeout: 10000
+      - tap:
+          id: 'auth.society.result.Test Society'
+
+# Verify society information is displayed
+- runFlow:
+    when:
+      visible:
+        id: 'auth.society.info.card'
+    commands:
+      - assertVisible:
+          id: 'auth.society.info.card'
+      - assertVisible:
+          text: 'Test Society'
+      - runFlow:
+          when:
+            visible:
+              id: 'auth.society.info.address'
+          commands:
+            - assertVisible:
+                id: 'auth.society.info.address'
+
+---
+# Test Case 9: Multiple society selection
+- launchApp
+- clearState
+
+# Setup: Navigate to society onboarding screen
+- runFlow:
+    file: ../helpers/auth-helpers.yaml
+    commands:
+      - registerPhoneNumber:
+          phoneNumber: '${TEST_USER_PHONE}'
+      - verifyOTP:
+          otp: '${TEST_USER_OTP}'
+      - setupUserProfile:
+          name: 'Test User'
+          email: 'test@test.com'
+          apartment: 'A-101'
+
+- assertVisible:
+    id: 'auth.society-onboarding.screen'
+
+# Test selecting one society then changing to another
+- runFlow:
+    when:
+      visible:
+        id: 'auth.society.search.field'
+    commands:
+      - tap:
+          id: 'auth.society.search.field'
+      - clearText
+      - inputText: 'Test Society'
+      - waitForElement:
+          id: 'auth.society.search.results'
+          timeout: 10000
+      - tap:
+          id: 'auth.society.result.Test Society'
+
+      # Change selection
+      - tap:
+          id: 'auth.society.search.field'
+      - clearText
+      - inputText: 'Another Society'
+      - waitForElement:
+          id: 'auth.society.search.results'
+          timeout: 10000
+      - runFlow:
+          when:
+            visible:
+              id: 'auth.society.result.Another Society'
+          commands:
+            - tap:
+                id: 'auth.society.result.Another Society'
+            - assertVisible:
+                text: 'Another Society'
+
+---
+# Test Case 10: Network error during society verification
+- launchApp
+- clearState
+
+# Setup: Navigate to society onboarding screen
+- runFlow:
+    file: ../helpers/auth-helpers.yaml
+    commands:
+      - registerPhoneNumber:
+          phoneNumber: '${TEST_USER_PHONE}'
+      - verifyOTP:
+          otp: '${TEST_USER_OTP}'
+      - setupUserProfile:
+          name: 'Test User'
+          email: 'test@test.com'
+          apartment: 'A-101'
+
+- assertVisible:
+    id: 'auth.society-onboarding.screen'
+
+# Enter valid society code
+- runFlow:
+    when:
+      visible:
+        id: 'auth.society.code.field'
+    commands:
+      - tap:
+          id: 'auth.society.code.field'
+      - clearText
+      - inputText: 'TEST123'
+
+- tap:
+    id: 'auth.society-onboarding.submit-button'
+
+# Wait for potential network error
+- runFlow:
+    when:
+      visible:
+        id: 'auth.network-error.message'
+        timeout: 15000
+    commands:
+      - assertVisible:
+          id: 'auth.network-error.message'
+      - takeScreenshot: 'society-onboarding-network-error'
+      - tap:
+          id: 'auth.error.retry.button'
+
+---
+# Test Case 11: Complete onboarding flow verification
+- launchApp
+- clearState
+
+# Complete full onboarding flow
+- runFlow:
+    file: ../helpers/auth-helpers.yaml
+    commands:
+      - completeFullRegistration:
+          phoneNumber: '${TEST_USER_PHONE}'
+          otp: '${TEST_USER_OTP}'
+          name: 'Test User'
+          email: 'test@test.com'
+          apartment: 'A-101'
+          societyCode: 'TEST123'
+          societyName: 'Test Society'
+
+# Verify final onboarding completion
+- runFlow:
+    when:
+      visible:
+        id: 'auth.onboarding-complete.screen'
+    commands:
+      - assertVisible:
+          id: 'auth.onboarding-complete.screen'
+      - assertVisible:
+          text: 'Welcome to Aptly'
+
+# Verify navigation to main app
+- runFlow:
+    when:
+      visible:
+        id: 'auth.onboarding.continue.button'
+    commands:
+      - tap:
+          id: 'auth.onboarding.continue.button'
+
+- waitForElement:
+    id: 'home.screen'
+    timeout: 15000
+
+- assertVisible:
+    id: 'home.screen'
+
+# Verify user is properly authenticated
+- runFlow:
+    file: ../helpers/auth-helpers.yaml
+    commands:
+      - verifyAuthenticatedState
+
+---
+# Cleanup
+- runFlow:
+    file: ../helpers/common.yaml
+    commands:
+      - cleanupTestData

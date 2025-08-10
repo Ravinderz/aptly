@@ -1,0 +1,48 @@
+appId: com.ravinderz.aptly
+---
+# Complete Authentication Flow Test Suite
+# Runs all authentication flow tests in sequence
+# Requirements: 3.1, 5.1, 5.2
+
+# Test Suite: Complete Authentication Flow
+- launchApp
+- clearState
+
+# Initialize test environment
+- runFlow:
+    file: ../helpers/common.yaml
+    commands:
+      - resetAppState
+      - setupTestEnvironment
+
+# Test 1: Phone Registration Flow
+- runFlow:
+    file: ./phone-registration.yaml
+
+# Test 2: OTP Verification Flow
+- runFlow:
+    file: ./otp-verification.yaml
+
+# Test 3: Profile Setup Flow
+- runFlow:
+    file: ./profile-setup.yaml
+
+# Test 4: Society Onboarding Flow
+- runFlow:
+    file: ./society-onboarding.yaml
+
+# Verify complete authentication state
+- runFlow:
+    file: ../helpers/auth-helpers.yaml
+    commands:
+      - verifyAuthenticatedState
+
+# Final cleanup
+- runFlow:
+    file: ../helpers/common.yaml
+    commands:
+      - cleanupTestData
+      - generateTestReport:
+          suiteName: 'Authentication Flow Tests'
+          testCount: 4
+          status: 'completed'

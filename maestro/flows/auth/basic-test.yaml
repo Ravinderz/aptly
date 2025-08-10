@@ -1,0 +1,4 @@
+appId: com.ravinderz.aptly
+---
+- launchApp
+- assertVisible: 'Welcome'

@@ -1,0 +1,89 @@
+appId: com.ravinderz.aptly
+---
+# Phone Registration Flow Test - Simple Version
+# Tests phone number input, validation, and OTP request flow
+# Requirements: 3.1, 5.1, 5.2
+
+- launchApp
+- clearState
+
+# Test Case 1: Valid phone number registration
+- assertVisible:
+    id: 'auth.phone-registration.screen'
+    timeout: 10000
+
+# Test valid phone number input
+- tap:
+    id: 'auth.phone-input.field'
+- clearText
+- inputText: '+919876543210'
+
+# Accept terms if checkbox is present
+- runFlow:
+    when:
+      visible:
+        id: 'auth.terms.checkbox'
+    commands:
+      - tap:
+          id: 'auth.terms.checkbox'
+
+# Submit phone number
+- tap:
+    id: 'auth.phone-input.submit-button'
+
+# Verify navigation to OTP screen
+- waitForElement:
+    id: 'auth.otp-verification.screen'
+    timeout: 15000
+
+- assertVisible:
+    id: 'auth.otp-verification.screen'
+
+---
+# Test Case 2: Invalid phone number validation
+- launchApp
+- clearState
+
+- assertVisible:
+    id: 'auth.phone-registration.screen'
+    timeout: 10000
+
+# Test invalid phone number (too short)
+- tap:
+    id: 'auth.phone-input.field'
+- clearText
+- inputText: '123'
+
+- tap:
+    id: 'auth.phone-input.submit-button'
+
+# Verify error message for invalid phone
+- assertVisible:
+    id: 'auth.phone-input.error'
+    timeout: 5000
+
+# Verify we stay on registration screen
+- assertVisible:
+    id: 'auth.phone-registration.screen'
+
+---
+# Test Case 3: Empty phone number validation
+- launchApp
+- clearState
+
+- assertVisible:
+    id: 'auth.phone-registration.screen'
+    timeout: 10000
+
+# Test empty phone number submission
+- tap:
+    id: 'auth.phone-input.field'
+- clearText
+
+- tap:
+    id: 'auth.phone-input.submit-button'
+
+# Verify error message for empty phone
+- assertVisible:
+    id: 'auth.phone-input.error'
+    timeout: 5000
