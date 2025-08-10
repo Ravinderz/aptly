@@ -1,0 +1,201 @@
+# Form filling and submission utilities
+# This file contains reusable form interaction helpers
+
+# Fill text input field
+- fillTextField:
+    fieldId: ${fieldId}
+    value: ${value}
+    - waitForElement:
+        id: ${fieldId}
+        timeout: 5000
+    - tap:
+        id: ${fieldId}
+    - clearText
+    - inputText: ${value}
+
+# Fill phone number field with formatting
+- fillPhoneField:
+    fieldId: ${fieldId}
+    phoneNumber: ${phoneNumber}
+    - waitForElement:
+        id: ${fieldId}
+        timeout: 5000
+    - tap:
+        id: ${fieldId}
+    - clearText
+    - inputText: ${phoneNumber}
+
+# Fill email field with validation
+- fillEmailField:
+    fieldId: ${fieldId}
+    email: ${email}
+    - waitForElement:
+        id: ${fieldId}
+        timeout: 5000
+    - tap:
+        id: ${fieldId}
+    - clearText
+    - inputText: ${email}
+
+# Select dropdown option
+- selectDropdownOption:
+    dropdownId: ${dropdownId}
+    optionId: ${optionId}
+    - tap:
+        id: ${dropdownId}
+    - waitForElement:
+        id: ${optionId}
+        timeout: 5000
+    - tap:
+        id: ${optionId}
+
+# Toggle switch/checkbox
+- toggleSwitch:
+    switchId: ${switchId}
+    - tap:
+        id: ${switchId}
+
+# Fill date picker
+- fillDatePicker:
+    pickerId: ${pickerId}
+    date: ${date}
+    - tap:
+        id: ${pickerId}
+    - waitForElement:
+        id: "date-picker.modal"
+        timeout: 5000
+    - inputText: ${date}
+    - tap:
+        id: "date-picker.confirm"
+
+# Fill time picker
+- fillTimePicker:
+    pickerId: ${pickerId}
+    time: ${time}
+    - tap:
+        id: ${pickerId}
+    - waitForElement:
+        id: "time-picker.modal"
+        timeout: 5000
+    - inputText: ${time}
+    - tap:
+        id: "time-picker.confirm"
+
+# Submit form with validation
+- submitForm:
+    submitButtonId: ${submitButtonId}
+    - waitForElement:
+        id: ${submitButtonId}
+        timeout: 5000
+    - tap:
+        id: ${submitButtonId}
+    - waitForLoadingComplete
+
+# Submit form and wait for success
+- submitFormAndWaitForSuccess:
+    submitButtonId: ${submitButtonId}
+    successIndicator: ${successIndicator}
+    - tap:
+        id: ${submitButtonId}
+    - waitForElement:
+        id: ${successIndicator}
+        timeout: 15000
+
+# Submit form and handle errors
+- submitFormWithErrorHandling:
+    submitButtonId: ${submitButtonId}
+    errorIndicator: ${errorIndicator}
+    - tap:
+        id: ${submitButtonId}
+    - runFlow:
+        when:
+          visible:
+            id: ${errorIndicator}
+        commands:
+          - takeScreenshot: "form-error"
+          - assertVisible:
+              id: ${errorIndicator}
+
+# Fill multi-step form
+- fillMultiStepForm:
+    steps: ${steps}
+    - repeat:
+        times: ${steps.length}
+        commands:
+          - runFlow: ${steps[index]}
+
+# Validate form field error
+- validateFieldError:
+    fieldId: ${fieldId}
+    errorId: ${errorId}
+    - assertVisible:
+        id: ${fieldId}
+    - assertVisible:
+        id: ${errorId}
+
+# Clear all form fields
+- clearAllFormFields:
+    formId: ${formId}
+    - runFlow:
+        when:
+          visible:
+            id: ${formId}
+        commands:
+          - tap:
+              id: "form.clear-all"
+
+# Fill contact form
+- fillContactForm:
+    name: ${name}
+    phone: ${phone}
+    email: ${email}
+    - fillTextField:
+        fieldId: "contact.name.field"
+        value: ${name}
+    - fillPhoneField:
+        fieldId: "contact.phone.field"
+        phoneNumber: ${phone}
+    - fillEmailField:
+        fieldId: "contact.email.field"
+        email: ${email}
+
+# Fill address form
+- fillAddressForm:
+    apartment: ${apartment}
+    building: ${building}
+    society: ${society}
+    - fillTextField:
+        fieldId: "address.apartment.field"
+        value: ${apartment}
+    - fillTextField:
+        fieldId: "address.building.field"
+        value: ${building}
+    - fillTextField:
+        fieldId: "address.society.field"
+        value: ${society}
+
+# Upload image/file
+- uploadFile:
+    uploadButtonId: ${uploadButtonId}
+    filePath: ${filePath}
+    - tap:
+        id: ${uploadButtonId}
+    - waitForElement:
+        id: "file-picker.modal"
+        timeout: 5000
+    - tap:
+        text: "Choose from Gallery"
+    - wait: 2000
+
+# Fill search form
+- fillSearchForm:
+    searchFieldId: ${searchFieldId}
+    query: ${query}
+    - tap:
+        id: ${searchFieldId}
+    - inputText: ${query}
+    - tap:
+        id: "search.submit"
+    - waitForElement:
+        id: "search.results"
+        timeout: 10000

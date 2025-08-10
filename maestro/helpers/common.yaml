@@ -1,22 +1,113 @@
 # Common reusable test utilities
-# This file will contain shared helper functions for Maestro tests
+# This file contains shared helper functions for Maestro tests
 
-# Wait for element to be visible
+# Wait for element to be visible with configurable timeout
 - waitForElement:
     id: ${elementId}
-    timeout: 10000
+    timeout: ${timeout:-10000}
 
-# Tap element by testID
+# Tap element by testID with optional wait
 - tapElement:
     id: ${elementId}
+    - waitForElement:
+        id: ${elementId}
+        timeout: 5000
+    - tap:
+        id: ${elementId}
 
-# Input text into field
+# Input text into field with validation
 - inputText:
     id: ${fieldId}
     text: ${inputText}
+    - waitForElement:
+        id: ${fieldId}
+        timeout: 5000
+    - tap:
+        id: ${fieldId}
+    - inputText: ${inputText}
+
+# Clear and input text
+- clearAndInputText:
+    id: ${fieldId}
+    text: ${inputText}
+    - waitForElement:
+        id: ${fieldId}
+        timeout: 5000
+    - tap:
+        id: ${fieldId}
+    - clearText
+    - inputText: ${inputText}
 
 # Wait for loading to complete
 - waitForLoadingComplete:
     - waitForElementToDisappear:
         id: "loading-indicator"
         timeout: 15000
+
+# Wait for any loading state to complete
+- waitForAnyLoadingComplete:
+    - waitForElementToDisappear:
+        id: ".*loading.*"
+        timeout: 15000
+
+# Scroll to element and tap
+- scrollToAndTap:
+    id: ${elementId}
+    - scroll:
+        until:
+          visible:
+            id: ${elementId}
+    - tap:
+        id: ${elementId}
+
+# Verify element exists and is visible
+- verifyElementVisible:
+    id: ${elementId}
+    - assertVisible:
+        id: ${elementId}
+
+# Verify element contains text
+- verifyElementText:
+    id: ${elementId}
+    text: ${expectedText}
+    - assertVisible:
+        id: ${elementId}
+        text: ${expectedText}
+
+# Verify element does not exist
+- verifyElementNotVisible:
+    id: ${elementId}
+    - assertNotVisible:
+        id: ${elementId}
+
+# Take screenshot with label
+- takeScreenshot:
+    label: ${screenshotLabel}
+    - takeScreenshot: ${screenshotLabel}
+
+# Wait for network request to complete
+- waitForNetworkIdle:
+    - wait: 2000  # Wait for network requests to settle
+
+# Swipe gesture helper
+- swipeGesture:
+    direction: ${direction}
+    element: ${elementId}
+    - swipe:
+        from: ${elementId}
+        direction: ${direction}
+
+# Long press element
+- longPressElement:
+    id: ${elementId}
+    - longPress:
+        id: ${elementId}
+
+# Double tap element
+- doubleTapElement:
+    id: ${elementId}
+    - tap:
+        id: ${elementId}
+    - wait: 100
+    - tap:
+        id: ${elementId}

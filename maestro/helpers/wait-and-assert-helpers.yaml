@@ -1,0 +1,360 @@
+# Wait conditions and assertion helpers
+# This file contains reusable wait conditions and assertion utilities
+
+# Wait for element visibility with custom timeout
+- waitForElementVisible:
+    elementId: ${elementId}
+    timeout: ${timeout:-10000}
+    - waitForElement:
+        id: ${elementId}
+        timeout: ${timeout}
+
+# Wait for element to disappear
+- waitForElementToDisappear:
+    elementId: ${elementId}
+    timeout: ${timeout:-10000}
+    - waitForElementToDisappear:
+        id: ${elementId}
+        timeout: ${timeout}
+
+# Wait for text to appear in element
+- waitForTextInElement:
+    elementId: ${elementId}
+    text: ${text}
+    timeout: ${timeout:-10000}
+    - waitForElement:
+        id: ${elementId}
+        text: ${text}
+        timeout: ${timeout}
+
+# Wait for loading states to complete
+- waitForLoadingComplete:
+    timeout: ${timeout:-15000}
+    - waitForElementToDisappear:
+        id: "loading-indicator"
+        timeout: ${timeout}
+    - waitForElementToDisappear:
+        id: "loading-spinner"
+        timeout: ${timeout}
+    - waitForElementToDisappear:
+        id: "loading-overlay"
+        timeout: ${timeout}
+
+# Wait for specific loading state to complete
+- waitForSpecificLoadingComplete:
+    loadingId: ${loadingId}
+    timeout: ${timeout:-15000}
+    - waitForElementToDisappear:
+        id: ${loadingId}
+        timeout: ${timeout}
+
+# Wait for network request to complete
+- waitForNetworkComplete:
+    timeout: ${timeout:-10000}
+    - wait: 2000  # Initial wait for network request to start
+    - waitForElementToDisappear:
+        id: "network-loading"
+        timeout: ${timeout}
+
+# Wait for screen transition
+- waitForScreenTransition:
+    fromScreen: ${fromScreen}
+    toScreen: ${toScreen}
+    timeout: ${timeout:-10000}
+    - waitForElementToDisappear:
+        id: ${fromScreen}
+        timeout: ${timeout}
+    - waitForElement:
+        id: ${toScreen}
+        timeout: ${timeout}
+
+# Wait for modal to appear
+- waitForModalToAppear:
+    modalId: ${modalId}
+    timeout: ${timeout:-5000}
+    - waitForElement:
+        id: ${modalId}
+        timeout: ${timeout}
+
+# Wait for modal to disappear
+- waitForModalToDisappear:
+    modalId: ${modalId}
+    timeout: ${timeout:-5000}
+    - waitForElementToDisappear:
+        id: ${modalId}
+        timeout: ${timeout}
+
+# Wait for animation to complete
+- waitForAnimationComplete:
+    duration: ${duration:-1000}
+    - wait: ${duration}
+
+# Wait for keyboard to appear
+- waitForKeyboardToAppear:
+    - wait: 500  # Standard keyboard animation time
+
+# Wait for keyboard to disappear
+- waitForKeyboardToDisappear:
+    - wait: 500  # Standard keyboard animation time
+
+# Wait for element to be enabled
+- waitForElementEnabled:
+    elementId: ${elementId}
+    timeout: ${timeout:-10000}
+    - waitForElement:
+        id: ${elementId}
+        enabled: true
+        timeout: ${timeout}
+
+# Wait for element to be disabled
+- waitForElementDisabled:
+    elementId: ${elementId}
+    timeout: ${timeout:-10000}
+    - waitForElement:
+        id: ${elementId}
+        enabled: false
+        timeout: ${timeout}
+
+# Wait for list to load items
+- waitForListToLoad:
+    listId: ${listId}
+    timeout: ${timeout:-15000}
+    - waitForElement:
+        id: ${listId}
+        timeout: ${timeout}
+    - waitForElementToDisappear:
+        id: "${listId}.loading"
+        timeout: ${timeout}
+
+# Wait for image to load
+- waitForImageToLoad:
+    imageId: ${imageId}
+    timeout: ${timeout:-10000}
+    - waitForElement:
+        id: ${imageId}
+        timeout: ${timeout}
+
+# Assert element is visible
+- assertElementVisible:
+    elementId: ${elementId}
+    - assertVisible:
+        id: ${elementId}
+
+# Assert element is not visible
+- assertElementNotVisible:
+    elementId: ${elementId}
+    - assertNotVisible:
+        id: ${elementId}
+
+# Assert element contains specific text
+- assertElementText:
+    elementId: ${elementId}
+    expectedText: ${expectedText}
+    - assertVisible:
+        id: ${elementId}
+        text: ${expectedText}
+
+# Assert element does not contain text
+- assertElementNotContainText:
+    elementId: ${elementId}
+    unexpectedText: ${unexpectedText}
+    - assertNotVisible:
+        id: ${elementId}
+        text: ${unexpectedText}
+
+# Assert element is enabled
+- assertElementEnabled:
+    elementId: ${elementId}
+    - assertVisible:
+        id: ${elementId}
+        enabled: true
+
+# Assert element is disabled
+- assertElementDisabled:
+    elementId: ${elementId}
+    - assertVisible:
+        id: ${elementId}
+        enabled: false
+
+# Assert screen is displayed
+- assertScreenDisplayed:
+    screenId: ${screenId}
+    - assertVisible:
+        id: ${screenId}
+
+# Assert modal is open
+- assertModalOpen:
+    modalId: ${modalId}
+    - assertVisible:
+        id: ${modalId}
+
+# Assert modal is closed
+- assertModalClosed:
+    modalId: ${modalId}
+    - assertNotVisible:
+        id: ${modalId}
+
+# Assert loading state is active
+- assertLoadingActive:
+    loadingId: ${loadingId:-"loading-indicator"}
+    - assertVisible:
+        id: ${loadingId}
+
+# Assert loading state is complete
+- assertLoadingComplete:
+    loadingId: ${loadingId:-"loading-indicator"}
+    - assertNotVisible:
+        id: ${loadingId}
+
+# Assert error message is displayed
+- assertErrorDisplayed:
+    errorId: ${errorId}
+    errorMessage: ${errorMessage}
+    - assertVisible:
+        id: ${errorId}
+        text: ${errorMessage}
+
+# Assert success message is displayed
+- assertSuccessDisplayed:
+    successId: ${successId}
+    successMessage: ${successMessage}
+    - assertVisible:
+        id: ${successId}
+        text: ${successMessage}
+
+# Assert list has items
+- assertListHasItems:
+    listId: ${listId}
+    minItems: ${minItems:-1}
+    - assertVisible:
+        id: ${listId}
+    - assertVisible:
+        id: "${listId}.item"
+
+# Assert list is empty
+- assertListEmpty:
+    listId: ${listId}
+    emptyStateId: ${emptyStateId}
+    - assertVisible:
+        id: ${listId}
+    - assertVisible:
+        id: ${emptyStateId}
+
+# Assert form validation error
+- assertFormValidationError:
+    fieldId: ${fieldId}
+    errorId: ${errorId}
+    errorMessage: ${errorMessage}
+    - assertVisible:
+        id: ${fieldId}
+    - assertVisible:
+        id: ${errorId}
+        text: ${errorMessage}
+
+# Assert navigation state
+- assertNavigationState:
+    currentScreen: ${currentScreen}
+    tabActive: ${tabActive}
+    - assertVisible:
+        id: ${currentScreen}
+    - runFlow:
+        when:
+          visible:
+            id: "tab.${tabActive}"
+        commands:
+          - assertVisible:
+              id: "tab.${tabActive}.active"
+
+# Assert user authentication state
+- assertUserAuthenticated:
+    - assertVisible:
+        id: "home.screen"
+    - assertNotVisible:
+        id: "auth.phone-registration.screen"
+
+# Assert user not authenticated
+- assertUserNotAuthenticated:
+    - assertVisible:
+        id: "auth.phone-registration.screen"
+    - assertNotVisible:
+        id: "home.screen"
+
+# Assert network connectivity
+- assertNetworkConnected:
+    - assertNotVisible:
+        id: "network.offline.banner"
+
+# Assert network offline
+- assertNetworkOffline:
+    - assertVisible:
+        id: "network.offline.banner"
+
+# Custom assertion for UI patterns
+- assertUIPattern:
+    patternType: ${patternType}
+    elementId: ${elementId}
+    - runFlow:
+        when:
+          condition: ${patternType} == "card"
+        commands:
+          - assertVisible:
+              id: ${elementId}
+          - assertVisible:
+              id: "${elementId}.title"
+          - assertVisible:
+              id: "${elementId}.content"
+    - runFlow:
+        when:
+          condition: ${patternType} == "list-item"
+        commands:
+          - assertVisible:
+              id: ${elementId}
+          - assertVisible:
+              id: "${elementId}.title"
+    - runFlow:
+        when:
+          condition: ${patternType} == "form"
+        commands:
+          - assertVisible:
+              id: ${elementId}
+          - assertVisible:
+              id: "${elementId}.submit-button"
+
+# Wait and assert combined helper
+- waitAndAssert:
+    elementId: ${elementId}
+    timeout: ${timeout:-10000}
+    assertion: ${assertion:-"visible"}
+    - waitForElement:
+        id: ${elementId}
+        timeout: ${timeout}
+    - runFlow:
+        when:
+          condition: ${assertion} == "visible"
+        commands:
+          - assertVisible:
+              id: ${elementId}
+    - runFlow:
+        when:
+          condition: ${assertion} == "not-visible"
+        commands:
+          - assertNotVisible:
+              id: ${elementId}
+
+# Retry assertion with multiple attempts
+- retryAssertion:
+    elementId: ${elementId}
+    maxRetries: ${maxRetries:-3}
+    retryDelay: ${retryDelay:-1000}
+    - repeat:
+        times: ${maxRetries}
+        commands:
+          - runFlow:
+              when:
+                visible:
+                  id: ${elementId}
+              commands:
+                - assertVisible:
+                    id: ${elementId}
+                - stop
+          - wait: ${retryDelay}

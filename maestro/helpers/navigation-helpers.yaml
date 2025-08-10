@@ -1,26 +1,165 @@
 # Navigation helper functions
-# This file will contain reusable navigation utilities
+# This file contains reusable navigation utilities
 
-# Navigate to tab
+# Navigate to specific tab with verification
 - navigateToTab:
-    - tapElement:
+    tabName: ${tabName}
+    - waitForElement:
+        id: "tab.${tabName}"
+        timeout: 5000
+    - tap:
         id: "tab.${tabName}"
     - waitForElement:
         id: "${tabName}.screen"
+        timeout: 10000
 
-# Navigate back
+# Navigate to home tab
+- navigateToHome:
+    - runFlow:
+        when:
+          visible:
+            id: "tab.home"
+        commands:
+          - tap:
+              id: "tab.home"
+          - waitForElement:
+              id: "home.screen"
+
+# Navigate to visitor tab
+- navigateToVisitor:
+    - runFlow:
+        when:
+          visible:
+            id: "tab.visitor"
+        commands:
+          - tap:
+              id: "tab.visitor"
+          - waitForElement:
+              id: "visitor.screen"
+
+# Navigate to community tab
+- navigateToCommunity:
+    - runFlow:
+        when:
+          visible:
+            id: "tab.community"
+        commands:
+          - tap:
+              id: "tab.community"
+          - waitForElement:
+              id: "community.screen"
+
+# Navigate to services tab
+- navigateToServices:
+    - runFlow:
+        when:
+          visible:
+            id: "tab.services"
+        commands:
+          - tap:
+              id: "tab.services"
+          - waitForElement:
+              id: "services.screen"
+
+# Navigate to settings tab
+- navigateToSettings:
+    - runFlow:
+        when:
+          visible:
+            id: "tab.settings"
+        commands:
+          - tap:
+              id: "tab.settings"
+          - waitForElement:
+              id: "settings.screen"
+
+# Navigate back with verification
 - navigateBack:
-    - tapElement:
-        id: "navigation.back-button"
+    - runFlow:
+        when:
+          visible:
+            id: "navigation.back-button"
+        commands:
+          - tap:
+              id: "navigation.back-button"
+          - wait: 1000
 
-# Open modal
-- openModal:
-    - tapElement:
-        id: "${modalTrigger}"
+# Navigate to stack screen
+- navigateToStackScreen:
+    screenId: ${screenId}
+    triggerId: ${triggerId}
+    - tap:
+        id: ${triggerId}
     - waitForElement:
-        id: "${modalId}"
+        id: ${screenId}
+        timeout: 10000
 
-# Close modal
+# Open modal with verification
+- openModal:
+    modalTrigger: ${modalTrigger}
+    modalId: ${modalId}
+    - tap:
+        id: ${modalTrigger}
+    - waitForElement:
+        id: ${modalId}
+        timeout: 5000
+
+# Close modal with verification
 - closeModal:
-    - tapElement:
-        id: "modal.close-button"
+    modalId: ${modalId}
+    - runFlow:
+        when:
+          visible:
+            id: "modal.close-button"
+        commands:
+          - tap:
+              id: "modal.close-button"
+          - waitForElementToDisappear:
+              id: ${modalId}
+              timeout: 5000
+
+# Open bottom sheet
+- openBottomSheet:
+    triggerId: ${triggerId}
+    sheetId: ${sheetId}
+    - tap:
+        id: ${triggerId}
+    - waitForElement:
+        id: ${sheetId}
+        timeout: 5000
+
+# Close bottom sheet
+- closeBottomSheet:
+    sheetId: ${sheetId}
+    - swipe:
+        from: ${sheetId}
+        direction: DOWN
+    - waitForElementToDisappear:
+        id: ${sheetId}
+        timeout: 5000
+
+# Navigate to admin dashboard
+- navigateToAdminDashboard:
+    - runFlow:
+        when:
+          visible:
+            id: "admin.dashboard.link"
+        commands:
+          - tap:
+              id: "admin.dashboard.link"
+          - waitForElement:
+              id: "admin.dashboard.screen"
+
+# Navigate to profile screen
+- navigateToProfile:
+    - tap:
+        id: "settings.profile.link"
+    - waitForElement:
+        id: "profile.screen"
+        timeout: 10000
+
+# Navigate using deep link
+- navigateViaDeepLink:
+    url: ${deepLinkUrl}
+    - openLink: ${deepLinkUrl}
+    - wait: 2000

@@ -39,27 +39,27 @@
   - Implement data seeding and cleanup utilities
   - _Requirements: 4.3, 5.4_
 
-- [ ] 4. Implement reusable test helpers and utilities
-- [ ] 4.1 Create common test action helpers
+- [x] 4. Implement reusable test helpers and utilities
+- [x] 4.1 Create common test action helpers
   - Implement login/logout helper functions
   - Create navigation helper functions for tab and stack navigation
   - Implement form filling and submission utilities
   - _Requirements: 4.1, 4.2, 4.4_
 
-- [ ] 4.2 Create authentication-specific helpers
+- [x] 4.2 Create authentication-specific helpers
   - Implement phone registration flow helper
   - Create OTP verification helper with mock OTP handling
   - Implement profile setup and society onboarding helpers
   - _Requirements: 4.1, 4.2, 4.4_
 
-- [ ] 4.3 Create wait conditions and assertion helpers
+- [x] 4.3 Create wait conditions and assertion helpers
   - Implement element visibility wait conditions
   - Create loading state wait utilities
   - Implement custom assertion helpers for common UI patterns
   - _Requirements: 4.1, 4.2, 4.4_
 
-- [ ] 5. Implement authentication flow tests
-- [ ] 5.1 Create phone registration flow test
+- [-] 5. Implement authentication flow tests
+- [-] 5.1 Create phone registration flow test
   - Write test for phone number input and validation
   - Test phone number submission and OTP request flow
   - Verify error handling for invalid phone numbers

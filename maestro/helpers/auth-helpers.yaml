@@ -1,26 +1,261 @@
 # Authentication-specific helper functions
-# This file will contain reusable authentication flow utilities
+# This file contains reusable authentication flow utilities
 
-# Login helper function
+# Complete login flow with phone and OTP
 - loginUser:
-    - tapElement:
+    phoneNumber: ${phoneNumber:-${TEST_USER_PHONE}}
+    otp: ${otp:-${TEST_USER_OTP}}
+    - waitForElement:
         id: "auth.phone-input.field"
-    - inputText:
+        timeout: 10000
+    - tap:
         id: "auth.phone-input.field"
-        text: ${TEST_USER_PHONE}
-    - tapElement:
+    - clearText
+    - inputText: ${phoneNumber}
+    - tap:
         id: "auth.phone-input.submit-button"
     - waitForElement:
         id: "auth.otp-verification.screen"
-    - inputText:
+        timeout: 15000
+    - tap:
         id: "auth.otp-input.field"
-        text: ${TEST_USER_OTP}
-    - tapElement:
+    - inputText: ${otp}
+    - tap:
         id: "auth.otp-verification.submit-button"
+    - waitForLoadingComplete
 
-# Logout helper function
+# Phone registration flow helper
+- registerPhoneNumber:
+    phoneNumber: ${phoneNumber}
+    - waitForElement:
+        id: "auth.phone-registration.screen"
+        timeout: 10000
+    - tap:
+        id: "auth.phone-input.field"
+    - clearText
+    - inputText: ${phoneNumber}
+    - runFlow:
+        when:
+          visible:
+            id: "auth.terms.checkbox"
+        commands:
+          - tap:
+              id: "auth.terms.checkbox"
+    - tap:
+        id: "auth.phone-input.submit-button"
+    - waitForElement:
+        id: "auth.otp-verification.screen"
+        timeout: 15000
+
+# OTP verification helper with mock OTP handling
+- verifyOTP:
+    otp: ${otp:-${TEST_USER_OTP}}
+    - waitForElement:
+        id: "auth.otp-verification.screen"
+        timeout: 10000
+    - tap:
+        id: "auth.otp-input.field"
+    - inputText: ${otp}
+    - tap:
+        id: "auth.otp-verification.submit-button"
+    - waitForLoadingComplete
+
+# Resend OTP helper
+- resendOTP:
+    - waitForElement:
+        id: "auth.otp-resend.button"
+        timeout: 5000
+    - tap:
+        id: "auth.otp-resend.button"
+    - waitForElement:
+        id: "auth.otp-resent.message"
+        timeout: 10000
+
+# Profile setup helper
+- setupUserProfile:
+    name: ${name}
+    email: ${email}
+    apartment: ${apartment}
+    - waitForElement:
+        id: "auth.profile-setup.screen"
+        timeout: 10000
+    - fillTextField:
+        fieldId: "auth.profile.name.field"
+        value: ${name}
+    - fillEmailField:
+        fieldId: "auth.profile.email.field"
+        email: ${email}
+    - fillTextField:
+        fieldId: "auth.profile.apartment.field"
+        value: ${apartment}
+    - runFlow:
+        when:
+          visible:
+            id: "auth.profile.image.upload"
+        commands:
+          - uploadFile:
+              uploadButtonId: "auth.profile.image.upload"
+              filePath: "test-profile-image.jpg"
+    - tap:
+        id: "auth.profile-setup.submit-button"
+    - waitForLoadingComplete
+
+# Society onboarding helper
+- completeSocietyOnboarding:
+    societyCode: ${societyCode}
+    societyName: ${societyName}
+    - waitForElement:
+        id: "auth.society-onboarding.screen"
+        timeout: 10000
+    - runFlow:
+        when:
+          visible:
+            id: "auth.society.search.field"
+        commands:
+          - fillTextField:
+              fieldId: "auth.society.search.field"
+              value: ${societyName}
+          - tap:
+              id: "auth.society.search.result.${societyName}"
+    - runFlow:
+        when:
+          visible:
+            id: "auth.society.code.field"
+        commands:
+          - fillTextField:
+              fieldId: "auth.society.code.field"
+              value: ${societyCode}
+    - tap:
+        id: "auth.society-onboarding.submit-button"
+    - waitForElement:
+        id: "auth.onboarding-complete.screen"
+        timeout: 15000
+
+# Biometric setup helper
+- setupBiometrics:
+    - waitForElement:
+        id: "auth.biometric-setup.screen"
+        timeout: 10000
+    - runFlow:
+        when:
+          visible:
+            id: "auth.biometric.enable.button"
+        commands:
+          - tap:
+              id: "auth.biometric.enable.button"
+          - waitForElement:
+              id: "system.biometric.prompt"
+              timeout: 5000
+          - tap:
+              id: "system.biometric.confirm"
+    - runFlow:
+        when:
+          visible:
+            id: "auth.biometric.skip.button"
+        commands:
+          - tap:
+              id: "auth.biometric.skip.button"
+
+# Complete full registration flow
+- completeFullRegistration:
+    phoneNumber: ${phoneNumber}
+    otp: ${otp}
+    name: ${name}
+    email: ${email}
+    apartment: ${apartment}
+    societyCode: ${societyCode}
+    societyName: ${societyName}
+    - registerPhoneNumber:
+        phoneNumber: ${phoneNumber}
+    - verifyOTP:
+        otp: ${otp}
+    - setupUserProfile:
+        name: ${name}
+        email: ${email}
+        apartment: ${apartment}
+    - completeSocietyOnboarding:
+        societyCode: ${societyCode}
+        societyName: ${societyName}
+    - setupBiometrics
+
+# Login with biometrics
+- loginWithBiometrics:
+    - waitForElement:
+        id: "auth.biometric.login.button"
+        timeout: 10000
+    - tap:
+        id: "auth.biometric.login.button"
+    - waitForElement:
+        id: "system.biometric.prompt"
+        timeout: 5000
+    - tap:
+        id: "system.biometric.confirm"
+    - waitForElement:
+        id: "home.screen"
+        timeout: 15000
+
+# Logout helper function with confirmation
 - logoutUser:
-    - tapElement:
+    - navigateToSettings
+    - scrollToAndTap:
         id: "settings.logout.button"
-    - tapElement:
-        id: "confirm-logout.button"
+    - waitForElement:
+        id: "logout.confirmation.modal"
+        timeout: 5000
+    - tap:
+        id: "logout.confirm.button"
+    - waitForElement:
+        id: "auth.phone-registration.screen"
+        timeout: 10000
+
+# Handle authentication errors
+- handleAuthError:
+    errorType: ${errorType}
+    - runFlow:
+        when:
+          visible:
+            id: "auth.error.${errorType}"
+        commands:
+          - takeScreenshot: "auth-error-${errorType}"
+          - tap:
+              id: "auth.error.dismiss.button"
+
+# Verify authentication state
+- verifyAuthenticatedState:
+    - assertVisible:
+        id: "home.screen"
+    - assertNotVisible:
+        id: "auth.phone-registration.screen"
+
+# Verify unauthenticated state
+- verifyUnauthenticatedState:
+    - assertVisible:
+        id: "auth.phone-registration.screen"
+    - assertNotVisible:
+        id: "home.screen"
+
+# Switch user account (for multi-account testing)
+- switchUserAccount:
+    phoneNumber: ${phoneNumber}
+    otp: ${otp}
+    - logoutUser
+    - loginUser:
+        phoneNumber: ${phoneNumber}
+        otp: ${otp}
+
+# Reset password/account recovery
+- initiateAccountRecovery:
+    phoneNumber: ${phoneNumber}
+    - waitForElement:
+        id: "auth.forgot-password.link"
+        timeout: 5000
+    - tap:
+        id: "auth.forgot-password.link"
+    - fillPhoneField:
+        fieldId: "auth.recovery.phone.field"
+        phoneNumber: ${phoneNumber}
+    - tap:
+        id: "auth.recovery.submit.button"
+    - waitForElement:
+        id: "auth.recovery.otp.screen"
+        timeout: 15000
