@@ -3,9 +3,9 @@
  * Custom hook for comprehensive form validation using Zod schemas
  */
 
-import { useState, useCallback, useRef, useEffect } from 'react';
+import { validateField, validateForm } from '@/utils/validation.enhanced';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { z } from 'zod';
-import { validateForm, validateField } from '@/utils/validation.enhanced';
 
 export interface FormField<T = any> {
   value: T;
@@ -53,10 +53,14 @@ export interface UseFormValidationReturn<T extends Record<string, any>> {
   resetForm: (newInitialValues?: Partial<T>) => void;
   validateField: <K extends keyof T>(field: K) => Promise<boolean>;
   validateForm: () => Promise<boolean>;
-  handleSubmit: (onSubmit: (values: T) => void | Promise<void>) => Promise<void>;
+  handleSubmit: (
+    onSubmit: (values: T) => void | Promise<void>,
+  ) => Promise<void>;
 
   // Utilities
-  getFieldProps: <K extends keyof T>(field: K) => {
+  getFieldProps: <K extends keyof T>(
+    field: K,
+  ) => {
     value: T[K];
     onChangeText: (value: T[K]) => void;
     onBlur: () => void;
@@ -69,7 +73,7 @@ export interface UseFormValidationReturn<T extends Record<string, any>> {
 export function useFormValidation<T extends Record<string, any>>(
   schema: z.ZodSchema<T>,
   initialValues: T,
-  options: UseFormValidationOptions = {}
+  options: UseFormValidationOptions = {},
 ): UseFormValidationReturn<T> {
   const {
     validateOnChange = false,
@@ -82,8 +86,11 @@ export function useFormValidation<T extends Record<string, any>>(
   // State management
   const [formState, setFormState] = useState<FormState<T>>(() => {
     const fields = {} as FormState<T>['fields'];
-    
-    Object.keys(initialValues).forEach((key) => {
+    console.log('🔍 Form submission debug:');
+
+    console.log('🔍 Object.keys(initialValues)', Object.keys(initialValues));
+
+    Object.keys(initialValues)?.forEach((key) => {
       const fieldKey = key as keyof T;
       fields[fieldKey] = {
         value: initialValues[fieldKey],
@@ -114,19 +121,24 @@ export function useFormValidation<T extends Record<string, any>>(
   // Cleanup debounce timers on unmount
   useEffect(() => {
     return () => {
-      debounceTimersRef.current.forEach((timer) => clearTimeout(timer));
+      console.log('🔍 debounceTimersRef?.current?', debounceTimersRef?.current);
+      debounceTimersRef?.current?.forEach((timer) => clearTimeout(timer));
     };
   }, []);
 
   // Derived state
   const isDirty = Object.keys(formState.fields).some(
-    (key) => formState.fields[key as keyof T].value !== initialValuesRef.current[key as keyof T]
+    (key) =>
+      formState.fields[key as keyof T].value !==
+      initialValuesRef.current[key as keyof T],
   );
 
   const dirtyFields = new Set(
     Object.keys(formState.fields).filter(
-      (key) => formState.fields[key as keyof T].value !== initialValuesRef.current[key as keyof T]
-    ) as (keyof T)[]
+      (key) =>
+        formState.fields[key as keyof T].value !==
+        initialValuesRef.current[key as keyof T],
+    ) as (keyof T)[],
   );
 
   // Validation functions
@@ -138,7 +150,7 @@ export function useFormValidation<T extends Record<string, any>>(
       // Get current field value from latest state
       const currentFieldValue = formState.fields[field].value;
       const result = validateField(fieldSchema, currentFieldValue);
-      
+
       setFormState((prev) => ({
         ...prev,
         fields: {
@@ -157,13 +169,13 @@ export function useFormValidation<T extends Record<string, any>>(
 
       return result.isValid;
     },
-    [schema] // Remove formState.fields dependency to prevent infinite loops
+    [schema], // Remove formState.fields dependency to prevent infinite loops
   );
 
   const validateEntireForm = useCallback(async (): Promise<boolean> => {
     // Use functional state update to get latest values
     let isFormValid = true;
-    
+
     setFormState((prev) => {
       const formValues = Object.keys(prev.fields).reduce((acc, key) => {
         acc[key as keyof T] = prev.fields[key as keyof T].value;
@@ -176,8 +188,10 @@ export function useFormValidation<T extends Record<string, any>>(
       const newFields = { ...prev.fields };
       const newErrors = {} as { [K in keyof T]?: string };
 
+      console.log('🔍 Object.keys(newFields)', Object.keys(newFields));
+
       // Clear all errors first
-      Object.keys(newFields).forEach((key) => {
+      Object.keys(newFields)?.forEach((key) => {
         const fieldKey = key as keyof T;
         newFields[fieldKey] = {
           ...newFields[fieldKey],
@@ -188,7 +202,7 @@ export function useFormValidation<T extends Record<string, any>>(
 
       // Set new errors
       if (result.errors) {
-        Object.entries(result.errors).forEach(([key, error]) => {
+        Object.entries(result.errors)?.forEach(([key, error]) => {
           const fieldKey = key as keyof T;
           if (newFields[fieldKey]) {
             newFields[fieldKey] = {
@@ -213,37 +227,41 @@ export function useFormValidation<T extends Record<string, any>>(
   }, [schema]); // Remove formState.fields dependency
 
   // Field operations
-  const setValue = useCallback(<K extends keyof T>(field: K, value: T[K]) => {
-    let shouldValidate = false;
-    
-    setFormState((prev) => {
-      // Check if we should validate based on previous state
-      shouldValidate = validateOnChange || (revalidateOnChange && prev.fields[field].error);
-      
-      return {
-        ...prev,
-        fields: {
-          ...prev.fields,
-          [field]: {
-            ...prev.fields[field],
-            value,
+  const setValue = useCallback(
+    <K extends keyof T>(field: K, value: T[K]) => {
+      let shouldValidate = false;
+
+      setFormState((prev) => {
+        // Check if we should validate based on previous state
+        shouldValidate =
+          validateOnChange || (revalidateOnChange && prev.fields[field].error);
+
+        return {
+          ...prev,
+          fields: {
+            ...prev.fields,
+            [field]: {
+              ...prev.fields[field],
+              value,
+            },
           },
-        },
-      };
-    });
+        };
+      });
 
-    // Debounced validation on change
-    if (shouldValidate) {
-      const timer = debounceTimersRef.current.get(field);
-      if (timer) clearTimeout(timer);
+      // Debounced validation on change
+      if (shouldValidate) {
+        const timer = debounceTimersRef.current.get(field);
+        if (timer) clearTimeout(timer);
 
-      const newTimer = setTimeout(() => {
-        validateSingleField(field);
-      }, debounceMs);
+        const newTimer = setTimeout(() => {
+          validateSingleField(field);
+        }, debounceMs);
 
-      debounceTimersRef.current.set(field, newTimer);
-    }
-  }, [validateOnChange, revalidateOnChange, debounceMs, validateSingleField]);
+        debounceTimersRef.current.set(field, newTimer);
+      }
+    },
+    [validateOnChange, revalidateOnChange, debounceMs, validateSingleField],
+  );
 
   const setError = useCallback(<K extends keyof T>(field: K, error: string) => {
     setFormState((prev) => ({
@@ -302,28 +320,31 @@ export function useFormValidation<T extends Record<string, any>>(
     });
   }, []);
 
-  const touchField = useCallback(<K extends keyof T>(field: K) => {
-    setFormState((prev) => {
-      const newTouchedFields = new Set(prev.touchedFields);
-      newTouchedFields.add(field);
+  const touchField = useCallback(
+    <K extends keyof T>(field: K) => {
+      setFormState((prev) => {
+        const newTouchedFields = new Set(prev.touchedFields);
+        newTouchedFields.add(field);
 
-      return {
-        ...prev,
-        fields: {
-          ...prev.fields,
-          [field]: {
-            ...prev.fields[field],
-            touched: true,
+        return {
+          ...prev,
+          fields: {
+            ...prev.fields,
+            [field]: {
+              ...prev.fields[field],
+              touched: true,
+            },
           },
-        },
-        touchedFields: newTouchedFields,
-      };
-    });
+          touchedFields: newTouchedFields,
+        };
+      });
 
-    if (validateOnBlur) {
-      validateSingleField(field);
-    }
-  }, [validateOnBlur, validateSingleField]);
+      if (validateOnBlur) {
+        validateSingleField(field);
+      }
+    },
+    [validateOnBlur, validateSingleField],
+  );
 
   const untouchField = useCallback(<K extends keyof T>(field: K) => {
     setFormState((prev) => {
@@ -348,7 +369,7 @@ export function useFormValidation<T extends Record<string, any>>(
   const setValues = useCallback((values: Partial<T>) => {
     setFormState((prev) => {
       const newFields = { ...prev.fields };
-      
+
       Object.entries(values).forEach(([key, value]) => {
         const fieldKey = key as keyof T;
         if (newFields[fieldKey]) {
@@ -368,10 +389,10 @@ export function useFormValidation<T extends Record<string, any>>(
 
   const resetForm = useCallback((newInitialValues?: Partial<T>) => {
     const valuesToUse = { ...initialValuesRef.current, ...newInitialValues };
-    
+
     setFormState(() => {
       const fields = {} as FormState<T>['fields'];
-      
+
       Object.keys(valuesToUse).forEach((key) => {
         const fieldKey = key as keyof T;
         fields[fieldKey] = {
@@ -407,25 +428,30 @@ export function useFormValidation<T extends Record<string, any>>(
 
       try {
         let isFormValid = true;
-        let formValues: T;
+        let formValues: T | undefined;
 
         if (validateOnSubmit) {
           isFormValid = await validateEntireForm();
         }
 
         if (isFormValid) {
-          // Get form values from current state
-          formValues = Object.keys(formState.fields).reduce((acc, key) => {
-            acc[key as keyof T] = formState.fields[key as keyof T].value;
-            return acc;
-          }, {} as T);
+          // Extract current form values using functional state update to avoid closure issues
+          setFormState((currentState) => {
+            formValues = Object.keys(currentState.fields).reduce((acc, key) => {
+              acc[key as keyof T] = currentState.fields[key as keyof T].value;
+              return acc;
+            }, {} as T);
+            return currentState; // No state change, just extracting values
+          });
 
           // Ensure formValues is defined before calling onSubmit
           if (formValues) {
             await onSubmit(formValues);
           } else {
             console.error('Form values are undefined, cannot submit form');
-            throw new Error('Form submission failed: form values are undefined');
+            throw new Error(
+              'Form submission failed: form values are undefined',
+            );
           }
         }
       } catch (error) {
@@ -438,18 +464,21 @@ export function useFormValidation<T extends Record<string, any>>(
         }));
       }
     },
-    [validateOnSubmit, validateEntireForm] // Remove formState.fields dependency
+    [validateOnSubmit, validateEntireForm],
   );
 
   // Utility functions
-  const getFieldProps = useCallback(<K extends keyof T>(field: K) => {
-    return {
-      value: formState.fields[field].value,
-      onChangeText: (value: T[K]) => setValue(field, value),
-      onBlur: () => touchField(field),
-      error: formState.fields[field].error,
-    };
-  }, [formState.fields, setValue, touchField]); // Keep formState.fields here as it's needed for the return value
+  const getFieldProps = useCallback(
+    <K extends keyof T>(field: K) => {
+      return {
+        value: formState.fields[field].value,
+        onChangeText: (value: T[K]) => setValue(field, value),
+        onBlur: () => touchField(field),
+        error: formState.fields[field].error,
+      };
+    },
+    [formState.fields, setValue, touchField],
+  ); // Keep formState.fields here as it's needed for the return value
 
   return {
     // State

@@ -162,8 +162,16 @@ export default function PhoneRegistration() {
   // Enhanced submit handler with comprehensive validation
   const handleFormSubmit = async (formData: PhoneRegistrationForm) => {
     try {
-      const fullPhoneNumber = getFullPhoneNumber(formData.phone);
-
+      console.log('🔍 Form submission debug:');
+      console.log('formData:', formData);
+      console.log('formData.phone:', formData.phone);
+      console.log('fields.phone.value:', fields.phone.value);
+      
+      // Use the actual field value if formData.phone is empty
+      const phoneValue = formData.phone || fields.phone.value;
+      console.log('Using phone value:', phoneValue);
+      const fullPhoneNumber = getFullPhoneNumber(phoneValue);
+      console.log('Full phone number:', fullPhoneNumber);
       // No society code needed for initial registration - will be handled in post-auth flow
       const result = await AuthService.registerPhone(
         fullPhoneNumber,
@@ -249,7 +257,10 @@ export default function PhoneRegistration() {
               <View className="h-6 w-px bg-divider mr-3" />
               <ValidatedInput
                 label=""
-                {...getFieldProps('phone')}
+                value={fields.phone.value}
+                onChangeText={handlePhoneChange}
+                onBlur={getFieldProps('phone').onBlur}
+                error={errors.phone}
                 placeholder="Enter mobile number"
                 keyboardType="phone-pad"
                 maxLength={13} // Formatted: XXX XXX XXXX
