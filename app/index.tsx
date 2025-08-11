@@ -1,12 +1,7 @@
-import { Text, View } from 'react-native';
+import Welcome from './welcome';
 
 function Index() {
-  // return <Welcome />;
-  return (
-    <View>
-      <Text>Welcome to Aptly</Text>
-    </View>
-  );
+  return <Welcome />;
 }
 
 // Add proper named export with displayName for React DevTools

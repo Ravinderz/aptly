@@ -185,6 +185,11 @@ export const useAuthStore = create<AuthStore>()(
                     state.loading = false;
                   });
                   
+                  // Initialize security profile if needed
+                  if (storedProfile.role === 'security_guard') {
+                    get().initializeSecurityGuard(storedProfile);
+                  }
+                  
                   // Refresh user data in background
                   AuthService.getCurrentUser().then((currentUser) => {
                     if (currentUser && JSON.stringify(currentUser) !== JSON.stringify(storedProfile)) {
@@ -605,14 +610,15 @@ export const useAuthStore = create<AuthStore>()(
             try {
               // Get from secure storage first for sensitive data
               if (name === 'auth-storage') {
-                const profile = SecureProfileStorage.getProfile();
+                const profile = await SecureProfileStorage.getProfileAsync();
+                const lastLoginTime = await SecureSessionStorage.getLastLoginTimeAsync();
                 const sessionData = {
                   user: profile,
                   isAuthenticated: !!profile,
                   securityProfile: null,
                   securityPermissions: null,
                   biometricEnabled: false,
-                  lastLoginTime: SecureSessionStorage.getLastLoginTime(),
+                  lastLoginTime: lastLoginTime,
                 };
                 return sessionData;
               }

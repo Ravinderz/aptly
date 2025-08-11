@@ -20,7 +20,7 @@ export type { APIResponse, APIError } from '@/types/api';
 
 
 // Modern REST-based Authentication service
-export { RestAuthService as AuthService } from './auth.service.rest';
+export const AuthService = RestAuthService.getInstance();
 export type {
   AuthResult,
   LoginRequest,
@@ -32,7 +32,7 @@ export type {
 } from '@/types/api';
 
 // Modern REST-based Visitors service
-export { RestVisitorsService as VisitorsService } from './visitors.service.rest';
+export const VisitorsService = RestVisitorsService.getInstance();
 export type {
   Visitor,
   VisitorCreateRequest,
@@ -41,13 +41,13 @@ export type {
 } from '@/types/api';
 
 // Modern REST-based Notices service
-export { RestNoticesService as NoticesService } from './notices.service.rest';
+export const NoticesService = RestNoticesService.getInstance();
 export type {
   Notice,
 } from '@/types/notifications';
 
 // Modern REST-based Home service
-export { RestHomeService as HomeService } from './home.service.rest';
+export const HomeService = RestHomeService.getInstance();
 export type {
   HomeStats,
   HomeDashboardData,

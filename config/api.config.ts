@@ -13,7 +13,7 @@ const ENV = process.env.NODE_ENV || 'development';
  * API Base URLs for different environments
  */
 const API_BASE_URLS = {
-  development: 'http://localhost:3000',
+  development: 'http://192.168.0.107:3000', // Use local IP for React Native simulators
   staging: 'https://api-staging.aptly.com',
   production: 'https://api.aptly.com',
 } as const;
@@ -83,6 +83,11 @@ export const API_ENDPOINTS = {
     CREATE: '/api/v4/societies',
     DETAILS: (id: string) => `/api/v4/societies/${id}`,
     UPDATE: (id: string) => `/api/v4/societies/${id}`,
+    // Society onboarding and verification endpoints
+    VERIFY: '/api/v4/societies/verify',
+    SEARCH: '/api/v4/societies/search',
+    JOIN: '/api/v4/societies/join',
+    HEALTH: (id: string) => `/api/v4/societies/${id}/health`,
     // Not implemented yet
     DELETE: (id: string) => `/api/societies/${id}`,
     MEMBERS: (id: string) => `/api/societies/${id}/members`,
@@ -141,10 +146,21 @@ export const API_ENDPOINTS = {
     COMMENTS: '/api/community/comments',
   },
 
+  // Society-specific endpoints (for backward compatibility)
+  SOCIETY: {
+    CHECK_ASSOCIATION: '/api/v4/user/societies', // Check user society associations
+    VERIFY: '/api/v4/societies/verify', // Verify society by code
+    SEARCH: '/api/v4/societies/search', // Search societies
+    JOIN: '/api/v4/societies/join', // Join/onboard to society
+    DETAILS: (id: string) => `/api/v4/societies/${id}`,
+    HEALTH: (id: string) => `/api/v4/societies/${id}/health`,
+  },
+
   // User management endpoints (to be implemented)
   USERS: {
     PROFILE: '/api/users/profile',
     SOCIETIES: '/api/users/societies',
+    SOCIETY_ASSOCIATIONS: '/api/v4/user/societies', // Check user society associations
     PERMISSIONS: '/api/users/permissions',
     GET_BY_ID: (id: string) => `/api/users/${id}`,
     CREATE: '/api/users',

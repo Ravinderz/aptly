@@ -10,6 +10,7 @@ import {
 } from 'react-native';
 import { Button } from '@/components/ui/Button';
 import { AuthService } from '@/services';
+import { SocietyService } from '@/services/society.service.rest';
 import { showErrorAlert, showSuccessAlert } from '@/utils/alert';
 
 export default function OTPVerification() {
@@ -90,14 +91,42 @@ export default function OTPVerification() {
       );
 
       if (result.success) {
-        // Navigate to society verification/profile setup
-        router.push({
-          pathname: '/auth/society-verification',
-          params: {
-            phoneNumber,
-            societyCode,
-          },
-        });
+        // Check if user has society associations
+        try {
+          const associationResult = await SocietyService.checkSocietyAssociation(phoneNumber || '');
+          
+          if (associationResult.success && associationResult.data) {
+            if (associationResult.data.hasAssociation && associationResult.data.associations.length > 0) {
+              // User has existing associations, go directly to main app
+              router.replace('/(tabs)');
+            } else {
+              // No associations, redirect to society onboarding
+              router.push({
+                pathname: '/auth/society-onboarding',
+                params: {
+                  phoneNumber,
+                },
+              });
+            }
+          } else {
+            // If association check fails, assume no association and go to onboarding
+            router.push({
+              pathname: '/auth/society-onboarding',
+              params: {
+                phoneNumber,
+              },
+            });
+          }
+        } catch (error) {
+          console.warn('Failed to check society association:', error);
+          // Fallback: go to onboarding
+          router.push({
+            pathname: '/auth/society-onboarding',
+            params: {
+              phoneNumber,
+            },
+          });
+        }
       } else {
         setError(result.error || 'Invalid OTP. Please try again.');
         // Clear OTP inputs

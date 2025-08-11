@@ -84,7 +84,7 @@ const AppNavigator = ({
     }
   }, [auth.user, segments]);
 
-  // Stable navigation handler to prevent infinite loops
+  // Simplified navigation handler to prevent conflicts
   const handleNavigation = useCallback(() => {
     // Prevent multiple navigation attempts
     if (hasNavigated || isCheckingFirstLaunch || isLoading) return;
@@ -110,70 +110,50 @@ const AppNavigator = ({
       let shouldNavigate = false;
       let targetRoute = '';
 
-      // Determine navigation target
-      if (isFirstLaunch && !onIndexPage) {
-        shouldNavigate = true;
-        targetRoute = '/';
-      } else if (!isFirstLaunch && !isAuthenticated && !inAuthGroup && !onWelcomePage) {
+      // Simplified navigation logic to reduce conflicts
+      if (isFirstLaunch && !onWelcomePage) {
+        // First launch should go to welcome
         shouldNavigate = true;
         targetRoute = '/welcome';
-      } else if (isAuthenticated && (inAuthGroup || onWelcomePage || onIndexPage)) {
-        // Get user from auth context and route to appropriate dashboard
-        const user = auth.user;
-        shouldNavigate = true;
-        
-        // Route based on user role
-        switch (user?.role) {
-          case 'security_guard':
-            targetRoute = '/security/dashboard';
-            break;
-          case 'super_admin':
-            targetRoute = '/admin/dashboard';
-            break;
-          case 'community_manager':
-            targetRoute = '/manager/dashboard';
-            break;
-          case 'society_admin':
-          case 'resident':
-            targetRoute = '/(tabs)';
-            break;
-          default:
-            targetRoute = '/welcome'; // Fallback for unknown roles
-        }
-      } else if (isAuthenticated && auth.user?.role && !isUserInCorrectSection()) {
-        // Ensure user is in their correct section
-        const user = auth.user;
-        shouldNavigate = true;
-        
-        switch (user.role) {
-          case 'security_guard':
-            if (!inSecurityGroup) targetRoute = '/security/dashboard';
-            break;
-          case 'super_admin':
-            if (!inAdminGroup && !inTabsGroup) targetRoute = '/admin/dashboard';
-            break;
-          case 'community_manager':
-            if (!inManagerGroup && !inTabsGroup) targetRoute = '/manager/dashboard';
-            break;
-          case 'society_admin':
-          case 'resident':
-            if (!inTabsGroup) targetRoute = '/(tabs)';
-            break;
-        }
-      } else if (!isFirstLaunch && !isAuthenticated && onIndexPage) {
+      } else if (!isAuthenticated && !onWelcomePage && !inAuthGroup) {
+        // Unauthenticated users go to welcome
         shouldNavigate = true;
         targetRoute = '/welcome';
+      } else if (isAuthenticated && (onWelcomePage || inAuthGroup || onIndexPage)) {
+        // Authenticated users get routed to their role-specific dashboard
+        const user = auth.user;
+        if (user?.role) {
+          shouldNavigate = true;
+          
+          switch (user.role) {
+            case 'security_guard':
+              targetRoute = '/security/dashboard';
+              break;
+            case 'super_admin':
+              targetRoute = '/admin/dashboard';
+              break;
+            case 'community_manager':
+              targetRoute = '/manager/dashboard';
+              break;
+            case 'society_admin':
+            case 'resident':
+            default:
+              targetRoute = '/(tabs)';
+              break;
+          }
+        }
       }
 
       // Perform navigation if needed
       if (shouldNavigate && targetRoute) {
+        console.log(`🧭 Navigating from [${segments.join('/')}] to [${targetRoute}]`);
         setHasNavigated(true);
         router.replace(targetRoute);
         
-        // Reset navigation flag after a delay to allow for future navigation if needed
-        setTimeout(() => setHasNavigated(false), 2000);
+        // Reset navigation flag after a delay
+        setTimeout(() => setHasNavigated(false), 1000);
       }
-    }, 100);
+    }, 150);
   }, [
     hasNavigated,
     isCheckingFirstLaunch,
@@ -183,7 +163,6 @@ const AppNavigator = ({
     segments,
     router,
     auth.user,
-    isUserInCorrectSection,
   ]);
 
   // Handle navigation with debouncing

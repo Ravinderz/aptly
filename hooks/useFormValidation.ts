@@ -135,7 +135,9 @@ export function useFormValidation<T extends Record<string, any>>(
       const fieldSchema = (schema as any).shape?.[field];
       if (!fieldSchema) return true;
 
-      const result = validateField(fieldSchema, formState.fields[field].value);
+      // Get current field value from latest state
+      const currentFieldValue = formState.fields[field].value;
+      const result = validateField(fieldSchema, currentFieldValue);
       
       setFormState((prev) => ({
         ...prev,
@@ -155,18 +157,22 @@ export function useFormValidation<T extends Record<string, any>>(
 
       return result.isValid;
     },
-    [schema, formState.fields]
+    [schema] // Remove formState.fields dependency to prevent infinite loops
   );
 
   const validateEntireForm = useCallback(async (): Promise<boolean> => {
-    const formValues = Object.keys(formState.fields).reduce((acc, key) => {
-      acc[key as keyof T] = formState.fields[key as keyof T].value;
-      return acc;
-    }, {} as T);
-
-    const result = validateForm(schema, formValues);
-
+    // Use functional state update to get latest values
+    let isFormValid = true;
+    
     setFormState((prev) => {
+      const formValues = Object.keys(prev.fields).reduce((acc, key) => {
+        acc[key as keyof T] = prev.fields[key as keyof T].value;
+        return acc;
+      }, {} as T);
+
+      const result = validateForm(schema, formValues);
+      isFormValid = result.isValid;
+
       const newFields = { ...prev.fields };
       const newErrors = {} as { [K in keyof T]?: string };
 
@@ -203,24 +209,31 @@ export function useFormValidation<T extends Record<string, any>>(
       };
     });
 
-    return result.isValid;
-  }, [schema, formState.fields]);
+    return isFormValid;
+  }, [schema]); // Remove formState.fields dependency
 
   // Field operations
   const setValue = useCallback(<K extends keyof T>(field: K, value: T[K]) => {
-    setFormState((prev) => ({
-      ...prev,
-      fields: {
-        ...prev.fields,
-        [field]: {
-          ...prev.fields[field],
-          value,
+    let shouldValidate = false;
+    
+    setFormState((prev) => {
+      // Check if we should validate based on previous state
+      shouldValidate = validateOnChange || (revalidateOnChange && prev.fields[field].error);
+      
+      return {
+        ...prev,
+        fields: {
+          ...prev.fields,
+          [field]: {
+            ...prev.fields[field],
+            value,
+          },
         },
-      },
-    }));
+      };
+    });
 
     // Debounced validation on change
-    if (validateOnChange || (revalidateOnChange && formState.fields[field].error)) {
+    if (shouldValidate) {
       const timer = debounceTimersRef.current.get(field);
       if (timer) clearTimeout(timer);
 
@@ -230,7 +243,7 @@ export function useFormValidation<T extends Record<string, any>>(
 
       debounceTimersRef.current.set(field, newTimer);
     }
-  }, [validateOnChange, revalidateOnChange, debounceMs, formState.fields, validateSingleField]);
+  }, [validateOnChange, revalidateOnChange, debounceMs, validateSingleField]);
 
   const setError = useCallback(<K extends keyof T>(field: K, error: string) => {
     setFormState((prev) => ({
@@ -394,18 +407,26 @@ export function useFormValidation<T extends Record<string, any>>(
 
       try {
         let isFormValid = true;
+        let formValues: T;
 
         if (validateOnSubmit) {
           isFormValid = await validateEntireForm();
         }
 
         if (isFormValid) {
-          const formValues = Object.keys(formState.fields).reduce((acc, key) => {
+          // Get form values from current state
+          formValues = Object.keys(formState.fields).reduce((acc, key) => {
             acc[key as keyof T] = formState.fields[key as keyof T].value;
             return acc;
           }, {} as T);
 
-          await onSubmit(formValues);
+          // Ensure formValues is defined before calling onSubmit
+          if (formValues) {
+            await onSubmit(formValues);
+          } else {
+            console.error('Form values are undefined, cannot submit form');
+            throw new Error('Form submission failed: form values are undefined');
+          }
         }
       } catch (error) {
         console.error('Form submission error:', error);
@@ -417,7 +438,7 @@ export function useFormValidation<T extends Record<string, any>>(
         }));
       }
     },
-    [validateOnSubmit, validateEntireForm, formState.fields]
+    [validateOnSubmit, validateEntireForm] // Remove formState.fields dependency
   );
 
   // Utility functions
@@ -428,7 +449,7 @@ export function useFormValidation<T extends Record<string, any>>(
       onBlur: () => touchField(field),
       error: formState.fields[field].error,
     };
-  }, [formState.fields, setValue, touchField]);
+  }, [formState.fields, setValue, touchField]); // Keep formState.fields here as it's needed for the return value
 
   return {
     // State

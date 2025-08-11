@@ -4,7 +4,6 @@ import LucideIcons from '@/components/ui/LucideIcons';
 import { useDirectAuth } from '@/hooks/useDirectAuth';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useRouter } from 'expo-router';
-import React from 'react';
 import {
   SafeAreaView,
   ScrollView,
@@ -68,7 +67,7 @@ export default function Welcome() {
         permissions: [
           'system.admin',
           'societies.create',
-          'societies.update', 
+          'societies.update',
           'societies.delete',
           'societies.view_all',
           'managers.assign',
@@ -76,7 +75,7 @@ export default function Welcome() {
           'managers.view_performance',
           'onboarding.review',
           'onboarding.approve',
-          'reports.view_all'
+          'reports.view_all',
         ],
         isVerified: true,
         avatar: null,
@@ -120,7 +119,7 @@ export default function Welcome() {
           'residents.view',
           'notices.create',
           'billing.manage',
-          'maintenance.handle'
+          'maintenance.handle',
         ],
         isVerified: true,
         avatar: null,
@@ -228,7 +227,7 @@ export default function Welcome() {
               ADMIN LOGIN
             </Text>
           </TouchableOpacity>
-          
+
           <TouchableOpacity
             onPress={handleCommunityManagerLogin}
             className="bg-blue-500/90 rounded-full px-3 py-2 flex-row items-center shadow-sm"
@@ -248,7 +247,7 @@ export default function Welcome() {
               SECURITY
             </Text>
           </TouchableOpacity>
-          
+
           <TouchableOpacity
             onPress={handleDevSkip}
             className="bg-warning/90 rounded-full px-3 py-2 flex-row items-center shadow-sm"
@@ -383,5 +382,3 @@ export default function Welcome() {
     </SafeAreaView>
   );
 }
-
-export default Welcome;

@@ -192,7 +192,10 @@ export type IconName =
   | 'fuel'
   | 'wifi'
   | 'heart-outline'
-  | 'userPlus';
+  | 'userPlus'
+  | 'users'
+  | 'check'
+  | 'shield';
 
 interface IconProps {
   name: IconName;
@@ -270,6 +273,7 @@ const LucideIcons = ({ name, color = '#000', size = 24 }: IconProps) => {
     people: Users,
     star: Star,
     'star-outline': Star,
+    users: Users,
 
     // System
     'settings-outline': Settings,
@@ -309,8 +313,10 @@ const LucideIcons = ({ name, color = '#000', size = 24 }: IconProps) => {
     fingerprint: Fingerprint,
     fuel: Fuel,
     wifi: Wifi,
+    check: Check,
     'heart-outline': Heart,
     userPlus: UserPlus,
+    shield: Shield,
   };
 
   const IconComponent = iconMap[name];

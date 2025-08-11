@@ -3,63 +3,65 @@
  * Complete authentication service with REST API integration
  */
 
-import { parsePhoneNumber, isValidPhoneNumber } from 'libphonenumber-js';
-import { z } from 'zod';
+import { API_CONFIG, API_ENDPOINTS } from '@/config/api.config';
 import { apiClient, APIClientError } from '@/services/api.client';
-import { 
-  SecureTokenStorage, 
-  SecureProfileStorage, 
-  SecureSessionStorage, 
-  SecureBiometricStorage,
-  clearAllSecureStorage 
-} from '@/utils/storage.secure';
-import { API_ENDPOINTS, API_CONFIG } from '@/config/api.config';
 import { developmentService } from '@/services/development.service';
+import { AdminSession, AdminUser } from '@/types/admin';
 import {
-  APIResponse,
-  LoginRequest,
-  LoginResponse,
-  OTPVerificationRequest,
   AuthTokens,
   AuthUser,
   ProfileUpdateRequest,
-  TokenData,
   RefreshTokenRequest,
   RefreshTokenResponse,
-  UserProfileExtended,
-  DeviceInfo
+  TokenData,
 } from '@/types/api';
-import { AdminUser, AdminSession } from '@/types/admin';
+import {
+  clearAllSecureStorage,
+  SecureProfileStorage,
+  SecureSessionStorage,
+  SecureTokenStorage,
+} from '@/utils/storage.secure';
+import { isValidPhoneNumber, parsePhoneNumber } from 'libphonenumber-js';
+import { z } from 'zod';
 
 // Validation schemas using Zod
-const phoneSchema = z.string()
+const phoneSchema = z
+  .string()
   .min(10, 'Phone number must be at least 10 digits')
   .max(15, 'Phone number cannot exceed 15 digits')
   .refine((phone) => isValidPhoneNumber(phone, 'IN'), {
-    message: 'Please enter a valid Indian mobile number'
+    message: 'Please enter a valid Indian mobile number',
   });
 
-const otpSchema = z.string()
+const otpSchema = z
+  .string()
   .length(6, 'OTP must be exactly 6 digits')
   .regex(/^\d{6}$/, 'OTP must contain only numbers');
 
-const societyCodeSchema = z.string()
+const societyCodeSchema = z
+  .string()
   .min(4, 'Society code must be at least 4 characters')
   .max(10, 'Society code cannot exceed 10 characters')
-  .regex(/^[A-Z0-9]+$/, 'Society code must contain only uppercase letters and numbers');
+  .regex(
+    /^[A-Z0-9]+$/,
+    'Society code must contain only uppercase letters and numbers',
+  );
 
 const adminLoginSchema = z.object({
-  email: z.string()
+  email: z
+    .string()
     .email('Please enter a valid email address')
     .min(5, 'Email must be at least 5 characters'),
-  password: z.string()
+  password: z
+    .string()
     .min(8, 'Password must be at least 8 characters')
     .max(50, 'Password cannot exceed 50 characters'),
   societyCode: z.string().optional(),
   rememberMe: z.boolean().optional().default(false),
 });
 
-const sessionValidationSchema = z.string()
+const sessionValidationSchema = z
+  .string()
   .min(10, 'Session ID is required')
   .max(100, 'Invalid session ID format');
 
@@ -131,6 +133,13 @@ export class RestAuthService {
   }
 
   /**
+   * Static method to check authentication status
+   */
+  static async isAuthenticated(): Promise<boolean> {
+    return RestAuthService.getInstance().isAuthenticated();
+  }
+
+  /**
    * Initialize device information
    */
   private async initializeDeviceInfo(): Promise<void> {
@@ -145,19 +154,24 @@ export class RestAuthService {
   /**
    * Register phone number and request OTP (or email/password registration)
    */
-  async registerPhone(phoneNumber: string, societyCode: string): Promise<AuthResult> {
+  async registerPhone(
+    phoneNumber: string,
+    societyCode: string = '',
+  ): Promise<AuthResult> {
     try {
       // Check what auth flow is available
       const authFlow = await developmentService.getAuthFlow();
-      
+
       // If registration endpoint is not available, use mock flow
       if (!authFlow.supportsRegistration) {
         console.log('🔧 Using development registration flow');
-        
+
         // Simulate OTP send for development
-        SecureSessionStorage.storeSocietyCode(societyCode.toUpperCase());
+        if (societyCode) {
+          SecureSessionStorage.storeSocietyCode(societyCode.toUpperCase());
+        }
         SecureSessionStorage.storeSessionId(`dev-session-${Date.now()}`);
-        
+
         return {
           success: true,
           data: { message: 'OTP sent successfully (development mode)' },
@@ -175,43 +189,76 @@ export class RestAuthService {
         };
       }
 
-      const codeValidation = societyCodeSchema.safeParse(societyCode.toUpperCase());
-      if (!codeValidation.success) {
-        return {
-          success: false,
-          error: codeValidation.error.issues[0].message,
-        };
+      // Only validate society code if provided (optional during initial registration)
+      if (societyCode) {
+        const codeValidation = societyCodeSchema.safeParse(
+          societyCode.toUpperCase(),
+        );
+        if (!codeValidation.success) {
+          return {
+            success: false,
+            error: codeValidation.error.issues[0].message,
+          };
+        }
       }
 
       // Format phone number
       const parsedPhone = parsePhoneNumber(phoneNumber, 'IN');
       const formattedPhone = parsedPhone.format('E.164');
 
+      // const formattedPhone = format(phoneNumber, 'IN', 'NATIONAL');
+      console.log('📞 Formatted phone number:', formattedPhone);
+      if (!isValidPhoneNumber(formattedPhone, 'IN')) {
+        return {
+          success: false,
+          error: 'Invalid phone number format',
+        };
+      }
+
+      // // Try email/password registration if available
+      // const requestData = {
+      //   name: 'User',
+      //   email: `user${Date.now()}@aptly.com`,
+      //   password: 'temp123',
+      //   phoneNumber: formattedPhone,
+      //   ...(societyCode && { societyCode: societyCode.toUpperCase() }),
+      // };
+
       // Try email/password registration if available
       const requestData = {
-        name: 'User',
-        email: `user${Date.now()}@aptly.com`,
-        password: 'temp123',
         phoneNumber: formattedPhone,
-        societyCode: societyCode.toUpperCase(),
+        ...(societyCode && { societyCode: societyCode.toUpperCase() }),
       };
 
       // Make API call
       const response = await apiClient.post<any>(
         API_ENDPOINTS.AUTH.REGISTER,
-        requestData
+        requestData,
       );
 
       if (response.success) {
-        // Store society code for future requests
-        SecureSessionStorage.storeSocietyCode(societyCode.toUpperCase());
-        SecureSessionStorage.storeSessionId(response.data.sessionId || `session-${Date.now()}`);
+        // Store society code for future requests (if provided)
+        if (societyCode) {
+          SecureSessionStorage.storeSocietyCode(societyCode.toUpperCase());
+        }
+        // Store session ID for OTP verification
+
+        SecureSessionStorage.storeSessionId(
+          response.data.sessionId || `session-${Date.now()}`,
+        );
 
         return {
           success: true,
-          data: { message: 'Registration successful' },
-          requiresOTP: false, // No OTP needed for email/password flow
+          data: { message: 'OTP sent successfully' },
+          requiresOTP: true,
+          sessionId: response.data.sessionId,
         };
+
+        // return {
+        //   success: true,
+        //   data: { message: 'Registration successful' },
+        //   requiresOTP: false, // No OTP needed for email/password flow
+        // };
       } else {
         return {
           success: false,
@@ -220,12 +267,14 @@ export class RestAuthService {
       }
     } catch (error) {
       console.error('❌ Registration failed:', error);
-      
+
       // Fallback to development mode
       console.log('🔧 Falling back to development mode');
-      SecureSessionStorage.storeSocietyCode(societyCode.toUpperCase());
+      if (societyCode) {
+        SecureSessionStorage.storeSocietyCode(societyCode.toUpperCase());
+      }
       SecureSessionStorage.storeSessionId(`dev-session-${Date.now()}`);
-      
+
       return {
         success: true,
         data: { message: 'Registration successful (development mode)' },
@@ -237,10 +286,15 @@ export class RestAuthService {
   /**
    * Verify OTP and complete authentication (or email/password login)
    */
-  async verifyOTP(phoneNumber: string, otp: string, sessionId?: string): Promise<AuthResult> {
+  async verifyOTP(
+    phoneNumber: string,
+    otp: string,
+    sessionId?: string,
+  ): Promise<AuthResult> {
     try {
       // Get session ID from storage if not provided
-      const currentSessionId = sessionId || SecureSessionStorage.getSessionId();
+      const currentSessionId =
+        sessionId || (await SecureSessionStorage.getSessionIdAsync());
       if (!currentSessionId) {
         return {
           success: false,
@@ -251,24 +305,24 @@ export class RestAuthService {
       // Check if this is a development session
       if (currentSessionId.startsWith('dev-session-')) {
         console.log('🔧 Using development OTP verification');
-        
+
         // Accept any 6-digit OTP in development
         if (otp.length === 6 && /^\d{6}$/.test(otp)) {
           // Create mock user
           const testUser = await developmentService.createTestUser();
-          
+
           // Store tokens securely
           const tokenData: TokenData = {
             accessToken: `dev-access-${Date.now()}`,
             refreshToken: `dev-refresh-${Date.now()}`,
-            expiresAt: Date.now() + (8 * 60 * 60 * 1000),
+            expiresAt: Date.now() + 8 * 60 * 60 * 1000,
             tokenType: 'Bearer',
           };
 
           await SecureTokenStorage.storeTokens(tokenData);
 
           // Store user profile
-          const userProfile = this.convertToUserProfile(testUser);
+          const userProfile = await this.convertToUserProfile(testUser);
           SecureProfileStorage.storeProfile(userProfile);
           this.currentUser = userProfile;
 
@@ -280,7 +334,10 @@ export class RestAuthService {
             data: {
               message: 'Authentication successful (development mode)',
               user: userProfile,
-              tokens: { accessToken: tokenData.accessToken, refreshToken: tokenData.refreshToken },
+              tokens: {
+                accessToken: tokenData.accessToken,
+                refreshToken: tokenData.refreshToken,
+              },
             },
           };
         } else {
@@ -303,7 +360,7 @@ export class RestAuthService {
       // Try real API login
       try {
         const authFlow = await developmentService.getAuthFlow();
-        
+
         if (authFlow.supportsEmailPassword) {
           // Try email/password login
           const loginData = {
@@ -311,24 +368,26 @@ export class RestAuthService {
             password: authFlow.mockCredentials.password,
           };
 
-          const response = await apiClient.post<{ user: AuthUser; tokens: AuthTokens }>(
-            API_ENDPOINTS.AUTH.LOGIN,
-            loginData
-          );
+          const response = await apiClient.post<{
+            user: AuthUser;
+            tokens: AuthTokens;
+          }>(API_ENDPOINTS.AUTH.LOGIN, loginData);
 
           if (response.success) {
             // Store tokens securely
             const tokenData: TokenData = {
               accessToken: response.data.tokens.accessToken,
               refreshToken: response.data.tokens.refreshToken,
-              expiresAt: Date.now() + (8 * 60 * 60 * 1000),
+              expiresAt: Date.now() + 8 * 60 * 60 * 1000,
               tokenType: 'Bearer',
             };
 
             await SecureTokenStorage.storeTokens(tokenData);
 
             // Store user profile
-            const userProfile = this.convertToUserProfile(response.data.user);
+            const userProfile = await this.convertToUserProfile(
+              response.data.user,
+            );
             SecureProfileStorage.storeProfile(userProfile);
             this.currentUser = userProfile;
 
@@ -350,11 +409,14 @@ export class RestAuthService {
       }
 
       // Fallback to development mode
-      return await this.verifyOTP(phoneNumber, otp, `dev-session-${Date.now()}`);
-      
+      return await this.verifyOTP(
+        phoneNumber,
+        otp,
+        `dev-session-${Date.now()}`,
+      );
     } catch (error) {
       console.error('❌ Authentication failed:', error);
-      
+
       return {
         success: false,
         error: 'Authentication failed. Please try again.',
@@ -374,7 +436,7 @@ export class RestAuthService {
       const response = await apiClient.get<AuthUser>(API_ENDPOINTS.AUTH.ME);
 
       if (response.success) {
-        const userProfile = this.convertToUserProfile(response.data);
+        const userProfile = await this.convertToUserProfile(response.data);
         SecureProfileStorage.storeProfile(userProfile);
         this.currentUser = userProfile;
         return userProfile;
@@ -399,11 +461,11 @@ export class RestAuthService {
 
       const response = await apiClient.patch<AuthUser>(
         API_ENDPOINTS.AUTH.UPDATE_PROFILE,
-        updateRequest
+        updateRequest,
       );
 
       if (response.success) {
-        const updatedProfile = this.convertToUserProfile(response.data);
+        const updatedProfile = await this.convertToUserProfile(response.data);
         SecureProfileStorage.storeProfile(updatedProfile);
         this.currentUser = updatedProfile;
 
@@ -419,7 +481,7 @@ export class RestAuthService {
       }
     } catch (error) {
       console.error('❌ Profile update failed:', error);
-      
+
       if (error instanceof APIClientError) {
         return {
           success: false,
@@ -439,7 +501,7 @@ export class RestAuthService {
    */
   async refreshToken(): Promise<TokenData | null> {
     try {
-      const refreshToken = SecureTokenStorage.getRefreshToken();
+      const refreshToken = await SecureTokenStorage.getRefreshTokenAsync();
       if (!refreshToken) {
         return null;
       }
@@ -448,14 +510,14 @@ export class RestAuthService {
 
       const response = await apiClient.post<RefreshTokenResponse>(
         API_ENDPOINTS.AUTH.REFRESH_TOKEN,
-        requestData
+        requestData,
       );
 
       if (response.success) {
         const tokenData: TokenData = {
           accessToken: response.data.accessToken,
           refreshToken: response.data.refreshToken,
-          expiresAt: Date.now() + (response.data.expiresIn * 1000),
+          expiresAt: Date.now() + response.data.expiresIn * 1000,
           tokenType: 'Bearer',
         };
 
@@ -489,29 +551,40 @@ export class RestAuthService {
    * Check if user is authenticated
    */
   async isAuthenticated(): Promise<boolean> {
-    const tokens = SecureTokenStorage.getTokens();
-    if (!tokens) {
-      return false;
-    }
-
-    // Check if token is expired
-    if (SecureTokenStorage.isTokenExpired()) {
-      try {
-        const newTokens = await this.refreshToken();
-        return newTokens !== null;
-      } catch (error) {
+    try {
+      const tokens = await SecureTokenStorage.getTokens();
+      if (!tokens) {
         return false;
       }
-    }
 
-    return true;
+      // Check if token is expired
+      const isExpired = await SecureTokenStorage.isTokenExpiredAsync();
+      if (isExpired) {
+        try {
+          const newTokens = await this.refreshToken();
+          return newTokens !== null;
+        } catch (error) {
+          return false;
+        }
+      }
+
+      return true;
+    } catch (error) {
+      console.error('❌ Error checking authentication:', error);
+      return false;
+    }
   }
 
   /**
    * Get stored user profile
    */
   async getStoredProfile(): Promise<UserProfile | null> {
-    return SecureProfileStorage.getProfile<UserProfile>();
+    try {
+      return await SecureProfileStorage.getProfileAsync<UserProfile>();
+    } catch (error) {
+      console.error('❌ Error getting stored profile:', error);
+      return null;
+    }
   }
 
   /**
@@ -529,7 +602,7 @@ export class RestAuthService {
       return await this.updateProfile(profileData);
     } catch (error) {
       console.error('❌ Profile creation failed:', error);
-      
+
       return {
         success: false,
         error: 'Network error. Please check your connection.',
@@ -541,9 +614,9 @@ export class RestAuthService {
    * Associate user with society (if needed)
    */
   async associateWithSociety(
-    userId: string, 
-    societyId: string, 
-    flatNumber: string
+    userId: string,
+    societyId: string,
+    flatNumber: string,
   ): Promise<AuthResult> {
     try {
       const response = await apiClient.post(API_ENDPOINTS.SOCIETY.JOIN, {
@@ -565,7 +638,7 @@ export class RestAuthService {
       }
     } catch (error) {
       console.error('❌ Society association failed:', error);
-      
+
       if (error instanceof APIClientError) {
         return {
           success: false,
@@ -610,7 +683,10 @@ export class RestAuthService {
     }
   }
 
-  async updateSecurityGuardShift(userId: string, shiftData: any): Promise<AuthResult> {
+  async updateSecurityGuardShift(
+    userId: string,
+    shiftData: any,
+  ): Promise<AuthResult> {
     try {
       // In a real implementation, this would be a dedicated endpoint
       return {
@@ -638,7 +714,7 @@ export class RestAuthService {
   /**
    * Convert AuthUser to UserProfile
    */
-  private convertToUserProfile(authUser: AuthUser): UserProfile {
+  private async convertToUserProfile(authUser: AuthUser): Promise<UserProfile> {
     return {
       ...authUser,
       fullName: authUser.name || '',
@@ -646,7 +722,10 @@ export class RestAuthService {
       ownershipType: 'owner' as const,
       familySize: 1,
       emergencyContact: '',
-      societyCode: authUser.societyCode || SecureSessionStorage.getSocietyCode() || '',
+      societyCode:
+        authUser.societyCode ||
+        (await SecureSessionStorage.getSocietyCodeAsync()) ||
+        '',
     };
   }
 
@@ -665,7 +744,12 @@ export class RestAuthService {
    * Get access token (for direct access)
    */
   async getAccessToken(): Promise<string | null> {
-    return SecureTokenStorage.getAccessToken();
+    try {
+      return await SecureTokenStorage.getAccessTokenAsync();
+    } catch (error) {
+      console.error('❌ Error getting access token:', error);
+      return null;
+    }
   }
 
   // ====================
@@ -743,7 +827,7 @@ export class RestAuthService {
       }
     } catch (error) {
       console.error('❌ Admin login failed:', error);
-      
+
       if (error instanceof APIClientError) {
         return {
           success: false,
@@ -764,7 +848,7 @@ export class RestAuthService {
   async validateAdminSession(sessionId?: string): Promise<AdminUser | null> {
     try {
       const currentSessionId = sessionId || this.adminSession?.sessionId;
-      
+
       if (!currentSessionId) {
         return null;
       }
@@ -776,11 +860,16 @@ export class RestAuthService {
       }
 
       // Check if session is stored and valid
-      if (this.currentAdmin && this.adminSession?.sessionId === currentSessionId) {
+      if (
+        this.currentAdmin &&
+        this.adminSession?.sessionId === currentSessionId
+      ) {
         // Check if session is expired
         const now = Date.now();
-        const expiresAt = this.adminSession.expiresAt || (this.adminSession.createdAt + (8 * 60 * 60 * 1000));
-        
+        const expiresAt =
+          this.adminSession.expiresAt ||
+          this.adminSession.createdAt + 8 * 60 * 60 * 1000;
+
         if (now < expiresAt) {
           return this.currentAdmin;
         }
@@ -789,7 +878,7 @@ export class RestAuthService {
       // Validate with server
       const response = await apiClient.post<AdminUser>(
         API_ENDPOINTS.AUTH.ADMIN_VALIDATE_SESSION,
-        { sessionId: currentSessionId }
+        { sessionId: currentSessionId },
       );
 
       if (response.success) {
@@ -817,7 +906,7 @@ export class RestAuthService {
       const storedAdmin = SecureProfileStorage.getProfile<AdminUser>('admin');
       if (storedAdmin) {
         this.currentAdmin = storedAdmin;
-        
+
         // Validate session is still active
         const validAdmin = await this.validateAdminSession();
         return validAdmin;
@@ -836,7 +925,7 @@ export class RestAuthService {
   async adminLogout(sessionId?: string): Promise<void> {
     try {
       const currentSessionId = sessionId || this.adminSession?.sessionId;
-      
+
       if (currentSessionId) {
         // Notify server about logout
         await apiClient.post(API_ENDPOINTS.AUTH.ADMIN_LOGOUT, {
@@ -850,7 +939,7 @@ export class RestAuthService {
       // Clean up local admin state
       this.currentAdmin = null;
       this.adminSession = null;
-      
+
       // Clear admin tokens and profile
       await SecureTokenStorage.clearTokens('admin');
       SecureProfileStorage.clearProfile('admin');
@@ -870,25 +959,27 @@ export class RestAuthService {
    */
   async getAdminPermissions(adminId?: string): Promise<string[] | null> {
     try {
-      const admin = adminId ? 
-        await this.validateAdminSession() : 
-        await this.getCurrentAdmin();
+      const admin = adminId
+        ? await this.validateAdminSession()
+        : await this.getCurrentAdmin();
 
       if (!admin) {
         return null;
       }
 
       // Return admin permissions based on role
-      return admin.permissions || [
-        'manage_residents',
-        'manage_visitors',
-        'manage_notices',
-        'view_reports',
-        'manage_vehicles',
-        'handle_emergencies',
-        'manage_billing',
-        'system_admin',
-      ];
+      return (
+        admin.permissions || [
+          'manage_residents',
+          'manage_visitors',
+          'manage_notices',
+          'view_reports',
+          'manage_vehicles',
+          'handle_emergencies',
+          'manage_billing',
+          'system_admin',
+        ]
+      );
     } catch (error) {
       console.error('❌ Failed to get admin permissions:', error);
       return null;
@@ -911,8 +1002,8 @@ export default restAuthService;
 // Export compatible interface with existing auth service
 export {
   restAuthService as AuthService,
-  type UserProfile,
-  type AuthResult,
-  type AdminLoginRequest,
   type AdminAuthResult,
+  type AdminLoginRequest,
+  type AuthResult,
+  type UserProfile,
 };
