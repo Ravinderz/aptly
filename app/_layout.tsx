@@ -19,26 +19,28 @@ function RootLayout() {
   }, [showAlert]);
 
   return (
-    <StoreInitializer environment={__DEV__ ? 'development' : 'production'}>
-      <SafeAreaView style={{ flex: 1 }}>
-        <AppNavigator>
-          <Stack screenOptions={{ headerShown: false }}>
-            <Stack.Screen name="index" options={{ headerShown: false }} />
-            <Stack.Screen name="welcome" options={{ headerShown: false }} />
-            <Stack.Screen name="auth" options={{ headerShown: false }} />
-            <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-            <Stack.Screen
-              name="notifications"
-              options={{
-                headerShown: false,
-                presentation: 'modal', // This makes it feel like a modal that can be dismissed
-              }}
-            />
-          </Stack>
-        </AppNavigator>
-        {AlertComponent}
-      </SafeAreaView>
-    </StoreInitializer>
+    <>
+      <StoreInitializer environment={__DEV__ ? 'development' : 'production'}>
+        <SafeAreaView style={{ flex: 1 }}>
+          <AppNavigator>
+            <Stack screenOptions={{ headerShown: false }}>
+              <Stack.Screen name="index" options={{ headerShown: false }} />
+              <Stack.Screen name="welcome" options={{ headerShown: false }} />
+              <Stack.Screen name="auth" options={{ headerShown: false }} />
+              <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+              <Stack.Screen
+                name="notifications"
+                options={{
+                  headerShown: false,
+                  presentation: 'modal', // This makes it feel like a modal that can be dismissed
+                }}
+              />
+            </Stack>
+          </AppNavigator>
+          {AlertComponent}
+        </SafeAreaView>
+      </StoreInitializer>
+    </>
   );
 }
 

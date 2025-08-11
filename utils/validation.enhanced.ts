@@ -26,7 +26,10 @@ export const nameSchema = z
 export const flatNumberSchema = z
   .string()
   .min(1, 'Flat number is required')
-  .regex(/^[A-Z]?-?\d+[A-Z]?$/i, 'Please enter a valid flat number (e.g., A-201, 101, B-5)');
+  .regex(
+    /^[A-Z]?-?\d+[A-Z]?$/i,
+    'Please enter a valid flat number (e.g., A-201, 101, B-5)',
+  );
 
 export const otpSchema = z
   .string()
@@ -40,19 +43,25 @@ export const passwordSchema = z
   .regex(/(?=.*[a-z])/, 'Password must contain at least one lowercase letter')
   .regex(/(?=.*[A-Z])/, 'Password must contain at least one uppercase letter')
   .regex(/(?=.*\d)/, 'Password must contain at least one number')
-  .regex(/(?=.*[@$!%*?&])/, 'Password must contain at least one special character');
+  .regex(
+    /(?=.*[@$!%*?&])/,
+    'Password must contain at least one special character',
+  );
 
 export const societyCodeSchema = z
   .string()
   .min(1, 'Society code is required')
   .min(4, 'Society code must be at least 4 characters')
   .max(20, 'Society code must not exceed 20 characters')
-  .regex(/^[A-Z0-9_-]+$/i, 'Society code can only contain letters, numbers, underscore, and dash');
+  .regex(
+    /^[A-Z0-9_-]+$/i,
+    'Society code can only contain letters, numbers, underscore, and dash',
+  );
 
 // Authentication forms
 export const phoneRegistrationSchema = z.object({
   phone: phoneSchema,
-  agreeToTerms: z.boolean().refine(val => val === true, {
+  agreeToTerms: z.boolean().refine((val) => val === true, {
     message: 'Please accept the terms and conditions',
   }),
 });
@@ -80,10 +89,17 @@ export const createPostSchema = z.object({
     .min(1, 'Post content is required')
     .min(10, 'Post content must be at least 10 characters')
     .max(1000, 'Post content must not exceed 1000 characters'),
-  category: z.enum(['announcement', 'buy_sell', 'lost_found', 'events', 'general'], {
-    errorMap: () => ({ message: 'Please select a valid category' }),
-  }),
-  imageUrl: z.string().url('Please enter a valid image URL').optional().or(z.literal('')),
+  category: z.enum(
+    ['announcement', 'buy_sell', 'lost_found', 'events', 'general'],
+    {
+      errorMap: () => ({ message: 'Please select a valid category' }),
+    },
+  ),
+  imageUrl: z
+    .string()
+    .url('Please enter a valid image URL')
+    .optional()
+    .or(z.literal('')),
 });
 
 export const createCommentSchema = z.object({
@@ -111,7 +127,10 @@ export const createVisitorSchema = z.object({
     .max(480, 'Maximum visit duration is 8 hours'), // in minutes
   vehicleNumber: z
     .string()
-    .regex(/^[A-Z]{2}[0-9]{2}[A-Z]{1,2}[0-9]{4}$/, 'Please enter a valid vehicle number')
+    .regex(
+      /^[A-Z]{2}[0-9]{2}[A-Z]{1,2}[0-9]{4}$/,
+      'Please enter a valid vehicle number',
+    )
     .optional()
     .or(z.literal('')),
   guestCount: z
@@ -140,9 +159,12 @@ export const maintenanceRequestSchema = z.object({
     .min(1, 'Description is required')
     .min(10, 'Description must be at least 10 characters')
     .max(500, 'Description must not exceed 500 characters'),
-  category: z.enum(['plumbing', 'electrical', 'carpentry', 'painting', 'general', 'emergency'], {
-    errorMap: () => ({ message: 'Please select a valid category' }),
-  }),
+  category: z.enum(
+    ['plumbing', 'electrical', 'carpentry', 'painting', 'general', 'emergency'],
+    {
+      errorMap: () => ({ message: 'Please select a valid category' }),
+    },
+  ),
   priority: z.enum(['low', 'medium', 'high', 'urgent'], {
     errorMap: () => ({ message: 'Please select a priority level' }),
   }),
@@ -150,9 +172,11 @@ export const maintenanceRequestSchema = z.object({
     .string()
     .min(1, 'Location is required')
     .max(100, 'Location must not exceed 100 characters'),
-  preferredTime: z.enum(['morning', 'afternoon', 'evening', 'anytime'], {
-    errorMap: () => ({ message: 'Please select a preferred time' }),
-  }).optional(),
+  preferredTime: z
+    .enum(['morning', 'afternoon', 'evening', 'anytime'], {
+      errorMap: () => ({ message: 'Please select a preferred time' }),
+    })
+    .optional(),
 });
 
 // Vehicle registration forms
@@ -160,7 +184,10 @@ export const vehicleRegistrationSchema = z.object({
   vehicleNumber: z
     .string()
     .min(1, 'Vehicle number is required')
-    .regex(/^[A-Z]{2}[0-9]{2}[A-Z]{1,2}[0-9]{4}$/, 'Please enter a valid vehicle number (e.g., MH12AB1234)'),
+    .regex(
+      /^[A-Z]{2}[0-9]{2}[A-Z]{1,2}[0-9]{4}$/,
+      'Please enter a valid vehicle number (e.g., MH12AB1234)',
+    ),
   vehicleType: z.enum(['car', 'bike', 'scooter', 'cycle', 'other'], {
     errorMap: () => ({ message: 'Please select a vehicle type' }),
   }),
@@ -199,9 +226,12 @@ export const billPaymentSchema = z.object({
 export const emergencyContactSchema = z.object({
   name: nameSchema,
   phone: phoneSchema,
-  relation: z.enum(['spouse', 'parent', 'child', 'sibling', 'friend', 'colleague', 'other'], {
-    errorMap: () => ({ message: 'Please select a relation' }),
-  }),
+  relation: z.enum(
+    ['spouse', 'parent', 'child', 'sibling', 'friend', 'colleague', 'other'],
+    {
+      errorMap: () => ({ message: 'Please select a relation' }),
+    },
+  ),
   isDefault: z.boolean().optional(),
 });
 
@@ -238,8 +268,18 @@ export const notificationSettingsSchema = z.object({
   }),
   quietHours: z.object({
     enabled: z.boolean(),
-    startTime: z.string().regex(/^([01]?[0-9]|2[0-3]):[0-5][0-9]$/, 'Please enter a valid time (HH:MM)'),
-    endTime: z.string().regex(/^([01]?[0-9]|2[0-3]):[0-5][0-9]$/, 'Please enter a valid time (HH:MM)'),
+    startTime: z
+      .string()
+      .regex(
+        /^([01]?[0-9]|2[0-3]):[0-5][0-9]$/,
+        'Please enter a valid time (HH:MM)',
+      ),
+    endTime: z
+      .string()
+      .regex(
+        /^([01]?[0-9]|2[0-3]):[0-5][0-9]$/,
+        'Please enter a valid time (HH:MM)',
+      ),
   }),
 });
 
@@ -256,25 +296,36 @@ export type VehicleRegistrationForm = z.infer<typeof vehicleRegistrationSchema>;
 export type BillPaymentForm = z.infer<typeof billPaymentSchema>;
 export type EmergencyContactForm = z.infer<typeof emergencyContactSchema>;
 export type FamilyMemberForm = z.infer<typeof familyMemberSchema>;
-export type NotificationSettingsForm = z.infer<typeof notificationSettingsSchema>;
+export type NotificationSettingsForm = z.infer<
+  typeof notificationSettingsSchema
+>;
 
 // Validation utility functions
-export const validateField = <T>(schema: z.ZodSchema<T>, value: unknown): { isValid: boolean; error?: string } => {
+export const validateField = <T>(
+  schema: z.ZodSchema<T>,
+  value: unknown,
+): { isValid: boolean; error?: string } => {
   try {
     schema.parse(value);
     return { isValid: true };
   } catch (error) {
     if (error instanceof z.ZodError) {
-      return { isValid: false, error: error.errors[0]?.message || 'Validation error' };
+      return {
+        isValid: false,
+        error: error.issues[0]?.message || 'Validation error',
+      };
     }
     return { isValid: false, error: 'Unknown validation error' };
   }
 };
 
-export const validateForm = <T>(schema: z.ZodSchema<T>, data: unknown): { 
-  isValid: boolean; 
-  errors?: Record<string, string>; 
-  data?: T 
+export const validateForm = <T>(
+  schema: z.ZodSchema<T>,
+  data: unknown,
+): {
+  isValid: boolean;
+  errors?: Record<string, string>;
+  data?: T;
 } => {
   try {
     const validData = schema.parse(data);
@@ -282,7 +333,7 @@ export const validateForm = <T>(schema: z.ZodSchema<T>, data: unknown): {
   } catch (error) {
     if (error instanceof z.ZodError) {
       const errors: Record<string, string> = {};
-      error.errors.forEach((err) => {
+      error.issues.forEach((err) => {
         const path = err.path.join('.');
         errors[path] = err.message;
       });
@@ -319,13 +370,17 @@ export const useFormValidation = <T>(schema: z.ZodSchema<T>) => {
 // Pre-built validation messages
 export const ValidationMessages = {
   REQUIRED: (field: string) => `${field} is required`,
-  MIN_LENGTH: (field: string, length: number) => `${field} must be at least ${length} characters`,
-  MAX_LENGTH: (field: string, length: number) => `${field} must not exceed ${length} characters`,
-  INVALID_FORMAT: (field: string) => `Please enter a valid ${field.toLowerCase()}`,
+  MIN_LENGTH: (field: string, length: number) =>
+    `${field} must be at least ${length} characters`,
+  MAX_LENGTH: (field: string, length: number) =>
+    `${field} must not exceed ${length} characters`,
+  INVALID_FORMAT: (field: string) =>
+    `Please enter a valid ${field.toLowerCase()}`,
   INVALID_PHONE: 'Please enter a valid phone number',
   INVALID_EMAIL: 'Please enter a valid email address',
   INVALID_OTP: 'Please enter a valid 6-digit OTP',
   TERMS_REQUIRED: 'Please accept the terms and conditions',
   PASSWORDS_DONT_MATCH: 'Passwords do not match',
-  WEAK_PASSWORD: 'Password is too weak. Please include uppercase, lowercase, numbers, and special characters',
+  WEAK_PASSWORD:
+    'Password is too weak. Please include uppercase, lowercase, numbers, and special characters',
 } as const;

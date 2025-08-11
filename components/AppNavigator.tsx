@@ -1,21 +1,19 @@
-import React, { useEffect, useState, useCallback, useRef } from 'react';
-import { View, ActivityIndicator } from 'react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useDirectAuth } from '@/hooks/useDirectAuth';
-import { useRouter, useSegments } from 'expo-router';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { Slot, useRouter, useSegments } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { ActivityIndicator, View } from 'react-native';
 
-const AppNavigator = ({
-  children,
-}: { children: React.ReactNode }) => {
+const AppNavigator = ({ children }: { children: React.ReactNode }) => {
   const [isFirstLaunch, setIsFirstLaunch] = useState<boolean | null>(null);
   const [isCheckingFirstLaunch, setIsCheckingFirstLaunch] = useState(true);
   const [hasNavigated, setHasNavigated] = useState(false);
-  
+
   // Use the hook only once to prevent multiple subscriptions
   const auth = useDirectAuth();
   const { isAuthenticated, isLoading } = auth;
-  
+
   const router = useRouter();
   const segments = useSegments();
   const navigationTimeoutRef = useRef<NodeJS.Timeout | null>(null);
@@ -44,15 +42,15 @@ const AppNavigator = ({
   // Check if this is the first launch (only run once)
   useEffect(() => {
     let isMounted = true;
-    
+
     const runCheck = async () => {
       if (isMounted) {
         await checkFirstLaunch();
       }
     };
-    
+
     runCheck();
-    
+
     return () => {
       isMounted = false;
     };
@@ -68,7 +66,7 @@ const AppNavigator = ({
     const inSecurityGroup = segments[0] === 'security';
     const inAdminGroup = segments[0] === 'admin';
     const inManagerGroup = segments[0] === 'manager';
-    
+
     switch (user.role) {
       case 'security_guard':
         return inSecurityGroup;
@@ -119,12 +117,15 @@ const AppNavigator = ({
         // Unauthenticated users go to welcome
         shouldNavigate = true;
         targetRoute = '/welcome';
-      } else if (isAuthenticated && (onWelcomePage || inAuthGroup || onIndexPage)) {
+      } else if (
+        isAuthenticated &&
+        (onWelcomePage || inAuthGroup || onIndexPage)
+      ) {
         // Authenticated users get routed to their role-specific dashboard
         const user = auth.user;
         if (user?.role) {
           shouldNavigate = true;
-          
+
           switch (user.role) {
             case 'security_guard':
               targetRoute = '/security/dashboard';
@@ -146,10 +147,12 @@ const AppNavigator = ({
 
       // Perform navigation if needed
       if (shouldNavigate && targetRoute) {
-        console.log(`🧭 Navigating from [${segments.join('/')}] to [${targetRoute}]`);
+        console.log(
+          `🧭 Navigating from [${segments.join('/')}] to [${targetRoute}]`,
+        );
         setHasNavigated(true);
         router.replace(targetRoute);
-        
+
         // Reset navigation flag after a delay
         setTimeout(() => setHasNavigated(false), 1000);
       }
@@ -180,9 +183,13 @@ const AppNavigator = ({
   // Show loading spinner while checking auth or first launch
   if (isCheckingFirstLaunch || isLoading) {
     return (
-      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-        <ActivityIndicator size="large" color="#6366f1" />
-      </View>
+      <>
+        <Slot />
+        <View
+          style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+          <ActivityIndicator size="large" color="#6366f1" />
+        </View>
+      </>
     );
   }
 

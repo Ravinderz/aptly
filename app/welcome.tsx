@@ -351,7 +351,12 @@ export default function Welcome() {
         {/* CTA Section */}
         <View className="px-6 pb-8">
           <Button
-            onPress={() => router.push('/auth/phone-registration')}
+            onPress={() =>
+              router.push({
+                pathname: '/auth/phone-registration',
+                params: { mode: 'signup' },
+              })
+            }
             className="mb-4">
             Get Started
           </Button>

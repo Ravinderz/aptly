@@ -179,14 +179,16 @@ export default function PhoneRegistration() {
       );
 
       if (result.success) {
-        // Navigate to OTP verification
-        router.push({
-          pathname: '/auth/otp-verification',
-          params: {
-            phoneNumber: fullPhoneNumber,
-            sessionId: result.sessionId || 'dev-session',
-          },
-        });
+        // Add a small delay to ensure navigation state is ready
+        setTimeout(() => {
+          router.push({
+            pathname: '/auth/otp-verification',
+            params: {
+              phoneNumber: fullPhoneNumber,
+              sessionId: result.sessionId || 'dev-session',
+            },
+          });
+        }, 100);
       } else {
         // Show error alert for API failures
         showErrorAlert(
