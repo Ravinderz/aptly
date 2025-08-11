@@ -52,7 +52,7 @@ export interface UseFormValidationReturn<T extends Record<string, any>> {
   setValues: (values: Partial<T>) => void;
   resetForm: (newInitialValues?: Partial<T>) => void;
   validateField: <K extends keyof T>(field: K) => Promise<boolean>;
-  validateForm: () => Promise<boolean>;
+  validateForm: () => Promise<{ isValid: boolean; data?: T }>;
   handleSubmit: (
     onSubmit: (values: T) => void | Promise<void>,
   ) => Promise<void>;
@@ -143,13 +143,24 @@ export function useFormValidation<T extends Record<string, any>>(
 
   // Validation functions
   const validateSingleField = useCallback(
-    async <K extends keyof T>(field: K): Promise<boolean> => {
+    async <K extends keyof T>(field: K, currentValue?: T[K]): Promise<boolean> => {
       const fieldSchema = (schema as any).shape?.[field];
       if (!fieldSchema) return true;
 
-      // Get current field value from latest state
-      const currentFieldValue = formState.fields[field].value;
-      const result = validateField(fieldSchema, currentFieldValue);
+      // Use provided value or get current field value
+      let fieldValue = currentValue;
+      if (currentValue === undefined) {
+        // Get value from the current state ref to avoid dependency issues
+        setFormState((prev) => {
+          fieldValue = prev.fields[field]?.value;
+          return prev; // Don't modify state in this call
+        });
+      }
+      
+      console.log(`🔍 Validating field ${String(field)}:`, fieldValue);
+      
+      const result = validateField(fieldSchema, fieldValue);
+      console.log(`🔍 Validation result for ${String(field)}:`, result);
 
       setFormState((prev) => ({
         ...prev,
@@ -169,29 +180,26 @@ export function useFormValidation<T extends Record<string, any>>(
 
       return result.isValid;
     },
-    [schema], // Remove formState.fields dependency to prevent infinite loops
+    [schema], // Remove formState.fields dependency to prevent circular dependencies
   );
 
-  const validateEntireForm = useCallback(async (): Promise<boolean> => {
-    // Use functional state update to get latest values
-    let isFormValid = true;
+  const validateEntireForm = useCallback(async (): Promise<{
+    isValid: boolean;
+    data?: T;
+  }> => {
+    const formValues = Object.keys(formState.fields).reduce((acc, key) => {
+      acc[key as keyof T] = formState.fields[key as keyof T].value;
+      return acc;
+    }, {} as T);
+
+    const result = validateForm(schema, formValues);
 
     setFormState((prev) => {
-      const formValues = Object.keys(prev.fields).reduce((acc, key) => {
-        acc[key as keyof T] = prev.fields[key as keyof T].value;
-        return acc;
-      }, {} as T);
-
-      const result = validateForm(schema, formValues);
-      isFormValid = result.isValid;
-
       const newFields = { ...prev.fields };
-      const newErrors = {} as { [K in keyof T]?: string };
+      const newErrors = result.errors || {};
 
-      console.log('🔍 Object.keys(newFields)', Object.keys(newFields));
-
-      // Clear all errors first
-      Object.keys(newFields)?.forEach((key) => {
+      // Reset all field errors before applying new ones
+      Object.keys(newFields).forEach((key) => {
         const fieldKey = key as keyof T;
         newFields[fieldKey] = {
           ...newFields[fieldKey],
@@ -200,9 +208,9 @@ export function useFormValidation<T extends Record<string, any>>(
         };
       });
 
-      // Set new errors
+      // Apply new errors from validation
       if (result.errors) {
-        Object.entries(result.errors)?.forEach(([key, error]) => {
+        Object.entries(result.errors).forEach(([key, error]) => {
           const fieldKey = key as keyof T;
           if (newFields[fieldKey]) {
             newFields[fieldKey] = {
@@ -210,7 +218,6 @@ export function useFormValidation<T extends Record<string, any>>(
               error: error as string,
               isValid: false,
             };
-            newErrors[fieldKey] = error as string;
           }
         });
       }
@@ -223,8 +230,8 @@ export function useFormValidation<T extends Record<string, any>>(
       };
     });
 
-    return isFormValid;
-  }, [schema]); // Remove formState.fields dependency
+    return { isValid: result.isValid, data: result.data };
+  }, [schema, formState.fields]);
 
   // Field operations
   const setValue = useCallback(
@@ -254,7 +261,7 @@ export function useFormValidation<T extends Record<string, any>>(
         if (timer) clearTimeout(timer);
 
         const newTimer = setTimeout(() => {
-          validateSingleField(field);
+          validateSingleField(field, value);
         }, debounceMs);
 
         debounceTimersRef.current.set(field, newTimer);
@@ -340,7 +347,10 @@ export function useFormValidation<T extends Record<string, any>>(
       });
 
       if (validateOnBlur) {
-        validateSingleField(field);
+        // Schedule validation for next tick to ensure state is updated
+        setTimeout(() => {
+          validateSingleField(field);
+        }, 0);
       }
     },
     [validateOnBlur, validateSingleField],
@@ -427,32 +437,20 @@ export function useFormValidation<T extends Record<string, any>>(
       }));
 
       try {
-        let isFormValid = true;
-        let formValues: T | undefined;
-
         if (validateOnSubmit) {
-          isFormValid = await validateEntireForm();
-        }
-
-        if (isFormValid) {
-          // Extract current form values using functional state update to avoid closure issues
-          setFormState((currentState) => {
-            formValues = Object.keys(currentState.fields).reduce((acc, key) => {
-              acc[key as keyof T] = currentState.fields[key as keyof T].value;
-              return acc;
-            }, {} as T);
-            return currentState; // No state change, just extracting values
-          });
-
-          // Ensure formValues is defined before calling onSubmit
-          if (formValues) {
-            await onSubmit(formValues);
-          } else {
-            console.error('Form values are undefined, cannot submit form');
-            throw new Error(
-              'Form submission failed: form values are undefined',
-            );
+          const validationResult = await validateEntireForm();
+          if (validationResult.isValid && validationResult.data) {
+            await onSubmit(validationResult.data);
           }
+        } else {
+          const formValues = Object.keys(formState.fields).reduce(
+            (acc, key) => {
+              acc[key as keyof T] = formState.fields[key as keyof T].value;
+              return acc;
+            },
+            {} as T,
+          );
+          await onSubmit(formValues);
         }
       } catch (error) {
         console.error('Form submission error:', error);
@@ -464,7 +462,7 @@ export function useFormValidation<T extends Record<string, any>>(
         }));
       }
     },
-    [validateOnSubmit, validateEntireForm],
+    [validateOnSubmit, validateEntireForm, formState.fields],
   );
 
   // Utility functions

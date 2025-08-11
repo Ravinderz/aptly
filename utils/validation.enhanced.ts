@@ -9,7 +9,16 @@ import { z } from 'zod';
 export const phoneSchema = z
   .string()
   .min(1, 'Phone number is required')
-  .regex(/^(\+91|91)?[6-9]\d{9}$/, 'Please enter a valid Indian phone number');
+  .transform((val) => {
+    if (!val || typeof val !== 'string') return '';
+    return val.replace(/\D/g, '');
+  })
+  .pipe(
+    z
+      .string()
+      .min(1, 'Phone number is required')
+      .regex(/^[6-9]\d{9}$/, 'Please enter a valid 10-digit Indian phone number'),
+  );
 
 export const emailSchema = z
   .string()
@@ -60,10 +69,24 @@ export const societyCodeSchema = z
 
 // Authentication forms
 export const phoneRegistrationSchema = z.object({
-  phone: phoneSchema,
-  agreeToTerms: z.boolean().refine((val) => val === true, {
-    message: 'Please accept the terms and conditions',
-  }),
+  phone: z
+    .string()
+    .min(1, 'Phone number is required')
+    .transform((val) => {
+      if (!val || typeof val !== 'string') return '';
+      return val.replace(/\D/g, '');
+    })
+    .pipe(
+      z
+        .string()
+        .min(1, 'Phone number is required')
+        .regex(/^[6-9]\d{9}$/, 'Please enter a valid 10-digit Indian phone number'),
+    ),
+  agreeToTerms: z
+    .boolean()
+    .refine((val) => val === true, {
+      message: 'Please accept the terms and conditions',
+    }),
 });
 
 export const otpVerificationSchema = z.object({

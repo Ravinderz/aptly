@@ -165,12 +165,8 @@ export default function PhoneRegistration() {
       console.log('🔍 Form submission debug:');
       console.log('formData:', formData);
       console.log('formData.phone:', formData.phone);
-      console.log('fields.phone.value:', fields.phone.value);
       
-      // Use the actual field value if formData.phone is empty
-      const phoneValue = formData.phone || fields.phone.value;
-      console.log('Using phone value:', phoneValue);
-      const fullPhoneNumber = getFullPhoneNumber(phoneValue);
+      const fullPhoneNumber = getFullPhoneNumber(formData.phone);
       console.log('Full phone number:', fullPhoneNumber);
       // No society code needed for initial registration - will be handled in post-auth flow
       const result = await AuthService.registerPhone(
@@ -275,9 +271,14 @@ export default function PhoneRegistration() {
                     ? "We'll send an OTP to your registered number"
                     : "We'll send an OTP to verify your number"
                 }
-                validationSchema={phoneSchema}
+                showError={false} // Use form-level error display instead
               />
             </View>
+            {errors.phone && (
+              <Text className="text-error text-sm mt-2">
+                {errors.phone}
+              </Text>
+            )}
           </View>
 
           {/* Terms Agreement Checkbox */}
