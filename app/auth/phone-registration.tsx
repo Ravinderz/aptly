@@ -17,7 +17,7 @@ import {
   phoneSchema,
 } from '@/utils/validation.enhanced';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   KeyboardAvoidingView,
   Platform,
@@ -29,7 +29,19 @@ import {
 
 export default function PhoneRegistration() {
   const router = useRouter();
-  const { mode } = useLocalSearchParams<{ mode?: string }>();
+  const searchParams = useLocalSearchParams<{ mode?: string }>();
+  
+  // Properly cache the mode to prevent getSnapshot infinite loop warning
+  const [mode, setMode] = React.useState<string | undefined>('');
+  
+  // Update mode when searchParams changes, but only if it's different
+  React.useEffect(() => {
+    const newMode = searchParams.mode;
+    if (newMode !== mode) {
+      setMode(newMode);
+    }
+  }, [searchParams.mode, mode]);
+  
   const { authenticateWithBiometrics } = useDirectAuth();
   const biometricAuthEnabled = useFeatureFlagStore(
     (state) => state.flags.biometric_auth,
@@ -153,8 +165,17 @@ export default function PhoneRegistration() {
     const cleanText = text.replace(/[^0-9\s\-\(\)\+]/g, '');
     const numbersOnly = cleanText.replace(/[^\d]/g, '');
 
-    if (numbersOnly.length <= 10) {
-      const formattedPhone = formatPhoneNumber(numbersOnly);
+    // Allow up to 12 digits to accommodate country codes (91XXXXXXXXXX)
+    if (numbersOnly.length <= 12) {
+      // Extract the actual 10-digit number for formatting
+      let numberToFormat = numbersOnly;
+      if (numbersOnly.startsWith('91') && numbersOnly.length === 12) {
+        numberToFormat = numbersOnly.substring(2);
+      } else if (numbersOnly.length <= 10) {
+        numberToFormat = numbersOnly;
+      }
+
+      const formattedPhone = formatPhoneNumber(numberToFormat);
       setValue('phone', formattedPhone);
     }
   };
@@ -261,7 +282,7 @@ export default function PhoneRegistration() {
                 error={errors.phone}
                 placeholder="Enter mobile number"
                 keyboardType="phone-pad"
-                maxLength={13} // Formatted: XXX XXX XXXX
+                maxLength={15} // Accommodate country codes and formatting
                 autoFocus={true}
                 containerStyle={{ marginBottom: 0, flex: 1 }}
                 variant="default"

@@ -1,6 +1,10 @@
-import { useRouter, useLocalSearchParams } from 'expo-router';
-import { ArrowLeft, Shield, RefreshCw } from 'lucide-react-native';
-import React, { useState, useEffect, useRef } from 'react';
+import { Button } from '@/components/ui/Button';
+import { AuthService } from '@/services';
+import { SocietyService } from '@/services/society.service.rest';
+import { showErrorAlert, showSuccessAlert } from '@/utils/alert';
+import { useLocalSearchParams, useRouter } from 'expo-router';
+import { ArrowLeft, RefreshCw, Shield } from 'lucide-react-native';
+import { useEffect, useRef, useState } from 'react';
 import {
   SafeAreaView,
   Text,
@@ -8,10 +12,6 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import { Button } from '@/components/ui/Button';
-import { AuthService } from '@/services';
-import { SocietyService } from '@/services/society.service.rest';
-import { showErrorAlert, showSuccessAlert } from '@/utils/alert';
 
 export default function OTPVerification() {
   const router = useRouter();
@@ -41,6 +41,8 @@ export default function OTPVerification() {
   const handleOTPChange = (value: string, index: number) => {
     // Only allow numbers
     const numericValue = value.replace(/[^0-9]/g, '');
+
+    console.log('OTP Input Change:', numericValue, 'at index:', index);
 
     if (numericValue.length <= 1) {
       const newOTP = [...otp];
@@ -81,6 +83,13 @@ export default function OTPVerification() {
       return;
     }
 
+    console.log('Verifying OTP:', otpToVerify);
+    console.log('Phone number:', phoneNumber);
+    if (!phoneNumber) {
+      setError('Phone number is required for verification');
+      return;
+    }
+
     setIsLoading(true);
     setError('');
 
@@ -93,10 +102,14 @@ export default function OTPVerification() {
       if (result.success) {
         // Check if user has society associations
         try {
-          const associationResult = await SocietyService.checkSocietyAssociation(phoneNumber || '');
-          
+          const associationResult =
+            await SocietyService.checkSocietyAssociation(phoneNumber || '');
+
           if (associationResult.success && associationResult.data) {
-            if (associationResult.data.hasAssociation && associationResult.data.associations.length > 0) {
+            if (
+              associationResult.data.hasAssociation &&
+              associationResult.data.associations.length > 0
+            ) {
               // User has existing associations, go directly to main app
               router.replace('/(tabs)');
             } else {

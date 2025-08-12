@@ -1,6 +1,6 @@
 /**
  * Society Onboarding - Main entry point for society onboarding flow
- * 
+ *
  * Provides user with choice between:
  * 1. Society code input and verification
  * 2. Society search and selection
@@ -13,8 +13,12 @@ import {
   ResponsiveText,
 } from '@/components/ui/ResponsiveContainer';
 import { useFormValidation } from '@/hooks/useFormValidation';
-import { responsive } from '@/utils/responsive';
+import {
+  useSocietyOnboardingActions,
+  useSocietyOnboardingStore,
+} from '@/stores/slices/societyOnboardingStore';
 import { showErrorAlert } from '@/utils/alert';
+import { responsive } from '@/utils/responsive';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import {
@@ -26,53 +30,65 @@ import {
   View,
 } from 'react-native';
 import { z } from 'zod';
-import { useSocietyOnboardingStore, useSocietyOnboardingActions } from '@/stores/slices/societyOnboardingStore';
 
 // Validation schema for society code
 const societyCodeSchema = z.object({
-  societyCode: z.string()
+  societyCode: z
+    .string()
     .min(4, 'Society code must be at least 4 characters')
     .max(12, 'Society code cannot exceed 12 characters')
     .regex(/^[A-Z0-9]+$/i, 'Society code can only contain letters and numbers')
-    .transform(val => val.toUpperCase()),
+    .transform((val) => val.toUpperCase()),
 });
 
 type SocietyCodeForm = z.infer<typeof societyCodeSchema>;
 
 export default function SocietyOnboarding() {
   const router = useRouter();
-  const { phoneNumber: phoneNumberParam } = useLocalSearchParams<{ phoneNumber: string }>();
-  
-  // Extract phoneNumber directly from params using the stable pattern
-  const phoneNumber = typeof phoneNumberParam === 'string' ? phoneNumberParam : '';
-  const [selectedOption, setSelectedOption] = useState<'code' | 'search' | null>(null);
-  
+  const searchParams = useLocalSearchParams<{ phoneNumber: string }>();
+
+  // Properly cache the phoneNumber to prevent getSnapshot infinite loop warning
+  const [phoneNumber, setPhoneNumber] = React.useState<string>('');
+
+  // Update phoneNumber when searchParams changes, but only if it's different
+  React.useEffect(() => {
+    const newPhoneNumber =
+      typeof searchParams.phoneNumber === 'string'
+        ? searchParams.phoneNumber
+        : '';
+    if (newPhoneNumber && newPhoneNumber !== phoneNumber) {
+      setPhoneNumber(newPhoneNumber);
+    }
+  }, [searchParams.phoneNumber, phoneNumber]);
+
+  const [selectedOption, setSelectedOption] = useState<
+    'code' | 'search' | null
+  >(null);
+
   // Store hooks - Use specific selectors to prevent unnecessary re-renders
   const { currentStep, loading } = useSocietyOnboardingStore(
-    React.useCallback((state) => ({ 
-      currentStep: state.currentStep, 
-      loading: state.loading 
-    }), [])
+    React.useCallback(
+      (state) => ({
+        currentStep: state.currentStep,
+        loading: state.loading,
+      }),
+      [],
+    ),
   );
-  const { verifySociety, goToStep, updateUserProfile } = useSocietyOnboardingActions();
+  const { verifySociety, goToStep, updateUserProfile } =
+    useSocietyOnboardingActions();
 
   // Form validation for society code
-  const {
-    fields,
-    errors,
-    isValid,
-    isSubmitting,
-    getFieldProps,
-    handleSubmit,
-  } = useFormValidation<SocietyCodeForm>(
-    societyCodeSchema,
-    { societyCode: '' },
-    {
-      validateOnChange: true,
-      validateOnBlur: true,
-      debounceMs: 300,
-    },
-  );
+  const { fields, errors, isValid, isSubmitting, getFieldProps, handleSubmit } =
+    useFormValidation<SocietyCodeForm>(
+      societyCodeSchema,
+      { societyCode: '' },
+      {
+        validateOnChange: true,
+        validateOnBlur: true,
+        debounceMs: 300,
+      },
+    );
 
   // Initialize user profile with phone number when component mounts
   React.useEffect(() => {
@@ -81,21 +97,24 @@ export default function SocietyOnboarding() {
     }
   }, [phoneNumber, updateUserProfile]);
 
-  const handleCodeVerification = React.useCallback(async (formData: SocietyCodeForm) => {
-    if (!phoneNumber) {
-      showErrorAlert('Error', 'Phone number is required');
-      return;
-    }
+  const handleCodeVerification = React.useCallback(
+    async (formData: SocietyCodeForm) => {
+      if (!phoneNumber) {
+        showErrorAlert('Error', 'Phone number is required');
+        return;
+      }
 
-    try {
-      await verifySociety({
-        phoneNumber,
-        societyCode: formData.societyCode,
-      });
-    } catch (error: any) {
-      showErrorAlert('Error', error.message || 'Verification failed');
-    }
-  }, [phoneNumber, verifySociety]);
+      try {
+        await verifySociety({
+          phoneNumber,
+          societyCode: formData.societyCode,
+        });
+      } catch (error: any) {
+        showErrorAlert('Error', error.message || 'Verification failed');
+      }
+    },
+    [phoneNumber, verifySociety],
+  );
 
   const handleSearchFlow = React.useCallback(() => {
     if (!phoneNumber) {
@@ -121,7 +140,6 @@ export default function SocietyOnboarding() {
       <KeyboardAvoidingView
         className="flex-1"
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
-        
         {/* Header */}
         <View className="flex-row items-center px-4 py-4">
           <TouchableOpacity onPress={() => router.back()} className="mr-4">
@@ -137,7 +155,6 @@ export default function SocietyOnboarding() {
           padding="lg"
           keyboardAware={true}
           preventOverflow={true}>
-          
           {/* Welcome Section */}
           <View className="items-center mb-8">
             <View
@@ -162,7 +179,7 @@ export default function SocietyOnboarding() {
               variant="body"
               size="medium"
               className="text-text-secondary text-center">
-              To get started, we need to connect you with your housing society. 
+              To get started, we need to connect you with your housing society.
               You can either enter your society code or search for your society.
             </ResponsiveText>
           </View>
@@ -177,7 +194,7 @@ export default function SocietyOnboarding() {
                 activeOpacity={0.8}>
                 <View className="flex-row items-center">
                   <View className="bg-primary/10 rounded-full w-12 h-12 items-center justify-center mr-4">
-                    <LucideIcons name="key" size={24} color="#6366f1" />
+                    <LucideIcons name="key-round" size={24} color="#6366f1" />
                   </View>
                   <View className="flex-1">
                     <Text className="text-text-primary font-semibold text-lg mb-1">
@@ -221,7 +238,9 @@ export default function SocietyOnboarding() {
                 onPress={() => setSelectedOption(null)}
                 className="flex-row items-center mb-4">
                 <LucideIcons name="arrow-left" size={20} color="#6366f1" />
-                <Text className="text-primary font-medium ml-2">Back to options</Text>
+                <Text className="text-primary font-medium ml-2">
+                  Back to options
+                </Text>
               </TouchableOpacity>
 
               <Text className="text-text-primary font-semibold text-lg mb-4">
@@ -255,19 +274,20 @@ export default function SocietyOnboarding() {
                 onPress={() => setSelectedOption(null)}
                 className="flex-row items-center mb-4">
                 <LucideIcons name="arrow-left" size={20} color="#6366f1" />
-                <Text className="text-primary font-medium ml-2">Back to options</Text>
+                <Text className="text-primary font-medium ml-2">
+                  Back to options
+                </Text>
               </TouchableOpacity>
 
               <Text className="text-text-primary font-semibold text-lg mb-4">
                 Search for Your Society
               </Text>
               <Text className="text-text-secondary mb-6">
-                We&apos;ll help you find your society by name, location, or other details.
+                We&apos;ll help you find your society by name, location, or
+                other details.
               </Text>
 
-              <Button
-                onPress={handleSearchFlow}
-                className="mb-4">
+              <Button onPress={handleSearchFlow} className="mb-4">
                 Start Search
               </Button>
             </View>
@@ -291,9 +311,9 @@ export default function SocietyOnboarding() {
           <View className="bg-primary/5 rounded-xl p-4 mt-4">
             <Text className="text-primary font-semibold mb-2">Need Help?</Text>
             <Text className="text-text-secondary text-sm leading-5">
-              • Contact your society management for the society code{'\n'}
-              • The code is usually 4-12 characters long{'\n'}
-              • Check notice boards or society apps for this information
+              • Contact your society management for the society code{'\n'}• The
+              code is usually 4-12 characters long{'\n'}• Check notice boards or
+              society apps for this information
             </Text>
           </View>
         </ResponsiveContainer>

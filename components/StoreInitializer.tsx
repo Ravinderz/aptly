@@ -4,6 +4,7 @@ import { useFeatureFlagStore } from '@/stores/slices/featureFlagStore';
 import { useAuthStore } from '@/stores/slices/authStore';
 import { useThemeStore } from '@/stores/slices/themeStore';
 import { useSocietyStore } from '@/stores/slices/societyStore';
+import { useSocietyOnboardingStore } from '@/stores/slices/societyOnboardingStore';
 import { initializeStorage, StorageRecovery } from '@/stores/utils/storageManager';
 import { storeMonitor, startStoreMonitoring } from '@/stores/utils/storeMonitor';
 import { useAggregatedLoading, useAggregatedErrors } from '@/stores/utils/storeHooks';
@@ -61,6 +62,7 @@ export const StoreInitializer = ({
         storeMonitor.registerStore('auth', useAuthStore);
         storeMonitor.registerStore('theme', useThemeStore);
         storeMonitor.registerStore('society', useSocietyStore);
+        storeMonitor.registerStore('societyOnboarding', useSocietyOnboardingStore);
 
         // 1. Initialize storage first  
         console.log('🔄 Initializing AsyncStorage...');
@@ -120,6 +122,18 @@ export const StoreInitializer = ({
           console.warn('⚠️ Auth initialization failed, app will work with guest mode:', authError);
         }
 
+        // 4. Pre-initialize society onboarding store to ensure storage is ready
+        console.log('🏢 Pre-initializing society onboarding store...');
+        try {
+          // Access the store to trigger persistence initialization
+          const onboardingStore = useSocietyOnboardingStore.getState();
+          // Trigger storage initialization by accessing the store
+          await new Promise(resolve => setTimeout(resolve, 100));
+          console.log('✅ Society onboarding store pre-initialized');
+        } catch (onboardingError) {
+          console.warn('⚠️ Society onboarding store pre-initialization failed:', onboardingError);
+        }
+
         console.log('🎉 Store initialization completed');
         setIsInitialized(true);
       } catch (error) {
@@ -133,10 +147,12 @@ export const StoreInitializer = ({
           // Try storage recovery first
           await StorageRecovery.recoverFromCorruption('feature-flags-storage');
           await StorageRecovery.recoverFromCorruption('auth-storage');
+          await StorageRecovery.recoverFromCorruption('society-onboarding-storage');
           
           // Reset stores to initial state
           useFeatureFlagStore.getState().reset();
           useAuthStore.getState().reset();
+          useSocietyOnboardingStore.getState().reset();
           console.log('✅ Emergency fallback completed');
         } catch (fallbackError) {
           console.error('❌ Emergency fallback also failed:', fallbackError);

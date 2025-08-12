@@ -4,66 +4,87 @@
  * Handles society verification, search, onboarding, and association management
  */
 
-import { z } from 'zod';
-import { apiClient, APIClientError } from '@/services/api.client';
 import { API_ENDPOINTS } from '@/config/api.config';
-import { SecureProfileStorage, SecureSessionStorage } from '@/utils/storage.secure';
+import { apiClient, APIClientError } from '@/services/api.client';
 import {
+  AssociatedSociety,
+  SocietyHealthMetrics,
   SocietyInfo,
-  SocietyVerificationRequest,
-  SocietyVerificationResponse,
-  SocietySearchRequest,
-  SocietySearchResponse,
   SocietyJoinRequest,
   SocietyJoinResponse,
-  UserSocietyAssociation,
   SocietyOnboardingState,
-  SocietyHealthMetrics,
-  UserMultiSocietyProfile,
+  SocietySearchRequest,
+  SocietySearchResponse,
+  SocietyVerificationRequest,
+  SocietyVerificationResponse,
+  UserSocietyAssociation,
+  UserSocietyAssociationResponse,
 } from '@/types/society';
-import { APIResponse } from '@/types/api';
+import {
+  SecureProfileStorage,
+  SecureSessionStorage,
+} from '@/utils/storage.secure';
+import { z } from 'zod';
 
 // Validation schemas using Zod
-const societyCodeSchema = z.string()
+const societyCodeSchema = z
+  .string()
   .min(4, 'Society code must be at least 4 characters')
   .max(12, 'Society code cannot exceed 12 characters')
-  .regex(/^[A-Z0-9]+$/, 'Society code must contain only uppercase letters and numbers');
+  .regex(
+    /^[A-Z0-9]+$/,
+    'Society code must contain only uppercase letters and numbers',
+  );
 
-const phoneNumberSchema = z.string()
+const phoneNumberSchema = z
+  .string()
   .min(10, 'Phone number must be at least 10 digits')
   .max(15, 'Phone number cannot exceed 15 digits')
   .regex(/^\+?[\d\s-()]+$/, 'Please enter a valid phone number');
 
-const flatNumberSchema = z.string()
+const flatNumberSchema = z
+  .string()
   .min(1, 'Flat number is required')
   .max(10, 'Flat number cannot exceed 10 characters')
-  .regex(/^[A-Z0-9\-\/]+$/i, 'Flat number can only contain letters, numbers, hyphens, and forward slashes');
+  .regex(
+    /^[A-Z0-9\-\/]+$/i,
+    'Flat number can only contain letters, numbers, hyphens, and forward slashes',
+  );
 
 const societySearchSchema = z.object({
   query: z.string().optional(),
-  location: z.object({
-    latitude: z.number().min(-90).max(90),
-    longitude: z.number().min(-180).max(180),
-    radius: z.number().min(0.1).max(50).optional(),
-  }).optional(),
-  filters: z.object({
-    city: z.string().optional(),
-    state: z.string().optional(),
-    minFlats: z.number().min(1).optional(),
-    maxFlats: z.number().min(1).optional(),
-    amenities: z.array(z.string()).optional(),
-  }).optional(),
-  pagination: z.object({
-    page: z.number().min(1),
-    limit: z.number().min(1).max(100),
-  }).optional(),
+  location: z
+    .object({
+      latitude: z.number().min(-90).max(90),
+      longitude: z.number().min(-180).max(180),
+      radius: z.number().min(0.1).max(50).optional(),
+    })
+    .optional(),
+  filters: z
+    .object({
+      city: z.string().optional(),
+      state: z.string().optional(),
+      minFlats: z.number().min(1).optional(),
+      maxFlats: z.number().min(1).optional(),
+      amenities: z.array(z.string()).optional(),
+    })
+    .optional(),
+  pagination: z
+    .object({
+      page: z.number().min(1),
+      limit: z.number().min(1).max(100),
+    })
+    .optional(),
 });
 
 const societyJoinRequestSchema = z.object({
   societyId: z.string().min(1, 'Society ID is required'),
   societyCode: societyCodeSchema,
   userProfile: z.object({
-    fullName: z.string().min(2, 'Full name must be at least 2 characters').max(100, 'Full name too long'),
+    fullName: z
+      .string()
+      .min(2, 'Full name must be at least 2 characters')
+      .max(100, 'Full name too long'),
     phoneNumber: phoneNumberSchema,
     email: z.string().email('Please enter a valid email address').optional(),
     dateOfBirth: z.string().optional(),
@@ -77,52 +98,72 @@ const societyJoinRequestSchema = z.object({
     moveInDate: z.string().min(1, 'Move-in date is required'),
     isPrimary: z.boolean(),
   }),
-  emergencyContacts: z.array(z.object({
-    name: z.string().min(2, 'Contact name is required'),
-    relationship: z.string().min(1, 'Relationship is required'),
-    phoneNumber: phoneNumberSchema,
-    email: z.string().email().optional(),
-    address: z.string().optional(),
-    isPrimary: z.boolean(),
-  })).min(1, 'At least one emergency contact is required'),
-  documents: z.object({
-    proofOfResidence: z.object({
-      id: z.string(),
-      filename: z.string(),
-      url: z.string(),
-      mimeType: z.string(),
-      size: z.number(),
-      uploadedAt: z.string(),
-    }).optional(),
-    identityProof: z.object({
-      id: z.string(),
-      filename: z.string(),
-      url: z.string(),
-      mimeType: z.string(),
-      size: z.number(),
-      uploadedAt: z.string(),
-    }).optional(),
-    ownershipProof: z.object({
-      id: z.string(),
-      filename: z.string(),
-      url: z.string(),
-      mimeType: z.string(),
-      size: z.number(),
-      uploadedAt: z.string(),
-    }).optional(),
-    agreementCopy: z.object({
-      id: z.string(),
-      filename: z.string(),
-      url: z.string(),
-      mimeType: z.string(),
-      size: z.number(),
-      uploadedAt: z.string(),
-    }).optional(),
-  }).optional(),
+  emergencyContacts: z
+    .array(
+      z.object({
+        name: z.string().min(2, 'Contact name is required'),
+        relationship: z.string().min(1, 'Relationship is required'),
+        phoneNumber: phoneNumberSchema,
+        email: z.string().email().optional(),
+        address: z.string().optional(),
+        isPrimary: z.boolean(),
+      }),
+    )
+    .min(1, 'At least one emergency contact is required'),
+  documents: z
+    .object({
+      proofOfResidence: z
+        .object({
+          id: z.string(),
+          filename: z.string(),
+          url: z.string(),
+          mimeType: z.string(),
+          size: z.number(),
+          uploadedAt: z.string(),
+        })
+        .optional(),
+      identityProof: z
+        .object({
+          id: z.string(),
+          filename: z.string(),
+          url: z.string(),
+          mimeType: z.string(),
+          size: z.number(),
+          uploadedAt: z.string(),
+        })
+        .optional(),
+      ownershipProof: z
+        .object({
+          id: z.string(),
+          filename: z.string(),
+          url: z.string(),
+          mimeType: z.string(),
+          size: z.number(),
+          uploadedAt: z.string(),
+        })
+        .optional(),
+      agreementCopy: z
+        .object({
+          id: z.string(),
+          filename: z.string(),
+          url: z.string(),
+          mimeType: z.string(),
+          size: z.number(),
+          uploadedAt: z.string(),
+        })
+        .optional(),
+    })
+    .optional(),
   consentAgreements: z.object({
-    termsAndConditions: z.boolean().refine(val => val === true, 'Terms and conditions must be accepted'),
-    privacyPolicy: z.boolean().refine(val => val === true, 'Privacy policy must be accepted'),
-    societyRules: z.boolean().refine(val => val === true, 'Society rules must be accepted'),
+    termsAndConditions: z
+      .boolean()
+      .refine((val) => val === true, 'Terms and conditions must be accepted'),
+    privacyPolicy: z
+      .boolean()
+      .refine((val) => val === true, 'Privacy policy must be accepted'),
+    societyRules: z
+      .boolean()
+      .refine((val) => val === true, 'Society rules must be accepted'),
     dataSharing: z.boolean(),
   }),
 });
@@ -163,29 +204,37 @@ export class RestSocietyService {
    */
   private async initializeFromStorage(): Promise<void> {
     try {
-      const storedSociety = SecureProfileStorage.getProfile<SocietyInfo>('society');
-      const storedAssociations = SecureProfileStorage.getProfile<UserSocietyAssociation[]>('societyAssociations');
-      
+      const storedSociety =
+        SecureProfileStorage.getProfile<SocietyInfo>('society');
+      const storedAssociations = SecureProfileStorage.getProfile<
+        UserSocietyAssociation[]
+      >('societyAssociations');
+
       if (storedSociety) {
         this.currentSociety = storedSociety;
       }
-      
+
       if (storedAssociations) {
         this.userAssociations = storedAssociations;
       }
     } catch (error) {
-      console.warn('⚠️ Failed to initialize society service from storage:', error);
+      console.warn(
+        '⚠️ Failed to initialize society service from storage:',
+        error,
+      );
     }
   }
 
   /**
    * Check if user has society association after authentication
    */
-  async checkSocietyAssociation(phoneNumber: string): Promise<SocietyServiceResult<{
-    hasAssociation: boolean;
-    associations: UserSocietyAssociation[];
-    requiresOnboarding: boolean;
-  }>> {
+  async checkSocietyAssociation(phoneNumber: string): Promise<
+    SocietyServiceResult<{
+      hasAssociation: boolean;
+      associations: AssociatedSociety[];
+      requiresOnboarding: boolean;
+    }>
+  > {
     try {
       // Validate phone number
       const phoneValidation = phoneNumberSchema.safeParse(phoneNumber);
@@ -198,44 +247,44 @@ export class RestSocietyService {
       }
 
       // Make API call to check associations
-      const response = await apiClient.get<{
-        associations: UserSocietyAssociation[];
-        defaultSocietyId?: string;
-      }>(`${API_ENDPOINTS.SOCIETY.CHECK_ASSOCIATION}?phone=${encodeURIComponent(phoneNumber)}`);
+      const response = await apiClient.get<UserSocietyAssociationResponse>(
+        `${API_ENDPOINTS.SOCIETY.CHECK_ASSOCIATION}?phone=${encodeURIComponent(phoneNumber)}`,
+      );
 
       if (response.success && response.data) {
-        const { associations, defaultSocietyId } = response.data;
-        
+        const { user, societies, total_societies } = response.data;
+
         // Store associations
-        this.userAssociations = associations;
-        SecureProfileStorage.storeProfile(associations, 'societyAssociations');
+        // this.userAssociations = societies;
+        SecureProfileStorage.storeProfile(societies, 'societyAssociations');
 
         // Set default society if available
-        if (defaultSocietyId && associations.length > 0) {
-          const defaultSociety = associations.find(assoc => assoc.societyId === defaultSocietyId);
+        if (total_societies > 0) {
+          const defaultSociety = societies[0];
           if (defaultSociety) {
-            await this.loadSocietyDetails(defaultSocietyId);
+            await this.loadSocietyDetails(defaultSociety.id);
           }
         }
 
         return {
           success: true,
           data: {
-            hasAssociation: associations.length > 0,
-            associations,
-            requiresOnboarding: associations.length === 0,
+            hasAssociation: total_societies > 0,
+            associations: societies,
+            requiresOnboarding: total_societies === 0,
           },
         };
       } else {
         return {
           success: false,
-          error: response.error?.message || 'Failed to check society association',
+          error:
+            response.error?.message || 'Failed to check society association',
           code: 'API_ERROR',
         };
       }
     } catch (error) {
       console.error('❌ Society association check failed:', error);
-      
+
       // Fallback: assume no association and require onboarding
       return {
         success: true,
@@ -251,7 +300,9 @@ export class RestSocietyService {
   /**
    * Verify society by code and phone number
    */
-  async verifySociety(request: SocietyVerificationRequest): Promise<SocietyServiceResult<SocietyVerificationResponse>> {
+  async verifySociety(
+    request: SocietyVerificationRequest,
+  ): Promise<SocietyServiceResult<SocietyVerificationResponse>> {
     try {
       // Validate inputs
       const phoneValidation = phoneNumberSchema.safeParse(request.phoneNumber);
@@ -282,10 +333,9 @@ export class RestSocietyService {
       };
 
       // Make API call
-      const response = await apiClient.post<SocietyVerificationResponse['data']>(
-        API_ENDPOINTS.SOCIETY.VERIFY,
-        requestData
-      );
+      const response = await apiClient.post<
+        SocietyVerificationResponse['data']
+      >(API_ENDPOINTS.SOCIETY.VERIFY, requestData);
 
       if (response.success && response.data) {
         const verificationResponse: SocietyVerificationResponse = {
@@ -302,7 +352,10 @@ export class RestSocietyService {
         // Store association if found
         if (response.data.userAssociation) {
           this.userAssociations = [response.data.userAssociation];
-          SecureProfileStorage.storeProfile([response.data.userAssociation], 'societyAssociations');
+          SecureProfileStorage.storeProfile(
+            [response.data.userAssociation],
+            'societyAssociations',
+          );
         }
 
         return {
@@ -311,8 +364,9 @@ export class RestSocietyService {
         };
       } else {
         const errorCode = response.error?.code || 'VERIFICATION_FAILED';
-        const errorMessage = response.error?.message || 'Failed to verify society details';
-        
+        const errorMessage =
+          response.error?.message || 'Failed to verify society details';
+
         const verificationResponse: SocietyVerificationResponse = {
           success: false,
           error: {
@@ -362,7 +416,9 @@ export class RestSocietyService {
   /**
    * Search societies by query, location, or filters
    */
-  async searchSocieties(request: SocietySearchRequest): Promise<SocietyServiceResult<SocietySearchResponse>> {
+  async searchSocieties(
+    request: SocietySearchRequest,
+  ): Promise<SocietyServiceResult<SocietySearchResponse>> {
     try {
       // Validate request
       const validation = societySearchSchema.safeParse(request);
@@ -376,11 +432,11 @@ export class RestSocietyService {
 
       // Build query parameters
       const params = new URLSearchParams();
-      
+
       if (request.query) {
         params.append('q', request.query);
       }
-      
+
       if (request.location) {
         params.append('lat', request.location.latitude.toString());
         params.append('lng', request.location.longitude.toString());
@@ -393,7 +449,7 @@ export class RestSocietyService {
         Object.entries(request.filters).forEach(([key, value]) => {
           if (value !== undefined) {
             if (Array.isArray(value)) {
-              value.forEach(v => params.append(`${key}[]`, v));
+              value.forEach((v) => params.append(`${key}[]`, v));
             } else {
               params.append(key, value.toString());
             }
@@ -408,7 +464,7 @@ export class RestSocietyService {
 
       // Make API call
       const response = await apiClient.get<SocietySearchResponse['data']>(
-        `${API_ENDPOINTS.SOCIETY.SEARCH}?${params.toString()}`
+        `${API_ENDPOINTS.SOCIETY.SEARCH}?${params.toString()}`,
       );
 
       if (response.success && response.data) {
@@ -468,7 +524,9 @@ export class RestSocietyService {
   /**
    * Submit society join/onboarding request
    */
-  async submitSocietyJoinRequest(request: SocietyJoinRequest): Promise<SocietyServiceResult<SocietyJoinResponse>> {
+  async submitSocietyJoinRequest(
+    request: SocietyJoinRequest,
+  ): Promise<SocietyServiceResult<SocietyJoinResponse>> {
     try {
       // Validate request
       const validation = societyJoinRequestSchema.safeParse(request);
@@ -483,7 +541,7 @@ export class RestSocietyService {
       // Make API call
       const response = await apiClient.post<SocietyJoinResponse['data']>(
         API_ENDPOINTS.SOCIETY.JOIN,
-        request
+        request,
       );
 
       if (response.success && response.data) {
@@ -495,7 +553,10 @@ export class RestSocietyService {
         // Store new association
         if (response.data.association) {
           this.userAssociations.push(response.data.association);
-          SecureProfileStorage.storeProfile(this.userAssociations, 'societyAssociations');
+          SecureProfileStorage.storeProfile(
+            this.userAssociations,
+            'societyAssociations',
+          );
         }
 
         // Clear onboarding state on success
@@ -554,9 +615,13 @@ export class RestSocietyService {
   /**
    * Load detailed society information
    */
-  async loadSocietyDetails(societyId: string): Promise<SocietyServiceResult<SocietyInfo>> {
+  async loadSocietyDetails(
+    societyId: string,
+  ): Promise<SocietyServiceResult<SocietyInfo>> {
     try {
-      const response = await apiClient.get<SocietyInfo>(API_ENDPOINTS.SOCIETY.DETAILS(societyId));
+      const response = await apiClient.get<SocietyInfo>(
+        API_ENDPOINTS.SOCIETY.DETAILS(societyId),
+      );
 
       if (response.success && response.data) {
         this.currentSociety = response.data;
@@ -595,9 +660,13 @@ export class RestSocietyService {
   /**
    * Get society health metrics
    */
-  async getSocietyHealthMetrics(societyId: string): Promise<SocietyServiceResult<SocietyHealthMetrics>> {
+  async getSocietyHealthMetrics(
+    societyId: string,
+  ): Promise<SocietyServiceResult<SocietyHealthMetrics>> {
     try {
-      const response = await apiClient.get<SocietyHealthMetrics>(API_ENDPOINTS.SOCIETY.HEALTH(societyId));
+      const response = await apiClient.get<SocietyHealthMetrics>(
+        API_ENDPOINTS.SOCIETY.HEALTH(societyId),
+      );
 
       if (response.success && response.data) {
         return {
@@ -607,7 +676,8 @@ export class RestSocietyService {
       } else {
         return {
           success: false,
-          error: response.error?.message || 'Failed to load society health metrics',
+          error:
+            response.error?.message || 'Failed to load society health metrics',
           code: response.error?.code || 'METRICS_FAILED',
         };
       }
@@ -646,7 +716,10 @@ export class RestSocietyService {
     } as SocietyOnboardingState;
 
     // Store in session storage
-    SecureSessionStorage.storeValue('societyOnboardingState', JSON.stringify(this.onboardingState));
+    SecureSessionStorage.storeValue(
+      'societyOnboardingState',
+      JSON.stringify(this.onboardingState),
+    );
   }
 
   /**
@@ -658,7 +731,9 @@ export class RestSocietyService {
     }
 
     try {
-      const storedState = SecureSessionStorage.getValue('societyOnboardingState');
+      const storedState = SecureSessionStorage.getValue(
+        'societyOnboardingState',
+      );
       if (storedState) {
         this.onboardingState = JSON.parse(storedState);
         return this.onboardingState;
@@ -681,9 +756,13 @@ export class RestSocietyService {
   /**
    * Switch to different society (for multi-society users)
    */
-  async switchSociety(societyId: string): Promise<SocietyServiceResult<SocietyInfo>> {
+  async switchSociety(
+    societyId: string,
+  ): Promise<SocietyServiceResult<SocietyInfo>> {
     try {
-      const association = this.userAssociations.find(assoc => assoc.societyId === societyId);
+      const association = this.userAssociations.find(
+        (assoc) => assoc.societyId === societyId,
+      );
       if (!association) {
         return {
           success: false,
@@ -764,7 +843,4 @@ const restSocietyService = RestSocietyService.getInstance();
 export default restSocietyService;
 
 // Export compatible interface
-export {
-  restSocietyService as SocietyService,
-  type SocietyServiceResult,
-};
+export { restSocietyService as SocietyService, type SocietyServiceResult };

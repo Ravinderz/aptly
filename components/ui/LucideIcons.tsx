@@ -42,6 +42,7 @@ import {
   Image,
   Info,
   Key,
+  KeyRound,
   Lock,
   Mail,
   // Location & Transport
@@ -195,7 +196,10 @@ export type IconName =
   | 'userPlus'
   | 'users'
   | 'check'
-  | 'shield';
+  | 'shield'
+  | 'key-round'
+  | 'chevron-right'
+  | 'search';
 
 interface IconProps {
   name: IconName;
@@ -317,6 +321,9 @@ const LucideIcons = ({ name, color = '#000', size = 24 }: IconProps) => {
     'heart-outline': Heart,
     userPlus: UserPlus,
     shield: Shield,
+    'key-round': KeyRound, // Using Key as a fallback for key-round
+    'chevron-right': ChevronRight,
+    search: Search, // Using Search as a fallback for search-outline
   };
 
   const IconComponent = iconMap[name];

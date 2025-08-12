@@ -13,7 +13,7 @@ const ENV = process.env.NODE_ENV || 'development';
  * API Base URLs for different environments
  */
 const API_BASE_URLS = {
-  development: 'http://192.168.0.107:3000', // Use local IP for React Native simulators
+  development: 'http://192.168.0.103:3000', // Use local IP for React Native simulators
   staging: 'https://api-staging.aptly.com',
   production: 'https://api.aptly.com',
 } as const;
@@ -23,22 +23,24 @@ const API_BASE_URLS = {
  */
 export const API_CONFIG = {
   // Base URL based on environment
-  BASE_URL: API_BASE_URLS[ENV as keyof typeof API_BASE_URLS] || API_BASE_URLS.development,
-  
+  BASE_URL:
+    API_BASE_URLS[ENV as keyof typeof API_BASE_URLS] ||
+    API_BASE_URLS.development,
+
   // Request timeout (30 seconds)
   TIMEOUT: 30000,
-  
+
   // Token refresh threshold (5 minutes before expiry)
   TOKEN_REFRESH_THRESHOLD: 5 * 60 * 1000,
-  
+
   // Default headers
   DEFAULT_HEADERS: {
     'Content-Type': 'application/json',
-    'Accept': 'application/json',
+    Accept: 'application/json',
     'X-Client-Version': Constants.expoConfig?.version || '1.0.0',
     'X-Platform': 'mobile',
   },
-  
+
   // Device information
   DEVICE_INFO: {
     platform: Device.osName || 'unknown',
@@ -209,7 +211,8 @@ export const API_ENDPOINTS = {
  * API Error Messages
  */
 export const API_ERRORS = {
-  NETWORK_ERROR: 'Network connection failed. Please check your internet connection.',
+  NETWORK_ERROR:
+    'Network connection failed. Please check your internet connection.',
   TIMEOUT_ERROR: 'Request timed out. Please try again.',
   UNAUTHORIZED: 'Your session has expired. Please log in again.',
   FORBIDDEN: 'You do not have permission to perform this action.',
@@ -227,7 +230,10 @@ export const RETRY_CONFIG = {
   retryDelay: (attempt: number) => Math.min(1000 * Math.pow(2, attempt), 10000),
   retryCondition: (error: any) => {
     // Retry on network errors and 5xx status codes
-    return !error.response || (error.response.status >= 500 && error.response.status < 600);
+    return (
+      !error.response ||
+      (error.response.status >= 500 && error.response.status < 600)
+    );
   },
 } as const;
 
@@ -239,7 +245,7 @@ export const CACHE_CONFIG = {
   DEFAULT_TTL: 5 * 60 * 1000, // 5 minutes
   SHORT_TTL: 60 * 1000, // 1 minute
   LONG_TTL: 30 * 60 * 1000, // 30 minutes
-  
+
   // Cache keys
   KEYS: {
     USER_PROFILE: 'user_profile',

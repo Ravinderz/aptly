@@ -55,7 +55,11 @@ export interface SocietyVerificationResponse {
     existingResident: boolean;
   };
   error?: {
-    code: 'SOCIETY_NOT_FOUND' | 'INVALID_CODE' | 'PHONE_NOT_ASSOCIATED' | 'NETWORK_ERROR';
+    code:
+      | 'SOCIETY_NOT_FOUND'
+      | 'INVALID_CODE'
+      | 'PHONE_NOT_ASSOCIATED'
+      | 'NETWORK_ERROR';
     message: string;
     suggestions?: string[];
   };
@@ -117,6 +121,36 @@ export interface UserSocietyAssociation {
   rejectionReason?: string;
   createdAt: string;
   updatedAt: string;
+}
+
+export interface AssociatedSociety {
+  id: string;
+  name: string;
+  code: string;
+  address: string;
+  role: string;
+  flat_number: string;
+  building_number: string;
+  verification_status: string;
+  is_active: string;
+  move_in_date: string;
+  society_details: {
+    total_units: number;
+    contact_person: string;
+    subscription_plan: string;
+    created_at: string;
+  };
+}
+
+export interface UserSocietyAssociationResponse {
+  user: {
+    id: string;
+    phone: string;
+    fullName: string;
+    email?: string;
+  };
+  societies: AssociatedSociety[];
+  total_societies?: number;
 }
 
 // Society join/onboarding requests
@@ -222,7 +256,14 @@ export interface ValidationError {
 
 // Society onboarding flow state
 export interface SocietyOnboardingState {
-  currentStep: 'verification' | 'search' | 'selection' | 'details' | 'profile' | 'review' | 'completion';
+  currentStep:
+    | 'verification'
+    | 'search'
+    | 'selection'
+    | 'details'
+    | 'profile'
+    | 'review'
+    | 'completion';
   selectedSociety: SocietyInfo | null;
   userAssociation: UserSocietyAssociation | null;
   onboardingData: Partial<SocietyJoinRequest>;
@@ -244,17 +285,17 @@ export interface SocietyOnboardingAnalytics {
   abandonedAt?: string;
   currentStep: string;
   completedSteps: string[];
-  errors: Array<{
+  errors: {
     step: string;
     error: string;
     timestamp: string;
-  }>;
-  userActions: Array<{
+  }[];
+  userActions: {
     action: string;
     step: string;
     data?: any;
     timestamp: string;
-  }>;
+  }[];
   deviceInfo: {
     platform: string;
     osVersion: string;
@@ -297,7 +338,13 @@ export interface SocietyPermission {
   id: string;
   name: string;
   description: string;
-  category: 'user_management' | 'billing' | 'maintenance' | 'security' | 'governance' | 'analytics';
+  category:
+    | 'user_management'
+    | 'billing'
+    | 'maintenance'
+    | 'security'
+    | 'governance'
+    | 'analytics';
   level: 'read' | 'write' | 'admin';
 }
 
@@ -328,39 +375,39 @@ export interface SocietyHealthMetrics {
     finance: { score: number; issues: string[] };
     governance: { score: number; issues: string[] };
   };
-  trends: Array<{
+  trends: {
     date: string;
     score: number;
     category: string;
-  }>;
-  recommendations: Array<{
+  }[];
+  recommendations: {
     category: string;
     priority: 'high' | 'medium' | 'low';
     description: string;
     action: string;
-  }>;
+  }[];
 }
 
 // Export all types for use throughout the application
 export type {
-  SocietyInfo,
-  SocietyVerificationRequest,
-  SocietyVerificationResponse,
-  SocietySearchRequest,
-  SocietySearchResponse,
-  UserSocietyAssociation,
-  SocietyJoinRequest,
-  SocietyJoinResponse,
   EmergencyContactInfo,
-  VehicleInfo,
   FamilyMemberInfo,
   FileUpload,
-  ValidationError,
-  SocietyOnboardingState,
-  SocietyOnboardingAnalytics,
-  SocietyInvitation,
   SocietyAdmin,
-  SocietyPermission,
-  UserMultiSocietyProfile,
   SocietyHealthMetrics,
+  SocietyInfo,
+  SocietyInvitation,
+  SocietyJoinRequest,
+  SocietyJoinResponse,
+  SocietyOnboardingAnalytics,
+  SocietyOnboardingState,
+  SocietyPermission,
+  SocietySearchRequest,
+  SocietySearchResponse,
+  SocietyVerificationRequest,
+  SocietyVerificationResponse,
+  UserMultiSocietyProfile,
+  UserSocietyAssociation,
+  ValidationError,
+  VehicleInfo,
 };

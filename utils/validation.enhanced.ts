@@ -11,13 +11,28 @@ export const phoneSchema = z
   .min(1, 'Phone number is required')
   .transform((val) => {
     if (!val || typeof val !== 'string') return '';
-    return val.replace(/\D/g, '');
+
+    // Remove all non-digit characters (spaces, dashes, parentheses, etc.)
+    let cleaned = val.replace(/\D/g, '');
+
+    // Handle country code prefixes
+    if (cleaned.startsWith('91') && cleaned.length === 12) {
+      // Remove +91 or 91 prefix for Indian numbers
+      cleaned = cleaned.substring(2);
+    }
+
+    return cleaned;
   })
   .pipe(
     z
       .string()
       .min(1, 'Phone number is required')
-      .regex(/^[6-9]\d{9}$/, 'Please enter a valid 10-digit Indian phone number'),
+      .min(1, 'Please input 10 digit mobile number')
+      .max(10, 'Phone number cannot exceed 10 digits')
+      .regex(
+        /^[6-9]\d{9}$/,
+        'Please enter a valid 10-digit Indian phone number starting with 6, 7, 8, or 9',
+      ),
   );
 
 export const emailSchema = z
@@ -69,24 +84,10 @@ export const societyCodeSchema = z
 
 // Authentication forms
 export const phoneRegistrationSchema = z.object({
-  phone: z
-    .string()
-    .min(1, 'Phone number is required')
-    .transform((val) => {
-      if (!val || typeof val !== 'string') return '';
-      return val.replace(/\D/g, '');
-    })
-    .pipe(
-      z
-        .string()
-        .min(1, 'Phone number is required')
-        .regex(/^[6-9]\d{9}$/, 'Please enter a valid 10-digit Indian phone number'),
-    ),
-  agreeToTerms: z
-    .boolean()
-    .refine((val) => val === true, {
-      message: 'Please accept the terms and conditions',
-    }),
+  phone: phoneSchema,
+  agreeToTerms: z.boolean().refine((val) => val === true, {
+    message: 'Please accept the terms and conditions',
+  }),
 });
 
 export const otpVerificationSchema = z.object({

@@ -73,7 +73,18 @@ type EmergencyContactForm = z.infer<typeof emergencyContactSchema>;
 
 export default function SocietyDetailsForm() {
   const router = useRouter();
-  const { phoneNumber } = useLocalSearchParams<{ phoneNumber: string }>();
+  const searchParams = useLocalSearchParams<{ phoneNumber: string }>();
+  
+  // Properly cache the phoneNumber to prevent getSnapshot infinite loop warning
+  const [phoneNumber, setPhoneNumber] = React.useState<string>('');
+  
+  // Update phoneNumber when searchParams changes, but only if it's different
+  React.useEffect(() => {
+    const newPhoneNumber = typeof searchParams.phoneNumber === 'string' ? searchParams.phoneNumber : '';
+    if (newPhoneNumber && newPhoneNumber !== phoneNumber) {
+      setPhoneNumber(newPhoneNumber);
+    }
+  }, [searchParams.phoneNumber, phoneNumber]);
   const [currentStep, setCurrentStep] = useState<'personal' | 'residence' | 'emergency'>('personal');
   const [showAddContact, setShowAddContact] = useState(false);
 
