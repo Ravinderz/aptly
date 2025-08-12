@@ -1,8 +1,12 @@
 import { Button } from '@/components/ui/Button';
 import { AuthService } from '@/services';
 import { SocietyService } from '@/services/society.service.rest';
+import {
+  useSocietyOnboardingActions,
+  useSocietyOnboardingStore,
+} from '@/stores/slices/societyOnboardingStore';
 import { showErrorAlert, showSuccessAlert } from '@/utils/alert';
-import { useLocalSearchParams, useRouter } from 'expo-router';
+import { useRouter } from 'expo-router';
 import { ArrowLeft, RefreshCw, Shield } from 'lucide-react-native';
 import { useEffect, useRef, useState } from 'react';
 import {
@@ -15,10 +19,8 @@ import {
 
 export default function OTPVerification() {
   const router = useRouter();
-  const { phoneNumber, societyCode } = useLocalSearchParams<{
-    phoneNumber: string;
-    societyCode: string;
-  }>();
+
+  const { updateUserProfile } = useSocietyOnboardingActions();
 
   const [otp, setOTP] = useState(['', '', '', '', '', '']);
   const [isLoading, setIsLoading] = useState(false);
@@ -28,6 +30,10 @@ export default function OTPVerification() {
   const [error, setError] = useState('');
 
   const inputRefs = useRef<(TextInput | null)[]>([]);
+
+  const phoneNumber = useSocietyOnboardingStore(
+    (state) => state.userProfile.phoneNumber,
+  );
 
   useEffect(() => {
     if (timeLeft > 0) {
@@ -113,32 +119,26 @@ export default function OTPVerification() {
               // User has existing associations, go directly to main app
               router.replace('/(tabs)');
             } else {
-              // No associations, redirect to society onboarding
-              router.push({
-                pathname: '/auth/society-onboarding',
-                params: {
-                  phoneNumber,
-                },
-              });
+              // No associations, store phoneNumber in Zustand and redirect to society onboarding
+              if (phoneNumber) {
+                updateUserProfile({ phoneNumber });
+              }
+              router.push('/auth/society-onboarding');
             }
           } else {
             // If association check fails, assume no association and go to onboarding
-            router.push({
-              pathname: '/auth/society-onboarding',
-              params: {
-                phoneNumber,
-              },
-            });
+            if (phoneNumber) {
+              updateUserProfile({ phoneNumber });
+            }
+            router.push('/auth/society-onboarding');
           }
         } catch (error) {
           console.warn('Failed to check society association:', error);
           // Fallback: go to onboarding
-          router.push({
-            pathname: '/auth/society-onboarding',
-            params: {
-              phoneNumber,
-            },
-          });
+          if (phoneNumber) {
+            updateUserProfile({ phoneNumber });
+          }
+          router.push('/auth/society-onboarding');
         }
       } else {
         setError(result.error || 'Invalid OTP. Please try again.');
@@ -158,10 +158,7 @@ export default function OTPVerification() {
     setIsResending(true);
 
     try {
-      const result = await AuthService.registerPhone(
-        phoneNumber || '',
-        societyCode || '',
-      );
+      const result = await AuthService.registerPhone(phoneNumber || '');
 
       if (result.success) {
         // Reset timer

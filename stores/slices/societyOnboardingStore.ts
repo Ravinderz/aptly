@@ -1,29 +1,32 @@
 /**
  * Society Onboarding Store - Zustand store for society onboarding flow
- * 
+ *
  * Manages the complete society onboarding state including verification,
  * search, selection, and join request processes.
  */
+import { SocietyService } from '@/services/society.service.rest';
+import {
+  EmergencyContactInfo,
+  FamilyMemberInfo,
+  SocietyInfo,
+  SocietyJoinRequest,
+  SocietyJoinResponse,
+  SocietySearchRequest,
+  SocietyVerificationRequest,
+  SocietyVerificationResponse,
+  UserSocietyAssociation,
+  VehicleInfo,
+} from '@/types/society';
+import { useMemo } from 'react';
 import { create } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
 import { immer } from 'zustand/middleware/immer';
-import { createStorageManager } from '../utils/storageManager';
 import type { BaseStore } from '../types';
 import {
-  SocietyInfo,
-  SocietyVerificationRequest,
-  SocietyVerificationResponse,
-  SocietySearchRequest,
-  SocietySearchResponse,
-  SocietyJoinRequest,
-  SocietyJoinResponse,
-  UserSocietyAssociation,
-  SocietyOnboardingState,
-  EmergencyContactInfo,
-  VehicleInfo,
-  FamilyMemberInfo,
-} from '@/types/society';
-import { SocietyService } from '@/services/society.service.rest';
+  createStorageManager,
+  safeParse,
+  safeStringify,
+} from '../utils/storageManager';
 
 // Onboarding flow steps
 export const ONBOARDING_STEPS = [
@@ -33,10 +36,10 @@ export const ONBOARDING_STEPS = [
   'details',
   'profile',
   'review',
-  'completion'
+  'completion',
 ] as const;
 
-export type OnboardingStep = typeof ONBOARDING_STEPS[number];
+export type OnboardingStep = (typeof ONBOARDING_STEPS)[number];
 
 // Society onboarding store state
 interface SocietyOnboardingStoreState extends BaseStore {
@@ -128,7 +131,10 @@ interface SocietyOnboardingActions {
 
   // Search actions
   setSearchRequest: (request: SocietySearchRequest) => void;
-  searchSocieties: (request: SocietySearchRequest, append?: boolean) => Promise<void>;
+  searchSocieties: (
+    request: SocietySearchRequest,
+    append?: boolean,
+  ) => Promise<void>;
   loadMoreResults: () => Promise<void>;
   clearSearch: () => void;
 
@@ -138,10 +144,17 @@ interface SocietyOnboardingActions {
   clearSelection: () => void;
 
   // Form data actions
-  updateUserProfile: (profile: Partial<SocietyOnboardingStoreState['userProfile']>) => void;
-  updateResidenceDetails: (details: Partial<SocietyOnboardingStoreState['residenceDetails']>) => void;
+  updateUserProfile: (
+    profile: Partial<SocietyOnboardingStoreState['userProfile']>,
+  ) => void;
+  updateResidenceDetails: (
+    details: Partial<SocietyOnboardingStoreState['residenceDetails']>,
+  ) => void;
   addEmergencyContact: (contact: EmergencyContactInfo) => void;
-  updateEmergencyContact: (index: number, contact: EmergencyContactInfo) => void;
+  updateEmergencyContact: (
+    index: number,
+    contact: EmergencyContactInfo,
+  ) => void;
   removeEmergencyContact: (index: number) => void;
   addVehicleDetails: (vehicle: VehicleInfo) => void;
   updateVehicleDetails: (index: number, vehicle: VehicleInfo) => void;
@@ -149,8 +162,12 @@ interface SocietyOnboardingActions {
   addFamilyMember: (member: FamilyMemberInfo) => void;
   updateFamilyMember: (index: number, member: FamilyMemberInfo) => void;
   removeFamilyMember: (index: number) => void;
-  updateAdditionalInfo: (info: Partial<SocietyOnboardingStoreState['additionalInfo']>) => void;
-  updateConsentAgreements: (consents: Partial<SocietyOnboardingStoreState['consentAgreements']>) => void;
+  updateAdditionalInfo: (
+    info: Partial<SocietyOnboardingStoreState['additionalInfo']>,
+  ) => void;
+  updateConsentAgreements: (
+    consents: Partial<SocietyOnboardingStoreState['consentAgreements']>,
+  ) => void;
 
   // Validation actions
   validateStep: (step: OnboardingStep) => boolean;
@@ -174,7 +191,8 @@ interface SocietyOnboardingActions {
   getStepValidationErrors: (step: OnboardingStep) => string[];
 }
 
-type SocietyOnboardingStore = SocietyOnboardingStoreState & SocietyOnboardingActions;
+type SocietyOnboardingStore = SocietyOnboardingStoreState &
+  SocietyOnboardingActions;
 
 // Initial state
 const initialState: SocietyOnboardingStoreState = {
@@ -287,16 +305,18 @@ export const useSocietyOnboardingStore = create<SocietyOnboardingStore>()(
           set((state) => {
             state.currentStep = step;
             state.progress.currentStep = ONBOARDING_STEPS.indexOf(step) + 1;
-            
+
             // Update navigation state
             state.canGoBack = state.progress.currentStep > 1;
-            state.canGoNext = get().validateStep(step) && state.progress.currentStep < ONBOARDING_STEPS.length;
+            state.canGoNext =
+              get().validateStep(step) &&
+              state.progress.currentStep < ONBOARDING_STEPS.length;
           }),
 
         nextStep: () => {
           const state = get();
           const currentIndex = ONBOARDING_STEPS.indexOf(state.currentStep);
-          
+
           if (currentIndex < ONBOARDING_STEPS.length - 1) {
             const nextStep = ONBOARDING_STEPS[currentIndex + 1];
             get().completeStep(state.currentStep);
@@ -307,7 +327,7 @@ export const useSocietyOnboardingStore = create<SocietyOnboardingStore>()(
         previousStep: () => {
           const state = get();
           const currentIndex = ONBOARDING_STEPS.indexOf(state.currentStep);
-          
+
           if (currentIndex > 0) {
             const previousStep = ONBOARDING_STEPS[currentIndex - 1];
             get().goToStep(previousStep);
@@ -342,22 +362,22 @@ export const useSocietyOnboardingStore = create<SocietyOnboardingStore>()(
 
           try {
             const result = await SocietyService.verifySociety(request);
-            
+
             set((state) => {
               state.verificationLoading = false;
-              
+
               if (result.success && result.data) {
                 state.verificationResponse = result.data;
-                
+
                 if (result.data.success && result.data.data) {
                   // Society found and verified
                   state.selectedSociety = result.data.data.society;
-                  
+
                   if (result.data.data.userAssociation) {
                     state.userAssociations = [result.data.data.userAssociation];
                     state.hasExistingAssociations = true;
                   }
-                  
+
                   // Auto-advance to next step based on verification result
                   if (result.data.data.requiresOnboarding) {
                     get().goToStep('details');
@@ -366,7 +386,8 @@ export const useSocietyOnboardingStore = create<SocietyOnboardingStore>()(
                   }
                 } else {
                   // Society not found, go to search
-                  state.verificationError = result.data.error?.message || 'Society not found';
+                  state.verificationError =
+                    result.data.error?.message || 'Society not found';
                   get().goToStep('search');
                 }
               } else {
@@ -394,12 +415,15 @@ export const useSocietyOnboardingStore = create<SocietyOnboardingStore>()(
             state.searchRequest = request;
           }),
 
-        searchSocieties: async (request: SocietySearchRequest, append = false) => {
+        searchSocieties: async (
+          request: SocietySearchRequest,
+          append = false,
+        ) => {
           set((state) => {
             state.searchLoading = true;
             state.searchError = null;
             state.searchRequest = request;
-            
+
             if (!append) {
               state.searchResults = [];
               state.searchTotal = 0;
@@ -408,19 +432,19 @@ export const useSocietyOnboardingStore = create<SocietyOnboardingStore>()(
 
           try {
             const result = await SocietyService.searchSocieties(request);
-            
+
             set((state) => {
               state.searchLoading = false;
-              
+
               if (result.success && result.data?.success && result.data.data) {
                 const { societies, total, hasMore } = result.data.data;
-                
+
                 if (append) {
                   state.searchResults.push(...societies);
                 } else {
                   state.searchResults = societies;
                 }
-                
+
                 state.searchTotal = total;
                 state.searchHasMore = hasMore;
               } else {
@@ -437,7 +461,11 @@ export const useSocietyOnboardingStore = create<SocietyOnboardingStore>()(
 
         loadMoreResults: async () => {
           const state = get();
-          if (!state.searchHasMore || state.searchLoading || !state.searchRequest) {
+          if (
+            !state.searchHasMore ||
+            state.searchLoading ||
+            !state.searchRequest
+          ) {
             return;
           }
 
@@ -476,14 +504,15 @@ export const useSocietyOnboardingStore = create<SocietyOnboardingStore>()(
 
           try {
             const result = await SocietyService.loadSocietyDetails(societyId);
-            
+
             set((state) => {
               state.societyDetailsLoading = false;
-              
+
               if (result.success && result.data) {
                 state.selectedSociety = result.data;
               } else {
-                state.societyDetailsError = result.error || 'Failed to load society details';
+                state.societyDetailsError =
+                  result.error || 'Failed to load society details';
               }
             });
           } catch (error: any) {
@@ -576,15 +605,18 @@ export const useSocietyOnboardingStore = create<SocietyOnboardingStore>()(
         validateStep: (step: OnboardingStep) => {
           const state = get();
           const errors = get().getStepValidationErrors(step);
-          
+
           // Update validation errors
           set((draft) => {
             draft.validationErrors = {
               ...draft.validationErrors,
-              ...errors.reduce((acc, error) => {
-                acc[error] = error;
-                return acc;
-              }, {} as Record<string, string>),
+              ...errors.reduce(
+                (acc, error) => {
+                  acc[error] = error;
+                  return acc;
+                },
+                {} as Record<string, string>,
+              ),
             };
           });
 
@@ -609,7 +641,7 @@ export const useSocietyOnboardingStore = create<SocietyOnboardingStore>()(
         // Submission actions
         submitJoinRequest: async () => {
           const state = get();
-          
+
           // Final validation
           if (!get().validateStep('review')) {
             return;
@@ -622,24 +654,27 @@ export const useSocietyOnboardingStore = create<SocietyOnboardingStore>()(
 
           try {
             const onboardingData = get().getOnboardingData();
-            const result = await SocietyService.submitSocietyJoinRequest(onboardingData as SocietyJoinRequest);
-            
+            const result = await SocietyService.submitSocietyJoinRequest(
+              onboardingData as SocietyJoinRequest,
+            );
+
             set((draft) => {
               draft.submitLoading = false;
-              
+
               if (result.success && result.data) {
                 draft.submitResponse = result.data;
-                
+
                 if (result.data.success && result.data.data) {
                   // Update user associations
                   draft.userAssociations.push(result.data.data.association);
                   draft.hasExistingAssociations = true;
-                  
+
                   // Go to completion step
                   get().completeStep('review');
                   get().goToStep('completion');
                 } else {
-                  draft.submitError = result.data.error?.message || 'Submission failed';
+                  draft.submitError =
+                    result.data.error?.message || 'Submission failed';
                 }
               } else {
                 draft.submitError = result.error || 'Submission failed';
@@ -666,13 +701,14 @@ export const useSocietyOnboardingStore = create<SocietyOnboardingStore>()(
 
         checkExistingAssociations: async (phoneNumber: string) => {
           try {
-            const result = await SocietyService.checkSocietyAssociation(phoneNumber);
-            
+            const result =
+              await SocietyService.checkSocietyAssociation(phoneNumber);
+
             if (result.success && result.data) {
               set((state) => {
                 state.userAssociations = result.data.associations;
                 state.hasExistingAssociations = result.data.hasAssociation;
-                
+
                 if (result.data.hasAssociation) {
                   // User has existing associations, skip onboarding
                   get().goToStep('completion');
@@ -690,7 +726,7 @@ export const useSocietyOnboardingStore = create<SocietyOnboardingStore>()(
         // Utility actions
         getOnboardingData: (): Partial<SocietyJoinRequest> => {
           const state = get();
-          
+
           if (!state.selectedSociety) {
             return {};
           }
@@ -793,21 +829,41 @@ export const useSocietyOnboardingStore = create<SocietyOnboardingStore>()(
       })),
       {
         name: 'society-onboarding-storage',
-        storage: createStorageManager('SocietyOnboardingStore') as any,
-        partialize: (state: SocietyOnboardingStore) => ({
-          currentStep: state.currentStep,
-          progress: state.progress,
-          selectedSociety: state.selectedSociety,
-          userProfile: state.userProfile,
-          residenceDetails: state.residenceDetails,
-          emergencyContacts: state.emergencyContacts,
-          vehicleDetails: state.vehicleDetails,
-          familyMembers: state.familyMembers,
-          additionalInfo: state.additionalInfo,
-          consentAgreements: state.consentAgreements,
-          userAssociations: state.userAssociations,
-          hasExistingAssociations: state.hasExistingAssociations,
-        }),
+        storage: {
+          ...createStorageManager('SocietyOnboardingStore'),
+          // Override setItem and getItem to ensure proper serialization
+          setItem: async (key: string, value: any) => {
+            const storage = createStorageManager('SocietyOnboardingStore');
+            const serializedValue = safeStringify(value);
+            return storage.setItem(key, serializedValue);
+          },
+          getItem: async (key: string) => {
+            const storage = createStorageManager('SocietyOnboardingStore');
+            const value = await storage.getItem(key);
+            return value ? safeParse(value) : null;
+          },
+        } as any,
+        partialize: (state: SocietyOnboardingStore) => {
+          // Create a clean serializable state object
+          const cleanState = {
+            currentStep: state.currentStep,
+            progress: state.progress,
+            selectedSociety: state.selectedSociety,
+            userProfile: state.userProfile,
+            residenceDetails: state.residenceDetails,
+            emergencyContacts: state.emergencyContacts,
+            vehicleDetails: state.vehicleDetails,
+            familyMembers: state.familyMembers,
+            additionalInfo: state.additionalInfo,
+            consentAgreements: state.consentAgreements,
+            userAssociations: state.userAssociations,
+            hasExistingAssociations: state.hasExistingAssociations,
+          };
+
+          // Ensure all nested objects are serializable
+          return JSON.parse(safeStringify(cleanState));
+        },
+        // Serialization is handled by our custom storage wrapper
       },
     ),
     { name: 'SocietyOnboardingStore' },
@@ -866,36 +922,28 @@ export const useSocietyOnboardingSubmission = () =>
     response: state.submitResponse,
   }));
 
-export const useSocietyOnboardingActions = () =>
-  useSocietyOnboardingStore((state) => ({
-    // Flow navigation
-    goToStep: state.goToStep,
-    nextStep: state.nextStep,
-    previousStep: state.previousStep,
-    resetFlow: state.resetFlow,
-    
-    // Verification
-    verifySociety: state.verifySociety,
-    
-    // Search
-    searchSocieties: state.searchSocieties,
-    loadMoreResults: state.loadMoreResults,
-    
-    // Selection
-    selectSociety: state.selectSociety,
-    
-    // Form updates
-    updateUserProfile: state.updateUserProfile,
-    updateResidenceDetails: state.updateResidenceDetails,
-    addEmergencyContact: state.addEmergencyContact,
-    updateEmergencyContact: state.updateEmergencyContact,
-    removeEmergencyContact: state.removeEmergencyContact,
-    updateConsentAgreements: state.updateConsentAgreements,
-    
-    // Validation
-    validateStep: state.validateStep,
-    
-    // Submission
-    submitJoinRequest: state.submitJoinRequest,
-    retrySubmission: state.retrySubmission,
-  }));
+export const useSocietyOnboardingActions = () => {
+  const actions = useMemo(() => {
+    const store = useSocietyOnboardingStore.getState();
+    return {
+      goToStep: store.goToStep,
+      nextStep: store.nextStep,
+      previousStep: store.previousStep,
+      resetFlow: store.resetFlow,
+      verifySociety: store.verifySociety,
+      searchSocieties: store.searchSocieties,
+      loadMoreResults: store.loadMoreResults,
+      selectSociety: store.selectSociety,
+      updateUserProfile: store.updateUserProfile,
+      updateResidenceDetails: store.updateResidenceDetails,
+      addEmergencyContact: store.addEmergencyContact,
+      updateEmergencyContact: store.updateEmergencyContact,
+      removeEmergencyContact: store.removeEmergencyContact,
+      updateConsentAgreements: store.updateConsentAgreements,
+      validateStep: store.validateStep,
+      submitJoinRequest: store.submitJoinRequest,
+      retrySubmission: store.retrySubmission,
+    };
+  }, []);
+  return useMemo(() => actions, [actions]); // Return stable reference to actions
+};

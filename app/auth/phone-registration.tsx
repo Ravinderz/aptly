@@ -9,12 +9,12 @@ import { useDirectAuth } from '@/hooks/useDirectAuth';
 import { useFormValidation } from '@/hooks/useFormValidation';
 import { AuthService, BiometricService } from '@/services';
 import { useFeatureFlagStore } from '@/stores/slices/featureFlagStore';
+import { useSocietyOnboardingActions } from '@/stores/slices/societyOnboardingStore';
 import { showErrorAlert } from '@/utils/alert';
 import { responsive } from '@/utils/responsive';
 import {
   PhoneRegistrationForm,
   phoneRegistrationSchema,
-  phoneSchema,
 } from '@/utils/validation.enhanced';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import React, { useEffect, useState } from 'react';
@@ -30,10 +30,10 @@ import {
 export default function PhoneRegistration() {
   const router = useRouter();
   const searchParams = useLocalSearchParams<{ mode?: string }>();
-  
+
   // Properly cache the mode to prevent getSnapshot infinite loop warning
   const [mode, setMode] = React.useState<string | undefined>('');
-  
+
   // Update mode when searchParams changes, but only if it's different
   React.useEffect(() => {
     const newMode = searchParams.mode;
@@ -41,8 +41,9 @@ export default function PhoneRegistration() {
       setMode(newMode);
     }
   }, [searchParams.mode, mode]);
-  
+
   const { authenticateWithBiometrics } = useDirectAuth();
+  const { updateUserProfile } = useSocietyOnboardingActions();
   const biometricAuthEnabled = useFeatureFlagStore(
     (state) => state.flags.biometric_auth,
   );
@@ -186,7 +187,7 @@ export default function PhoneRegistration() {
       console.log('🔍 Form submission debug:');
       console.log('formData:', formData);
       console.log('formData.phone:', formData.phone);
-      
+
       const fullPhoneNumber = getFullPhoneNumber(formData.phone);
       console.log('Full phone number:', fullPhoneNumber);
       // No society code needed for initial registration - will be handled in post-auth flow
@@ -197,13 +198,10 @@ export default function PhoneRegistration() {
 
       if (result.success) {
         // Add a small delay to ensure navigation state is ready
+        updateUserProfile({ phoneNumber: fullPhoneNumber });
         setTimeout(() => {
           router.push({
             pathname: '/auth/otp-verification',
-            params: {
-              phoneNumber: fullPhoneNumber,
-              sessionId: result.sessionId || 'dev-session',
-            },
           });
         }, 100);
       } else {
@@ -296,9 +294,7 @@ export default function PhoneRegistration() {
               />
             </View>
             {errors.phone && (
-              <Text className="text-error text-sm mt-2">
-                {errors.phone}
-              </Text>
+              <Text className="text-error text-sm mt-2">{errors.phone}</Text>
             )}
           </View>
 
