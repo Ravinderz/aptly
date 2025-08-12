@@ -41,7 +41,10 @@ type SocietyCodeForm = z.infer<typeof societyCodeSchema>;
 
 export default function SocietyOnboarding() {
   const router = useRouter();
-  const { phoneNumber } = useLocalSearchParams<{ phoneNumber: string }>();
+  const { phoneNumber: phoneNumberParam } = useLocalSearchParams<{ phoneNumber: string }>();
+  
+  // Extract phoneNumber directly from params using the stable pattern
+  const phoneNumber = typeof phoneNumberParam === 'string' ? phoneNumberParam : '';
   const [selectedOption, setSelectedOption] = useState<'code' | 'search' | null>(null);
   
   // Store hooks - Use specific selectors to prevent unnecessary re-renders
@@ -71,12 +74,12 @@ export default function SocietyOnboarding() {
     },
   );
 
-  // Initialize user profile with phone number
+  // Initialize user profile with phone number when component mounts
   React.useEffect(() => {
     if (phoneNumber) {
       updateUserProfile({ phoneNumber });
     }
-  }, [phoneNumber]); // Remove updateUserProfile from dependencies to prevent infinite loop
+  }, [phoneNumber, updateUserProfile]);
 
   const handleCodeVerification = React.useCallback(async (formData: SocietyCodeForm) => {
     if (!phoneNumber) {
@@ -259,7 +262,7 @@ export default function SocietyOnboarding() {
                 Search for Your Society
               </Text>
               <Text className="text-text-secondary mb-6">
-                We'll help you find your society by name, location, or other details.
+                We&apos;ll help you find your society by name, location, or other details.
               </Text>
 
               <Button
@@ -276,7 +279,7 @@ export default function SocietyOnboarding() {
               onPress={handleSkipForNow}
               className="items-center py-4">
               <Text className="text-text-secondary text-sm">
-                I'll do this later
+                I&apos;ll do this later
               </Text>
               <Text className="text-primary font-medium mt-1">
                 Skip for now
