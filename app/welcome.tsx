@@ -351,23 +351,25 @@ export default function Welcome() {
         {/* CTA Section */}
         <View className="px-6 pb-8">
           <Button
-            onPress={() =>
+            onPress={() => {
+              console.log('🔘 Welcome: Get Started button pressed - navigating to email-registration');
               router.push({
                 pathname: '/auth/email-registration',
                 params: { mode: 'signup' },
-              })
-            }
+              });
+            }}
             className="mb-4">
             Get Started
           </Button>
 
           <TouchableOpacity
-            onPress={() =>
+            onPress={() => {
+              console.log('🔘 Welcome: Sign In button pressed - navigating to email-registration');
               router.push({
                 pathname: '/auth/email-registration',
                 params: { mode: 'signin' },
-              })
-            }
+              });
+            }}
             className="items-center py-3">
             <Text className="text-text-secondary">
               Already have an account?{' '}

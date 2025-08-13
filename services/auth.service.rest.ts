@@ -13,6 +13,7 @@ import {
   ProfileUpdateRequest,
   RefreshTokenRequest,
   RefreshTokenResponse,
+  SupabaseTokens,
   TokenData,
 } from '@/types/api';
 import {
@@ -291,27 +292,6 @@ export class RestAuthService {
     societyCode: string = '',
   ): Promise<AuthResult> {
     try {
-      // Check what auth flow is available
-      // const authFlow = await developmentService.getAuthFlow();
-
-      // // If registration endpoint is not available, use mock flow
-      // if (!authFlow.supportsRegistration) {
-      //   console.log('🔧 Using development email registration flow');
-
-      //   // Simulate verification email send for development
-      //   if (societyCode) {
-      //     SecureSessionStorage.storeSocietyCode(societyCode.toUpperCase());
-      //   }
-      //   SecureSessionStorage.storeSessionId(`dev-email-session-${Date.now()}`);
-
-      //   return {
-      //     success: true,
-      //     data: { message: 'Verification email sent successfully (development mode)' },
-      //     requiresOTP: true,
-      //     sessionId: `dev-email-session-${Date.now()}`,
-      //   };
-      // }
-
       // Validate email
       const emailSchema = z
         .string()
@@ -344,12 +324,11 @@ export class RestAuthService {
       // Prepare request data
       const requestData = {
         email: normalizedEmail,
-        ...(societyCode && { societyCode: societyCode.toUpperCase() }),
       };
 
       // Make API call
       const response = await apiClient.post<any>(
-        API_ENDPOINTS.AUTH.REGISTER,
+        API_ENDPOINTS.AUTH.EMAIL_REGISTER,
         requestData,
       );
 
@@ -398,7 +377,7 @@ export class RestAuthService {
    * Verify OTP and complete authentication (or email/password login)
    */
   async verifyOTP(
-    phoneNumber: string,
+    phoneNumber_email: string,
     otp: string,
     sessionId?: string,
   ): Promise<AuthResult> {
@@ -413,52 +392,6 @@ export class RestAuthService {
         };
       }
 
-      // Check if this is a development session
-      if (currentSessionId.startsWith('dev-session-')) {
-        console.log('🔧 Using development OTP verification');
-
-        // Accept any 6-digit OTP in development
-        if (otp.length === 6 && /^\d{6}$/.test(otp)) {
-          // Create mock user
-          const testUser = await developmentService.createTestUser();
-
-          // Store tokens securely
-          const tokenData: TokenData = {
-            accessToken: `dev-access-${Date.now()}`,
-            refreshToken: `dev-refresh-${Date.now()}`,
-            expiresAt: Date.now() + 8 * 60 * 60 * 1000,
-            tokenType: 'Bearer',
-          };
-
-          await SecureTokenStorage.storeTokens(tokenData);
-
-          // Store user profile
-          const userProfile = await this.convertToUserProfile(testUser);
-          SecureProfileStorage.storeProfile(userProfile);
-          this.currentUser = userProfile;
-
-          // Store login timestamp
-          SecureSessionStorage.storeLastLoginTime(Date.now());
-
-          return {
-            success: true,
-            data: {
-              message: 'Authentication successful (development mode)',
-              user: userProfile,
-              tokens: {
-                accessToken: tokenData.accessToken,
-                refreshToken: tokenData.refreshToken,
-              },
-            },
-          };
-        } else {
-          return {
-            success: false,
-            error: 'Please enter a valid 6-digit OTP',
-          };
-        }
-      }
-
       // Validate OTP for real API
       const otpValidation = otpSchema.safeParse(otp);
       if (!otpValidation.success) {
@@ -469,62 +402,48 @@ export class RestAuthService {
       }
 
       // Try real API login
-      try {
-        const authFlow = await developmentService.getAuthFlow();
-
-        if (authFlow.supportsEmailPassword) {
-          // Try email/password login
-          const loginData = {
-            email: authFlow.mockCredentials.email,
-            password: authFlow.mockCredentials.password,
-          };
-
-          const response = await apiClient.post<{
-            user: AuthUser;
-            tokens: AuthTokens;
-          }>(API_ENDPOINTS.AUTH.LOGIN, loginData);
-
-          if (response.success) {
-            // Store tokens securely
-            const tokenData: TokenData = {
-              accessToken: response.data.tokens.accessToken,
-              refreshToken: response.data.tokens.refreshToken,
-              expiresAt: Date.now() + 8 * 60 * 60 * 1000,
-              tokenType: 'Bearer',
-            };
-
-            await SecureTokenStorage.storeTokens(tokenData);
-
-            // Store user profile
-            const userProfile = await this.convertToUserProfile(
-              response.data.user,
-            );
-            SecureProfileStorage.storeProfile(userProfile);
-            this.currentUser = userProfile;
-
-            // Store login timestamp
-            SecureSessionStorage.storeLastLoginTime(Date.now());
-
-            return {
-              success: true,
-              data: {
-                message: 'Login successful',
-                user: userProfile,
-                tokens: response.data.tokens,
-              },
-            };
-          }
-        }
-      } catch (error) {
-        console.log('🔧 Real API login failed, using development mode');
+      let response;
+      if (phoneNumber_email.includes('@')) {
+        // Email-based verification
+        response = await apiClient.post<{
+          user: AuthUser;
+          session: SupabaseTokens;
+        }>(API_ENDPOINTS.AUTH.VERIFY_EMAIL_OTP, {
+          phoneNumber_email,
+          otp,
+          sessionId: sessionId,
+        });
+      } else {
+        // Phone-based verification
       }
 
-      // Fallback to development mode
-      return await this.verifyOTP(
-        phoneNumber,
-        otp,
-        `dev-session-${Date.now()}`,
-      );
+      if (response.success) {
+        // Store tokens securely
+        console.log('🔐 Storing tokens securely');
+        console.log('Response data:', response.data);
+
+        const tokenData: TokenData = {
+          accessToken: response.data.session.access_token,
+          refreshToken: response.data.session.refresh_token,
+          expiresAt: Date.now() + response.data.session.expires_in * 1000,
+          expiresIn: response.data.session.expires_in,
+          tokenType: response.data.session.token_type || 'Bearer',
+        };
+        await SecureTokenStorage.storeTokens(tokenData);
+
+        return {
+          success: true,
+          data: {
+            message: 'Email Verified',
+            tokens: tokenData,
+          },
+        };
+      } else {
+        return {
+          success: false,
+          error: response.error?.message || 'OTP verification failed',
+        };
+      }
     } catch (error) {
       console.error('❌ Authentication failed:', error);
 

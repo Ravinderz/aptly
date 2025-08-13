@@ -84,8 +84,22 @@ const AppNavigator = ({ children }: { children: React.ReactNode }) => {
 
   // Simplified navigation handler to prevent conflicts
   const handleNavigation = useCallback(() => {
+    console.log('🧭 AppNavigator: handleNavigation called', {
+      hasNavigated,
+      isCheckingFirstLaunch,
+      isLoading,
+      segments: segments.join('/'),
+    });
+
     // Prevent multiple navigation attempts
-    if (hasNavigated || isCheckingFirstLaunch || isLoading) return;
+    if (hasNavigated || isCheckingFirstLaunch || isLoading) {
+      console.log('🧭 AppNavigator: Navigation blocked', {
+        hasNavigated,
+        isCheckingFirstLaunch,
+        isLoading,
+      });
+      return;
+    }
 
     // Clear any existing timeout
     if (navigationTimeoutRef.current) {
@@ -108,9 +122,39 @@ const AppNavigator = ({ children }: { children: React.ReactNode }) => {
       let shouldNavigate = false;
       let targetRoute = '';
 
+      // Check if we're on a protected auth route that should not be redirected
+      const protectedAuthRoutes = [
+        'email-registration',
+        'phone-registration', 
+        'otp-verification',
+        'society-onboarding',
+        'society-search-flow',
+        'society-details-form',
+        'society-completion'
+      ];
+      const isOnProtectedAuthRoute = inAuthGroup && segments.length > 1 && protectedAuthRoutes.includes(segments[1]);
+
+      // DEBUG: Log current navigation state
+      console.log('🧭 AppNavigator DEBUG:', {
+        segments: segments,
+        isFirstLaunch,
+        isAuthenticated,
+        onWelcomePage,
+        inAuthGroup,
+        onIndexPage,
+        isOnProtectedAuthRoute,
+        currentUser: auth.user?.role || 'none',
+      });
+
+      // Don't interfere with protected auth routes
+      if (isOnProtectedAuthRoute) {
+        console.log('🧭 AppNavigator: Protected auth route detected, skipping navigation override');
+        return;
+      }
+
       // Simplified navigation logic to reduce conflicts
-      if (isFirstLaunch && !onWelcomePage) {
-        // First launch should go to welcome
+      if (isFirstLaunch && !onWelcomePage && !inAuthGroup) {
+        // First launch should go to welcome, but not if user is in auth flow
         shouldNavigate = true;
         targetRoute = '/welcome';
       } else if (!isAuthenticated && !onWelcomePage && !inAuthGroup) {
@@ -145,16 +189,33 @@ const AppNavigator = ({ children }: { children: React.ReactNode }) => {
         }
       }
 
+      // DEBUG: Log navigation decision
+      console.log('🧭 Navigation Decision:', {
+        shouldNavigate,
+        targetRoute,
+        reason: shouldNavigate
+          ? isFirstLaunch && !onWelcomePage && !inAuthGroup
+            ? 'first_launch'
+            : !isAuthenticated && !onWelcomePage && !inAuthGroup
+              ? 'unauthenticated'
+              : isAuthenticated && (onWelcomePage || inAuthGroup || onIndexPage)
+                ? 'authenticated_redirect'
+                : 'unknown'
+          : 'no_navigation',
+      });
+
       // Perform navigation if needed
       if (shouldNavigate && targetRoute) {
         console.log(
-          `🧭 Navigating from [${segments.join('/')}] to [${targetRoute}]`,
+          `🧭 EXECUTING NAVIGATION: [${segments.join('/')}] → [${targetRoute}]`,
         );
         setHasNavigated(true);
         router.replace(targetRoute);
 
         // Reset navigation flag after a delay
         setTimeout(() => setHasNavigated(false), 1000);
+      } else {
+        console.log('🧭 NO NAVIGATION: Staying on current route');
       }
     }, 150);
   }, [

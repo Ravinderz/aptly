@@ -1,6 +1,5 @@
 import { Button } from '@/components/ui/Button';
 import { AuthService } from '@/services';
-import { SocietyService } from '@/services/society.service.rest';
 import {
   useSocietyOnboardingActions,
   useSocietyOnboardingStore,
@@ -34,6 +33,11 @@ export default function OTPVerification() {
   const phoneNumber = useSocietyOnboardingStore(
     (state) => state.userProfile.phoneNumber,
   );
+  const sessionId = useSocietyOnboardingStore(
+    (state) => state.userProfile.sessionId,
+  );
+
+  const email = useSocietyOnboardingStore((state) => state.userProfile.email);
 
   useEffect(() => {
     if (timeLeft > 0) {
@@ -91,8 +95,8 @@ export default function OTPVerification() {
 
     console.log('Verifying OTP:', otpToVerify);
     console.log('Phone number:', phoneNumber);
-    if (!phoneNumber) {
-      setError('Phone number is required for verification');
+    if (!phoneNumber && !email) {
+      setError('Phone number or email is required for verification');
       return;
     }
 
@@ -101,44 +105,49 @@ export default function OTPVerification() {
 
     try {
       const result = await AuthService.verifyOTP(
-        phoneNumber || '',
+        phoneNumber ? phoneNumber : email || '',
         otpToVerify,
+        sessionId,
       );
 
       if (result.success) {
         // Check if user has society associations
         try {
-          const associationResult =
-            await SocietyService.checkSocietyAssociation(phoneNumber || '');
+          console.log('user onboarding');
 
-          if (associationResult.success && associationResult.data) {
-            if (
-              associationResult.data.hasAssociation &&
-              associationResult.data.associations.length > 0
-            ) {
-              // User has existing associations, go directly to main app
-              router.replace('/(tabs)');
-            } else {
-              // No associations, store phoneNumber in Zustand and redirect to society onboarding
-              if (phoneNumber) {
-                updateUserProfile({ phoneNumber });
-              }
-              router.push('/auth/society-onboarding');
-            }
-          } else {
-            // If association check fails, assume no association and go to onboarding
-            if (phoneNumber) {
-              updateUserProfile({ phoneNumber });
-            }
-            router.push('/auth/society-onboarding');
-          }
+          router.push('/auth/user-onboarding');
+
+          // const associationResult =
+          //   await SocietyService.checkSocietyAssociation(phoneNumber || '');
+
+          // if (associationResult.success && associationResult.data) {
+          //   if (
+          //     associationResult.data.hasAssociation &&
+          //     associationResult.data.associations.length > 0
+          //   ) {
+          //     // User has existing associations, go directly to main app
+          //     router.replace('/(tabs)');
+          //   } else {
+          //     // No associations, store phoneNumber in Zustand and redirect to society onboarding
+          //     if (phoneNumber) {
+          //       updateUserProfile({ phoneNumber });
+          //     }
+          //     router.push('/auth/society-onboarding');
+          //   }
+          // } else {
+          //   // If association check fails, assume no association and go to onboarding
+          //   if (phoneNumber) {
+          //     updateUserProfile({ phoneNumber });
+          //   }
+          //   router.push('/auth/society-onboarding');
+          // }
         } catch (error) {
           console.warn('Failed to check society association:', error);
           // Fallback: go to onboarding
-          if (phoneNumber) {
-            updateUserProfile({ phoneNumber });
-          }
-          router.push('/auth/society-onboarding');
+          // if (phoneNumber) {
+          //   updateUserProfile({ phoneNumber });
+          // }
+          // router.push('/auth/society-onboarding');
         }
       } else {
         setError(result.error || 'Invalid OTP. Please try again.');

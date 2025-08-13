@@ -17,7 +17,7 @@ import {
   emailRegistrationSchema,
 } from '@/utils/validation.enhanced';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import {
   KeyboardAvoidingView,
   Platform,
@@ -30,6 +30,11 @@ import {
 export default function EmailRegistration() {
   const router = useRouter();
   const searchParams = useLocalSearchParams<{ mode?: string }>();
+
+  console.log(
+    '📧 EmailRegistration: Component mounting with params:',
+    searchParams,
+  );
 
   // Properly cache the mode to prevent getSnapshot infinite loop warning
   const [mode, setMode] = React.useState<string | undefined>('');
@@ -76,9 +81,9 @@ export default function EmailRegistration() {
 
   useEffect(() => {
     checkBiometricAvailability();
-  }, []);
+  }, [checkBiometricAvailability]);
 
-  const checkBiometricAvailability = async () => {
+  const checkBiometricAvailability = useCallback(async () => {
     if (!isSignIn) return; // Only show for sign in
 
     const biometricConfig = await BiometricService.checkBiometricSupport();
@@ -94,7 +99,7 @@ export default function EmailRegistration() {
         BiometricService.getBiometricTypeName(biometricConfig.supportedTypes),
       );
     }
-  };
+  }, [isSignIn]);
 
   const handleBiometricLogin = async () => {
     setIsBiometricLoading(true);
@@ -141,7 +146,7 @@ export default function EmailRegistration() {
 
       const normalizedEmail = formatEmail(formData.email);
       console.log('Normalized email:', normalizedEmail);
-      
+
       // No society code needed for initial registration - will be handled in post-auth flow
       const result = await AuthService.registerEmail(
         normalizedEmail,
@@ -150,7 +155,10 @@ export default function EmailRegistration() {
 
       if (result.success) {
         // Add a small delay to ensure navigation state is ready
-        updateUserProfile({ email: normalizedEmail });
+        updateUserProfile({
+          email: normalizedEmail,
+          sessionId: result.sessionId,
+        });
         setTimeout(() => {
           router.push({
             pathname: '/auth/otp-verification',
@@ -160,12 +168,16 @@ export default function EmailRegistration() {
         // Show error alert for API failures
         showErrorAlert(
           'Error',
-          result.error || 'Failed to send verification email. Please try again.',
+          result.error ||
+            'Failed to send verification email. Please try again.',
         );
       }
     } catch (error) {
       console.error('Email registration error:', error);
-      showErrorAlert('Error', 'Failed to send verification email. Please try again.');
+      showErrorAlert(
+        'Error',
+        'Failed to send verification email. Please try again.',
+      );
     }
   };
 
@@ -222,7 +234,12 @@ export default function EmailRegistration() {
           {/* Enhanced Email Input with Validation */}
           <View className="mb-6">
             <View className="flex-row items-center bg-surface rounded-xl border border-divider px-4 py-4">
-              <LucideIcons name="mail" size={20} color="#6b7280" className="mr-3" />
+              <LucideIcons
+                name="mail"
+                size={20}
+                color="#6b7280"
+                className="mr-3"
+              />
               <View className="h-6 w-px bg-divider mr-3" />
               <ValidatedInput
                 label=""
@@ -339,8 +356,8 @@ export default function EmailRegistration() {
             <Text className="text-primary font-semibold mb-2">Need Help?</Text>
             <Text className="text-text-secondary text-sm leading-5">
               Contact your society manager or housing committee to get your
-              society code. Make sure you're using the email address registered
-              with your society.
+              society code. Make sure you&apos;re using the email address
+              registered with your society.
             </Text>
           </View>
         </ResponsiveContainer>

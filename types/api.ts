@@ -57,13 +57,22 @@ export interface OTPVerificationRequest {
 export interface AuthTokens {
   accessToken: string;
   refreshToken: string;
-  expiresAt: string;
+  expiresAt: number;
+  expiresIn: number;
   tokenType: 'Bearer';
+}
+
+export interface SupabaseTokens {
+  access_token: string;
+  refresh_token: string;
+  expires_at: number;
+  expires_in: number;
+  token_type: 'bearer';
 }
 
 export interface AuthUser {
   id: string;
-  phoneNumber: string;
+  phone: string;
   name?: string;
   email?: string;
   avatar?: string;
@@ -452,6 +461,7 @@ export interface TokenData {
   accessToken: string;
   refreshToken: string;
   expiresAt: number;
+  expiresIn: number;
   tokenType: 'Bearer';
 }
 
@@ -470,7 +480,13 @@ export interface RefreshTokenResponse {
 export interface VisitorListQuery {
   page?: number;
   limit?: number;
-  status?: 'pending' | 'approved' | 'rejected' | 'checked_in' | 'checked_out' | 'expired';
+  status?:
+    | 'pending'
+    | 'approved'
+    | 'rejected'
+    | 'checked_in'
+    | 'checked_out'
+    | 'expired';
   date?: string;
   hostFlatNumber?: string;
   search?: string;
@@ -587,7 +603,13 @@ export interface SocialProfile {
 
 export interface UserDocument {
   id: string;
-  type: 'aadhar' | 'pan' | 'passport' | 'driving_license' | 'voter_id' | 'other';
+  type:
+    | 'aadhar'
+    | 'pan'
+    | 'passport'
+    | 'driving_license'
+    | 'voter_id'
+    | 'other';
   documentNumber: string;
   expiryDate?: string;
   fileUrl: string;
@@ -640,8 +662,15 @@ export interface RequestLog {
 
 // Real-time updates
 export interface WebSocketEvent {
-  type: 'visitor_created' | 'visitor_approved' | 'visitor_checked_in' | 'visitor_checked_out' | 
-        'emergency_alert' | 'maintenance_update' | 'notice_published' | 'bill_generated';
+  type:
+    | 'visitor_created'
+    | 'visitor_approved'
+    | 'visitor_checked_in'
+    | 'visitor_checked_out'
+    | 'emergency_alert'
+    | 'maintenance_update'
+    | 'notice_published'
+    | 'bill_generated';
   payload: any;
   timestamp: string;
   userId?: string;

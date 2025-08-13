@@ -64,8 +64,10 @@ export const API_ENDPOINTS = {
     // Regular user authentication
     LOGIN: '/api/v4/auth/login',
     REGISTER: '/api/v4/auth/register',
+    EMAIL_REGISTER: '/api/v4/auth/register/email', // New endpoint for email registration
     PHONE_REGISTER: '/api/v4/auth/register', // Uses same endpoint as register
     VERIFY_OTP: '/api/v4/auth/login', // Uses login endpoint with OTP
+    VERIFY_EMAIL_OTP: '/api/v4/auth/verify-email-otp', // New endpoint for email OTP verification
     REFRESH_TOKEN: '/api/v4/auth/refresh',
     LOGOUT: '/api/v4/auth/logout',
     ME: '/api/v4/user/profile', // Updated to correct user profile endpoint

@@ -79,6 +79,7 @@ interface SocietyOnboardingStoreState extends BaseStore {
     email: string;
     dateOfBirth: string;
     photo: string;
+    sessionId?: string; // Optional session ID for verification
   };
   residenceDetails: {
     flatNumber: string;
