@@ -19,7 +19,7 @@ import {
 } from '@/stores/slices/societyOnboardingStore';
 import { showErrorAlert } from '@/utils/alert';
 import { responsive } from '@/utils/responsive';
-import { useLocalSearchParams, useRouter } from 'expo-router';
+import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import {
   KeyboardAvoidingView,
@@ -45,36 +45,18 @@ type SocietyCodeForm = z.infer<typeof societyCodeSchema>;
 
 export default function SocietyOnboarding() {
   const router = useRouter();
-  const searchParams = useLocalSearchParams<{ phoneNumber: string }>();
-
-  // Properly cache the phoneNumber to prevent getSnapshot infinite loop warning
-  const [phoneNumber, setPhoneNumber] = React.useState<string>('');
-
-  // Update phoneNumber when searchParams changes, but only if it's different
-  React.useEffect(() => {
-    const newPhoneNumber =
-      typeof searchParams.phoneNumber === 'string'
-        ? searchParams.phoneNumber
-        : '';
-    if (newPhoneNumber && newPhoneNumber !== phoneNumber) {
-      setPhoneNumber(newPhoneNumber);
-    }
-  }, [searchParams.phoneNumber, phoneNumber]);
 
   const [selectedOption, setSelectedOption] = useState<
     'code' | 'search' | null
   >(null);
 
   // Store hooks - Use specific selectors to prevent unnecessary re-renders
-  const { currentStep, loading } = useSocietyOnboardingStore(
-    React.useCallback(
-      (state) => ({
-        currentStep: state.currentStep,
-        loading: state.loading,
-      }),
-      [],
-    ),
+  const currentStep = useSocietyOnboardingStore((state) => state.currentStep);
+  const loading = useSocietyOnboardingStore((state) => state.loading);
+  const phoneNumber = useSocietyOnboardingStore(
+    (state) => state.userProfile.phoneNumber,
   );
+
   const { verifySociety, goToStep, updateUserProfile } =
     useSocietyOnboardingActions();
 
@@ -90,12 +72,13 @@ export default function SocietyOnboarding() {
       },
     );
 
-  // Initialize user profile with phone number when component mounts
+  // Check if phoneNumber is available, if not redirect back to phone registration
   React.useEffect(() => {
-    if (phoneNumber) {
-      updateUserProfile({ phoneNumber });
+    if (!phoneNumber) {
+      // No phone number available, redirect to phone registration
+      router.replace('/auth/phone-registration');
     }
-  }, [phoneNumber, updateUserProfile]);
+  }, []);
 
   const handleCodeVerification = React.useCallback(
     async (formData: SocietyCodeForm) => {
@@ -122,11 +105,8 @@ export default function SocietyOnboarding() {
       return;
     }
 
-    // Navigate to search flow
-    router.push({
-      pathname: '/auth/society-search-flow',
-      params: { phoneNumber },
-    });
+    // Navigate to search flow - phoneNumber is already stored in Zustand
+    router.push('/auth/society-search-flow');
   }, [phoneNumber, router]);
 
   const handleSkipForNow = React.useCallback(() => {

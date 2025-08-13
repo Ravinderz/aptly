@@ -353,7 +353,7 @@ export default function Welcome() {
           <Button
             onPress={() =>
               router.push({
-                pathname: '/auth/phone-registration',
+                pathname: '/auth/email-registration',
                 params: { mode: 'signup' },
               })
             }
@@ -364,7 +364,7 @@ export default function Welcome() {
           <TouchableOpacity
             onPress={() =>
               router.push({
-                pathname: '/auth/phone-registration',
+                pathname: '/auth/email-registration',
                 params: { mode: 'signin' },
               })
             }

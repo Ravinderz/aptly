@@ -17,7 +17,7 @@ import {
 import { useFormValidation } from '@/hooks/useFormValidation';
 import { responsive } from '@/utils/responsive';
 import { showErrorAlert, showSuccessAlert } from '@/utils/alert';
-import { useLocalSearchParams, useRouter } from 'expo-router';
+import { useRouter } from 'expo-router';
 import React, { useState, useEffect } from 'react';
 import {
   KeyboardAvoidingView,
@@ -73,22 +73,13 @@ type EmergencyContactForm = z.infer<typeof emergencyContactSchema>;
 
 export default function SocietyDetailsForm() {
   const router = useRouter();
-  const searchParams = useLocalSearchParams<{ phoneNumber: string }>();
-  
-  // Properly cache the phoneNumber to prevent getSnapshot infinite loop warning
-  const [phoneNumber, setPhoneNumber] = React.useState<string>('');
-  
-  // Update phoneNumber when searchParams changes, but only if it's different
-  React.useEffect(() => {
-    const newPhoneNumber = typeof searchParams.phoneNumber === 'string' ? searchParams.phoneNumber : '';
-    if (newPhoneNumber && newPhoneNumber !== phoneNumber) {
-      setPhoneNumber(newPhoneNumber);
-    }
-  }, [searchParams.phoneNumber, phoneNumber]);
   const [currentStep, setCurrentStep] = useState<'personal' | 'residence' | 'emergency'>('personal');
   const [showAddContact, setShowAddContact] = useState(false);
 
   // Store hooks
+  const { phoneNumber } = useSocietyOnboardingStore((state) => ({
+    phoneNumber: state.userProfile.phoneNumber,
+  }));
   const { 
     updateUserProfile, 
     updateResidenceDetails,
@@ -98,6 +89,13 @@ export default function SocietyDetailsForm() {
     goToStep 
   } = useSocietyOnboardingActions();
   const { userProfile, residenceDetails, emergencyContacts } = useSocietyOnboardingData();
+
+  // Check if phoneNumber is available, if not redirect back
+  React.useEffect(() => {
+    if (!phoneNumber) {
+      router.replace('/auth/phone-registration');
+    }
+  }, [phoneNumber, router]);
   const { selectedSociety } = useSocietySelection();
 
   // Personal details form

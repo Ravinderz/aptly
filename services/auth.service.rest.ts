@@ -284,6 +284,117 @@ export class RestAuthService {
   }
 
   /**
+   * Register with email address and send verification email
+   */
+  async registerEmail(
+    email: string,
+    societyCode: string = '',
+  ): Promise<AuthResult> {
+    try {
+      // Check what auth flow is available
+      // const authFlow = await developmentService.getAuthFlow();
+
+      // // If registration endpoint is not available, use mock flow
+      // if (!authFlow.supportsRegistration) {
+      //   console.log('🔧 Using development email registration flow');
+
+      //   // Simulate verification email send for development
+      //   if (societyCode) {
+      //     SecureSessionStorage.storeSocietyCode(societyCode.toUpperCase());
+      //   }
+      //   SecureSessionStorage.storeSessionId(`dev-email-session-${Date.now()}`);
+
+      //   return {
+      //     success: true,
+      //     data: { message: 'Verification email sent successfully (development mode)' },
+      //     requiresOTP: true,
+      //     sessionId: `dev-email-session-${Date.now()}`,
+      //   };
+      // }
+
+      // Validate email
+      const emailSchema = z
+        .string()
+        .email('Please enter a valid email address');
+      const emailValidation = emailSchema.safeParse(email);
+      if (!emailValidation.success) {
+        return {
+          success: false,
+          error: emailValidation.error.issues[0].message,
+        };
+      }
+
+      // Only validate society code if provided (optional during initial registration)
+      if (societyCode) {
+        const codeValidation = societyCodeSchema.safeParse(
+          societyCode.toUpperCase(),
+        );
+        if (!codeValidation.success) {
+          return {
+            success: false,
+            error: codeValidation.error.issues[0].message,
+          };
+        }
+      }
+
+      // Normalize email (lowercase and trim)
+      const normalizedEmail = email.trim().toLowerCase();
+      console.log('📧 Normalized email:', normalizedEmail);
+
+      // Prepare request data
+      const requestData = {
+        email: normalizedEmail,
+        ...(societyCode && { societyCode: societyCode.toUpperCase() }),
+      };
+
+      // Make API call
+      const response = await apiClient.post<any>(
+        API_ENDPOINTS.AUTH.REGISTER,
+        requestData,
+      );
+
+      if (response.success) {
+        // Store society code for future requests (if provided)
+        if (societyCode) {
+          SecureSessionStorage.storeSocietyCode(societyCode.toUpperCase());
+        }
+        // Store session ID for email verification
+
+        SecureSessionStorage.storeSessionId(
+          response.data.sessionId || `email-session-${Date.now()}`,
+        );
+
+        return {
+          success: true,
+          data: { message: 'Verification email sent successfully' },
+          requiresOTP: true,
+          sessionId: response.data.sessionId,
+        };
+      } else {
+        return {
+          success: false,
+          error: response.error?.message || 'Email registration failed',
+        };
+      }
+    } catch (error) {
+      console.error('❌ Email registration failed:', error);
+
+      // Fallback to development mode
+      console.log('🔧 Falling back to development mode');
+      if (societyCode) {
+        SecureSessionStorage.storeSocietyCode(societyCode.toUpperCase());
+      }
+      SecureSessionStorage.storeSessionId(`dev-email-session-${Date.now()}`);
+
+      return {
+        success: true,
+        data: { message: 'Email registration successful (development mode)' },
+        requiresOTP: true,
+      };
+    }
+  }
+
+  /**
    * Verify OTP and complete authentication (or email/password login)
    */
   async verifyOTP(

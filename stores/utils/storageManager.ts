@@ -1,6 +1,53 @@
 // Storage Manager - Robust AsyncStorage handling for Zustand persistence
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
+/**
+ * Safe JSON serialization with fallback for non-serializable data
+ */
+export const safeStringify = (value: any): string => {
+  try {
+    return JSON.stringify(value, (key, val) => {
+      // Handle circular references and non-serializable objects
+      if (val && typeof val === 'object') {
+        // Check for ReadableNativeMap or similar React Native objects
+        if (val.constructor && val.constructor.name && 
+            (val.constructor.name.includes('Native') || val.constructor.name.includes('Readable'))) {
+          // Convert to plain object
+          const plainObj: any = {};
+          try {
+            Object.keys(val).forEach(k => {
+              plainObj[k] = val[k];
+            });
+            return plainObj;
+          } catch {
+            return {}; // Return empty object if conversion fails
+          }
+        }
+      }
+      return val;
+    });
+  } catch (error) {
+    console.warn('Failed to stringify value, using fallback:', error);
+    // Return a minimal fallback representation
+    if (value && typeof value === 'object') {
+      return JSON.stringify({ _fallback: true, _type: typeof value });
+    }
+    return JSON.stringify(value?.toString() || null);
+  }
+};
+
+/**
+ * Safe JSON parsing with error handling
+ */
+export const safeParse = (value: string): any => {
+  try {
+    return JSON.parse(value);
+  } catch (error) {
+    console.warn('Failed to parse JSON value:', error);
+    return null;
+  }
+};
+
 export interface StorageManager {
   getItem: (key: string) => Promise<string | null>;
   setItem: (key: string, value: string) => Promise<void>;
@@ -99,17 +146,21 @@ export const createSafeStorage = (storeName: string): StorageManager => {
     setItem: async (key: string, value: string): Promise<void> => {
       try {
         if (await checkAndFallback('setItem', key)) {
-          await AsyncStorage.setItem(key, value);
+          // Ensure value is a string and properly serialized
+          const serializedValue = typeof value === 'string' ? value : safeStringify(value);
+          await AsyncStorage.setItem(key, serializedValue);
           console.log(`💾 ${storeName}: Stored item '${key}' to storage`);
           // Also store in memory as backup
-          memoryFallback.set(key, value);
+          memoryFallback.set(key, serializedValue);
         } else {
-          memoryFallback.set(key, value);
+          const serializedValue = typeof value === 'string' ? value : safeStringify(value);
+          memoryFallback.set(key, serializedValue);
         }
       } catch (error) {
         console.warn(`⚠️ ${storeName}: Failed to set item '${key}', using memory fallback:`, error);
         storageAvailable = false;
-        memoryFallback.set(key, value);
+        const serializedValue = typeof value === 'string' ? value : safeStringify(value);
+        memoryFallback.set(key, serializedValue);
         // Don't throw error - allow app to continue
       }
     },

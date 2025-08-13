@@ -1,4 +1,5 @@
-import { useRouter, useLocalSearchParams } from 'expo-router';
+import { useRouter } from 'expo-router';
+import { useSocietyOnboardingStore } from '@/stores/slices/societyOnboardingStore';
 import {
   ArrowLeft,
   Building,
@@ -30,10 +31,17 @@ interface Society {
 
 export default function SocietyVerification() {
   const router = useRouter();
-  const { phoneNumber, societyCode } = useLocalSearchParams<{
-    phoneNumber: string;
-    societyCode: string;
-  }>();
+  const { phoneNumber, societyCode } = useSocietyOnboardingStore((state) => ({
+    phoneNumber: state.userProfile.phoneNumber,
+    societyCode: state.selectedSociety?.code || '',
+  }));
+
+  // Check if required data is available, if not redirect back
+  React.useEffect(() => {
+    if (!phoneNumber) {
+      router.replace('/auth/phone-registration');
+    }
+  }, [phoneNumber, router]);
 
   const [isLoading, setIsLoading] = useState(true);
   const [society, setSociety] = useState<Society | null>(null);

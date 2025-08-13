@@ -16,7 +16,7 @@ import {
 import { useFormValidation } from '@/hooks/useFormValidation';
 import { responsive } from '@/utils/responsive';
 import { showErrorAlert } from '@/utils/alert';
-import { useLocalSearchParams, useRouter } from 'expo-router';
+import { useRouter } from 'expo-router';
 import React, { useState, useEffect } from 'react';
 import {
   ActivityIndicator,
@@ -45,23 +45,21 @@ type SearchForm = z.infer<typeof searchSchema>;
 
 export default function SocietySearchFlow() {
   const router = useRouter();
-  const searchParams = useLocalSearchParams<{ phoneNumber: string }>();
-  
-  // Properly cache the phoneNumber to prevent getSnapshot infinite loop warning
-  const [phoneNumber, setPhoneNumber] = React.useState<string>('');
-  
-  // Update phoneNumber when searchParams changes, but only if it's different
-  React.useEffect(() => {
-    const newPhoneNumber = typeof searchParams.phoneNumber === 'string' ? searchParams.phoneNumber : '';
-    if (newPhoneNumber && newPhoneNumber !== phoneNumber) {
-      setPhoneNumber(newPhoneNumber);
-    }
-  }, [searchParams.phoneNumber, phoneNumber]);
   const [searchMode, setSearchMode] = useState<'text' | 'location' | null>(null);
 
   // Store hooks
+  const { phoneNumber } = useSocietyOnboardingStore((state) => ({
+    phoneNumber: state.userProfile.phoneNumber,
+  }));
   const { searchSocieties, selectSociety, loadMoreResults } = useSocietyOnboardingActions();
   const { results, loading, error, hasMore } = useSocietySearch();
+
+  // Check if phoneNumber is available, if not redirect back
+  React.useEffect(() => {
+    if (!phoneNumber) {
+      router.replace('/auth/phone-registration');
+    }
+  }, [phoneNumber, router]);
 
   // Form validation for text search
   const {
@@ -112,11 +110,8 @@ export default function SocietySearchFlow() {
 
   const handleSocietySelect = (society: SocietyInfo) => {
     selectSociety(society);
-    // Navigate to details form
-    router.push({
-      pathname: '/auth/society-details-form',
-      params: { phoneNumber },
-    });
+    // Navigate to details form - phoneNumber is already stored in Zustand
+    router.push('/auth/society-details-form');
   };
 
   const handleLoadMore = () => {

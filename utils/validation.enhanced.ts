@@ -90,6 +90,13 @@ export const phoneRegistrationSchema = z.object({
   }),
 });
 
+export const emailRegistrationSchema = z.object({
+  email: emailSchema,
+  agreeToTerms: z.boolean().refine((val) => val === true, {
+    message: 'Please accept the terms and conditions',
+  }),
+});
+
 export const otpVerificationSchema = z.object({
   phone: phoneSchema,
   otp: otpSchema,
@@ -309,6 +316,7 @@ export const notificationSettingsSchema = z.object({
 
 // Utility types
 export type PhoneRegistrationForm = z.infer<typeof phoneRegistrationSchema>;
+export type EmailRegistrationForm = z.infer<typeof emailRegistrationSchema>;
 export type OTPVerificationForm = z.infer<typeof otpVerificationSchema>;
 export type ProfileSetupForm = z.infer<typeof profileSetupSchema>;
 export type SocietyVerificationForm = z.infer<typeof societyVerificationSchema>;

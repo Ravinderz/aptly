@@ -14,7 +14,7 @@ import {
 } from '@/components/ui/ResponsiveContainer';
 import { responsive } from '@/utils/responsive';
 import { showErrorAlert } from '@/utils/alert';
-import { useLocalSearchParams, useRouter } from 'expo-router';
+import { useRouter } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import {
   SafeAreaView,
@@ -33,21 +33,19 @@ import {
 
 export default function SocietyCompletion() {
   const router = useRouter();
-  const searchParams = useLocalSearchParams<{ phoneNumber: string }>();
-  
-  // Properly cache the phoneNumber to prevent getSnapshot infinite loop warning
-  const [phoneNumber, setPhoneNumber] = React.useState<string>('');
-  
-  // Update phoneNumber when searchParams changes, but only if it's different
-  React.useEffect(() => {
-    const newPhoneNumber = typeof searchParams.phoneNumber === 'string' ? searchParams.phoneNumber : '';
-    if (newPhoneNumber && newPhoneNumber !== phoneNumber) {
-      setPhoneNumber(newPhoneNumber);
-    }
-  }, [searchParams.phoneNumber, phoneNumber]);
   const [isReviewing, setIsReviewing] = useState(false);
 
   // Store hooks
+  const { phoneNumber } = useSocietyOnboardingStore((state) => ({
+    phoneNumber: state.userProfile.phoneNumber,
+  }));
+
+  // Check if phoneNumber is available, if not redirect back
+  React.useEffect(() => {
+    if (!phoneNumber) {
+      router.replace('/auth/phone-registration');
+    }
+  }, [phoneNumber, router]);
   const { 
     submitJoinRequest, 
     retrySubmission, 
