@@ -88,7 +88,7 @@ export default function ProfileSetup() {
         confirmPasscode: '',
       },
       {
-        validateOnChange: true,
+        validateOnChange: false, // Only validate on blur, not during typing
         validateOnBlur: true,
         debounceMs: 300,
       },
@@ -344,7 +344,7 @@ export default function ProfileSetup() {
               onPress={() => router.push('/auth/society-onboarding')}
               className="items-center">
               <Text className="text-text-secondary text-sm">
-                Skip for now, I'll complete this later
+                Skip for now, I&apos;ll complete this later
               </Text>
             </TouchableOpacity>
           </View>

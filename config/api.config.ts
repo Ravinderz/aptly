@@ -13,7 +13,7 @@ const ENV = process.env.NODE_ENV || 'development';
  * API Base URLs for different environments
  */
 const API_BASE_URLS = {
-  development: 'http://192.168.0.103:3000', // Use local IP for React Native simulators
+  development: 'http://192.168.8.199:3000', // Use local IP for React Native simulators
   staging: 'https://api-staging.aptly.com',
   production: 'https://api.aptly.com',
 } as const;

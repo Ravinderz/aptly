@@ -17,7 +17,7 @@ import {
   phoneRegistrationSchema,
 } from '@/utils/validation.enhanced';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import {
   KeyboardAvoidingView,
   Platform,
@@ -68,17 +68,13 @@ export default function PhoneRegistration() {
       agreeToTerms: false,
     },
     {
-      validateOnChange: true,
+      validateOnChange: false, // Only validate on blur, not during typing
       validateOnBlur: true,
-      debounceMs: 500,
+      debounceMs: 300, // Standard debounce timing
     },
   );
 
-  useEffect(() => {
-    checkBiometricAvailability();
-  }, []);
-
-  const checkBiometricAvailability = async () => {
+  const checkBiometricAvailability = useCallback(async () => {
     if (!isSignIn) return; // Only show for sign in
 
     const biometricConfig = await BiometricService.checkBiometricSupport();
@@ -94,7 +90,11 @@ export default function PhoneRegistration() {
         BiometricService.getBiometricTypeName(biometricConfig.supportedTypes),
       );
     }
-  };
+  }, [isSignIn]);
+
+  useEffect(() => {
+    checkBiometricAvailability();
+  }, [checkBiometricAvailability]);
 
   const handleBiometricLogin = async () => {
     setIsBiometricLoading(true);
@@ -385,7 +385,7 @@ export default function PhoneRegistration() {
             <Text className="text-primary font-semibold mb-2">Need Help?</Text>
             <Text className="text-text-secondary text-sm leading-5">
               Contact your society manager or housing committee to get your
-              society code. Make sure you're using the mobile number registered
+              society code. Make sure you&apos;re using the mobile number registered
               with your society.
             </Text>
           </View>

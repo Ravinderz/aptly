@@ -17,7 +17,7 @@ import { useFormValidation } from '@/hooks/useFormValidation';
 import { responsive } from '@/utils/responsive';
 import { showErrorAlert } from '@/utils/alert';
 import { useRouter } from 'expo-router';
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import {
   ActivityIndicator,
   FlatList,
@@ -74,9 +74,9 @@ export default function SocietySearchFlow() {
     searchSchema,
     { query: '' },
     {
-      validateOnChange: true,
+      validateOnChange: false, // Only validate on blur, not during typing
       validateOnBlur: true,
-      debounceMs: 500,
+      debounceMs: 300,
     },
   );
 
@@ -271,7 +271,7 @@ export default function SocietySearchFlow() {
               <Button
                 onPress={() => handleSubmit(handleTextSearch)}
                 loading={isSubmitting || loading}
-                disabled={!isValid}
+                disabled={!isValid || isSubmitting}
                 className="mb-4">
                 Search Societies
               </Button>
@@ -292,7 +292,7 @@ export default function SocietySearchFlow() {
                 Browse Nearby Societies
               </Text>
               <Text className="text-text-secondary mb-6">
-                We'll show you housing societies within a 5km radius of your location.
+                We&apos;ll show you housing societies within a 5km radius of your location.
               </Text>
 
               <Button
@@ -358,7 +358,7 @@ export default function SocietySearchFlow() {
             <Text className="text-text-secondary text-sm leading-5">
               • Try different variations of your society name{'\n'}
               • Include locality or area name for better results{'\n'}
-              • Check with your society management if you can't find it
+              • Check with your society management if you can&apos;t find it
             </Text>
           </View>
         </ResponsiveContainer>

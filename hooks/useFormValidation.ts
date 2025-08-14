@@ -92,17 +92,19 @@ export function useFormValidation<T extends Record<string, any>>(
 
     Object.keys(initialValues)?.forEach((key) => {
       const fieldKey = key as keyof T;
+      
+      // Initialize fields without showing errors initially (for better UX)
       fields[fieldKey] = {
         value: initialValues[fieldKey],
         error: '',
         touched: false,
-        isValid: true,
+        isValid: true, // Start optimistic, validate on first interaction
       };
     });
 
     return {
       fields,
-      isValid: true,
+      isValid: false, // Start with form invalid to prevent premature submission
       isSubmitting: false,
       submitCount: 0,
       touchedFields: new Set<keyof T>(),
@@ -141,6 +143,24 @@ export function useFormValidation<T extends Record<string, any>>(
     ) as (keyof T)[],
   );
 
+  // Helper function to calculate overall form validity
+  const calculateFormValidity = useCallback((fields: FormState<T>['fields']): boolean => {
+    return Object.keys(fields).every(key => {
+      const field = fields[key as keyof T];
+      const fieldSchema = (schema as any).shape?.[key];
+      
+      if (!fieldSchema) return true;
+      
+      // Check if field has valid content
+      try {
+        fieldSchema.parse(field.value);
+        return true;
+      } catch {
+        return false;
+      }
+    });
+  }, [schema]);
+
   // Validation functions
   const validateSingleField = useCallback(
     async <K extends keyof T>(field: K, currentValue?: T[K]): Promise<boolean> => {
@@ -162,25 +182,30 @@ export function useFormValidation<T extends Record<string, any>>(
       const result = validateField(fieldSchema, fieldValue);
       console.log(`🔍 Validation result for ${String(field)}:`, result);
 
-      setFormState((prev) => ({
-        ...prev,
-        fields: {
+      setFormState((prev) => {
+        const newFields = {
           ...prev.fields,
           [field]: {
             ...prev.fields[field],
             error: result.error || '',
             isValid: result.isValid,
           },
-        },
-        errors: {
-          ...prev.errors,
-          [field]: result.error || undefined,
-        },
-      }));
+        };
+
+        return {
+          ...prev,
+          fields: newFields,
+          errors: {
+            ...prev.errors,
+            [field]: result.error || undefined,
+          },
+          isValid: calculateFormValidity(newFields), // Recalculate overall form validity
+        };
+      });
 
       return result.isValid;
     },
-    [schema], // Remove formState.fields dependency to prevent circular dependencies
+    [schema, calculateFormValidity], // Remove formState.fields dependency to prevent circular dependencies
   );
 
   const validateEntireForm = useCallback(async (): Promise<{
@@ -243,15 +268,18 @@ export function useFormValidation<T extends Record<string, any>>(
         shouldValidate =
           validateOnChange || (revalidateOnChange && prev.fields[field].error);
 
+        const newFields = {
+          ...prev.fields,
+          [field]: {
+            ...prev.fields[field],
+            value,
+          },
+        };
+
         return {
           ...prev,
-          fields: {
-            ...prev.fields,
-            [field]: {
-              ...prev.fields[field],
-              value,
-            },
-          },
+          fields: newFields,
+          isValid: calculateFormValidity(newFields), // Recalculate form validity when values change
         };
       });
 
@@ -267,44 +295,54 @@ export function useFormValidation<T extends Record<string, any>>(
         debounceTimersRef.current.set(field, newTimer);
       }
     },
-    [validateOnChange, revalidateOnChange, debounceMs, validateSingleField],
+    [validateOnChange, revalidateOnChange, debounceMs, validateSingleField, calculateFormValidity],
   );
 
   const setError = useCallback(<K extends keyof T>(field: K, error: string) => {
-    setFormState((prev) => ({
-      ...prev,
-      fields: {
+    setFormState((prev) => {
+      const newFields = {
         ...prev.fields,
         [field]: {
           ...prev.fields[field],
           error,
           isValid: !error,
         },
-      },
-      errors: {
-        ...prev.errors,
-        [field]: error || undefined,
-      },
-    }));
-  }, []);
+      };
+
+      return {
+        ...prev,
+        fields: newFields,
+        errors: {
+          ...prev.errors,
+          [field]: error || undefined,
+        },
+        isValid: calculateFormValidity(newFields), // Recalculate overall form validity
+      };
+    });
+  }, [calculateFormValidity]);
 
   const clearError = useCallback(<K extends keyof T>(field: K) => {
-    setFormState((prev) => ({
-      ...prev,
-      fields: {
+    setFormState((prev) => {
+      const newFields = {
         ...prev.fields,
         [field]: {
           ...prev.fields[field],
           error: '',
           isValid: true,
         },
-      },
-      errors: {
-        ...prev.errors,
-        [field]: undefined,
-      },
-    }));
-  }, []);
+      };
+
+      return {
+        ...prev,
+        fields: newFields,
+        errors: {
+          ...prev.errors,
+          [field]: undefined,
+        },
+        isValid: calculateFormValidity(newFields), // Recalculate overall form validity
+      };
+    });
+  }, [calculateFormValidity]);
 
   const clearAllErrors = useCallback(() => {
     setFormState((prev) => {
@@ -322,10 +360,10 @@ export function useFormValidation<T extends Record<string, any>>(
         ...prev,
         fields: newFields,
         errors: {},
-        isValid: true,
+        isValid: calculateFormValidity(newFields), // Should be true since all fields are valid
       };
     });
-  }, []);
+  }, [calculateFormValidity]);
 
   const touchField = useCallback(
     <K extends keyof T>(field: K) => {

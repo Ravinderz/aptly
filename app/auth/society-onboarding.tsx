@@ -66,7 +66,7 @@ export default function SocietyOnboarding() {
       societyCodeSchema,
       { societyCode: '' },
       {
-        validateOnChange: true,
+        validateOnChange: false, // Only validate on blur, not during typing
         validateOnBlur: true,
         debounceMs: 300,
       },
@@ -78,7 +78,7 @@ export default function SocietyOnboarding() {
       // No phone number available, redirect to phone registration
       router.replace('/auth/phone-registration');
     }
-  }, []);
+  }, [phoneNumber, router]);
 
   const handleCodeVerification = React.useCallback(
     async (formData: SocietyCodeForm) => {
@@ -240,7 +240,7 @@ export default function SocietyOnboarding() {
               <Button
                 onPress={() => handleSubmit(handleCodeVerification)}
                 loading={isSubmitting || loading}
-                disabled={!isValid}
+                disabled={!isValid || isSubmitting}
                 className="mb-4">
                 Verify Society Code
               </Button>

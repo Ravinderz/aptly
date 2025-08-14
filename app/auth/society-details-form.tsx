@@ -106,7 +106,7 @@ export default function SocietyDetailsForm() {
       email: userProfile.email || '',
       dateOfBirth: userProfile.dateOfBirth || '',
     },
-    { validateOnChange: true, validateOnBlur: true, debounceMs: 300 }
+    { validateOnChange: false, validateOnBlur: true, debounceMs: 300 }
   );
 
   // Residence details form
@@ -119,7 +119,7 @@ export default function SocietyDetailsForm() {
       ownershipType: residenceDetails.ownershipType || 'owner',
       moveInDate: residenceDetails.moveInDate || '',
     },
-    { validateOnChange: true, validateOnBlur: true, debounceMs: 300 }
+    { validateOnChange: false, validateOnBlur: true, debounceMs: 300 }
   );
 
   // Emergency contact form
@@ -131,7 +131,7 @@ export default function SocietyDetailsForm() {
       phoneNumber: '',
       email: '',
     },
-    { validateOnChange: true, validateOnBlur: true, debounceMs: 300 }
+    { validateOnChange: false, validateOnBlur: true, debounceMs: 300 }
   );
 
   // Initialize phone number if available
@@ -211,7 +211,8 @@ export default function SocietyDetailsForm() {
 
       <Button
         onPress={() => personalForm.handleSubmit(handlePersonalDetailsSubmit)}
-        disabled={!personalForm.isValid}
+        disabled={!personalForm.isValid || personalForm.isSubmitting}
+        loading={personalForm.isSubmitting}
         className="mb-4">
         Continue to Residence Details
       </Button>
@@ -300,7 +301,8 @@ export default function SocietyDetailsForm() {
 
       <Button
         onPress={() => residenceForm.handleSubmit(handleResidenceDetailsSubmit)}
-        disabled={!residenceForm.isValid}
+        disabled={!residenceForm.isValid || residenceForm.isSubmitting}
+        loading={residenceForm.isSubmitting}
         className="mb-4">
         Continue to Emergency Contacts
       </Button>
@@ -398,7 +400,8 @@ export default function SocietyDetailsForm() {
             </Button>
             <Button
               onPress={() => contactForm.handleSubmit(handleEmergencyContactSubmit)}
-              disabled={!contactForm.isValid}
+              disabled={!contactForm.isValid || contactForm.isSubmitting}
+              loading={contactForm.isSubmitting}
               className="flex-1">
               Add Contact
             </Button>

@@ -125,14 +125,18 @@ const AppNavigator = ({ children }: { children: React.ReactNode }) => {
       // Check if we're on a protected auth route that should not be redirected
       const protectedAuthRoutes = [
         'email-registration',
-        'phone-registration', 
+        'phone-registration',
+        'user-onboarding',
         'otp-verification',
         'society-onboarding',
         'society-search-flow',
         'society-details-form',
-        'society-completion'
+        'society-completion',
       ];
-      const isOnProtectedAuthRoute = inAuthGroup && segments.length > 1 && protectedAuthRoutes.includes(segments[1]);
+      const isOnProtectedAuthRoute =
+        inAuthGroup &&
+        segments.length > 1 &&
+        protectedAuthRoutes.includes(segments[1]);
 
       // DEBUG: Log current navigation state
       console.log('🧭 AppNavigator DEBUG:', {
@@ -148,7 +152,9 @@ const AppNavigator = ({ children }: { children: React.ReactNode }) => {
 
       // Don't interfere with protected auth routes
       if (isOnProtectedAuthRoute) {
-        console.log('🧭 AppNavigator: Protected auth route detected, skipping navigation override');
+        console.log(
+          '🧭 AppNavigator: Protected auth route detected, skipping navigation override',
+        );
         return;
       }
 

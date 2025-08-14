@@ -1,7 +1,7 @@
 import { Button } from '@/components/ui/Button';
 import { AuthService } from '@/services';
 import {
-  useSocietyOnboardingActions,
+  // useSocietyOnboardingActions, // Not used in this component
   useSocietyOnboardingStore,
 } from '@/stores/slices/societyOnboardingStore';
 import { showErrorAlert, showSuccessAlert } from '@/utils/alert';
@@ -19,7 +19,7 @@ import {
 export default function OTPVerification() {
   const router = useRouter();
 
-  const { updateUserProfile } = useSocietyOnboardingActions();
+  // const { updateUserProfile } = useSocietyOnboardingActions(); // Not needed in this component
 
   const [otp, setOTP] = useState(['', '', '', '', '', '']);
   const [isLoading, setIsLoading] = useState(false);
@@ -221,7 +221,7 @@ export default function OTPVerification() {
             Verify Your Number
           </Text>
           <Text className="text-text-secondary text-center leading-6 mb-2">
-            We've sent a 6-digit verification code to
+            We&apos;ve sent a 6-digit verification code to
           </Text>
           <Text className="text-text-primary font-semibold">
             {formatPhoneNumber(phoneNumber || '')}
@@ -270,7 +270,7 @@ export default function OTPVerification() {
         {/* Resend Section */}
         <View className="items-center">
           <Text className="text-text-secondary mb-4">
-            Didn't receive the code?
+            Didn&apos;t receive the code?
           </Text>
 
           {canResend ? (

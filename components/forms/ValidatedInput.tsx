@@ -221,6 +221,9 @@ export const ValidatedInput = forwardRef<TextInput, ValidatedInputProps>(
       if (hasError) stateStyles = { ...stateStyles, ...styles.errorInput };
       if (isValid) stateStyles = { ...stateStyles, ...styles.successInput };
       if (!editable) stateStyles = { ...stateStyles, ...styles.disabledInput };
+      
+      // Add left padding when icon is present
+      if (icon) stateStyles = { ...stateStyles, ...styles.inputWithLeftIcon };
 
       return [baseStyle, sizeStyles, variantStyles, stateStyles, style];
     };
@@ -478,10 +481,15 @@ const styles = StyleSheet.create({
     backgroundColor: '#F3F4F6',
     color: '#9CA3AF',
   },
+  inputWithLeftIcon: {
+    paddingLeft: 44, // Increase left padding when icon is present (12 base + 24 icon + 8 gap)
+  },
   leftIcon: {
     position: 'absolute',
     left: 12,
     zIndex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   rightIconsContainer: {
     position: 'absolute',

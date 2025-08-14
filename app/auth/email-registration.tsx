@@ -73,9 +73,9 @@ export default function EmailRegistration() {
       agreeToTerms: false,
     },
     {
-      validateOnChange: true,
+      validateOnChange: false, // Only validate on blur, not on change
       validateOnBlur: true,
-      debounceMs: 500,
+      debounceMs: 300, // Reduced debounce for better UX
     },
   );
 
@@ -264,7 +264,7 @@ export default function EmailRegistration() {
                 showError={false} // Use form-level error display instead
               />
             </View>
-            {errors.email && (
+            {errors.email && fields.email.touched && (
               <Text className="text-error text-sm mt-2">{errors.email}</Text>
             )}
           </View>
@@ -272,9 +272,13 @@ export default function EmailRegistration() {
           {/* Terms Agreement Checkbox */}
           <View className="mb-8 flex-row items-start">
             <TouchableOpacity
-              onPress={() =>
-                setValue('agreeToTerms', !fields.agreeToTerms.value)
-              }
+              onPress={() => {
+                setValue('agreeToTerms', !fields.agreeToTerms.value);
+                // Mark field as touched when user interacts
+                if (!fields.agreeToTerms.touched) {
+                  getFieldProps('agreeToTerms').onBlur();
+                }
+              }}
               className="mr-3 mt-1">
               <View
                 className={`w-5 h-5 border-2 rounded ${
@@ -288,9 +292,13 @@ export default function EmailRegistration() {
               </View>
             </TouchableOpacity>
             <TouchableOpacity
-              onPress={() =>
-                setValue('agreeToTerms', !fields.agreeToTerms.value)
-              }
+              onPress={() => {
+                setValue('agreeToTerms', !fields.agreeToTerms.value);
+                // Mark field as touched when user interacts
+                if (!fields.agreeToTerms.touched) {
+                  getFieldProps('agreeToTerms').onBlur();
+                }
+              }}
               className="flex-1">
               <Text className="text-text-secondary text-sm">
                 I agree to the{' '}
@@ -302,7 +310,7 @@ export default function EmailRegistration() {
               </Text>
             </TouchableOpacity>
           </View>
-          {errors.agreeToTerms && (
+          {errors.agreeToTerms && fields.agreeToTerms.touched && (
             <Text className="text-error text-sm mb-4 mt-[-16px]">
               {errors.agreeToTerms}
             </Text>

@@ -8,9 +8,10 @@ export default function AuthLayout() {
         animation: 'slide_from_right',
       }}>
       {/* Phone and OTP Verification */}
-      <Stack.Screen name="phone-registration" />
+      {/* <Stack.Screen name="phone-registration" /> */}
       <Stack.Screen name="email-registration" />
       <Stack.Screen name="otp-verification" />
+      <Stack.Screen name="user-onboarding" />
 
       {/* Society Onboarding Flow */}
       <Stack.Screen name="society-onboarding" />

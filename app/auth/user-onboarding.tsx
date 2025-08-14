@@ -72,10 +72,12 @@ export default function UserOnboarding() {
 
   const { updateUserProfile } = useSocietyOnboardingActions();
 
-  // Get phone number from store
+  // Get phone number and email from store
   const phoneNumber = useSocietyOnboardingStore(
     (state) => state.userProfile.phoneNumber,
   );
+
+  const email = useSocietyOnboardingStore((state) => state.userProfile.email);
 
   // Form validation
   const {
@@ -90,24 +92,17 @@ export default function UserOnboarding() {
     profileSetupSchema,
     {
       fullName: '',
-      phoneNumber: phoneNumber || '',
-      email: '',
+      phoneNumber: '',
+      email: email || '',
       passcode: '',
       confirmPasscode: '',
     },
     {
-      validateOnChange: true,
+      validateOnChange: false, // Only validate on blur, not during typing
       validateOnBlur: true,
       debounceMs: 300,
     },
   );
-
-  // Check if phoneNumber is available, if not redirect back to phone registration
-  React.useEffect(() => {
-    if (!phoneNumber) {
-      router.replace('/auth/phone-registration');
-    }
-  }, [phoneNumber, router]);
 
   // Format phone number for display
   const formatPhoneNumber = (phone: string) => {
@@ -127,12 +122,12 @@ export default function UserOnboarding() {
         const profileData = {
           fullName: formData.fullName.trim(),
           phoneNumber: formData.phoneNumber,
-          email: formData.email.toLowerCase().trim(),
+          email: formData.email.trim(),
           passcode: formData.passcode,
         };
 
         // Call auth service to create user profile
-        const result = await AuthService.createUserProfile(profileData);
+        const result = await AuthService.createProfile(profileData);
 
         if (result.success) {
           // Update the store with profile data
@@ -232,20 +227,42 @@ export default function UserOnboarding() {
               maxLength={50}
             />
 
-            {/* Phone Number (Read-only) */}
-            <View>
-              <Text className="text-text-primary font-medium mb-2">
-                Phone Number
-              </Text>
-              <View className="bg-surface/50 border border-divider rounded-xl px-4 py-4 flex-row items-center">
+            {/* Phone Number */}
+            <ValidatedInput
+              label="Phone Number"
+              placeholder="Enter your phone number"
+              value={fields.phoneNumber.value}
+              onChangeText={(text) => setValue('phoneNumber', text)}
+              onBlur={getFieldProps('phoneNumber').onBlur}
+              error={errors.phoneNumber}
+              keyboardType="phone-pad"
+              autoComplete="tel"
+              textContentType="telephoneNumber"
+              maxLength={13}
+              icon={
                 <LucideIcons
-                  name="phone"
+                  name="call-outline"
                   size={20}
                   color="#6b7280"
-                  className="mr-3"
                 />
+              }
+            />
+
+            {/* Email Address (Read-only - Verified) */}
+            <View>
+              <Text className="text-text-primary font-medium mb-2">
+                Email Address
+              </Text>
+              <View className="bg-surface/50 border border-divider rounded-xl px-4 py-4 flex-row items-center">
+                <View className="mr-3">
+                  <LucideIcons
+                    name="mail-outline"
+                    size={20}
+                    color="#6b7280"
+                  />
+                </View>
                 <Text className="text-text-primary font-medium flex-1">
-                  {formatPhoneNumber(fields.phoneNumber.value)}
+                  {fields.email.value}
                 </Text>
                 <View className="bg-success/10 px-2 py-1 rounded-full">
                   <Text className="text-success text-xs font-medium">
@@ -253,25 +270,7 @@ export default function UserOnboarding() {
                   </Text>
                 </View>
               </View>
-              <Text className="text-text-secondary text-sm mt-1">
-                Your verified phone number
-              </Text>
             </View>
-
-            {/* Email Address */}
-            <ValidatedInput
-              label="Email Address"
-              placeholder="Enter your email address"
-              value={fields.email.value}
-              onChangeText={(text) => setValue('email', text.toLowerCase())}
-              onBlur={getFieldProps('email').onBlur}
-              error={errors.email}
-              keyboardType="email-address"
-              autoCapitalize="none"
-              autoComplete="email"
-              textContentType="emailAddress"
-              maxLength={100}
-            />
 
             {/* Passcode */}
             <ValidatedInput
@@ -356,7 +355,7 @@ export default function UserOnboarding() {
               onPress={() => router.push('/auth/society-onboarding')}
               className="items-center">
               <Text className="text-text-secondary text-sm">
-                Skip for now, I'll complete this later
+                Skip for now, I&apos;ll complete this later
               </Text>
             </TouchableOpacity>
           </View>

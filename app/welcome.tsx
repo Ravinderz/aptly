@@ -352,9 +352,11 @@ export default function Welcome() {
         <View className="px-6 pb-8">
           <Button
             onPress={() => {
-              console.log('🔘 Welcome: Get Started button pressed - navigating to email-registration');
+              console.log(
+                '🔘 Welcome: Get Started button pressed - navigating to email-registration',
+              );
               router.push({
-                pathname: '/auth/email-registration',
+                pathname: '/auth/user-onboarding',
                 params: { mode: 'signup' },
               });
             }}
@@ -364,7 +366,9 @@ export default function Welcome() {
 
           <TouchableOpacity
             onPress={() => {
-              console.log('🔘 Welcome: Sign In button pressed - navigating to email-registration');
+              console.log(
+                '🔘 Welcome: Sign In button pressed - navigating to email-registration',
+              );
               router.push({
                 pathname: '/auth/email-registration',
                 params: { mode: 'signin' },
