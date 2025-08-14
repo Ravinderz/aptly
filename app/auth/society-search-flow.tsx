@@ -1,6 +1,6 @@
 /**
  * Society Search Flow - Search and select society
- * 
+ *
  * Allows users to search for societies by:
  * 1. Name/text search
  * 2. Location-based search
@@ -14,10 +14,16 @@ import {
   ResponsiveText,
 } from '@/components/ui/ResponsiveContainer';
 import { useFormValidation } from '@/hooks/useFormValidation';
-import { responsive } from '@/utils/responsive';
+import {
+  useSocietyOnboardingActions,
+  useSocietyOnboardingStore,
+  useSocietySearch,
+} from '@/stores/slices/societyOnboardingStore';
+import type { SocietyInfo } from '@/types/society';
 import { showErrorAlert } from '@/utils/alert';
+import { responsive } from '@/utils/responsive';
 import { useRouter } from 'expo-router';
-import React, { useState } from 'react';
+import React, { useState, useCallback, useMemo } from 'react';
 import {
   ActivityIndicator,
   FlatList,
@@ -29,12 +35,6 @@ import {
   View,
 } from 'react-native';
 import { z } from 'zod';
-import { 
-  useSocietyOnboardingStore, 
-  useSocietyOnboardingActions, 
-  useSocietySearch 
-} from '@/stores/slices/societyOnboardingStore';
-import type { SocietyInfo } from '@/types/society';
 
 // Search form validation
 const searchSchema = z.object({
@@ -45,21 +45,26 @@ type SearchForm = z.infer<typeof searchSchema>;
 
 export default function SocietySearchFlow() {
   const router = useRouter();
+  
+  // Simplified state to avoid re-render loops
   const [searchMode, setSearchMode] = useState<'text' | 'location' | null>(null);
 
-  // Store hooks
-  const { phoneNumber } = useSocietyOnboardingStore((state) => ({
-    phoneNumber: state.userProfile.phoneNumber,
-  }));
+  // Simple store selectors without memoization to avoid loops
+  const phoneNumber = useSocietyOnboardingStore((state) => state.userProfile?.phoneNumber);
+  const results = useSocietyOnboardingStore((state) => state.searchResults || []);
+  const loading = useSocietyOnboardingStore((state) => state.searchLoading || false);
+  const error = useSocietyOnboardingStore((state) => state.searchError || null);
+  const hasMore = useSocietyOnboardingStore((state) => state.searchHasMore || false);
+  
+  // Get actions directly
   const { searchSocieties, selectSociety, loadMoreResults } = useSocietyOnboardingActions();
-  const { results, loading, error, hasMore } = useSocietySearch();
 
-  // Check if phoneNumber is available, if not redirect back
-  React.useEffect(() => {
-    if (!phoneNumber) {
-      router.replace('/auth/phone-registration');
-    }
-  }, [phoneNumber, router]);
+  // // Check if phoneNumber is available, if not redirect back
+  // React.useEffect(() => {
+  //   if (!phoneNumber) {
+  //     router.replace('/auth/phone-registration');
+  //   }
+  // }, [phoneNumber, router]);
 
   // Form validation for text search
   const {
@@ -80,7 +85,7 @@ export default function SocietySearchFlow() {
     },
   );
 
-  const handleTextSearch = async (formData: SearchForm) => {
+  const handleTextSearch = useCallback(async (formData: SearchForm) => {
     try {
       await searchSocieties({
         query: formData.query.trim(),
@@ -89,16 +94,16 @@ export default function SocietySearchFlow() {
     } catch (error: any) {
       showErrorAlert('Error', error.message || 'Search failed');
     }
-  };
+  }, [searchSocieties]);
 
-  const handleLocationSearch = async () => {
+  const handleLocationSearch = useCallback(async () => {
     // TODO: Implement location-based search
     // For now, show mock results based on location
     try {
       await searchSocieties({
         location: {
           latitude: 28.5355, // Delhi coordinates as example
-          longitude: 77.3910,
+          longitude: 77.391,
           radius: 5, // 5km radius
         },
         pagination: { page: 1, limit: 20 },
@@ -106,21 +111,21 @@ export default function SocietySearchFlow() {
     } catch (error: any) {
       showErrorAlert('Error', error.message || 'Location search failed');
     }
-  };
+  }, [searchSocieties]);
 
-  const handleSocietySelect = (society: SocietyInfo) => {
+  const handleSocietySelect = useCallback((society: SocietyInfo) => {
     selectSociety(society);
     // Navigate to details form - phoneNumber is already stored in Zustand
     router.push('/auth/society-details-form');
-  };
+  }, [selectSociety, router]);
 
-  const handleLoadMore = () => {
+  const handleLoadMore = useCallback(() => {
     if (hasMore && !loading) {
       loadMoreResults();
     }
-  };
+  }, [hasMore, loading, loadMoreResults]);
 
-  const renderSocietyItem = ({ item }: { item: SocietyInfo }) => (
+  const renderSocietyItem = useCallback(({ item }: { item: SocietyInfo }) => (
     <TouchableOpacity
       onPress={() => handleSocietySelect(item)}
       className="bg-surface border border-divider rounded-xl p-4 mb-4"
@@ -145,11 +150,11 @@ export default function SocietySearchFlow() {
         <LucideIcons name="chevron-right" size={20} color="#9CA3AF" />
       </View>
     </TouchableOpacity>
-  );
+  ), [handleSocietySelect]);
 
-  const renderEmptyState = () => (
+  const renderEmptyState = useCallback(() => (
     <View className="items-center py-12">
-      <LucideIcons name="search" size={48} color="#9CA3AF" />
+      <LucideIcons name="search-outline" size={48} color="#9CA3AF" />
       <Text className="text-text-secondary font-medium text-lg mt-4 mb-2">
         No societies found
       </Text>
@@ -157,14 +162,13 @@ export default function SocietySearchFlow() {
         Try adjusting your search criteria or check the spelling
       </Text>
     </View>
-  );
+  ), []);
 
   return (
     <SafeAreaView className="flex-1 bg-background">
       <KeyboardAvoidingView
         className="flex-1"
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
-        
         {/* Header */}
         <View className="flex-row items-center px-4 py-4">
           <TouchableOpacity onPress={() => router.back()} className="mr-4">
@@ -180,7 +184,6 @@ export default function SocietySearchFlow() {
           padding="lg"
           keyboardAware={true}
           preventOverflow={true}>
-          
           {/* Search Options */}
           {!searchMode && results.length === 0 && (
             <>
@@ -192,7 +195,7 @@ export default function SocietySearchFlow() {
                     height: responsive.spacing(64),
                   }}>
                   <LucideIcons
-                    name="map-pin"
+                    name="location-outline"
                     size={responsive.spacing(32)}
                     color="#6366f1"
                   />
@@ -239,7 +242,11 @@ export default function SocietySearchFlow() {
                 activeOpacity={0.8}>
                 <View className="flex-row items-center">
                   <View className="bg-primary/10 rounded-full w-12 h-12 items-center justify-center mr-4">
-                    <LucideIcons name="map-pin" size={24} color="#6366f1" />
+                    <LucideIcons
+                      name="location-outline"
+                      size={24}
+                      color="#6366f1"
+                    />
                   </View>
                   <View className="flex-1">
                     <Text className="text-text-primary font-semibold text-lg mb-1">
@@ -260,16 +267,18 @@ export default function SocietySearchFlow() {
             <View className="mb-6">
               <ValidatedInput
                 label="Society Name"
-                {...getFieldProps('query')}
+                value={fields.query.value}
+                onChangeText={(text) => setValue('query', text)}
+                onBlur={getFieldProps('query').onBlur}
+                error={errors.query}
                 placeholder="e.g., Green Valley Apartments, DLF Phase 1"
                 autoFocus={searchMode === 'text'}
-                containerStyle={{ marginBottom: 16 }}
-                helpText="Enter the full or partial name of your society"
-                onSubmitEditing={() => handleSubmit(handleTextSearch)}
+                helperText="Enter the full or partial name of your society"
+                onSubmitEditing={useCallback(() => handleSubmit(handleTextSearch), [handleSubmit, handleTextSearch])}
               />
 
               <Button
-                onPress={() => handleSubmit(handleTextSearch)}
+                onPress={useCallback(() => handleSubmit(handleTextSearch), [handleSubmit, handleTextSearch])}
                 loading={isSubmitting || loading}
                 disabled={!isValid || isSubmitting}
                 className="mb-4">
@@ -285,21 +294,30 @@ export default function SocietySearchFlow() {
                 onPress={() => setSearchMode(null)}
                 className="flex-row items-center mb-4">
                 <LucideIcons name="arrow-left" size={20} color="#6366f1" />
-                <Text className="text-primary font-medium ml-2">Back to search options</Text>
+                <Text className="text-primary font-medium ml-2">
+                  Back to search options
+                </Text>
               </TouchableOpacity>
 
               <Text className="text-text-primary font-semibold text-lg mb-4">
                 Browse Nearby Societies
               </Text>
               <Text className="text-text-secondary mb-6">
-                We&apos;ll show you housing societies within a 5km radius of your location.
+                We&apos;ll show you housing societies within a 5km radius of
+                your location.
               </Text>
 
               <Button
                 onPress={handleLocationSearch}
                 loading={loading}
                 className="mb-4">
-                <LucideIcons name="map-pin" size={20} color="#ffffff" className="mr-2" />
+                <View className="mr-2">
+                  <LucideIcons
+                    name="location-outline"
+                    size={20}
+                    color="#ffffff"
+                  />
+                </View>
                 Find Nearby Societies
               </Button>
             </View>
@@ -310,7 +328,9 @@ export default function SocietySearchFlow() {
             <View className="bg-error/5 border border-error/20 rounded-xl p-4 mb-4">
               <View className="flex-row items-center mb-2">
                 <LucideIcons name="alert-circle" size={20} color="#EF4444" />
-                <Text className="text-error font-semibold ml-2">Search Failed</Text>
+                <Text className="text-error font-semibold ml-2">
+                  Search Failed
+                </Text>
               </View>
               <Text className="text-error text-sm">{error}</Text>
             </View>
@@ -327,7 +347,9 @@ export default function SocietySearchFlow() {
                   <TouchableOpacity
                     onPress={() => setSearchMode(null)}
                     className="flex-row items-center">
-                    <Text className="text-primary text-sm mr-1">New search</Text>
+                    <Text className="text-primary text-sm mr-1">
+                      New search
+                    </Text>
                     <LucideIcons name="search" size={16} color="#6366f1" />
                   </TouchableOpacity>
                 )}
@@ -356,9 +378,9 @@ export default function SocietySearchFlow() {
           <View className="bg-primary/5 rounded-xl p-4 mt-4">
             <Text className="text-primary font-semibold mb-2">Search Tips</Text>
             <Text className="text-text-secondary text-sm leading-5">
-              • Try different variations of your society name{'\n'}
-              • Include locality or area name for better results{'\n'}
-              • Check with your society management if you can&apos;t find it
+              • Try different variations of your society name{'\n'}• Include
+              locality or area name for better results{'\n'}• Check with your
+              society management if you can&apos;t find it
             </Text>
           </View>
         </ResponsiveContainer>

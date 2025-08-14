@@ -72,13 +72,13 @@ export default function SocietyOnboarding() {
       },
     );
 
-  // Check if phoneNumber is available, if not redirect back to phone registration
-  React.useEffect(() => {
-    if (!phoneNumber) {
-      // No phone number available, redirect to phone registration
-      router.replace('/auth/phone-registration');
-    }
-  }, [phoneNumber, router]);
+  // // Check if phoneNumber is available, if not redirect back to phone registration
+  // React.useEffect(() => {
+  //   if (!phoneNumber) {
+  //     // No phone number available, redirect to phone registration
+  //     router.replace('/auth/phone-registration');
+  //   }
+  // }, [phoneNumber, router]);
 
   const handleCodeVerification = React.useCallback(
     async (formData: SocietyCodeForm) => {
@@ -100,14 +100,14 @@ export default function SocietyOnboarding() {
   );
 
   const handleSearchFlow = React.useCallback(() => {
-    if (!phoneNumber) {
-      showErrorAlert('Error', 'Phone number is required');
-      return;
-    }
+    // if (!phoneNumber) {
+    //   showErrorAlert('Error', 'Phone number is required');
+    //   return;
+    // }
 
     // Navigate to search flow - phoneNumber is already stored in Zustand
     router.push('/auth/society-search-flow');
-  }, [phoneNumber, router]);
+  }, [router]);
 
   const handleSkipForNow = React.useCallback(() => {
     // For MVP, allow users to skip society selection
@@ -125,8 +125,8 @@ export default function SocietyOnboarding() {
           <TouchableOpacity onPress={() => router.back()} className="mr-4">
             <LucideIcons name="arrow-left" size={24} color="#212121" />
           </TouchableOpacity>
-          <Text className="text-xl font-bold text-text-primary">
-            Join Your Society
+          <Text className="text-xl font-bold text-text-primary flex-1">
+            Society Setup
           </Text>
         </View>
 
