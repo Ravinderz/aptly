@@ -1,31 +1,50 @@
-import { Stack } from "expo-router";
-import { useState } from "react";
-import { SafeAreaView } from "react-native-safe-area-context";
-import "./globals.css";
+import AppNavigator from '@/components/AppNavigator';
+import StoreInitializer from '@/components/StoreInitializer';
+import { useAlert } from '@/components/ui/AlertCard';
+import { setGlobalAlertHandler } from '@/utils/alert';
+import { Stack } from 'expo-router';
+import * as SplashScreen from 'expo-splash-screen';
+import { useEffect } from 'react';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import './globals.css';
 
-export default function RootLayout() {
-  const [firstLaunch, setFirstLaunch] = useState(true);
-  // useEffect(() => {
-  //   const checkFirstLaunch = async () => {
-  //     const isFirstLaunch = await SecureStore.getItemAsync("firstLaunch");
-  //     if (isFirstLaunch !== "false") {
-  //       setFirstLaunch(true);
-  //       SecureStore.setItemAsync("firstLaunch", "true");
-  //     } else {
-  //       setFirstLaunch(false);
-  //     }
-  //   };
-  //   checkFirstLaunch();
-  // }, []);
+// Keep the splash screen visible while we fetch resources
+SplashScreen.preventAutoHideAsync();
 
-  // return  firstLaunch ? <Onboarding /> : <Tabs />;
+function RootLayout() {
+  const { showAlert, AlertComponent } = useAlert();
+
+  useEffect(() => {
+    setGlobalAlertHandler(showAlert);
+  }, [showAlert]);
 
   return (
-    <SafeAreaView style={{ flex: 1 }}>
-      <Stack>
-        <Stack.Screen name="index" options={{ headerShown: false }} />
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-      </Stack>
-    </SafeAreaView>
+    <>
+      <StoreInitializer environment={__DEV__ ? 'development' : 'production'}>
+        <SafeAreaView style={{ flex: 1 }}>
+          <AppNavigator>
+            <Stack screenOptions={{ headerShown: false }}>
+              <Stack.Screen name="index" options={{ headerShown: false }} />
+              <Stack.Screen name="welcome" options={{ headerShown: false }} />
+              <Stack.Screen name="auth" options={{ headerShown: false }} />
+              <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+              <Stack.Screen
+                name="notifications"
+                options={{
+                  headerShown: false,
+                  presentation: 'modal', // This makes it feel like a modal that can be dismissed
+                }}
+              />
+            </Stack>
+          </AppNavigator>
+          {AlertComponent}
+        </SafeAreaView>
+      </StoreInitializer>
+    </>
   );
 }
+
+// Add proper named export with displayName for React DevTools
+RootLayout.displayName = 'RootLayout';
+
+export default RootLayout;

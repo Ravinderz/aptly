@@ -2,10 +2,12 @@ import {
   BottomSheetModal,
   BottomSheetModalProvider,
   BottomSheetView,
-} from "@gorhom/bottom-sheet";
-import React, { useCallback } from "react";
-import { StyleSheet, Text } from "react-native";
-import { GestureHandlerRootView } from "react-native-gesture-handler";
+} from '@gorhom/bottom-sheet';
+import { Image } from 'expo-image';
+import { CircleX, Download, Share2 } from 'lucide-react-native';
+import React, { useCallback } from 'react';
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 interface AptlyBottomSheetModalProps {
   ref: React.RefObject<BottomSheetModal>;
@@ -14,16 +16,73 @@ interface AptlyBottomSheetModalProps {
 const AptlyBottomSheetModal = ({ ref }: AptlyBottomSheetModalProps) => {
   // ref
   const handleSheetChanges = useCallback((index: number) => {
-    console.log("handleSheetChanges", index);
+    console.log('handleSheetChanges', index);
   }, []);
 
   // renders
   return (
     <GestureHandlerRootView style={styles.container}>
       <BottomSheetModalProvider>
-        <BottomSheetModal ref={ref} onChange={handleSheetChanges}>
+        <BottomSheetModal
+          ref={bottomSheetModalRef}
+          onChange={handleSheetChanges}
+          stackBehavior="push"
+          containerStyle={{ zIndex: 2 }}
+          snapPoints={['90%']}>
           <BottomSheetView style={styles.contentContainer}>
-            <Text>Awesome 🎉</Text>
+            <View className="w-full px-4">
+              <View className="flex flex-row justify-between items-center pb-3 ">
+                <View className="flex flex-row gap-2 items-center ">
+                  <Text className="text-2xl font-bold bg-accent_secondary text-white rounded-full flex items-center justify-center p-3">
+                    {getLetters(selectedVisitor?.name as string)}
+                  </Text>
+                  <Text className="text-xl font-semibold">
+                    {selectedVisitor?.name}
+                  </Text>
+                </View>
+                <CircleX
+                  size={24}
+                  color="black"
+                  strokeWidth={1.5}
+                  onPress={() => bottomSheetModalRef.current?.dismiss()}
+                />
+              </View>
+              <View className="flex items-center justify-center">
+                <Image
+                  style={{ width: 250, height: 250 }}
+                  source={require('../../../assets/images/QR_Code.png')}
+                  contentFit="cover"
+                  transition={1000}
+                />
+              </View>
+              <View className="flex items-center gap-2">
+                <View className="flex flex-row gap-2">
+                  <Text className="text-xl font-medium text-zinc-500">
+                    {selectedVisitor?.date}
+                  </Text>
+                  <Text className="text-xl font-medium text-zinc-500">
+                    {selectedVisitor?.time}
+                  </Text>
+                </View>
+                <Text className="text-lg font-medium text-zinc-500">
+                  {selectedVisitor?.status}
+                </Text>
+              </View>
+              <View className="flex flex-row justify-around my-6">
+                <TouchableOpacity className="flex flex-row gap-2 justify-center items-center bg-neutral h-16 w-36  rounded-lg">
+                  <Share2 size={24} color="white" strokeWidth={1.5} />
+                  <Text className="text-white text-md font-semibold">
+                    Share
+                  </Text>
+                </TouchableOpacity>
+                <TouchableOpacity className="flex flex-row gap-2 justify-center items-center bg-neutral h-16 w-36 rounded-lg">
+                  <Download size={24} color="white" strokeWidth={1.5} />
+                  <Text className="text-white text-md font-semibold">
+                    Download
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            </View>
           </BottomSheetView>
         </BottomSheetModal>
       </BottomSheetModalProvider>
@@ -35,12 +94,12 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 24,
-    justifyContent: "center",
-    backgroundColor: "grey",
+    justifyContent: 'center',
+    backgroundColor: 'grey',
   },
   contentContainer: {
     flex: 1,
-    alignItems: "center",
+    alignItems: 'center',
   },
 });
 

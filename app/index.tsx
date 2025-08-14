@@ -1,16 +1,10 @@
-import Onboarding from "@/components/Onboarding";
-import { View } from "react-native";
+import Welcome from './welcome';
 
-export default function Index() {
-  return (
-    <View
-      style={{
-        flex: 1,
-        justifyContent: "center",
-        alignItems: "center",
-      }}
-    >
-      <Onboarding />
-    </View>
-  );
+function Index() {
+  return <Welcome />;
 }
+
+// Add proper named export with displayName for React DevTools
+Index.displayName = 'Index';
+
+export default Index;

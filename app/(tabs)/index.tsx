@@ -1,23 +1,18 @@
-import AlertCard from "@/components/AlertCard";
-import QuickActions from "@/components/QuickActions";
-import Header from "@/components/ui/Header";
-import VisitorHorizontalScrollSection from "@/components/VisitorHorizontalScrollSection";
-import { StyleSheet } from "react-native";
+import BillerSection from '@/components/BillerSection';
+import NoticeSection from '@/components/NoticeSection';
+import QuickActions from '@/components/QuickActions';
+import { SocietyOverview } from '@/components/SocietyOverview';
+import Header from '@/components/ui/Header';
+import UpcomingVisitorSection from '@/components/UpcomingVisitorSection';
 
-export default function HomeScreen() {
+export default function HomePage() {
   return (
     <Header>
-      <VisitorHorizontalScrollSection />
-      <AlertCard />
+      <NoticeSection />
+      <UpcomingVisitorSection />
+      <BillerSection />
       <QuickActions />
+      <SocietyOverview />
     </Header>
   );
 }
-
-const styles = StyleSheet.create({
-  contentContainer: {
-    flex: 1,
-    width: "100%",
-    zIndex: 1,
-  },
-});

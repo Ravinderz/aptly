@@ -1,18 +1,32 @@
-import React, { ReactNode } from "react";
-import { ScrollView, View } from "react-native";
-import HomeHeader from "../HomeHeader";
+import React, { ReactNode } from 'react';
+import { ScrollView, View } from 'react-native';
+import { TabHeader } from './headers';
 
-const Header = ({ children }: { children: ReactNode }) => {
+interface HeaderProps {
+  children: ReactNode;
+  onNotificationPress?: () => void;
+  onHelpPress?: () => void;
+  notificationCount?: number;
+}
+
+const Header = ({
+  children,
+  onNotificationPress,
+  onHelpPress,
+  notificationCount = 3, // Mock notification count - replace with real data
+}: HeaderProps) => {
   return (
-    <View className="flex flex-1 bg-[#fed0b5] border-t-2 border-[#d59f7e]">
-      <HomeHeader />
+    <View className="flex flex-1">
+      <TabHeader
+        onNotificationPress={onNotificationPress}
+        onHelpPress={onHelpPress}
+        notificationCount={notificationCount}
+      />
       <ScrollView
         className="flex flex-1"
         contentContainerStyle={{ flexGrow: 1 }}
-        showsVerticalScrollIndicator={false}
-        alwaysBounceVertical
-      >
-        <View className="flex h-full p-4 rounded-t-3xl bg-[#fff5ee] mb-8">
+        showsVerticalScrollIndicator={false}>
+        <View className="flex h-full px-4 py-4 mb-8 bg-background">
           {children}
         </View>
       </ScrollView>

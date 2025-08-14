@@ -1,10 +1,18 @@
-import React from "react";
-import { Text, TouchableOpacity } from "react-native";
+import React from 'react';
+import { Text, TouchableOpacity } from 'react-native';
 
-const LinkButton = ({ label }: { label: string }) => {
+const LinkButton = ({
+  label,
+  handleViewAll,
+}: {
+  label: string;
+  handleViewAll: () => void;
+}) => {
   return (
-    <TouchableOpacity>
-      <Text className="font-bold color-blue-800">{label}</Text>
+    <TouchableOpacity onPress={handleViewAll}>
+      <Text className="text-label-large font-semibold text-primary">
+        {label}
+      </Text>
     </TouchableOpacity>
   );
 };
