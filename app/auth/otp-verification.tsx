@@ -1,7 +1,7 @@
 import { Button } from '@/components/ui/Button';
 import { AuthService } from '@/services';
 import {
-  // useSocietyOnboardingActions, // Not used in this component
+  useSocietyOnboardingActions,
   useSocietyOnboardingStore,
 } from '@/stores/slices/societyOnboardingStore';
 import { showErrorAlert, showSuccessAlert } from '@/utils/alert';
@@ -18,8 +18,7 @@ import {
 
 export default function OTPVerification() {
   const router = useRouter();
-
-  // const { updateUserProfile } = useSocietyOnboardingActions(); // Not needed in this component
+  const { updateUserProfile } = useSocietyOnboardingActions();
 
   const [otp, setOTP] = useState(['', '', '', '', '', '']);
   const [isLoading, setIsLoading] = useState(false);
@@ -31,7 +30,7 @@ export default function OTPVerification() {
   const inputRefs = useRef<(TextInput | null)[]>([]);
 
   const phoneNumber = useSocietyOnboardingStore(
-    (state) => state.userProfile.phoneNumber,
+    (state) => state.userProfile.phone,
   );
   const sessionId = useSocietyOnboardingStore(
     (state) => state.userProfile.sessionId,
@@ -52,7 +51,9 @@ export default function OTPVerification() {
     // Only allow numbers
     const numericValue = value.replace(/[^0-9]/g, '');
 
-    console.log('OTP Input Change:', numericValue, 'at index:', index);
+    if (__DEV__) {
+      console.log('🔢 OTP Input Change:', numericValue, 'at index:', index);
+    }
 
     if (numericValue.length <= 1) {
       const newOTP = [...otp];
@@ -93,10 +94,20 @@ export default function OTPVerification() {
       return;
     }
 
-    console.log('Verifying OTP:', otpToVerify);
-    console.log('Phone number:', phoneNumber);
+    console.log('🔐 Starting OTP verification:', {
+      otpLength: otpToVerify.length,
+      phoneNumber: phoneNumber ? '***' + phoneNumber.slice(-4) : null,
+      email: email ? '***' + email.split('@')[1] : null,
+      sessionId: sessionId ? sessionId.substring(0, 8) + '...' : null,
+    });
+
     if (!phoneNumber && !email) {
       setError('Phone number or email is required for verification');
+      return;
+    }
+
+    if (!sessionId) {
+      setError('Session ID is required for verification');
       return;
     }
 
@@ -104,89 +115,127 @@ export default function OTPVerification() {
     setError('');
 
     try {
+      // Use the existing verifyOTP method that handles both email and phone
       const result = await AuthService.verifyOTP(
-        phoneNumber ? phoneNumber : email || '',
+        email || phoneNumber,
         otpToVerify,
         sessionId,
       );
 
-      if (result.success) {
-        // Check if user has society associations
-        try {
-          console.log('user onboarding');
+      console.log('🔐 OTP verification result:', {
+        success: result.success,
+        hasData: !!result.data,
+        hasUser: !!result.data?.user,
+      });
 
-          router.push('/auth/user-onboarding');
-
-          // const associationResult =
-          //   await SocietyService.checkSocietyAssociation(phoneNumber || '');
-
-          // if (associationResult.success && associationResult.data) {
-          //   if (
-          //     associationResult.data.hasAssociation &&
-          //     associationResult.data.associations.length > 0
-          //   ) {
-          //     // User has existing associations, go directly to main app
-          //     router.replace('/(tabs)');
-          //   } else {
-          //     // No associations, store phoneNumber in Zustand and redirect to society onboarding
-          //     if (phoneNumber) {
-          //       updateUserProfile({ phoneNumber });
-          //     }
-          //     router.push('/auth/society-onboarding');
-          //   }
-          // } else {
-          //   // If association check fails, assume no association and go to onboarding
-          //   if (phoneNumber) {
-          //     updateUserProfile({ phoneNumber });
-          //   }
-          //   router.push('/auth/society-onboarding');
-          // }
-        } catch (error) {
-          console.warn('Failed to check society association:', error);
-          // Fallback: go to onboarding
-          // if (phoneNumber) {
-          //   updateUserProfile({ phoneNumber });
-          // }
-          // router.push('/auth/society-onboarding');
+      if (result.success && result.data) {
+        console.log('✅ OTP verification successful, authentication data stored in service');
+        
+        // Update onboarding store with user profile data
+        if (result.data.user) {
+          updateUserProfile({
+            fullName: result.data.user.name || '', // Will be filled in onboarding
+            phone: result.data.user.phone || phoneNumber || '',
+            email: result.data.user.email || email || '',
+            dateOfBirth: '',
+            photo: '',
+            sessionId: sessionId,
+          });
+        } else {
+          // Fallback if user data not in response
+          updateUserProfile({
+            fullName: '',
+            phone: phoneNumber || '',
+            email: email || '',
+            dateOfBirth: '',
+            photo: '',
+            sessionId: sessionId,
+          });
         }
+        
+        console.log('🎯 Authentication complete, navigating to society selection');
+        
+        // Navigate to society selection for onboarding
+        router.replace('/auth/society-selection');
+        
       } else {
+        console.warn('⚠️ OTP verification failed:', result.error);
         setError(result.error || 'Invalid OTP. Please try again.');
-        // Clear OTP inputs
+        
+        // Clear OTP inputs on failure
         setOTP(['', '', '', '', '', '']);
         inputRefs.current[0]?.focus();
       }
-    } catch (error) {
-      console.error('OTP verification error:', error);
-      setError('Verification failed. Please try again.');
+    } catch (error: any) {
+      console.error('❌ OTP verification error:', error);
+      
+      let errorMessage = 'Verification failed. Please try again.';
+      
+      if (error.code === 'OTP_EXPIRED') {
+        errorMessage = 'OTP has expired. Please request a new code.';
+      } else if (error.code === 'OTP_INVALID') {
+        errorMessage = 'Invalid OTP code. Please check and try again.';
+      } else if (error.message) {
+        errorMessage = error.message;
+      }
+      
+      setError(errorMessage);
     } finally {
       setIsLoading(false);
     }
   };
 
   const handleResendOTP = async () => {
+    console.log('📤 Resending OTP request');
     setIsResending(true);
 
     try {
-      const result = await AuthService.registerPhone(phoneNumber || '');
+      // For email OTP, we need to call the email registration endpoint again
+      if (email) {
+        const result = await AuthService.registerEmail(email);
 
-      if (result.success) {
-        // Reset timer
-        setTimeLeft(30);
-        setCanResend(false);
-        setError('');
+        if (result.success) {
+          // Reset timer
+          setTimeLeft(30);
+          setCanResend(false);
+          setError('');
 
-        showSuccessAlert(
-          'OTP Sent',
-          'A new OTP has been sent to your mobile number.',
-        );
-      } else {
-        showErrorAlert(
-          'Error',
-          result.error || 'Failed to resend OTP. Please try again.',
-        );
+          console.log('✅ Email OTP resent successfully');
+          showSuccessAlert(
+            'OTP Sent',
+            'A new OTP has been sent to your email address.',
+          );
+        } else {
+          console.warn('⚠️ Failed to resend email OTP:', result.error);
+          showErrorAlert(
+            'Error',
+            result.error || 'Failed to resend OTP. Please try again.',
+          );
+        }
+      } else if (phoneNumber) {
+        // For phone OTP (if implemented later)
+        const result = await AuthService.registerPhone(phoneNumber);
+        
+        if (result.success) {
+          setTimeLeft(30);
+          setCanResend(false);
+          setError('');
+          
+          console.log('✅ Phone OTP resent successfully');
+          showSuccessAlert(
+            'OTP Sent',
+            'A new OTP has been sent to your mobile number.',
+          );
+        } else {
+          console.warn('⚠️ Failed to resend phone OTP:', result.error);
+          showErrorAlert(
+            'Error',
+            result.error || 'Failed to resend OTP. Please try again.',
+          );
+        }
       }
-    } catch (error) {
-      console.error('Resend OTP error:', error);
+    } catch (error: any) {
+      console.error('❌ Resend OTP error:', error);
       showErrorAlert('Error', 'Failed to resend OTP. Please try again.');
     } finally {
       setIsResending(false);
@@ -198,6 +247,17 @@ export default function OTPVerification() {
       const number = phone.substring(3);
       return `+91 ${number.substring(0, 3)} ${number.substring(3, 6)} ${number.substring(6)}`;
     }
+    return phone;
+  };
+  
+  const formatEmail = (email: string) => {
+    const [username, domain] = email.split('@');
+    if (username.length <= 3) {
+      return email;
+    }
+    const maskedUsername = username.substring(0, 2) + '***' + username.slice(-1);
+    return `${maskedUsername}@${domain}`;
+  };
     return phone;
   };
 

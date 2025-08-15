@@ -73,9 +73,7 @@ export default function UserOnboarding() {
   const { updateUserProfile } = useSocietyOnboardingActions();
 
   // Get phone number and email from store
-  const phoneNumber = useSocietyOnboardingStore(
-    (state) => state.userProfile.phoneNumber,
-  );
+  const phone = useSocietyOnboardingStore((state) => state.userProfile.phone);
 
   const email = useSocietyOnboardingStore((state) => state.userProfile.email);
 
@@ -121,7 +119,7 @@ export default function UserOnboarding() {
         // Create user profile
         const profileData = {
           fullName: formData.fullName.trim(),
-          phoneNumber: formData.phoneNumber,
+          phone: formData.phoneNumber,
           email: formData.email.trim(),
           passcode: formData.passcode,
         };
@@ -133,7 +131,7 @@ export default function UserOnboarding() {
           // Update the store with profile data
           updateUserProfile({
             fullName: profileData.fullName,
-            phoneNumber: profileData.phoneNumber,
+            phone: profileData.phone,
             email: profileData.email,
           });
 
@@ -240,11 +238,7 @@ export default function UserOnboarding() {
               textContentType="telephoneNumber"
               maxLength={13}
               icon={
-                <LucideIcons
-                  name="call-outline"
-                  size={20}
-                  color="#6b7280"
-                />
+                <LucideIcons name="call-outline" size={20} color="#6b7280" />
               }
             />
 
@@ -255,11 +249,7 @@ export default function UserOnboarding() {
               </Text>
               <View className="bg-surface/50 border border-divider rounded-xl px-4 py-4 flex-row items-center">
                 <View className="mr-3">
-                  <LucideIcons
-                    name="mail-outline"
-                    size={20}
-                    color="#6b7280"
-                  />
+                  <LucideIcons name="mail-outline" size={20} color="#6b7280" />
                 </View>
                 <Text className="text-text-primary font-medium flex-1">
                   {fields.email.value}

@@ -21,6 +21,8 @@ import {
   SecureProfileStorage,
   SecureSessionStorage,
   SecureTokenStorage,
+  SecureUserStorage,
+  createAuthDataFromOTPResponse,
 } from '@/utils/storage.secure';
 import { isValidPhoneNumber, parsePhoneNumber } from 'libphonenumber-js';
 import { z } from 'zod';
@@ -374,7 +376,7 @@ export class RestAuthService {
   }
 
   /**
-   * Verify OTP and complete authentication (or email/password login)
+   * Verify OTP and complete authentication (enhanced with secure storage)
    */
   async verifyOTP(
     phoneNumber_email: string,
@@ -419,7 +421,7 @@ export class RestAuthService {
 
       if (response.success) {
         // Store tokens securely
-        console.log('🔐 Storing tokens securely');
+        console.log('🔐 Storing authentication data securely');
         console.log('Response data:', response.data);
 
         const tokenData: TokenData = {
@@ -431,11 +433,35 @@ export class RestAuthService {
         };
         await SecureTokenStorage.storeTokens(tokenData);
 
+        // Store user data and session data using the new secure storage
+        try {
+          const authData = createAuthDataFromOTPResponse({
+            success: true,
+            data: {
+              user: response.data.user,
+              session: response.data.session,
+            },
+          });
+          
+          await SecureUserStorage.storeAuthData(authData);
+          
+          console.log('📦 Complete authentication data stored:', {
+            userId: authData.user.id,
+            email: authData.user.email,
+            expiresAt: new Date(authData.session.expiresAt * 1000).toISOString(),
+          });
+        } catch (storageError) {
+          console.warn('⚠️ Failed to store additional auth data:', storageError);
+          // Continue with basic token storage even if enhanced storage fails
+        }
+
         return {
           success: true,
           data: {
             message: 'Email Verified',
             tokens: tokenData,
+            user: response.data.user,
+            session: response.data.session,
           },
         };
       } else {
@@ -629,7 +655,25 @@ export class RestAuthService {
 
       // For now, we'll update the profile instead of creating a new one
       // In a real implementation, this would be a separate endpoint
-      return await this.updateProfile(profileData);
+      const response = await apiClient.post<UserProfile>(
+        API_ENDPOINTS.AUTH.CREATE_PROFILE,
+        profileData,
+      );
+
+      if (response.success) {
+        const userProfile = response.data as UserProfile;
+        SecureProfileStorage.storeProfile(userProfile);
+        this.currentUser = userProfile;
+        return {
+          success: true,
+          data: userProfile,
+        };
+      } else {
+        return {
+          success: false,
+          error: response.error?.message || 'Failed to create profile',
+        };
+      }
     } catch (error) {
       console.error('❌ Profile creation failed:', error);
 

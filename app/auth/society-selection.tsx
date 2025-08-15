@@ -22,9 +22,9 @@ import {
 import type { SocietyInfo } from '@/types/society';
 import { showErrorAlert } from '@/utils/alert';
 import { responsive } from '@/utils/responsive';
+import { useFocusEffect } from '@react-navigation/native';
 import { useRouter } from 'expo-router';
 import { useCallback, useEffect, useState } from 'react';
-import { useFocusEffect } from '@react-navigation/native';
 import {
   ActivityIndicator,
   FlatList,
@@ -76,7 +76,7 @@ export default function SocietySelection() {
   );
   const searchError = useSocietyOnboardingStore((state) => state.searchError);
   const searchTotal = useSocietyOnboardingStore((state) => state.searchTotal);
-  
+
   // Verification state from store
   const verificationLoading = useSocietyOnboardingStore(
     (state) => state.verificationLoading,
@@ -84,7 +84,7 @@ export default function SocietySelection() {
   const verificationError = useSocietyOnboardingStore(
     (state) => state.verificationError,
   );
-  
+
   // Selected society from store (single source of truth)
   const selectedSociety = useSocietyOnboardingStore(
     (state) => state.selectedSociety,
@@ -101,8 +101,15 @@ export default function SocietySelection() {
     selectedSociety: selectedSociety?.name || null,
   });
 
-  const { searchSocieties, verifySociety, selectSociety, clearSearch, clearVerification, clearSelection, goToStep } =
-    useSocietyOnboardingActions();
+  const {
+    searchSocieties,
+    verifySociety,
+    selectSociety,
+    clearSearch,
+    clearVerification,
+    clearSelection,
+    goToStep,
+  } = useSocietyOnboardingActions();
 
   // Form validation for code search
   const codeForm = useFormValidation<CodeSearchForm>(
@@ -134,7 +141,7 @@ export default function SocietySelection() {
     (mode: 'code' | 'name') => {
       console.log('🔄 Switching search mode to:', mode);
       setSearchMode(mode);
-      
+
       // Clear verification and selection state when switching modes
       // This prevents showing stale verification results for the wrong mode
       if (selectedSociety) {
@@ -142,7 +149,7 @@ export default function SocietySelection() {
         clearVerification();
         clearSelection();
       }
-      
+
       // Clear form data and search results when switching modes
       if (mode === 'code') {
         if (nameForm.fields.societyName.value) {
@@ -156,7 +163,14 @@ export default function SocietySelection() {
         clearSearch(); // Clear search results when switching to name mode
       }
     },
-    [codeForm, nameForm, selectedSociety, clearSearch, clearVerification, clearSelection],
+    [
+      codeForm,
+      nameForm,
+      selectedSociety,
+      clearSearch,
+      clearVerification,
+      clearSelection,
+    ],
   );
 
   // Handle code-based verification
@@ -164,23 +178,23 @@ export default function SocietySelection() {
     async (formData: CodeSearchForm) => {
       const societyCode = formData.societyCode.toUpperCase();
       console.log('🔐 Starting society code verification:', societyCode);
-      
+
       try {
         // The store handles the verification and state updates
         await verifySociety({
           phoneNumber: '', // Will be handled by store
           societyCode,
         });
-        
+
         console.log('✅ Verification completed successfully');
         // Note: No need to manually update selectedSociety - store handles this
         // The UI will automatically react to store state changes
-        
       } catch (error: any) {
         console.error('❌ Verification failed:', error);
         showErrorAlert(
           'Verification Failed',
-          error.message || 'Failed to verify society code. Please check the code and try again.',
+          error.message ||
+            'Failed to verify society code. Please check the code and try again.',
         );
       }
     },
@@ -222,11 +236,14 @@ export default function SocietySelection() {
   );
 
   // Handle society selection from search results
-  const handleSocietySelect = useCallback((society: SocietyInfo) => {
-    console.log('🏢 Selecting society from search results:', society.name);
-    // Use store action instead of local state
-    selectSociety(society);
-  }, [selectSociety]);
+  const handleSocietySelect = useCallback(
+    (society: SocietyInfo) => {
+      console.log('🏢 Selecting society from search results:', society.name);
+      // Use store action instead of local state
+      selectSociety(society);
+    },
+    [selectSociety],
+  );
 
   // Handle continue to next screen
   const handleContinue = useCallback(() => {
@@ -235,7 +252,7 @@ export default function SocietySelection() {
     // Ensure the society is selected and advance the onboarding step
     selectSociety(selectedSociety);
     goToStep('details');
-    
+
     // Navigate to next screen
     router.push('/auth/society-profile-complete');
   }, [selectedSociety, selectSociety, goToStep, router]);
@@ -249,25 +266,27 @@ export default function SocietySelection() {
         nameFormValue: nameForm.fields.societyName.value,
         searchMode,
       });
-      
+
       // Clear state if we have verification/selection data but no corresponding form input
       // This indicates the user either:
       // 1. Came from welcome page (fresh start)
       // 2. Navigated back from next screen
       // 3. Has stale data from previous session
-      
+
       const hasVerificationData = selectedSociety;
-      const hasCorrespondingInput = 
+      const hasCorrespondingInput =
         (searchMode === 'code' && codeForm.fields.societyCode.value.trim()) ||
         (searchMode === 'name' && nameForm.fields.societyName.value.trim());
-      
+
       // If we have verification data but no corresponding form input, clear it
       if (hasVerificationData && !hasCorrespondingInput) {
-        console.log('🧹 Clearing verification state - no corresponding form input');
+        console.log(
+          '🧹 Clearing verification state - no corresponding form input',
+        );
         clearVerification();
         clearSelection();
         clearSearch();
-        
+
         // Reset to verification step to ensure clean state
         goToStep('verification');
       }
@@ -280,7 +299,7 @@ export default function SocietySelection() {
       clearSelection,
       clearSearch,
       goToStep,
-    ])
+    ]),
   );
 
   // Auto-search when name input changes with debouncing
@@ -470,32 +489,41 @@ export default function SocietySelection() {
               <Button
                 onPress={() => codeForm.handleSubmit(handleCodeVerification)}
                 loading={codeForm.isSubmitting || verificationLoading}
-                disabled={!codeForm.isValid || codeForm.isSubmitting || verificationLoading}
+                disabled={
+                  !codeForm.isValid ||
+                  codeForm.isSubmitting ||
+                  verificationLoading
+                }
                 className="mt-4">
                 {verificationLoading ? 'Verifying...' : 'Verify Society Code'}
               </Button>
-              
+
               {/* Success message for code verification */}
-              {!verificationLoading && !verificationError && selectedSociety && searchMode === 'code' && (
-                <View className="bg-success/5 border border-success/20 rounded-xl p-4 mt-4">
-                  <View className="flex-row items-center mb-2">
-                    <LucideIcons
-                      name="check-circle"
-                      size={20}
-                      color="#10B981"
-                    />
-                    <Text className="text-success font-semibold ml-2">
-                      Society Code Verified!
+              {!verificationLoading &&
+                !verificationError &&
+                selectedSociety &&
+                searchMode === 'code' && (
+                  <View className="bg-success/5 border border-success/20 rounded-xl p-4 mt-4">
+                    <View className="flex-row items-center mb-2">
+                      <LucideIcons
+                        name="check-circle"
+                        size={20}
+                        color="#10B981"
+                      />
+                      <Text className="text-success font-semibold ml-2">
+                        Society Code Verified!
+                      </Text>
+                    </View>
+                    <Text className="text-success text-md">
+                      Found: {selectedSociety.name}
+                    </Text>
+                    <Text className="text-text-secondary text-sm mt-1">
+                      {selectedSociety.address.street},{' '}
+                      {selectedSociety.address.city},{' '}
+                      {selectedSociety.address.state}
                     </Text>
                   </View>
-                  <Text className="text-success text-sm">
-                    Found: {selectedSociety.name}
-                  </Text>
-                  <Text className="text-text-secondary text-xs mt-1">
-                    {selectedSociety.address.street}, {selectedSociety.address.city}
-                  </Text>
-                </View>
-              )}
+                )}
             </View>
           ) : (
             <View className="mb-6">
@@ -517,16 +545,14 @@ export default function SocietySelection() {
           {searchMode === 'code' && verificationError && (
             <View className="bg-error/5 border border-error/20 rounded-xl p-4 mb-4">
               <View className="flex-row items-center mb-2">
-                <LucideIcons
-                  name="alert-circle"
-                  size={20}
-                  color="#EF4444"
-                />
+                <LucideIcons name="alert-circle" size={20} color="#EF4444" />
                 <Text className="text-error font-semibold ml-2">
                   Verification Failed
                 </Text>
               </View>
-              <Text className="text-error text-sm mb-2">{verificationError}</Text>
+              <Text className="text-error text-sm mb-2">
+                {verificationError}
+              </Text>
               <TouchableOpacity
                 onPress={() => {
                   const codeValue = codeForm.fields.societyCode.value.trim();
@@ -626,7 +652,7 @@ export default function SocietySelection() {
           )}
 
           {/* Selected Society Confirmation */}
-          {renderSelectedSociety()}
+          {searchMode === 'name' && renderSelectedSociety()}
 
           {/* Continue Button */}
           {selectedSociety && (

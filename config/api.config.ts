@@ -72,6 +72,7 @@ export const API_ENDPOINTS = {
     LOGOUT: '/api/v4/auth/logout',
     ME: '/api/v4/user/profile', // Updated to correct user profile endpoint
     UPDATE_PROFILE: '/api/v4/user/profile',
+    CREATE_PROFILE: '/api/v4/user/profile', // New endpoint for profile creation
     // Admin authentication (not available in current API)
     ADMIN_LOGIN: '/api/v4/admin/login', // May not be available
     ADMIN_LOGOUT: '/api/v4/admin/logout',

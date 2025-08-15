@@ -1,6 +1,6 @@
 /**
  * Profile Setup Screen - User profile creation form
- * 
+ *
  * Allows users to create their basic profile with:
  * - Full Name
  * - Phone Number (pre-filled from auth flow)
@@ -35,33 +35,33 @@ import {
 import { z } from 'zod';
 
 // Validation schema for profile setup
-const profileSetupSchema = z.object({
-  fullName: z
-    .string()
-    .min(2, 'Full name must be at least 2 characters')
-    .max(50, 'Full name cannot exceed 50 characters')
-    .regex(/^[a-zA-Z\s]+$/, 'Full name can only contain letters and spaces'),
-  phoneNumber: z
-    .string()
-    .min(10, 'Phone number is required')
-    .regex(/^\+91\d{10}$/, 'Invalid phone number format'),
-  email: z
-    .string()
-    .email('Please enter a valid email address')
-    .min(5, 'Email is required')
-    .max(100, 'Email cannot exceed 100 characters'),
-  passcode: z
-    .string()
-    .min(4, 'Passcode must be at least 4 digits')
-    .max(6, 'Passcode cannot exceed 6 digits')
-    .regex(/^\d+$/, 'Passcode can only contain numbers'),
-  confirmPasscode: z
-    .string()
-    .min(4, 'Please confirm your passcode'),
-}).refine((data) => data.passcode === data.confirmPasscode, {
-  message: "Passcodes don't match",
-  path: ["confirmPasscode"],
-});
+const profileSetupSchema = z
+  .object({
+    fullName: z
+      .string()
+      .min(2, 'Full name must be at least 2 characters')
+      .max(50, 'Full name cannot exceed 50 characters')
+      .regex(/^[a-zA-Z\s]+$/, 'Full name can only contain letters and spaces'),
+    phoneNumber: z
+      .string()
+      .min(10, 'Phone number is required')
+      .regex(/^\+91\d{10}$/, 'Invalid phone number format'),
+    email: z
+      .string()
+      .email('Please enter a valid email address')
+      .min(5, 'Email is required')
+      .max(100, 'Email cannot exceed 100 characters'),
+    passcode: z
+      .string()
+      .min(4, 'Passcode must be at least 4 digits')
+      .max(6, 'Passcode cannot exceed 6 digits')
+      .regex(/^\d+$/, 'Passcode can only contain numbers'),
+    confirmPasscode: z.string().min(4, 'Please confirm your passcode'),
+  })
+  .refine((data) => data.passcode === data.confirmPasscode, {
+    message: "Passcodes don't match",
+    path: ['confirmPasscode'],
+  });
 
 type ProfileSetupForm = z.infer<typeof profileSetupSchema>;
 
@@ -77,22 +77,29 @@ export default function ProfileSetup() {
   const { updateUserProfile } = useSocietyOnboardingActions();
 
   // Form validation
-  const { fields, errors, isValid, isSubmitting, setValue, getFieldProps, handleSubmit } =
-    useFormValidation<ProfileSetupForm>(
-      profileSetupSchema,
-      {
-        fullName: '',
-        phoneNumber: phoneNumber || '',
-        email: '',
-        passcode: '',
-        confirmPasscode: '',
-      },
-      {
-        validateOnChange: false, // Only validate on blur, not during typing
-        validateOnBlur: true,
-        debounceMs: 300,
-      },
-    );
+  const {
+    fields,
+    errors,
+    isValid,
+    isSubmitting,
+    setValue,
+    getFieldProps,
+    handleSubmit,
+  } = useFormValidation<ProfileSetupForm>(
+    profileSetupSchema,
+    {
+      fullName: '',
+      phoneNumber: phoneNumber || '',
+      email: '',
+      passcode: '',
+      confirmPasscode: '',
+    },
+    {
+      validateOnChange: false, // Only validate on blur, not during typing
+      validateOnBlur: true,
+      debounceMs: 300,
+    },
+  );
 
   // Check if phoneNumber is available, if not redirect back to phone registration
   React.useEffect(() => {
@@ -130,7 +137,7 @@ export default function ProfileSetup() {
           // Update the store with profile data
           updateUserProfile({
             fullName: profileData.fullName,
-            phoneNumber: profileData.phoneNumber,
+            phone: profileData.phoneNumber,
             email: profileData.email,
           });
 
@@ -270,7 +277,9 @@ export default function ProfileSetup() {
               label="App Passcode"
               placeholder="Create a 4-6 digit passcode"
               value={fields.passcode.value}
-              onChangeText={(text) => setValue('passcode', text.replace(/[^0-9]/g, ''))}
+              onChangeText={(text) =>
+                setValue('passcode', text.replace(/[^0-9]/g, ''))
+              }
               onBlur={getFieldProps('passcode').onBlur}
               error={errors.passcode}
               secureTextEntry={!showPasscode}
@@ -295,7 +304,9 @@ export default function ProfileSetup() {
               label="Confirm Passcode"
               placeholder="Re-enter your passcode"
               value={fields.confirmPasscode.value}
-              onChangeText={(text) => setValue('confirmPasscode', text.replace(/[^0-9]/g, ''))}
+              onChangeText={(text) =>
+                setValue('confirmPasscode', text.replace(/[^0-9]/g, ''))
+              }
               onBlur={getFieldProps('confirmPasscode').onBlur}
               error={errors.confirmPasscode}
               secureTextEntry={!showConfirmPasscode}

@@ -154,7 +154,7 @@ export interface SocietyJoinRequest {
   societyCode: string;
   userProfile: {
     fullName: string;
-    phoneNumber: string;
+    phone: string;
     email?: string;
     dateOfBirth?: string;
     photo?: string;

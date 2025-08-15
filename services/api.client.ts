@@ -3,22 +3,26 @@
  * Centralized HTTP client with authentication, error handling, and retry logic
  */
 
+import {
+  API_CONFIG,
+  API_ENDPOINTS,
+  API_ERRORS,
+  RETRY_CONFIG,
+} from '@/config/api.config';
+import { APIResponse } from '@/types/api';
+import {
+  SecureSessionStorage,
+  SecureTokenStorage,
+  clearAllSecureStorage,
+} from '@/utils/storage.secure';
+import NetInfo from '@react-native-community/netinfo';
 import axios, {
+  AxiosError,
   AxiosInstance,
   AxiosRequestConfig,
   AxiosResponse,
-  AxiosError,
   InternalAxiosRequestConfig,
 } from 'axios';
-import NetInfo from '@react-native-community/netinfo';
-import { API_CONFIG, API_ENDPOINTS, API_ERRORS, RETRY_CONFIG } from '@/config/api.config';
-import { 
-  SecureTokenStorage, 
-  SecureSessionStorage, 
-  SecureProfileStorage,
-  clearAllSecureStorage 
-} from '@/utils/storage.secure';
-import { APIResponse, APIError } from '@/types/api';
 
 /**
  * Custom API Error class
@@ -28,7 +32,12 @@ export class APIClientError extends Error {
   public code: string;
   public details?: any;
 
-  constructor(message: string, statusCode: number = 500, code: string = 'API_ERROR', details?: any) {
+  constructor(
+    message: string,
+    statusCode: number = 500,
+    code: string = 'API_ERROR',
+    details?: any,
+  ) {
     super(message);
     this.name = 'APIClientError';
     this.statusCode = statusCode;
@@ -83,7 +92,7 @@ class APIClient {
       (error: AxiosError) => {
         console.error('❌ Request interceptor error:', error);
         return Promise.reject(error);
-      }
+      },
     );
 
     // Response interceptor
@@ -94,26 +103,30 @@ class APIClient {
       },
       async (error: AxiosError) => {
         return this.handleResponseError(error);
-      }
+      },
     );
   }
 
   /**
    * Attach authentication token to request
    */
-  private async attachAuthToken(config: InternalAxiosRequestConfig): Promise<void> {
+  private async attachAuthToken(
+    config: InternalAxiosRequestConfig,
+  ): Promise<void> {
     const accessToken = SecureTokenStorage.getAccessToken();
-    
+
     if (accessToken) {
       // Check if token is expired or about to expire
-      if (SecureTokenStorage.isTokenExpired(API_CONFIG.TOKEN_REFRESH_THRESHOLD)) {
+      if (await SecureTokenStorage.isTokenExpiredAsync()) {
         try {
           const newToken = await this.refreshTokenIfNeeded();
           if (newToken) {
             config.headers.Authorization = `Bearer ${newToken}`;
           }
         } catch (error) {
-          console.warn('⚠️ Token refresh failed, proceeding with existing token');
+          console.warn(
+            '⚠️ Token refresh failed, proceeding with existing token',
+          );
           config.headers.Authorization = `Bearer ${accessToken}`;
         }
       } else {
@@ -138,11 +151,11 @@ class APIClient {
   private attachDeviceInfo(config: InternalAxiosRequestConfig): void {
     const deviceId = SecureSessionStorage.getDeviceId();
     const sessionId = SecureSessionStorage.getSessionId();
-    
+
     if (deviceId) {
       config.headers['X-Device-ID'] = deviceId;
     }
-    
+
     if (sessionId) {
       config.headers['X-Session-ID'] = sessionId;
     }
@@ -152,7 +165,9 @@ class APIClient {
    * Handle response errors with retry logic and token refresh
    */
   private async handleResponseError(error: AxiosError): Promise<never> {
-    const originalRequest = error.config as InternalAxiosRequestConfig & { _retry?: boolean };
+    const originalRequest = error.config as InternalAxiosRequestConfig & {
+      _retry?: boolean;
+    };
 
     this.logError(error);
 
@@ -160,11 +175,7 @@ class APIClient {
     if (!error.response) {
       const isConnected = await this.checkNetworkConnection();
       if (!isConnected) {
-        throw new APIClientError(
-          API_ERRORS.NETWORK_ERROR,
-          0,
-          'NETWORK_ERROR'
-        );
+        throw new APIClientError(API_ERRORS.NETWORK_ERROR, 0, 'NETWORK_ERROR');
       }
     }
 
@@ -173,7 +184,7 @@ class APIClient {
     // Handle 401 Unauthorized - Token expired
     if (status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;
-      
+
       try {
         const newToken = await this.refreshTokenIfNeeded();
         if (newToken && originalRequest.headers) {
@@ -192,7 +203,7 @@ class APIClient {
         API_ERRORS.FORBIDDEN,
         403,
         'FORBIDDEN',
-        error.response?.data
+        error.response?.data,
       );
     }
 
@@ -202,7 +213,7 @@ class APIClient {
         API_ERRORS.NOT_FOUND,
         404,
         'NOT_FOUND',
-        error.response?.data
+        error.response?.data,
       );
     }
 
@@ -212,14 +223,14 @@ class APIClient {
         API_ERRORS.VALIDATION_ERROR,
         422,
         'VALIDATION_ERROR',
-        error.response?.data
+        error.response?.data,
       );
     }
 
     // Handle server errors (5xx) with retry
     if (status && status >= 500 && !originalRequest._retry) {
       originalRequest._retry = true;
-      
+
       if (RETRY_CONFIG.retryCondition(error)) {
         await this.delay(RETRY_CONFIG.retryDelay(0));
         return this.axiosInstance(originalRequest);
@@ -228,24 +239,21 @@ class APIClient {
 
     // Handle timeout errors
     if (error.code === 'ECONNABORTED') {
-      throw new APIClientError(
-        API_ERRORS.TIMEOUT_ERROR,
-        408,
-        'TIMEOUT_ERROR'
-      );
+      throw new APIClientError(API_ERRORS.TIMEOUT_ERROR, 408, 'TIMEOUT_ERROR');
     }
 
     // Generic error handling
-    const errorMessage = error.response?.data?.message || 
-                        error.response?.data?.error?.message || 
-                        error.message || 
-                        API_ERRORS.UNKNOWN_ERROR;
+    const errorMessage =
+      error.response?.data?.message ||
+      error.response?.data?.error?.message ||
+      error.message ||
+      API_ERRORS.UNKNOWN_ERROR;
 
     throw new APIClientError(
       errorMessage,
       status || 500,
       error.response?.data?.error?.code || 'API_ERROR',
-      error.response?.data
+      error.response?.data,
     );
   }
 
@@ -286,19 +294,19 @@ class APIClient {
         {
           headers: API_CONFIG.DEFAULT_HEADERS,
           timeout: API_CONFIG.TIMEOUT,
-        }
+        },
       );
 
       const { data } = response.data;
       const tokens = {
         accessToken: data.accessToken,
         refreshToken: data.refreshToken,
-        expiresAt: Date.now() + (data.expiresIn * 1000),
+        expiresAt: Date.now() + data.expiresIn * 1000,
       };
 
       await SecureTokenStorage.storeTokens(tokens);
       console.log('✅ Token refreshed successfully');
-      
+
       return tokens.accessToken;
     } catch (error) {
       console.error('❌ Token refresh failed:', error);
@@ -313,7 +321,7 @@ class APIClient {
   private async handleAuthenticationFailure(): Promise<void> {
     console.log('🔓 Authentication failed, clearing all data');
     await clearAllSecureStorage();
-    
+
     // You might want to emit an event or call a callback here
     // to notify the app about authentication failure
   }
@@ -335,7 +343,7 @@ class APIClient {
    * Delay utility for retry logic
    */
   private delay(ms: number): Promise<void> {
-    return new Promise(resolve => setTimeout(resolve, ms));
+    return new Promise((resolve) => setTimeout(resolve, ms));
   }
 
   /**
@@ -343,7 +351,9 @@ class APIClient {
    */
   private logResponse(response: AxiosResponse): void {
     if (__DEV__) {
-      console.log(`✅ ${response.config.method?.toUpperCase()} ${response.config.url} - ${response.status}`);
+      console.log(
+        `✅ ${response.config.method?.toUpperCase()} ${response.config.url} - ${response.status}`,
+      );
     }
   }
 
@@ -356,8 +366,10 @@ class APIClient {
       const method = error.config?.method?.toUpperCase();
       const url = error.config?.url;
       const message = error.response?.data?.message || error.message;
-      
-      console.error(`❌ ${method} ${url} - ${status || 'Network Error'}: ${message}`);
+
+      console.error(
+        `❌ ${method} ${url} - ${status || 'Network Error'}: ${message}`,
+      );
     }
   }
 
@@ -366,7 +378,10 @@ class APIClient {
   /**
    * GET request
    */
-  public async get<T = any>(url: string, config?: AxiosRequestConfig): Promise<APIResponse<T>> {
+  public async get<T = any>(
+    url: string,
+    config?: AxiosRequestConfig,
+  ): Promise<APIResponse<T>> {
     const response = await this.axiosInstance.get<APIResponse<T>>(url, config);
     return response.data;
   }
@@ -375,11 +390,15 @@ class APIClient {
    * POST request
    */
   public async post<T = any>(
-    url: string, 
-    data?: any, 
-    config?: AxiosRequestConfig
+    url: string,
+    data?: any,
+    config?: AxiosRequestConfig,
   ): Promise<APIResponse<T>> {
-    const response = await this.axiosInstance.post<APIResponse<T>>(url, data, config);
+    const response = await this.axiosInstance.post<APIResponse<T>>(
+      url,
+      data,
+      config,
+    );
     return response.data;
   }
 
@@ -387,11 +406,15 @@ class APIClient {
    * PUT request
    */
   public async put<T = any>(
-    url: string, 
-    data?: any, 
-    config?: AxiosRequestConfig
+    url: string,
+    data?: any,
+    config?: AxiosRequestConfig,
   ): Promise<APIResponse<T>> {
-    const response = await this.axiosInstance.put<APIResponse<T>>(url, data, config);
+    const response = await this.axiosInstance.put<APIResponse<T>>(
+      url,
+      data,
+      config,
+    );
     return response.data;
   }
 
@@ -399,19 +422,29 @@ class APIClient {
    * PATCH request
    */
   public async patch<T = any>(
-    url: string, 
-    data?: any, 
-    config?: AxiosRequestConfig
+    url: string,
+    data?: any,
+    config?: AxiosRequestConfig,
   ): Promise<APIResponse<T>> {
-    const response = await this.axiosInstance.patch<APIResponse<T>>(url, data, config);
+    const response = await this.axiosInstance.patch<APIResponse<T>>(
+      url,
+      data,
+      config,
+    );
     return response.data;
   }
 
   /**
    * DELETE request
    */
-  public async delete<T = any>(url: string, config?: AxiosRequestConfig): Promise<APIResponse<T>> {
-    const response = await this.axiosInstance.delete<APIResponse<T>>(url, config);
+  public async delete<T = any>(
+    url: string,
+    config?: AxiosRequestConfig,
+  ): Promise<APIResponse<T>> {
+    const response = await this.axiosInstance.delete<APIResponse<T>>(
+      url,
+      config,
+    );
     return response.data;
   }
 
@@ -421,7 +454,7 @@ class APIClient {
   public async upload<T = any>(
     url: string,
     file: FormData,
-    config?: AxiosRequestConfig
+    config?: AxiosRequestConfig,
   ): Promise<APIResponse<T>> {
     const uploadConfig: AxiosRequestConfig = {
       ...config,
@@ -432,7 +465,11 @@ class APIClient {
       timeout: 60000, // 1 minute for uploads
     };
 
-    const response = await this.axiosInstance.post<APIResponse<T>>(url, file, uploadConfig);
+    const response = await this.axiosInstance.post<APIResponse<T>>(
+      url,
+      file,
+      uploadConfig,
+    );
     return response.data;
   }
 

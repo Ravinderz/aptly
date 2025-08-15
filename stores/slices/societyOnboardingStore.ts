@@ -75,7 +75,7 @@ interface SocietyOnboardingStoreState extends BaseStore {
   // Onboarding data
   userProfile: {
     fullName: string;
-    phoneNumber: string;
+    phone: string;
     email: string;
     dateOfBirth: string;
     photo: string;
@@ -351,12 +351,12 @@ export const useSocietyOnboardingStore = create<SocietyOnboardingStore>()(
         setVerificationRequest: (request: SocietyVerificationRequest) =>
           set((state) => {
             state.verificationRequest = request;
-            state.userProfile.phoneNumber = request.phoneNumber;
+            state.userProfile.phone = request.phoneNumber;
           }),
 
         verifySociety: async (request: SocietyVerificationRequest) => {
           console.log('🏪 Store: Starting society verification', request);
-          
+
           set((state) => {
             state.verificationLoading = true;
             state.verificationError = null;
@@ -371,11 +371,17 @@ export const useSocietyOnboardingStore = create<SocietyOnboardingStore>()(
               state.verificationLoading = false;
 
               if (result.success && result.data) {
-                console.log('🏪 Store: Processing successful verification response', result.data);
+                console.log(
+                  '🏪 Store: Processing successful verification response',
+                  result.data,
+                );
                 state.verificationResponse = result.data;
 
                 if (result.data.success && result.data.data) {
-                  console.log('🏪 Store: Society found and verified', result.data.data.society);
+                  console.log(
+                    '🏪 Store: Society found and verified',
+                    result.data.data.society,
+                  );
                   // Society found and verified
                   state.selectedSociety = result.data.data.society;
 
@@ -384,9 +390,11 @@ export const useSocietyOnboardingStore = create<SocietyOnboardingStore>()(
                   //   state.hasExistingAssociations = true;
                   // }
 
-                  // For society-selection.tsx, don't auto-advance 
+                  // For society-selection.tsx, don't auto-advance
                   // Let the UI handle navigation when user clicks "Continue"
-                  console.log('🏪 Store: Society verification successful, waiting for user action');
+                  console.log(
+                    '🏪 Store: Society verification successful, waiting for user action',
+                  );
                 } else {
                   console.log('🏪 Store: Society not found', result.data.error);
                   // Society not found, go to search
@@ -970,8 +978,12 @@ export const useSocietyOnboardingActions = () => {
     (state) => state.loadMoreResults,
   );
   const clearSearch = useSocietyOnboardingStore((state) => state.clearSearch);
-  const clearVerification = useSocietyOnboardingStore((state) => state.clearVerification);
-  const clearSelection = useSocietyOnboardingStore((state) => state.clearSelection);
+  const clearVerification = useSocietyOnboardingStore(
+    (state) => state.clearVerification,
+  );
+  const clearSelection = useSocietyOnboardingStore(
+    (state) => state.clearSelection,
+  );
   const selectSociety = useSocietyOnboardingStore(
     (state) => state.selectSociety,
   );
