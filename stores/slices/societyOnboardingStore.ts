@@ -355,6 +355,8 @@ export const useSocietyOnboardingStore = create<SocietyOnboardingStore>()(
           }),
 
         verifySociety: async (request: SocietyVerificationRequest) => {
+          console.log('🏪 Store: Starting society verification', request);
+          
           set((state) => {
             state.verificationLoading = true;
             state.verificationError = null;
@@ -363,14 +365,17 @@ export const useSocietyOnboardingStore = create<SocietyOnboardingStore>()(
 
           try {
             const result = await SocietyService.verifySociety(request);
+            console.log('🏪 Store: Verification API result', result);
 
             set((state) => {
               state.verificationLoading = false;
 
               if (result.success && result.data) {
+                console.log('🏪 Store: Processing successful verification response', result.data);
                 state.verificationResponse = result.data;
 
                 if (result.data.success && result.data.data) {
+                  console.log('🏪 Store: Society found and verified', result.data.data.society);
                   // Society found and verified
                   state.selectedSociety = result.data.data.society;
 
@@ -379,19 +384,18 @@ export const useSocietyOnboardingStore = create<SocietyOnboardingStore>()(
                   //   state.hasExistingAssociations = true;
                   // }
 
-                  // Auto-advance to next step based on verification result
-                  if (result.data.data.society) {
-                    get().goToStep('details');
-                  } else {
-                    get().goToStep('completion');
-                  }
+                  // For society-selection.tsx, don't auto-advance 
+                  // Let the UI handle navigation when user clicks "Continue"
+                  console.log('🏪 Store: Society verification successful, waiting for user action');
                 } else {
+                  console.log('🏪 Store: Society not found', result.data.error);
                   // Society not found, go to search
                   state.verificationError =
                     result.data.error?.message || 'Society not found';
                   get().goToStep('search');
                 }
               } else {
+                console.log('🏪 Store: Verification failed', result.error);
                 state.verificationError = result.error || 'Verification failed';
               }
             });
@@ -399,6 +403,7 @@ export const useSocietyOnboardingStore = create<SocietyOnboardingStore>()(
             // Return the result for UI handling
             return result;
           } catch (error: any) {
+            console.error('❌ Store: Verification error', error);
             set((state) => {
               state.verificationLoading = false;
               state.verificationError = error.message || 'Network error';
@@ -518,7 +523,9 @@ export const useSocietyOnboardingStore = create<SocietyOnboardingStore>()(
         selectSociety: (society: SocietyInfo) =>
           set((state) => {
             state.selectedSociety = society;
-            get().goToStep('details');
+            // Don't auto-advance step - let the UI handle navigation
+            // This allows the society-selection screen to show confirmation
+            // get().goToStep('details');
           }),
 
         loadSocietyDetails: async (societyId: string) => {
@@ -963,6 +970,8 @@ export const useSocietyOnboardingActions = () => {
     (state) => state.loadMoreResults,
   );
   const clearSearch = useSocietyOnboardingStore((state) => state.clearSearch);
+  const clearVerification = useSocietyOnboardingStore((state) => state.clearVerification);
+  const clearSelection = useSocietyOnboardingStore((state) => state.clearSelection);
   const selectSociety = useSocietyOnboardingStore(
     (state) => state.selectSociety,
   );
@@ -1002,6 +1011,8 @@ export const useSocietyOnboardingActions = () => {
       searchSocieties,
       loadMoreResults,
       clearSearch,
+      clearVerification,
+      clearSelection,
       selectSociety,
       updateUserProfile,
       updateResidenceDetails,
@@ -1022,6 +1033,8 @@ export const useSocietyOnboardingActions = () => {
       searchSocieties,
       loadMoreResults,
       clearSearch,
+      clearVerification,
+      clearSelection,
       selectSociety,
       updateUserProfile,
       updateResidenceDetails,

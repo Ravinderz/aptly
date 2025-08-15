@@ -24,6 +24,7 @@ import { showErrorAlert } from '@/utils/alert';
 import { responsive } from '@/utils/responsive';
 import { useRouter } from 'expo-router';
 import { useCallback, useEffect, useState } from 'react';
+import { useFocusEffect } from '@react-navigation/native';
 import {
   ActivityIndicator,
   FlatList,
@@ -58,9 +59,7 @@ type NameSearchForm = z.infer<typeof nameSearchSchema>;
 export default function SocietySelection() {
   const router = useRouter();
   const [searchMode, setSearchMode] = useState<'code' | 'name'>('code');
-  const [selectedSociety, setSelectedSociety] = useState<SocietyInfo | null>(
-    null,
-  );
+  // Remove local selectedSociety state - use store state instead
 
   // Debug logging
   console.log('🏠 Society Selection rendered', {
@@ -77,6 +76,19 @@ export default function SocietySelection() {
   );
   const searchError = useSocietyOnboardingStore((state) => state.searchError);
   const searchTotal = useSocietyOnboardingStore((state) => state.searchTotal);
+  
+  // Verification state from store
+  const verificationLoading = useSocietyOnboardingStore(
+    (state) => state.verificationLoading,
+  );
+  const verificationError = useSocietyOnboardingStore(
+    (state) => state.verificationError,
+  );
+  
+  // Selected society from store (single source of truth)
+  const selectedSociety = useSocietyOnboardingStore(
+    (state) => state.selectedSociety,
+  );
 
   // Debug store state
   console.log('🏪 Store state:', {
@@ -84,9 +96,12 @@ export default function SocietySelection() {
     searchLoading,
     searchError,
     searchTotal,
+    verificationLoading,
+    verificationError,
+    selectedSociety: selectedSociety?.name || null,
   });
 
-  const { searchSocieties, verifySociety, selectSociety, clearSearch } =
+  const { searchSocieties, verifySociety, selectSociety, clearSearch, clearVerification, clearSelection, goToStep } =
     useSocietyOnboardingActions();
 
   // Form validation for code search
@@ -117,36 +132,55 @@ export default function SocietySelection() {
   // Handle search mode toggle
   const handleSearchModeChange = useCallback(
     (mode: 'code' | 'name') => {
+      console.log('🔄 Switching search mode to:', mode);
       setSearchMode(mode);
-      setSelectedSociety(null);
-      // Clear form data when switching modes
+      
+      // Clear verification and selection state when switching modes
+      // This prevents showing stale verification results for the wrong mode
+      if (selectedSociety) {
+        console.log('🧹 Clearing verification state on mode switch');
+        clearVerification();
+        clearSelection();
+      }
+      
+      // Clear form data and search results when switching modes
       if (mode === 'code') {
-        nameForm.fields.societyName.value &&
+        if (nameForm.fields.societyName.value) {
           nameForm.setValue?.('societyName', '');
+        }
+        clearSearch(); // Clear search results when switching to code mode
       } else {
-        codeForm.fields.societyCode.value &&
+        if (codeForm.fields.societyCode.value) {
           codeForm.setValue?.('societyCode', '');
+        }
+        clearSearch(); // Clear search results when switching to name mode
       }
     },
-    [codeForm, nameForm],
+    [codeForm, nameForm, selectedSociety, clearSearch, clearVerification, clearSelection],
   );
 
   // Handle code-based verification
   const handleCodeVerification = useCallback(
     async (formData: CodeSearchForm) => {
+      const societyCode = formData.societyCode.toUpperCase();
+      console.log('🔐 Starting society code verification:', societyCode);
+      
       try {
-        const result = await verifySociety({
+        // The store handles the verification and state updates
+        await verifySociety({
           phoneNumber: '', // Will be handled by store
-          societyCode: formData.societyCode.toUpperCase(),
+          societyCode,
         });
-
-        if (result && result.society) {
-          setSelectedSociety(result.society);
-        }
+        
+        console.log('✅ Verification completed successfully');
+        // Note: No need to manually update selectedSociety - store handles this
+        // The UI will automatically react to store state changes
+        
       } catch (error: any) {
+        console.error('❌ Verification failed:', error);
         showErrorAlert(
-          'Error',
-          error.message || 'Failed to verify society code',
+          'Verification Failed',
+          error.message || 'Failed to verify society code. Please check the code and try again.',
         );
       }
     },
@@ -189,16 +223,65 @@ export default function SocietySelection() {
 
   // Handle society selection from search results
   const handleSocietySelect = useCallback((society: SocietyInfo) => {
-    setSelectedSociety(society);
-  }, []);
+    console.log('🏢 Selecting society from search results:', society.name);
+    // Use store action instead of local state
+    selectSociety(society);
+  }, [selectSociety]);
 
   // Handle continue to next screen
   const handleContinue = useCallback(() => {
     if (!selectedSociety) return;
 
+    // Ensure the society is selected and advance the onboarding step
     selectSociety(selectedSociety);
+    goToStep('details');
+    
+    // Navigate to next screen
     router.push('/auth/society-profile-complete');
-  }, [selectedSociety, selectSociety, router]);
+  }, [selectedSociety, selectSociety, goToStep, router]);
+
+  // Navigation cleanup effect - clear state when returning from back navigation or coming fresh
+  useFocusEffect(
+    useCallback(() => {
+      console.log('🏠 Society Selection screen focused', {
+        selectedSociety: selectedSociety?.name,
+        codeFormValue: codeForm.fields.societyCode.value,
+        nameFormValue: nameForm.fields.societyName.value,
+        searchMode,
+      });
+      
+      // Clear state if we have verification/selection data but no corresponding form input
+      // This indicates the user either:
+      // 1. Came from welcome page (fresh start)
+      // 2. Navigated back from next screen
+      // 3. Has stale data from previous session
+      
+      const hasVerificationData = selectedSociety;
+      const hasCorrespondingInput = 
+        (searchMode === 'code' && codeForm.fields.societyCode.value.trim()) ||
+        (searchMode === 'name' && nameForm.fields.societyName.value.trim());
+      
+      // If we have verification data but no corresponding form input, clear it
+      if (hasVerificationData && !hasCorrespondingInput) {
+        console.log('🧹 Clearing verification state - no corresponding form input');
+        clearVerification();
+        clearSelection();
+        clearSearch();
+        
+        // Reset to verification step to ensure clean state
+        goToStep('verification');
+      }
+    }, [
+      selectedSociety,
+      searchMode,
+      codeForm.fields.societyCode.value,
+      nameForm.fields.societyName.value,
+      clearVerification,
+      clearSelection,
+      clearSearch,
+      goToStep,
+    ])
+  );
 
   // Auto-search when name input changes with debouncing
   useEffect(() => {
@@ -386,11 +469,33 @@ export default function SocietySelection() {
               />
               <Button
                 onPress={() => codeForm.handleSubmit(handleCodeVerification)}
-                loading={codeForm.isSubmitting || searchLoading}
-                disabled={!codeForm.isValid || codeForm.isSubmitting}
+                loading={codeForm.isSubmitting || verificationLoading}
+                disabled={!codeForm.isValid || codeForm.isSubmitting || verificationLoading}
                 className="mt-4">
-                Verify Society Code
+                {verificationLoading ? 'Verifying...' : 'Verify Society Code'}
               </Button>
+              
+              {/* Success message for code verification */}
+              {!verificationLoading && !verificationError && selectedSociety && searchMode === 'code' && (
+                <View className="bg-success/5 border border-success/20 rounded-xl p-4 mt-4">
+                  <View className="flex-row items-center mb-2">
+                    <LucideIcons
+                      name="check-circle"
+                      size={20}
+                      color="#10B981"
+                    />
+                    <Text className="text-success font-semibold ml-2">
+                      Society Code Verified!
+                    </Text>
+                  </View>
+                  <Text className="text-success text-sm">
+                    Found: {selectedSociety.name}
+                  </Text>
+                  <Text className="text-text-secondary text-xs mt-1">
+                    {selectedSociety.address.street}, {selectedSociety.address.city}
+                  </Text>
+                </View>
+              )}
             </View>
           ) : (
             <View className="mb-6">
@@ -405,6 +510,35 @@ export default function SocietySelection() {
                 helperText="Enter society name or area for instant search"
                 icon={<LucideIcons name="search" size={20} color="#6b7280" />}
               />
+            </View>
+          )}
+
+          {/* Verification Error */}
+          {searchMode === 'code' && verificationError && (
+            <View className="bg-error/5 border border-error/20 rounded-xl p-4 mb-4">
+              <View className="flex-row items-center mb-2">
+                <LucideIcons
+                  name="alert-circle"
+                  size={20}
+                  color="#EF4444"
+                />
+                <Text className="text-error font-semibold ml-2">
+                  Verification Failed
+                </Text>
+              </View>
+              <Text className="text-error text-sm mb-2">{verificationError}</Text>
+              <TouchableOpacity
+                onPress={() => {
+                  const codeValue = codeForm.fields.societyCode.value.trim();
+                  if (codeValue.length >= 4) {
+                    handleCodeVerification({ societyCode: codeValue });
+                  }
+                }}
+                className="bg-error/10 rounded-lg px-3 py-2 self-start">
+                <Text className="text-error text-sm font-medium">
+                  Try Again
+                </Text>
+              </TouchableOpacity>
             </View>
           )}
 
