@@ -167,14 +167,17 @@ export function useFormValidation<T extends Record<string, any>>(
       const fieldSchema = (schema as any).shape?.[field];
       if (!fieldSchema) return true;
 
-      // Use provided value or get current field value
+      // Use provided value or get current field value from state
       let fieldValue = currentValue;
-      if (currentValue === undefined) {
-        // Get value from the current state ref to avoid dependency issues
-        setFormState((prev) => {
-          fieldValue = prev.fields[field]?.value;
-          return prev; // Don't modify state in this call
-        });
+      if (fieldValue === undefined) {
+        // Safely get current value from formState
+        fieldValue = formState.fields[field]?.value;
+      }
+      
+      // Skip validation if we still don't have a valid value
+      if (fieldValue === undefined) {
+        console.log(`🔍 Skipping validation for ${String(field)}: value is undefined`);
+        return true; // Don't show error for undefined values
       }
       
       console.log(`🔍 Validating field ${String(field)}:`, fieldValue);
@@ -205,7 +208,7 @@ export function useFormValidation<T extends Record<string, any>>(
 
       return result.isValid;
     },
-    [schema, calculateFormValidity], // Remove formState.fields dependency to prevent circular dependencies
+    [schema, calculateFormValidity, formState.fields], // Include formState.fields to ensure current values
   );
 
   const validateEntireForm = useCallback(async (): Promise<{
@@ -266,7 +269,7 @@ export function useFormValidation<T extends Record<string, any>>(
       setFormState((prev) => {
         // Check if we should validate based on previous state
         shouldValidate =
-          validateOnChange || (revalidateOnChange && prev.fields[field].error);
+          validateOnChange || (revalidateOnChange && Boolean(prev.fields[field].error));
 
         const newFields = {
           ...prev.fields,
@@ -371,7 +374,7 @@ export function useFormValidation<T extends Record<string, any>>(
         const newTouchedFields = new Set(prev.touchedFields);
         newTouchedFields.add(field);
 
-        return {
+        const updatedState = {
           ...prev,
           fields: {
             ...prev.fields,
@@ -382,14 +385,21 @@ export function useFormValidation<T extends Record<string, any>>(
           },
           touchedFields: newTouchedFields,
         };
-      });
 
-      if (validateOnBlur) {
-        // Schedule validation for next tick to ensure state is updated
-        setTimeout(() => {
-          validateSingleField(field);
-        }, 0);
-      }
+        // If validation on blur is enabled, trigger it with the current field value
+        if (validateOnBlur) {
+          // Use the current field value directly from the updated state
+          const currentValue = updatedState.fields[field]?.value;
+          if (currentValue !== undefined) {
+            // Schedule validation for next tick with the current value
+            setTimeout(() => {
+              validateSingleField(field, currentValue);
+            }, 0);
+          }
+        }
+
+        return updatedState;
+      });
     },
     [validateOnBlur, validateSingleField],
   );
