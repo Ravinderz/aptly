@@ -89,13 +89,38 @@ export const Button: React.FC<ButtonProps> = ({
           className="mr-2"
         />
       )}
-      {typeof children === 'string' ? (
-        <Text className={cn(textVariants[variant], textSizes[size])}>
-          {children}
-        </Text>
-      ) : (
-        children
-      )}
+      {(() => {
+        // Handle string children (simple text)
+        if (typeof children === 'string') {
+          return (
+            <Text className={cn(textVariants[variant], textSizes[size])}>
+              {children}
+            </Text>
+          );
+        }
+        
+        // Handle single React element (custom components like Views, Icons, etc.)
+        if (React.isValidElement(children)) {
+          return children;
+        }
+        
+        // Handle mixed content (template literals, arrays, etc.) 
+        // This covers cases like "Continue with {selectedSociety.name}"
+        const hasTextContent = React.Children.toArray(children).some(
+          child => typeof child === 'string' || typeof child === 'number'
+        );
+        
+        if (hasTextContent) {
+          return (
+            <Text className={cn(textVariants[variant], textSizes[size])}>
+              {children}
+            </Text>
+          );
+        }
+        
+        // For complex React nodes without text content, render as-is
+        return children;
+      })()}
     </TouchableOpacity>
   );
 };
