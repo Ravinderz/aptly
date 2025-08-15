@@ -304,16 +304,6 @@ export class RestSocietyService {
     request: SocietyVerificationRequest,
   ): Promise<SocietyServiceResult<SocietyVerificationResponse>> {
     try {
-      // Validate inputs
-      const phoneValidation = phoneNumberSchema.safeParse(request.phoneNumber);
-      if (!phoneValidation.success) {
-        return {
-          success: false,
-          error: phoneValidation.error.issues[0].message,
-          code: 'INVALID_PHONE',
-        };
-      }
-
       if (request.societyCode) {
         const codeValidation = societyCodeSchema.safeParse(request.societyCode);
         if (!codeValidation.success) {
@@ -325,37 +315,28 @@ export class RestSocietyService {
         }
       }
 
-      // Build request payload
-      const requestData = {
-        phoneNumber: request.phoneNumber,
-        societyCode: request.societyCode?.toUpperCase(),
-        location: request.location,
-      };
+      // Build query parameters
+      const params = new URLSearchParams();
+
+      params.append('code', request.societyCode);
 
       // Make API call
-      const response = await apiClient.post<
-        SocietyVerificationResponse['data']
-      >(API_ENDPOINTS.SOCIETY.VERIFY, requestData);
+      const response = await apiClient.get<SocietySearchResponse['data']>(
+        `${API_ENDPOINTS.SOCIETY.VERIFY}?${params.toString()}`,
+      );
 
       if (response.success && response.data) {
         const verificationResponse: SocietyVerificationResponse = {
           success: true,
-          data: response.data,
+          data: {
+            society: response.data.societies[0] || null,
+          },
         };
 
         // Store society info if found
-        if (response.data.society) {
-          this.currentSociety = response.data.society;
-          SecureProfileStorage.storeProfile(response.data.society, 'society');
-        }
-
-        // Store association if found
-        if (response.data.userAssociation) {
-          this.userAssociations = [response.data.userAssociation];
-          SecureProfileStorage.storeProfile(
-            [response.data.userAssociation],
-            'societyAssociations',
-          );
+        if (response.data.societies && response.data.societies.length > 0) {
+          this.currentSociety = response.data.societies[0];
+          SecureProfileStorage.storeProfile(this.currentSociety, 'society');
         }
 
         return {

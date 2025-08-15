@@ -52,16 +52,9 @@ export interface SocietyVerificationResponse {
   success: boolean;
   data?: {
     society: SocietyInfo;
-    userAssociation?: UserSocietyAssociation;
-    requiresOnboarding: boolean;
-    existingResident: boolean;
   };
   error?: {
-    code:
-      | 'SOCIETY_NOT_FOUND'
-      | 'INVALID_CODE'
-      | 'PHONE_NOT_ASSOCIATED'
-      | 'NETWORK_ERROR';
+    code: 'SOCIETY_NOT_FOUND' | 'INVALID_CODE' | 'NETWORK_ERROR';
     message: string;
     suggestions?: string[];
   };
