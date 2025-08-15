@@ -356,7 +356,7 @@ export default function Welcome() {
                 '🔘 Welcome: Get Started button pressed - navigating to email-registration',
               );
               router.push({
-                pathname: '/auth/society-onboarding',
+                pathname: '/auth/society-selection',
                 params: { mode: 'signup' },
               });
             }}

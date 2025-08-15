@@ -125,6 +125,11 @@ export default function SocietySearchFlow() {
     }
   }, [hasMore, loading, loadMoreResults]);
 
+  // Create stable callbacks for form submission
+  const handleFormSubmit = useCallback(() => {
+    handleSubmit(handleTextSearch);
+  }, [handleSubmit, handleTextSearch]);
+
   const renderSocietyItem = useCallback(({ item }: { item: SocietyInfo }) => (
     <TouchableOpacity
       onPress={() => handleSocietySelect(item)}
@@ -274,11 +279,11 @@ export default function SocietySearchFlow() {
                 placeholder="e.g., Green Valley Apartments, DLF Phase 1"
                 autoFocus={searchMode === 'text'}
                 helperText="Enter the full or partial name of your society"
-                onSubmitEditing={useCallback(() => handleSubmit(handleTextSearch), [handleSubmit, handleTextSearch])}
+                onSubmitEditing={handleFormSubmit}
               />
 
               <Button
-                onPress={useCallback(() => handleSubmit(handleTextSearch), [handleSubmit, handleTextSearch])}
+                onPress={handleFormSubmit}
                 loading={isSubmitting || loading}
                 disabled={!isValid || isSubmitting}
                 className="mb-4">

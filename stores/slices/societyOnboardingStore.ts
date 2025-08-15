@@ -395,11 +395,15 @@ export const useSocietyOnboardingStore = create<SocietyOnboardingStore>()(
                 state.verificationError = result.error || 'Verification failed';
               }
             });
+
+            // Return the result for UI handling
+            return result;
           } catch (error: any) {
             set((state) => {
               state.verificationLoading = false;
               state.verificationError = error.message || 'Network error';
             });
+            throw error;
           }
         },
 
@@ -420,6 +424,8 @@ export const useSocietyOnboardingStore = create<SocietyOnboardingStore>()(
           request: SocietySearchRequest,
           append = false,
         ) => {
+          console.log('🏪 Store: Starting society search', { request, append });
+          
           set((state) => {
             state.searchLoading = true;
             state.searchError = null;
@@ -433,12 +439,14 @@ export const useSocietyOnboardingStore = create<SocietyOnboardingStore>()(
 
           try {
             const result = await SocietyService.searchSocieties(request);
+            console.log('🏪 Store: Search API result', result);
 
             set((state) => {
               state.searchLoading = false;
 
               if (result.success && result.data?.success && result.data.data) {
                 const { societies, total, hasMore } = result.data.data;
+                console.log('🏪 Store: Updating search results', { societies, total, hasMore });
 
                 if (append) {
                   state.searchResults.push(...societies);
@@ -449,14 +457,23 @@ export const useSocietyOnboardingStore = create<SocietyOnboardingStore>()(
                 state.searchTotal = total;
                 state.searchHasMore = hasMore;
               } else {
-                state.searchError = result.error || 'Search failed';
+                const errorMsg = result.error || result.data?.error?.message || 'Search failed';
+                console.log('🏪 Store: Search failed', errorMsg);
+                state.searchError = errorMsg;
               }
             });
+
+            // Return the result for UI handling
+            return result;
           } catch (error: any) {
+            console.error('🏪 Store: Search error', error);
+            
             set((state) => {
               state.searchLoading = false;
               state.searchError = error.message || 'Network error';
             });
+            
+            throw error;
           }
         },
 
@@ -924,27 +941,63 @@ export const useSocietyOnboardingSubmission = () =>
   }));
 
 export const useSocietyOnboardingActions = () => {
-  const actions = useMemo(() => {
-    const store = useSocietyOnboardingStore.getState();
-    return {
-      goToStep: store.goToStep,
-      nextStep: store.nextStep,
-      previousStep: store.previousStep,
-      resetFlow: store.resetFlow,
-      verifySociety: store.verifySociety,
-      searchSocieties: store.searchSocieties,
-      loadMoreResults: store.loadMoreResults,
-      selectSociety: store.selectSociety,
-      updateUserProfile: store.updateUserProfile,
-      updateResidenceDetails: store.updateResidenceDetails,
-      addEmergencyContact: store.addEmergencyContact,
-      updateEmergencyContact: store.updateEmergencyContact,
-      removeEmergencyContact: store.removeEmergencyContact,
-      updateConsentAgreements: store.updateConsentAgreements,
-      validateStep: store.validateStep,
-      submitJoinRequest: store.submitJoinRequest,
-      retrySubmission: store.retrySubmission,
-    };
-  }, []);
-  return useMemo(() => actions, [actions]); // Return stable reference to actions
+  // Using direct selectors to ensure we get the latest actions
+  const goToStep = useSocietyOnboardingStore((state) => state.goToStep);
+  const nextStep = useSocietyOnboardingStore((state) => state.nextStep);
+  const previousStep = useSocietyOnboardingStore((state) => state.previousStep);
+  const resetFlow = useSocietyOnboardingStore((state) => state.resetFlow);
+  const verifySociety = useSocietyOnboardingStore((state) => state.verifySociety);
+  const searchSocieties = useSocietyOnboardingStore((state) => state.searchSocieties);
+  const loadMoreResults = useSocietyOnboardingStore((state) => state.loadMoreResults);
+  const clearSearch = useSocietyOnboardingStore((state) => state.clearSearch);
+  const selectSociety = useSocietyOnboardingStore((state) => state.selectSociety);
+  const updateUserProfile = useSocietyOnboardingStore((state) => state.updateUserProfile);
+  const updateResidenceDetails = useSocietyOnboardingStore((state) => state.updateResidenceDetails);
+  const addEmergencyContact = useSocietyOnboardingStore((state) => state.addEmergencyContact);
+  const updateEmergencyContact = useSocietyOnboardingStore((state) => state.updateEmergencyContact);
+  const removeEmergencyContact = useSocietyOnboardingStore((state) => state.removeEmergencyContact);
+  const updateConsentAgreements = useSocietyOnboardingStore((state) => state.updateConsentAgreements);
+  const validateStep = useSocietyOnboardingStore((state) => state.validateStep);
+  const submitJoinRequest = useSocietyOnboardingStore((state) => state.submitJoinRequest);
+  const retrySubmission = useSocietyOnboardingStore((state) => state.retrySubmission);
+
+  return useMemo(() => ({
+    goToStep,
+    nextStep,
+    previousStep,
+    resetFlow,
+    verifySociety,
+    searchSocieties,
+    loadMoreResults,
+    clearSearch,
+    selectSociety,
+    updateUserProfile,
+    updateResidenceDetails,
+    addEmergencyContact,
+    updateEmergencyContact,
+    removeEmergencyContact,
+    updateConsentAgreements,
+    validateStep,
+    submitJoinRequest,
+    retrySubmission,
+  }), [
+    goToStep,
+    nextStep,
+    previousStep,
+    resetFlow,
+    verifySociety,
+    searchSocieties,
+    loadMoreResults,
+    clearSearch,
+    selectSociety,
+    updateUserProfile,
+    updateResidenceDetails,
+    addEmergencyContact,
+    updateEmergencyContact,
+    removeEmergencyContact,
+    updateConsentAgreements,
+    validateStep,
+    submitJoinRequest,
+    retrySubmission,
+  ]);
 };

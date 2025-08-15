@@ -434,7 +434,7 @@ export class RestSocietyService {
       const params = new URLSearchParams();
 
       if (request.query) {
-        params.append('q', request.query);
+        params.append('query', request.query);
       }
 
       if (request.location) {

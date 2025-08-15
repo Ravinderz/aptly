@@ -99,15 +99,6 @@ export default function SocietyOnboarding() {
     [phoneNumber, verifySociety],
   );
 
-  const handleSearchFlow = React.useCallback(() => {
-    // if (!phoneNumber) {
-    //   showErrorAlert('Error', 'Phone number is required');
-    //   return;
-    // }
-
-    // Navigate to search flow - phoneNumber is already stored in Zustand
-    router.push('/auth/society-search-flow');
-  }, [router]);
 
   const handleSkipForNow = React.useCallback(() => {
     // For MVP, allow users to skip society selection
@@ -190,7 +181,7 @@ export default function SocietyOnboarding() {
 
               {/* Search Option */}
               <TouchableOpacity
-                onPress={() => setSelectedOption('search')}
+                onPress={() => router.push('/auth/society-selection')}
                 className="bg-surface border border-divider rounded-xl p-6 mb-6"
                 activeOpacity={0.8}>
                 <View className="flex-row items-center">
@@ -199,10 +190,10 @@ export default function SocietyOnboarding() {
                   </View>
                   <View className="flex-1">
                     <Text className="text-text-primary font-semibold text-lg mb-1">
-                      Search for My Society
+                      Find My Society
                     </Text>
                     <Text className="text-text-secondary text-sm">
-                      Find your society by name or location
+                      Search by code or name to get started
                     </Text>
                   </View>
                   <LucideIcons name="chevron-right" size={20} color="#9CA3AF" />
@@ -247,31 +238,6 @@ export default function SocietyOnboarding() {
             </View>
           )}
 
-          {/* Search Flow Button */}
-          {selectedOption === 'search' && (
-            <View className="mb-6">
-              <TouchableOpacity
-                onPress={() => setSelectedOption(null)}
-                className="flex-row items-center mb-4">
-                <LucideIcons name="arrow-left" size={20} color="#6366f1" />
-                <Text className="text-primary font-medium ml-2">
-                  Back to options
-                </Text>
-              </TouchableOpacity>
-
-              <Text className="text-text-primary font-semibold text-lg mb-4">
-                Search for Your Society
-              </Text>
-              <Text className="text-text-secondary mb-6">
-                We&apos;ll help you find your society by name, location, or
-                other details.
-              </Text>
-
-              <Button onPress={handleSearchFlow} className="mb-4">
-                Start Search
-              </Button>
-            </View>
-          )}
 
           {/* Skip Option */}
           <View className="mt-8 pt-8 border-t border-divider">

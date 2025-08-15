@@ -142,9 +142,9 @@ export default function UserOnboarding() {
             'Your profile has been created successfully.',
           );
 
-          // Navigate to society onboarding
+          // Navigate to simplified society selection
           setTimeout(() => {
-            router.push('/auth/society-onboarding');
+            router.push('/auth/society-selection');
           }, 500);
         } else {
           showErrorAlert(

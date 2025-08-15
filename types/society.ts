@@ -26,6 +26,8 @@ export interface SocietyInfo {
     registeredResidents: number;
     occupancyRate: number;
   };
+  // Backward compatibility
+  totalFlats?: number;
   amenities: string[];
   rules: string[];
   images?: string[];
